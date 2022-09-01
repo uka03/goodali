@@ -1,0 +1,379 @@
+import 'package:audio_service/audio_service.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/custom_elevated_button.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
+import 'package:goodali/controller/audio_player_handler.dart';
+import 'package:goodali/controller/page_manager.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/controller/progress_notifier.dart';
+import 'package:goodali/controller/service_locator.dart';
+import 'package:goodali/models/media_state.dart';
+import 'package:goodali/models/products_model.dart';
+import 'package:goodali/screens/payment/cart_screen.dart';
+import 'package:iconly/iconly.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:goodali/Utils/utils.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
+class IntroAudio extends StatefulWidget {
+  final Products products;
+  final List<Products> productsList;
+  const IntroAudio(
+      {Key? key, required this.products, required this.productsList})
+      : super(key: key);
+
+  @override
+  State<IntroAudio> createState() => _IntroAudioState();
+}
+
+class _IntroAudioState extends State<IntroAudio> {
+  late Stream<ProgressBarState> _durationState;
+
+  AudioPlayer audioPlayer = AudioPlayer();
+  AudioPlayerHandler audioPlayerHandler = AudioPlayerHandler();
+  PlayerState? playerState;
+
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
+
+  Duration audioPosition = Duration.zero;
+
+  String introUrl = "";
+  String audioUrl = "";
+
+  @override
+  void initState() {
+    super.initState();
+    // introUrl = "https://staging.goodali.mn" + widget.products.intro!;
+    // audioUrl = "https://staging.goodali.mn" + widget.products.intro!;
+    _durationState =
+        Rx.combineLatest2<Duration, PlaybackEvent, ProgressBarState>(
+            audioPlayer.positionStream,
+            audioPlayer.playbackEventStream,
+            (position, playbackEvent) => ProgressBarState(
+                  current: position,
+                  buffered: playbackEvent.bufferedPosition,
+                  total: playbackEvent.duration!,
+                ));
+    // _init();
+    // audioPlayerHandler.loadUrl(introUrl);
+    getIt<PageManager>().init(widget.productsList);
+  }
+
+  Future<void> _init() async {
+    try {
+      await audioPlayer.setUrl(audioUrl).then((value) {
+        setState(() {
+          audioPosition = value ?? Duration.zero;
+        });
+      });
+      setState(() {
+        audioPlayer.setUrl(introUrl);
+      });
+    } catch (e) {
+      debugPrint('An error occured $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    audioPlayer.dispose();
+    getIt<PageManager>().dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context);
+    final pageManager = getIt<PageManager>();
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height / 2 + 120,
+      width: MediaQuery.of(context).size.width,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              width: 38,
+              height: 6,
+              decoration: BoxDecoration(
+                  color: MyColors.gray,
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            const SizedBox(height: 40),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                      color: MyColors.gray,
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.products.title?.capitalize() ?? "",
+                        style: const TextStyle(
+                            fontSize: 16,
+                            height: 1.6,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                      const SizedBox(height: 40),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Wrap(children: [
+                            const Text(
+                              "Үргэлжлэх хугацаа: ",
+                              style:
+                                  TextStyle(fontSize: 12, color: MyColors.gray),
+                            ),
+                            Text(formatTime(audioPosition) + " мин",
+                                style: const TextStyle(
+                                    fontSize: 12, color: MyColors.black))
+                          ]),
+                          const SizedBox(width: 20),
+                          Wrap(children: [
+                            const Text(
+                              "Үнэ: ",
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 12, color: MyColors.gray),
+                            ),
+                            Text(
+                              widget.products.price.toString() + "₮",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  fontSize: 12, color: MyColors.black),
+                            ),
+                          ]),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 70),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ValueListenableBuilder<ProgressBarState>(
+                  valueListenable: pageManager.progressNotifier,
+                  builder: (context, value, _) {
+                    return ProgressBar(
+                      progress: value.current,
+                      buffered: value.buffered,
+                      total: value.total,
+                      thumbColor: MyColors.primaryColor,
+                      thumbGlowColor: MyColors.primaryColor,
+                      timeLabelTextStyle: const TextStyle(color: MyColors.gray),
+                      progressBarColor: MyColors.primaryColor,
+                      bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
+                      baseBarColor: MyColors.border1,
+                      onSeek: pageManager.seek,
+                    );
+                    // });
+                  }),
+            ),
+            const SizedBox(height: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                InkWell(
+                  onTap: buttonBackWard5Seconds,
+                  child: SvgPicture.asset(
+                    "assets/images/replay_5.svg",
+                  ),
+                ),
+                PlayButton(),
+                // CircleAvatar(
+                //   radius: 36,
+                //   backgroundColor: MyColors.primaryColor,
+                //   child: StreamBuilder<PlayerState>(
+                //     stream: audioPlayer.playerStateStream,
+                //     builder: (context, snapshot) {
+                //       final playerState = snapshot.data;
+                //       final processingState = playerState?.processingState;
+                //       final playing = playerState?.playing;
+                //       if (processingState == ProcessingState.loading ||
+                //           processingState == ProcessingState.buffering) {
+                //         return const Center(
+                //           child: CircularProgressIndicator(color: Colors.white),
+                //         );
+                //       } else if (playing != true) {
+                //         return IconButton(
+                //           padding: EdgeInsets.zero,
+                //           icon: const Icon(
+                //             Icons.play_arrow_rounded,
+                //             color: Colors.white,
+                //             size: 40.0,
+                //           ),
+                //           onPressed: audioPlayer.play,
+                //         );
+                //       } else if (processingState != ProcessingState.completed) {
+                //         return IconButton(
+                //           padding: EdgeInsets.zero,
+                //           icon: const Icon(
+                //             Icons.pause_rounded,
+                //             color: Colors.white,
+                //             size: 40.0,
+                //           ),
+                //           onPressed: () {
+                //             print(position);
+                //             audioPlayer.pause();
+                //           },
+                //         );
+                //       } else {
+                //         return IconButton(
+                //           padding: EdgeInsets.zero,
+                //           icon: const Icon(
+                //             Icons.replay,
+                //             color: Colors.white,
+                //             size: 40.0,
+                //           ),
+                //           onPressed: () => audioPlayer.seek(Duration.zero),
+                //         );
+                //       }
+                //     },
+                //   ),
+                // ),
+                InkWell(
+                  onTap: buttonForward15Seconds,
+                  child: SvgPicture.asset(
+                    "assets/images/forward_15.svg",
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                    width: MediaQuery.of(context).size.width / 2 + 70,
+                    child: CustomElevatedButton(
+                        text: "Худалдаж авах",
+                        onPress: () {
+                          cart.addItemsIndex(widget.products.productId!);
+                          if (!cart.sameItemCheck) {
+                            cart.addProducts(widget.products);
+                            cart.addTotalPrice(
+                                widget.products.price?.toDouble() ?? 0.0);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const CartScreen()));
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const CartScreen()));
+                          }
+                        })),
+                GestureDetector(
+                  onTap: () {
+                    cart.addItemsIndex(widget.products.productId!);
+                    if (!cart.sameItemCheck) {
+                      cart.addProducts(widget.products);
+                      cart.addTotalPrice(
+                          widget.products.price?.toDouble() ?? 0.0);
+                      showTopSnackBar(
+                          context,
+                          const CustomTopSnackBar(
+                              type: 1, text: "Сагсанд амжилттай нэмэгдлээ"));
+                    } else {
+                      showTopSnackBar(
+                          context,
+                          const CustomTopSnackBar(
+                              type: 0, text: "Сагсанд бүтээгдэхүүн байна"));
+                    }
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: MyColors.input),
+                    child: const Icon(
+                      IconlyLight.buy,
+                      color: MyColors.primaryColor,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 40)
+          ],
+        ),
+      ),
+    );
+  }
+
+  buttonBackWard5Seconds() {
+    position = position - const Duration(seconds: 5);
+
+    if (position < const Duration(seconds: 0)) {
+      audioPlayer.seek(const Duration(seconds: 0));
+    } else {
+      audioPlayer.seek(position);
+    }
+  }
+
+  buttonForward15Seconds() {
+    position = position + const Duration(seconds: 15);
+
+    if (duration > position) {
+      audioPlayer.seek(position);
+    } else if (duration < position) {
+      audioPlayer.seek(duration);
+    }
+  }
+}
+
+class PlayButton extends StatelessWidget {
+  const PlayButton({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    final pageManager = getIt<PageManager>();
+    return ValueListenableBuilder<ButtonState>(
+      valueListenable: pageManager.playButtonNotifier,
+      builder: (_, value, __) {
+        switch (value) {
+          case ButtonState.loading:
+            return Container(
+              margin: EdgeInsets.all(8.0),
+              width: 32.0,
+              height: 32.0,
+              child: CircularProgressIndicator(),
+            );
+          case ButtonState.paused:
+            return IconButton(
+              icon: Icon(Icons.play_arrow),
+              iconSize: 32.0,
+              onPressed: pageManager.play,
+            );
+          case ButtonState.playing:
+            return IconButton(
+              icon: Icon(Icons.pause),
+              iconSize: 32.0,
+              onPressed: pageManager.pause,
+            );
+        }
+      },
+    );
+  }
+}
