@@ -3,8 +3,6 @@ import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
-import 'package:goodali/controller/page_manager.dart';
-import 'package:goodali/controller/service_locator.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/intro_audio.dart';

@@ -1,4 +1,5 @@
-import 'package:audio_service/audio_service.dart';
+import 'dart:async';
+
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -23,6 +24,9 @@ class MoodDetail extends StatefulWidget {
 }
 
 class _MoodDetailState extends State<MoodDetail> {
+  StreamController<DurationState> _controller =
+      StreamController<DurationState>.broadcast();
+
   late final Future futureMoodItem = getMoodList();
   final PageController _pageController = PageController();
   final _kDuration = const Duration(milliseconds: 300);
@@ -32,9 +36,6 @@ class _MoodDetailState extends State<MoodDetail> {
 
   AudioPlayer audioPlayer = AudioPlayer();
   PlayerState? playerState;
-
-  // Duration duration = Duration.zero;
-  // Duration position = Duration.zero;
 
   double _current = 0;
 
@@ -49,12 +50,7 @@ class _MoodDetailState extends State<MoodDetail> {
   @override
   void initState() {
     super.initState();
-    audioPlayer.playingStream.listen((event) {
-      bool playfb = event == audioPlayer.playing;
-      if (playfb) {
-        audioPlayer.stop();
-      }
-    });
+
     getMoodList();
     _pageController.addListener(() {
       setState(() {
@@ -85,8 +81,9 @@ class _MoodDetailState extends State<MoodDetail> {
   Future<void> playAudio(String url) async {
     try {
       developer.log("init $url");
-
-      if (await audioPlayer.existedInLocal(url: url) == true) {
+      bool isExited = await audioPlayer.existedInLocal(url: url);
+      print("isExited $isExited");
+      if (isExited) {
         String cachedFile = await audioPlayer.getCachedPath(url: url) ?? "";
         developer.log("cached $cachedFile");
         setState(() {
@@ -238,6 +235,8 @@ class _MoodDetailState extends State<MoodDetail> {
                       onPressed: () {
                         _pageController.previousPage(
                             curve: _kCurve, duration: _kDuration);
+                        audioPlayer.stop();
+                        _controller.close();
                       },
                       child: const Icon(IconlyLight.arrow_left,
                           color: MyColors.black),
@@ -264,7 +263,6 @@ class _MoodDetailState extends State<MoodDetail> {
                     // }
                     if (_current == moodItem.length - 1) {
                       audioPlayer.dispose();
-
                       Navigator.pop(context);
                     }
                   },

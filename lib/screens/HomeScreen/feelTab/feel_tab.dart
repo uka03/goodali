@@ -7,8 +7,6 @@ import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/screens/ListItems/mood_item.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:readmore/readmore.dart';
 
 class FeelTabbar extends StatefulWidget {
   const FeelTabbar({Key? key}) : super(key: key);
