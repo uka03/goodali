@@ -36,128 +36,11 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   Widget login() {
     final focus = FocusScope.of(context);
     final isBiometric = Provider.of<Auth>(context).checkBiometric();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-      height: MediaQuery.of(context).size.height - 80,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              padding: const EdgeInsets.all(0),
-              icon: const Icon(Icons.close),
-              color: MyColors.black,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              iconSize: 28,
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text("Нэвтрэх",
-              style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: MyColors.black)),
-          const SizedBox(height: 50),
-          TextFormField(
-            controller: emailController,
-            cursorColor: MyColors.primaryColor,
-            onEditingComplete: () {
-              setState(() {
-                textFieldColor = MyColors.black;
-              });
-              focus.nextFocus();
-            },
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-            style: TextStyle(color: textFieldColor),
-            decoration: const InputDecoration(
-              hintText: "И-мэйл",
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.border1, width: 0.5),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.primaryColor),
-              ),
-            ),
-          ),
-          const SizedBox(height: 30),
-          TextFormField(
-            controller: passwordController,
-            cursorColor: MyColors.primaryColor,
-            onEditingComplete: () {
-              setState(() {
-                FocusManager.instance.primaryFocus?.unfocus();
-                textFieldColor = MyColors.black;
-              });
-            },
-            obscureText: true,
-            maxLength: 4,
-            textInputAction: TextInputAction.done,
-            keyboardType: TextInputType.number,
-            style: TextStyle(color: textFieldColor),
-            decoration: const InputDecoration(
-              hintText: "Нууц үг",
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.border1, width: 0.5),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.primaryColor),
-              ),
-            ),
-          ),
-          const Spacer(),
-          Column(
-            children: [
-              CustomElevatedButton(
-                  text: "Нэвтрэх",
-                  onPress: () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-
-                    Utils.showLoaderDialog(context);
-                    userSignin();
-                  }),
-              const SizedBox(height: 30),
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                      text: 'Хаяг байхгүй?',
-                      style: const TextStyle(color: MyColors.gray),
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: ' Бүртгүүлэх',
-                            style:
-                                const TextStyle(color: MyColors.primaryColor),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                setState(() {
-                                  isRegitered = false;
-                                  emailController.text = "";
-                                  passwordController.text = "";
-                                  nicknameController.text = "";
-                                });
-                              })
-                      ]),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 150),
-        ],
-      ),
-    );
-  }
-
-  Widget register() {
-    final focus = FocusScope.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-      height: MediaQuery.of(context).size.height - 80,
-      child: Stack(children: [
-        Column(
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+        height: MediaQuery.of(context).size.height - 80,
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Align(
@@ -173,7 +56,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text("Бүртгүүлэх",
+            const Text("Нэвтрэх",
                 style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -182,23 +65,15 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
             TextFormField(
               controller: emailController,
               cursorColor: MyColors.primaryColor,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
               onEditingComplete: () {
                 setState(() {
                   textFieldColor = MyColors.black;
                 });
                 focus.nextFocus();
               },
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
               style: TextStyle(color: textFieldColor),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Цахим шуудан оруулна уу";
-                }
-                if (isEmailCorrect(value) == false) {
-                  return "Цахим шуудан буруу байна";
-                }
-              },
               decoration: const InputDecoration(
                 hintText: "И-мэйл",
                 enabledBorder: UnderlineInputBorder(
@@ -209,36 +84,8 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             TextFormField(
-              controller: nicknameController,
-              cursorColor: MyColors.primaryColor,
-              onEditingComplete: () {
-                setState(() {
-                  textFieldColor = MyColors.black;
-                });
-                focus.nextFocus();
-              },
-              textInputAction: TextInputAction.next,
-              style: TextStyle(color: textFieldColor),
-              decoration: const InputDecoration(
-                hintText: "Nickname",
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: MyColors.border1, width: 0.5),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: MyColors.primaryColor),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "Та өөртөө хүссэн нэрээ өгөөрэй",
-              style: TextStyle(fontSize: 12, color: MyColors.gray),
-            ),
-            const SizedBox(height: 10),
-            TextFormField(
-              obscureText: true,
               controller: passwordController,
               cursorColor: MyColors.primaryColor,
               onEditingComplete: () {
@@ -247,18 +94,10 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   textFieldColor = MyColors.black;
                 });
               },
-              validator: (value) {
-                if (value!.length < 4) {
-                  return "4 оронтой байх";
-                }
-                if (value.isEmpty) {
-                  return "Нууц үг оруулна уу.";
-                }
-                return null;
-              },
+              obscureText: true,
               maxLength: 4,
-              keyboardType: TextInputType.number,
               textInputAction: TextInputAction.done,
+              keyboardType: TextInputType.number,
               style: TextStyle(color: textFieldColor),
               decoration: const InputDecoration(
                 hintText: "Нууц үг",
@@ -271,52 +110,217 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               ),
             ),
             const Spacer(),
-            Column(children: [
-              CustomElevatedButton(
-                  text: "Бүртгүүлэх",
-                  onPress: () {
-                    if (_formKey.currentState!.validate()) {
+            Column(
+              children: [
+                CustomElevatedButton(
+                    text: "Нэвтрэх",
+                    onPress: () {
                       FocusManager.instance.primaryFocus?.unfocus();
+
                       Utils.showLoaderDialog(context);
-                      userRegister().then((value) {
-                        print("value $value");
-                        if (value == true) {
-                          setState(() {
-                            isRegitered = true;
-                            emailController.text = "";
-                            passwordController.text = "";
-                          });
-                        }
-                      });
-                    }
-                  }),
-              const SizedBox(height: 30),
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                      text: 'Хаяг байгаа?',
-                      style: const TextStyle(color: MyColors.gray),
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: ' Нэвтрэх',
-                            style:
-                                const TextStyle(color: MyColors.primaryColor),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                setState(() {
-                                  isRegitered = true;
-                                  emailController.text = "";
-                                  passwordController.text = "";
-                                });
-                              })
-                      ]),
+                      userSignin();
+                    }),
+                const SizedBox(height: 30),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                        text: 'Хаяг байхгүй?',
+                        style: const TextStyle(color: MyColors.gray),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: ' Бүртгүүлэх',
+                              style:
+                                  const TextStyle(color: MyColors.primaryColor),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  setState(() {
+                                    isRegitered = false;
+                                    emailController.text = "";
+                                    passwordController.text = "";
+                                    nicknameController.text = "";
+                                  });
+                                })
+                        ]),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 150)
-            ]),
+              ],
+            ),
+            const SizedBox(height: 150),
           ],
         ),
-      ]),
+      ),
+    );
+  }
+
+  Widget register() {
+    final focus = FocusScope.of(context);
+
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+        height: MediaQuery.of(context).size.height - 80,
+        child: Stack(children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  padding: const EdgeInsets.all(0),
+                  icon: const Icon(Icons.close),
+                  color: MyColors.black,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  iconSize: 28,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text("Бүртгүүлэх",
+                  style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: MyColors.black)),
+              const SizedBox(height: 50),
+              TextFormField(
+                controller: emailController,
+                cursorColor: MyColors.primaryColor,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                onEditingComplete: () {
+                  setState(() {
+                    textFieldColor = MyColors.black;
+                  });
+                  focus.nextFocus();
+                },
+                style: TextStyle(color: textFieldColor),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Цахим шуудан оруулна уу";
+                  }
+                  if (isEmailCorrect(value) == false) {
+                    return "Цахим шуудан буруу байна";
+                  }
+                },
+                decoration: const InputDecoration(
+                  hintText: "И-мэйл",
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.primaryColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: nicknameController,
+                cursorColor: MyColors.primaryColor,
+                onEditingComplete: () {
+                  setState(() {
+                    textFieldColor = MyColors.black;
+                  });
+                  focus.nextFocus();
+                },
+                textInputAction: TextInputAction.next,
+                style: TextStyle(color: textFieldColor),
+                decoration: const InputDecoration(
+                  hintText: "Nickname",
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.primaryColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Та өөртөө хүссэн нэрээ өгөөрэй",
+                style: TextStyle(fontSize: 12, color: MyColors.gray),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                obscureText: true,
+                controller: passwordController,
+                cursorColor: MyColors.primaryColor,
+                onEditingComplete: () {
+                  setState(() {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    textFieldColor = MyColors.black;
+                  });
+                },
+                validator: (value) {
+                  if (value!.length < 4) {
+                    return "4 оронтой байх";
+                  }
+                  if (value.isEmpty) {
+                    return "Нууц үг оруулна уу.";
+                  }
+                  return null;
+                },
+                maxLength: 4,
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                style: TextStyle(color: textFieldColor),
+                decoration: const InputDecoration(
+                  hintText: "Нууц үг",
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.primaryColor),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Column(children: [
+                CustomElevatedButton(
+                    text: "Бүртгүүлэх",
+                    onPress: () {
+                      if (_formKey.currentState!.validate()) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        Utils.showLoaderDialog(context);
+                        userRegister().then((value) {
+                          print("value $value");
+                          if (value == true) {
+                            setState(() {
+                              isRegitered = true;
+                              emailController.text = "";
+                              passwordController.text = "";
+                            });
+                          }
+                        });
+                      }
+                    }),
+                const SizedBox(height: 30),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                        text: 'Хаяг байгаа?',
+                        style: const TextStyle(color: MyColors.gray),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: ' Нэвтрэх',
+                              style:
+                                  const TextStyle(color: MyColors.primaryColor),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  setState(() {
+                                    isRegitered = true;
+                                    emailController.text = "";
+                                    passwordController.text = "";
+                                  });
+                                })
+                        ]),
+                  ),
+                ),
+                const SizedBox(height: 150)
+              ]),
+            ],
+          ),
+        ]),
+      ),
     );
   }
 
@@ -335,9 +339,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
       return true;
     } else {
       showTopSnackBar(
-          context,
-          const CustomTopSnackBar(
-              type: 0, text: "Алдаа гарлаа, дахин оролдоно уу"));
+          context, CustomTopSnackBar(type: 0, text: data["message"] ?? ""));
       return false;
     }
   }

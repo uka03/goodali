@@ -62,9 +62,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         horizontal: 20.0, vertical: 10),
                     child: Row(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 35,
                           backgroundColor: MyColors.secondary,
+                          child: Image.network(
+                            userInfo.avatarPath ?? "",
+                            errorBuilder: (context, error, stackTrace) =>
+                                Text("error"),
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Wrap(
@@ -98,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 if (value != null) {
                                   setState(() {
                                     isChanged = true;
-                                    changedName = value;
+                                    changedName = value['name'];
                                   });
                                 }
                               });

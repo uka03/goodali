@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 
+late AudioHandler audioHandler;
 Future<AudioHandler> initAudioService() async {
   return await AudioService.init(
     builder: () => AudioPlayerHandler(),

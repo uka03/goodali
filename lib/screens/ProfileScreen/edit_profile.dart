@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
@@ -8,6 +11,7 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:iconly/iconly.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class EditProfile extends StatefulWidget {
@@ -22,6 +26,10 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController nicknameController = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+  XFile? image;
+  XFile? camerPhoto;
 
   bool isChanged = false;
 
@@ -87,7 +95,7 @@ class _EditProfileState extends State<EditProfile> {
               TextField(
                   controller: phoneController,
                   cursorColor: MyColors.primaryColor,
-                  readOnly: true,
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     enabledBorder: UnderlineInputBorder(
                       borderSide:
@@ -164,12 +172,17 @@ class _EditProfileState extends State<EditProfile> {
                         fontSize: 24)),
                 const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () async {
+                          camerPhoto = await _picker.pickImage(
+                              source: ImageSource.camera);
+                          checkImage(camerPhoto!);
+                          Utils.showLoaderDialog(context);
+                        },
                         child: Container(
                           height: 125,
                           width: 150,
@@ -190,7 +203,12 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () async {
+                          image = await _picker.pickImage(
+                              source: ImageSource.gallery);
+                          checkImage(image!);
+                          Utils.showLoaderDialog(context);
+                        },
                         child: Container(
                           height: 125,
                           width: 150,
@@ -219,12 +237,39 @@ class _EditProfileState extends State<EditProfile> {
         });
   }
 
+  checkImage(XFile image) {
+    File fileImage = File(image.path);
+
+    uploadImage(fileImage);
+  }
+
+  uploadImage(File imageFile) async {
+    var stream = await Connection.uploadUserAvatar(context, imageFile);
+    print(stream["success"]);
+    Navigator.pop(context);
+    if (stream["success"]) {
+      showTopSnackBar(context,
+          const CustomTopSnackBar(type: 1, text: "Амжилттай солигдлоо"));
+      Navigator.pop(context);
+    } else {
+      showTopSnackBar(
+          context,
+          const CustomTopSnackBar(
+              type: 0, text: "Алдаа гарлаа дахин оролдоно уу"));
+      Navigator.pop(context);
+    }
+  }
+
   editUserData() async {
     var data = await Connection.editUserData(context, nicknameController.text);
     if (data['succes'] == true) {
       showTopSnackBar(context,
           const CustomTopSnackBar(type: 1, text: "Амжилттай солигдлоо"));
-      Navigator.pop(context, data["name"]);
+      Map<String, dynamic> map = {
+        "name": data["name"],
+        "avatar": data['avatar']
+      };
+      Navigator.pop(context, map);
     } else {
       showTopSnackBar(
           context,

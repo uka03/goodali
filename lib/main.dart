@@ -1,4 +1,3 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goodali/Providers/audio_provider.dart';
@@ -14,10 +13,13 @@ import 'package:goodali/controller/service_locator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late AudioHandler _audioHandler;
-
 Future<void> main() async {
   await setupServiceLocator();
+  // await JustAudioBackground.init(
+  //     androidNotificationChannelId: 'com.goodali.goodali.channel.audio',
+  //     androidNotificationChannelName: 'Audio playback',
+  //     androidNotificationOngoing: true,
+  //     androidStopForegroundOnPause: true);
   runApp(const MyApp());
 }
 

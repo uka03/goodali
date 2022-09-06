@@ -48,6 +48,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     audioPlayer.playingStream.listen((event) {
       isPlaying = event;
     });
+
     super.initState();
   }
 

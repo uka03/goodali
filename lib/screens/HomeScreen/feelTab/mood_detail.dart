@@ -1,9 +1,11 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:just_audio_cache/just_audio_cache.dart';
 
 import 'package:goodali/models/mood_item.dart';
 
@@ -47,6 +49,12 @@ class _MoodDetailState extends State<MoodDetail> {
   @override
   void initState() {
     super.initState();
+    audioPlayer.playingStream.listen((event) {
+      bool playfb = event == audioPlayer.playing;
+      if (playfb) {
+        audioPlayer.stop();
+      }
+    });
     getMoodList();
     _pageController.addListener(() {
       setState(() {
@@ -72,15 +80,26 @@ class _MoodDetailState extends State<MoodDetail> {
   @override
   void dispose() {
     super.dispose();
-    audioPlayer.dispose();
   }
 
   Future<void> playAudio(String url) async {
     try {
       developer.log("init $url");
-      setState(() {
-        audioPlayer.setUrl(url);
-      });
+
+      if (await audioPlayer.existedInLocal(url: url) == true) {
+        String cachedFile = await audioPlayer.getCachedPath(url: url) ?? "";
+        developer.log("cached $cachedFile");
+        setState(() {
+          audioPlayer.setFilePath(cachedFile);
+        });
+      } else {
+        print("jfnudonfonfd");
+        setState(() {
+          audioPlayer.setUrl(url);
+        });
+        await audioPlayer.existedInLocal(url: url);
+        audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(url)));
+      }
     } catch (e) {
       debugPrint('An error occured $e');
     }
@@ -149,10 +168,6 @@ class _MoodDetailState extends State<MoodDetail> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: 40),
-                                if (moodItem[index].banner != "")
-                                  banner("https://staging.goodali.mn" +
-                                      moodItem[index].banner!),
                                 const SizedBox(height: 20),
                                 HtmlWidget(
                                   moodItem[index].title!,
@@ -243,10 +258,13 @@ class _MoodDetailState extends State<MoodDetail> {
                     _pageController.nextPage(
                         curve: _kCurve, duration: _kDuration);
 
-                    if (url != "") {
-                      playAudio(url);
-                    }
+                    // if (url != "") {
+                    //   print("duusgah");
+                    //   playAudio(url);
+                    // }
                     if (_current == moodItem.length - 1) {
+                      audioPlayer.dispose();
+
                       Navigator.pop(context);
                     }
                   },

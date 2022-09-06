@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/constans.dart';
 
@@ -21,7 +24,7 @@ class Connection {
       if (response.data["status"] == 1) {
         return {"success": true};
       } else {
-        return {"success": false};
+        return {"success": false, "message": response.data['msg']};
       }
     } catch (error) {
       print("error $error");
@@ -205,7 +208,11 @@ class Connection {
           .post(Urls.editUserData, data: {"nickname": nickname});
 
       if (response.data['status'] == 1) {
-        return {'succes': true, 'name': response.data['name']['data']};
+        return {
+          'succes': true,
+          'name': response.data['name']['data'],
+          'avatar': response.data['name']["avatar"]
+        };
       } else {
         print("error");
         return {'succes': false};
@@ -236,6 +243,35 @@ class Connection {
       print("error $error");
 
       return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>> uploadUserAvatar(
+      BuildContext context, File imageFile) async {
+    try {
+      String imagePath = imageFile.path.split('/').last;
+      print("imagePath $imagePath");
+
+      FormData data = FormData.fromMap({
+        "image":
+            await MultipartFile.fromFile(imageFile.path, filename: imagePath)
+      });
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.uploadUserAvatar, data: data);
+      print(response.data);
+      if (response.data['status'] == 1) {
+        return {
+          'success': true,
+        };
+      } else {
+        print("error");
+        return {'success': false};
+      }
+    } catch (error) {
+      print("error $error");
+
+      return {'succes': false};
     }
   }
 }

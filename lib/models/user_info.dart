@@ -3,15 +3,18 @@ class UserInfo {
   String? nickname;
   String? token;
   int? expiry;
+  String? avatarPath;
 
-  UserInfo({this.email, this.expiry, this.nickname, this.token});
+  UserInfo(
+      {this.email, this.expiry, this.nickname, this.token, this.avatarPath});
 
   factory UserInfo.fromJson(Map<String, dynamic> json) {
     return UserInfo(
         email: json['email'],
         nickname: json['nickname'],
         token: json['token'],
-        expiry: json['expiry']);
+        expiry: json['expiry'],
+        avatarPath: json['avatar']);
   }
 
   Map<String, dynamic> toJson() {
@@ -21,6 +24,7 @@ class UserInfo {
     data["nickname"] = nickname;
     data["token"] = token;
     data["expiry"] = expiry;
+    data["avatar"] = avatarPath;
 
     return data;
   }

@@ -19,4 +19,5 @@ class Urls {
   static final getArticle = "$host/post_list";
   static final editUserData = "$host/edit_user_data";
   static final lectureList = "$host/lecture_list";
+  static final uploadUserAvatar = "$host/upload_user_avatar";
 }
