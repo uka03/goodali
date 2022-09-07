@@ -1,32 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 
-class ImageViewer extends StatefulWidget {
+class ImageView extends StatelessWidget {
   final String imgPath;
   final double? height;
   final double? width;
   final bool? isQpay;
-  const ImageViewer(
-      {Key? key,
-      required this.imgPath,
-      this.height,
-      this.width,
-      this.isQpay = false})
+  const ImageView(
+      {Key? key, required this.imgPath, this.height, this.width, this.isQpay})
       : super(key: key);
 
   @override
-  State<ImageViewer> createState() => _ImageViewerState();
-}
-
-class _ImageViewerState extends State<ImageViewer> {
-  @override
   Widget build(BuildContext context) {
+    print("https://staging.goodali.mn" + imgPath);
     return Image.network(
-      widget.isQpay == true
-          ? widget.imgPath
-          : "https://staging.goodali.mn" + widget.imgPath,
-      width: widget.width,
-      height: widget.height,
+      isQpay == true ? imgPath : "https://staging.goodali.mn" + imgPath,
+      width: width,
+      height: height,
       loadingBuilder: (BuildContext context, Widget child,
           ImageChunkEvent? loadingProgress) {
         if (loadingProgress == null) return child;
@@ -42,8 +32,7 @@ class _ImageViewerState extends State<ImageViewer> {
         );
       },
       fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) =>
-          const Text("Error while fetching image"),
+      errorBuilder: (context, error, stackTrace) => const Text("Error"),
     );
   }
 }

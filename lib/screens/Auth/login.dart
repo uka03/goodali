@@ -35,7 +35,6 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
 
   Widget login() {
     final focus = FocusScope.of(context);
-    final isBiometric = Provider.of<Auth>(context).checkBiometric();
     return SingleChildScrollView(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),

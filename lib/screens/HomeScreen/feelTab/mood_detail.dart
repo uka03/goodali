@@ -1,17 +1,24 @@
 import 'dart:async';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:goodali/Providers/audio_provider.dart';
+import 'package:goodali/controller/audio_player_handler.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/main.dart';
+import 'package:goodali/models/audio_player_model.dart';
 import 'package:just_audio_cache/just_audio_cache.dart';
 
 import 'package:goodali/models/mood_item.dart';
 
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:developer' as developer;
 
@@ -24,22 +31,23 @@ class MoodDetail extends StatefulWidget {
 }
 
 class _MoodDetailState extends State<MoodDetail> {
-  StreamController<DurationState> _controller =
-      StreamController<DurationState>.broadcast();
-
   late final Future futureMoodItem = getMoodList();
   final PageController _pageController = PageController();
   final _kDuration = const Duration(milliseconds: 300);
   final _kCurve = Curves.easeIn;
   Stream<DurationState>? _durationState;
   List<MoodItem> moodItem = [];
-
   AudioPlayer audioPlayer = AudioPlayer();
   PlayerState? playerState;
 
+  Duration duration = Duration.zero;
+  Duration savedPos = Duration.zero;
+
   double _current = 0;
+  bool isLoading = true;
 
   String url = "";
+  bool isExited = false;
 
   Widget rightButton = const Text(
     "Дараах",
@@ -78,36 +86,57 @@ class _MoodDetailState extends State<MoodDetail> {
     super.dispose();
   }
 
+  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
+      .map((state) => state.bufferedPosition)
+      .distinct();
+
   Future<void> playAudio(String url) async {
     try {
-      developer.log("init $url");
-      bool isExited = await audioPlayer.existedInLocal(url: url);
+      isExited = await audioPlayer.existedInLocal(url: url);
       print("isExited $isExited");
-      if (isExited) {
-        String cachedFile = await audioPlayer.getCachedPath(url: url) ?? "";
-        developer.log("cached $cachedFile");
+      if (isExited == true) {
+        int saveddouble =
+            Provider.of<AudioPlayerProvider>(context, listen: false)
+                .getPosition(moodItem[_current.toInt()].id ?? 0);
         setState(() {
-          audioPlayer.setFilePath(cachedFile);
+          isLoading = false;
         });
+        savedPos = Duration(milliseconds: saveddouble);
+        print(savedPos);
+        // audioHandler.play(savedPos);
+        // await audioHandler.play();
       } else {
-        print("jfnudonfonfd");
-        setState(() {
-          audioPlayer.setUrl(url);
-        });
-        await audioPlayer.existedInLocal(url: url);
-        audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(url)));
+        duration = await audioPlayer.setUrl(url).then((value) {
+              setState(() => isLoading = false);
+              return value;
+            }) ??
+            Duration.zero;
+        await audioPlayer.dynamicSet(url: url);
       }
+
+      MediaItem item = MediaItem(
+        id: url,
+        title: moodItem[_current.toInt()].title ?? "",
+        duration: duration,
+        // artUri: Uri.parse(moodItem[_current.toInt()].banner!),
+      );
+      setState(() {
+        audioHandler.playMediaItem(item);
+      });
+
+      _durationState =
+          Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
+              audioHandler.mediaItem,
+              AudioService.position,
+              _bufferedPositionStream,
+              (mediaItem, position, buffered) => DurationState(
+                    progress: position,
+                    buffered: buffered,
+                    total: mediaItem?.duration,
+                  ));
     } catch (e) {
       debugPrint('An error occured $e');
     }
-    _durationState = Rx.combineLatest2<Duration, PlaybackEvent, DurationState>(
-        audioPlayer.positionStream,
-        audioPlayer.playbackEventStream,
-        (position, playbackEvent) => DurationState(
-              progress: position,
-              buffered: playbackEvent.bufferedPosition,
-              total: playbackEvent.duration,
-            ));
   }
 
   @override
@@ -235,8 +264,6 @@ class _MoodDetailState extends State<MoodDetail> {
                       onPressed: () {
                         _pageController.previousPage(
                             curve: _kCurve, duration: _kDuration);
-                        audioPlayer.stop();
-                        _controller.close();
                       },
                       child: const Icon(IconlyLight.arrow_left,
                           color: MyColors.black),
@@ -316,6 +343,7 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   Widget audioPlayerWidget() {
+    final audioPosition = Provider.of<AudioPlayerProvider>(context);
     return StreamBuilder<DurationState>(
         stream: _durationState,
         builder: (context, snapshot) {
@@ -336,12 +364,17 @@ class _MoodDetailState extends State<MoodDetail> {
                   timeLabelTextStyle: const TextStyle(color: MyColors.gray),
                   progressBarColor: Colors.white,
                   bufferedBarColor: Colors.white54,
-                  baseBarColor: Colors.white10,
+                  baseBarColor: isExited ? Colors.white54 : Colors.white10,
                   onSeek: (duration) async {
                     final position = duration;
-                    await audioPlayer.seek(position);
+                    await audioHandler.seek(position);
 
-                    await audioPlayer.play();
+                    await audioHandler.play();
+                    AudioPlayerModel _audio = AudioPlayerModel(
+                        productID: moodItem[_current.toInt()].id,
+                        audioPosition: position.inMilliseconds,
+                        audioDuration: duration.inMilliseconds);
+                    audioPosition.addAudioPosition(_audio);
                   },
                 ),
                 const SizedBox(height: 20),
@@ -353,6 +386,7 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   Widget playerButton(Duration position, Duration duration) {
+    final audioPosition = Provider.of<AudioPlayerProvider>(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -366,14 +400,14 @@ class _MoodDetailState extends State<MoodDetail> {
         CircleAvatar(
           radius: 36,
           backgroundColor: Colors.white,
-          child: StreamBuilder<PlayerState>(
-            stream: audioPlayer.playerStateStream,
+          child: StreamBuilder<bool>(
+            stream: audioHandler.playbackState
+                .map((state) => state.playing)
+                .distinct(),
             builder: (context, snapshot) {
-              final playerState = snapshot.data;
-              final processingState = playerState?.processingState;
-              final playing = playerState?.playing;
-              if (processingState == ProcessingState.loading ||
-                  processingState == ProcessingState.buffering) {
+              final playing = snapshot.data ?? false;
+
+              if (isLoading) {
                 return const CircularProgressIndicator(
                     color: MyColors.primaryColor);
               } else if (playing != true) {
@@ -384,9 +418,11 @@ class _MoodDetailState extends State<MoodDetail> {
                     color: MyColors.primaryColor,
                     size: 40.0,
                   ),
-                  onPressed: audioPlayer.play,
+                  onPressed: () {
+                    audioHandler.play();
+                  },
                 );
-              } else if (processingState != ProcessingState.completed) {
+              } else {
                 return IconButton(
                   padding: EdgeInsets.zero,
                   icon: const Icon(
@@ -394,17 +430,14 @@ class _MoodDetailState extends State<MoodDetail> {
                     color: MyColors.primaryColor,
                     size: 40.0,
                   ),
-                  onPressed: audioPlayer.pause,
-                );
-              } else {
-                return IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(
-                    Icons.replay,
-                    color: Colors.white,
-                    size: 40.0,
-                  ),
-                  onPressed: () => audioPlayer.seek(Duration.zero),
+                  onPressed: () {
+                    AudioPlayerModel _audio = AudioPlayerModel(
+                        productID: moodItem[_current.toInt()].id,
+                        audioPosition: position.inMilliseconds,
+                        audioDuration: duration.inMilliseconds);
+                    audioPosition.addAudioPosition(_audio);
+                    audioHandler.pause();
+                  },
                 );
               }
             },
@@ -425,9 +458,9 @@ class _MoodDetailState extends State<MoodDetail> {
     position = position - const Duration(seconds: 5);
 
     if (position < const Duration(seconds: 0)) {
-      audioPlayer.seek(const Duration(seconds: 0));
+      audioHandler.seek(const Duration(seconds: 0));
     } else {
-      audioPlayer.seek(position);
+      audioHandler.seek(position);
     }
   }
 
@@ -435,9 +468,9 @@ class _MoodDetailState extends State<MoodDetail> {
     position = position + const Duration(seconds: 15);
 
     if (duration > position) {
-      audioPlayer.seek(position);
+      audioHandler.seek(position);
     } else if (duration < position) {
-      audioPlayer.seek(duration);
+      audioHandler.seek(duration);
     }
   }
 
@@ -449,11 +482,4 @@ class _MoodDetailState extends State<MoodDetail> {
 
     return moodItem;
   }
-}
-
-class DurationState {
-  const DurationState({this.progress, this.buffered, this.total});
-  final Duration? progress;
-  final Duration? buffered;
-  final Duration? total;
 }

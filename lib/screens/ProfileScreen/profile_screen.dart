@@ -5,6 +5,8 @@ import 'package:flutter/rendering.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
+import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/Widgets/image_viewer.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:goodali/screens/Auth/login.dart';
@@ -27,125 +29,141 @@ class _ProfileScreenState extends State<ProfileScreen> {
   UserInfo userInfo = UserInfo();
   String? changedName;
   bool isChanged = false;
+  String? avatarPath;
 
   @override
   void initState() {
-    userData();
     super.initState();
   }
 
-  userData() async {
+  Future<UserInfo?> userData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var data = pref.getString('userData');
     if (data != null) {
       var json = jsonDecode(data);
-      setState(() {
-        userInfo = UserInfo.fromJson(json);
-      });
+      userInfo = UserInfo.fromJson(json);
+
+      return userInfo;
     } else {
       print("hooson");
+      return null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isBiometric = Provider.of<Auth>(context).checkBiometric();
+
     return Scaffold(
       body: Consumer<Auth>(
         builder: (BuildContext context, value, Widget? child) {
           if (value.isAuth == true) {
             return DefaultTabController(
               length: 2,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 10),
-                    child: Row(
+              child: FutureBuilder(
+                future: userData(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    userInfo = snapshot.data;
+                    return Column(
                       children: [
-                        CircleAvatar(
-                          radius: 35,
-                          backgroundColor: MyColors.secondary,
-                          child: Image.network(
-                            userInfo.avatarPath ?? "",
-                            errorBuilder: (context, error, stackTrace) =>
-                                Text("error"),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 10),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: ImageView(
+                                    imgPath: userInfo.avatarPath!,
+                                    width: 70,
+                                    height: 70,
+                                  )),
+                              const SizedBox(width: 16),
+                              Wrap(
+                                direction: Axis.vertical,
+                                spacing: 8,
+                                children: [
+                                  Text(
+                                    isChanged
+                                        ? changedName ?? ""
+                                        : userInfo.nickname ?? "",
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        color: MyColors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    userInfo.email ?? "",
+                                    style:
+                                        const TextStyle(color: MyColors.gray),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => EditProfile(
+                                                userInfo: userInfo))).then(
+                                        (value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          isChanged = true;
+                                          changedName = value['name'];
+                                        });
+                                      }
+                                    });
+                                  },
+                                  child: const Text(
+                                    "Засах",
+                                    style: TextStyle(
+                                        color: MyColors.primaryColor,
+                                        fontSize: 16),
+                                  ))
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Wrap(
-                          direction: Axis.vertical,
-                          spacing: 8,
-                          children: [
-                            Text(
-                              isChanged
-                                  ? changedName ?? ""
-                                  : userInfo.nickname ?? "",
-                              style: const TextStyle(
-                                  fontSize: 20,
-                                  color: MyColors.black,
-                                  fontWeight: FontWeight.bold),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                      color: MyColors.border1, width: 0.8))),
+                          height: 50,
+                          child: AppBar(
+                            backgroundColor: Colors.white,
+                            elevation: 0,
+                            bottom: const TabBar(
+                              isScrollable: true,
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              tabs: [
+                                SizedBox(width: 70, child: Tab(text: "Авсан")),
+                                SizedBox(width: 70, child: Tab(text: "Татсан"))
+                              ],
+                              indicatorWeight: 3,
+                              labelColor: MyColors.primaryColor,
+                              unselectedLabelColor: MyColors.black,
+                              indicatorColor: MyColors.primaryColor,
                             ),
-                            Text(
-                              userInfo.email ?? "",
-                              style: const TextStyle(color: MyColors.gray),
-                            ),
-                          ],
+                          ),
                         ),
-                        const Spacer(),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              EditProfile(userInfo: userInfo)))
-                                  .then((value) {
-                                if (value != null) {
-                                  setState(() {
-                                    isChanged = true;
-                                    changedName = value['name'];
-                                  });
-                                }
-                              });
-                            },
-                            child: const Text(
-                              "Засах",
-                              style: TextStyle(
-                                  color: MyColors.primaryColor, fontSize: 16),
-                            ))
+                        const Expanded(
+                          child: TabBarView(
+                            children: [MyCourses(), Downloaded()],
+                          ),
+                        )
                       ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    decoration: const BoxDecoration(
-                        border: Border(
-                            bottom: BorderSide(
-                                color: MyColors.border1, width: 0.8))),
-                    height: 50,
-                    child: AppBar(
-                      backgroundColor: Colors.white,
-                      elevation: 0,
-                      bottom: const TabBar(
-                        isScrollable: true,
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        tabs: [
-                          SizedBox(width: 70, child: Tab(text: "Авсан")),
-                          SizedBox(width: 70, child: Tab(text: "Татсан"))
-                        ],
-                        indicatorWeight: 3,
-                        labelColor: MyColors.primaryColor,
-                        unselectedLabelColor: MyColors.black,
-                        indicatorColor: MyColors.primaryColor,
-                      ),
-                    ),
-                  ),
-                  const Expanded(
-                    child: TabBarView(
-                      children: [MyCourses(), Downloaded()],
-                    ),
-                  )
-                ],
+                    );
+                  } else {
+                    return const Center(
+                        child: CircularProgressIndicator(
+                            color: MyColors.primaryColor));
+                  }
+                },
               ),
             );
           } else {
@@ -155,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: CustomElevatedButton(
                   text: "Нэвтрэх",
                   onPress: () {
-                    value.checkBiometric()
+                    isBiometric
                         ? value.authenticateWithBiometrics(context)
                         : showLoginModal();
                   },

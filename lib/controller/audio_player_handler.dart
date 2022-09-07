@@ -1,13 +1,13 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:goodali/main.dart';
 import 'package:just_audio/just_audio.dart';
 
-late AudioHandler audioHandler;
 Future<AudioHandler> initAudioService() async {
   return await AudioService.init(
     builder: () => AudioPlayerHandler(),
     config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.mycompany.myapp.audio',
-      androidNotificationChannelName: 'Audio Service Demo',
+      androidNotificationChannelId: 'com.goodali.goodali.audio',
+      androidNotificationChannelName: 'Audio Service',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
     ),
@@ -16,52 +16,41 @@ Future<AudioHandler> initAudioService() async {
 
 class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final _player = AudioPlayer();
-  final _playlist = ConcatenatingAudioSource(children: []);
 
   AudioPlayerHandler() {
-    _loadEmptyPlaylist();
-    _notifyAudioHandlerAboutPlaybackEvents();
-    _listenForDurationChanges();
-    _listenForCurrentSongIndexChanges();
-    _listenForSequenceStateChanges();
-  }
+    _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
 
-  Future<void> _loadEmptyPlaylist() async {
-    try {
-      await _player.setAudioSource(_playlist);
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
+    // mediaItem.add(item);
 
-  void _notifyAudioHandlerAboutPlaybackEvents() {
-    _player.playbackEventStream.listen((PlaybackEvent event) {
-      final playing = _player.playing;
-      playbackState.add(playbackState.value.copyWith(
-        controls: [
-          // MediaControl.skipToPrevious,
-          if (playing) MediaControl.pause else MediaControl.play,
-          // MediaControl.stop,
-          // MediaControl.skipToNext,
-        ],
-        systemActions: const {
-          MediaAction.seek,
-        },
-        androidCompactActionIndices: const [0, 1, 3],
-        processingState: const {
-          ProcessingState.idle: AudioProcessingState.idle,
-          ProcessingState.loading: AudioProcessingState.loading,
-          ProcessingState.buffering: AudioProcessingState.buffering,
-          ProcessingState.ready: AudioProcessingState.ready,
-          ProcessingState.completed: AudioProcessingState.completed,
-        }[_player.processingState]!,
-        playing: playing,
-        updatePosition: _player.position,
-        bufferedPosition: _player.bufferedPosition,
-        speed: _player.speed,
-        queueIndex: event.currentIndex,
-      ));
-    });
+    // _listenForDurationChanges();
+    // _listenForCurrentSongIndexChanges();
+    // _listenForSequenceStateChanges();
+  }
+  PlaybackState _transformEvent(PlaybackEvent event) {
+    return PlaybackState(
+      controls: [
+        // MediaControl.rewind,
+        if (_player.playing) MediaControl.pause else MediaControl.play,
+        // MediaControl.stop,
+        // MediaControl.fastForward,
+      ],
+      systemActions: const {
+        MediaAction.seek,
+      },
+      androidCompactActionIndices: const [0, 1, 3],
+      processingState: const {
+        ProcessingState.idle: AudioProcessingState.idle,
+        ProcessingState.loading: AudioProcessingState.loading,
+        ProcessingState.buffering: AudioProcessingState.buffering,
+        ProcessingState.ready: AudioProcessingState.ready,
+        ProcessingState.completed: AudioProcessingState.completed,
+      }[_player.processingState]!,
+      playing: _player.playing,
+      updatePosition: _player.position,
+      bufferedPosition: _player.bufferedPosition,
+      speed: _player.speed,
+      queueIndex: event.currentIndex,
+    );
   }
 
   void _listenForDurationChanges() {
@@ -100,15 +89,21 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     });
   }
 
-  UriAudioSource _createAudioSource(MediaItem mediaItem) {
-    return AudioSource.uri(
-      Uri.parse(mediaItem.extras!['url']),
-      tag: mediaItem,
-    );
+  @override
+  Future<void> play() async {
+    print("audio handler play");
+
+    _player.play();
+    return super.play();
   }
 
   @override
-  Future<void> play() => _player.play();
+  // ignore: avoid_renaming_method_parameters
+  Future<void> playMediaItem(MediaItem item) async {
+    mediaItem.add(item);
+    updateMediaItem(item);
+    _player.setAudioSource(AudioSource.uri(Uri.parse(item.id)));
+  }
 
   @override
   Future<void> pause() => _player.pause();

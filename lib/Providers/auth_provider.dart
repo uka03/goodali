@@ -58,7 +58,6 @@ class Auth with ChangeNotifier {
           .getDio(context, headerTypeNone)
           .post(Urls.signin, data: data);
 
-      print(response.data);
       if (response.statusCode == 200) {
         if (response.data['token'] != null) {
           preferences.setString("email", data['email']);
@@ -66,9 +65,9 @@ class Auth with ChangeNotifier {
           preferences.setString("token", response.data['token']);
 
           String mapToStr = json.encode(response.data);
-          print(mapToStr.runtimeType);
+
           var strToMap = json.decode(mapToStr);
-          print(strToMap.runtimeType);
+
           UserInfo userInfo = UserInfo.fromJson(response.data);
           preferences.setString("userData", json.encode(strToMap));
 

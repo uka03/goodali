@@ -5,8 +5,8 @@ import 'package:goodali/models/audio_player_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AudioPlayerProvider with ChangeNotifier {
-  double _position = 0.0;
-  double get position => _position;
+  int _position = 0;
+  int get position => _position;
 
   List<int> _productsId = [];
 
@@ -15,7 +15,7 @@ class AudioPlayerProvider with ChangeNotifier {
 
   void _setPrefItems() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    print(_audioItems.last.audioPosition);
     List<String> encodedProducts =
         _audioItems.map((res) => json.encode(res.toJson())).toList();
     print(encodedProducts);
@@ -31,20 +31,24 @@ class AudioPlayerProvider with ChangeNotifier {
         .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
         .toList();
     _audioItems = decodedProduct;
-    int audioIndex = _audioItems.indexWhere((f) => f.productID == productID);
-    _position = _audioItems[audioIndex].audioPosition;
+    _position = _audioItems.last.audioPosition ?? 0;
+    print("_position $_position");
 
     notifyListeners();
   }
 
-  double getPosition(int productID) {
+  int getPosition(int productID) {
     _getPrefItems(productID);
     return _position;
   }
+  // int getPosition(int productID) {
+  // _getPrefItems(productID);
+  // return _position;
+  // }
 
   void addAudioPosition(AudioPlayerModel audio) {
-    AudioPlayerModel audioItem =
-        AudioPlayerModel(productID: audio.productID, audioPosition: position);
+    AudioPlayerModel audioItem = AudioPlayerModel(
+        productID: audio.productID, audioPosition: audio.audioPosition);
     print("inProvider ${audio.audioPosition}");
     _audioItems.add(audioItem);
     _setPrefItems();
