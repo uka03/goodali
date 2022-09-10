@@ -1,22 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/Widgets/image_viewer.dart';
-import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/Auth/pincode_feild.dart';
-import 'package:goodali/screens/ProfileScreen/bought.dart';
+import 'package:goodali/screens/ProfileScreen/my_courses.dart';
 import 'package:goodali/screens/ProfileScreen/downloaded.dart';
 import 'package:goodali/screens/ProfileScreen/edit_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -75,11 +71,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
-                                  child: ImageView(
-                                    imgPath: userInfo.avatarPath!,
+                                  child: Container(
                                     width: 70,
                                     height: 70,
-                                  )),
+                                    color: Colors.pink,
+                                  )
+                                  // ImageView(
+                                  //   imgPath: userInfo.avatarPath ?? "",
+                                  //   width: 70,
+                                  //   height: 70,
+                                  // )
+                                  ),
                               const SizedBox(width: 16),
                               Wrap(
                                 direction: Axis.vertical,

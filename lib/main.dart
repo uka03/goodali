@@ -10,18 +10,16 @@ import 'package:goodali/screens/Auth/enable_biometric.dart';
 import 'package:goodali/screens/blank.dart';
 import 'package:goodali/screens/bottom_bar.dart';
 import 'package:goodali/screens/intro_screen.dart';
-import 'package:goodali/controller/service_locator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late AudioHandler audioHandler;
 
 Future<void> main() async {
-  // await setupServiceLocator();
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerHandler(),
     config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.goodali.goodali.audio',
+      androidNotificationChannelId: 'com.example.example.audio',
       androidNotificationChannelName: 'Audio Service',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,

@@ -4,8 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/constans.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Http {
   late Dio _dio;
@@ -15,7 +17,7 @@ class Http {
   static Http? _instance;
   factory Http() => _instance ?? Http._();
 
-  BaseOptions options = BaseOptions(receiveTimeout: 6000, connectTimeout: 6000);
+  BaseOptions options = BaseOptions(receiveTimeout: 7000, connectTimeout: 6000);
   Http._() {
     try {
       _dio = Dio(options);
@@ -44,15 +46,11 @@ class Http {
       }, onResponse: (response, handler) async {
         var prefs = await SharedPreferences.getInstance();
         var token = prefs.getString('token');
-        // Do something with response data
         print("Response is: $response");
-        // continue
 
         if (response.statusCode == 200) {
           return handler.next(response);
         } else if (response.statusCode == 401) {
-          // print("error 40111");
-          // Provider.of<Auth>(context, listen: false).changeStatus(false);
         } else {
           var message = 'Алдаа гарлаа';
           if (response.data != "") {
@@ -62,9 +60,15 @@ class Http {
           return;
         }
       }, onError: (e, handler) async {
+        if (e.type == DioErrorType.connectTimeout) {
+          showTopSnackBar(context,
+              CustomTopSnackBar(type: 0, text: "http dotor Aldaa garlaa"));
+        } else if (e.type == DioErrorType.receiveTimeout) {
+          print("DIO RECEIVE TIME OUT");
+        }
+
         if (e.response?.statusCode == 401) {
           print("error 401");
-
           //FOR REFRESH TOKEN-> Yawaanda bolwol uncomment
           // &&
           //   e.response.requestOptions.path != '/refresh-token-endpoint' &&
@@ -100,6 +104,7 @@ class Http {
   }
 
   dynamic erroInterceptor(DioError error, BuildContext context) async {
+    print("erroInterceptor in http");
     if (error.response?.statusCode == 401) {}
     return error;
   }

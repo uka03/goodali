@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
-
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/play_audio.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:readmore/readmore.dart';
 
 class AlbumDetail extends StatefulWidget {
   final Products products;
@@ -163,6 +158,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
         itemBuilder: (BuildContext context, int index) {
           return AlbumDetailItem(
               products: product[index],
+              isBought: false,
               albumName: widget.products.title!,
               productsList: product);
         },

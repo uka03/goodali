@@ -5,6 +5,7 @@ import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
+import 'package:goodali/screens/ProfileScreen/my_course_detail.dart';
 import 'package:goodali/screens/intro_screen.dart';
 import 'package:iconly/iconly.dart';
 
@@ -78,7 +79,8 @@ class _ListenTabbarState extends State<ListenTabbar> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => const Podcast()));
+                                        builder: (_) =>
+                                            const MyCourseDetail()));
                               },
                               icon: const Icon(IconlyLight.arrow_right))
                         ],
@@ -159,7 +161,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
                       Text(
-                        "#25 Гоо Даль-ийн дэвэлтээрjnjnjnj",
+                        "#25 Гоо Даль-ийн дэвэлт...",
                         maxLines: 1,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,

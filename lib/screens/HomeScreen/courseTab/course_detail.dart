@@ -3,7 +3,6 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
-import 'package:goodali/Widgets/image_viewer.dart';
 import 'package:goodali/Widgets/info.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/products_model.dart';

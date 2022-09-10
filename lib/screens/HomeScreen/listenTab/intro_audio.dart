@@ -1,17 +1,12 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
-import 'package:goodali/controller/audio_player_handler.dart';
-import 'package:goodali/controller/page_manager.dart';
-import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/controller/progress_notifier.dart';
-import 'package:goodali/controller/service_locator.dart';
-import 'package:goodali/models/media_state.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:iconly/iconly.dart';
@@ -36,7 +31,6 @@ class _IntroAudioState extends State<IntroAudio> {
   late Stream<ProgressBarState> _durationState;
 
   AudioPlayer audioPlayer = AudioPlayer();
-  AudioPlayerHandler audioPlayerHandler = AudioPlayerHandler();
   PlayerState? playerState;
 
   Duration duration = Duration.zero;
@@ -50,8 +44,8 @@ class _IntroAudioState extends State<IntroAudio> {
   @override
   void initState() {
     super.initState();
-    // introUrl = "https://staging.goodali.mn" + widget.products.intro!;
-    // audioUrl = "https://staging.goodali.mn" + widget.products.intro!;
+    introUrl = Urls.host + widget.products.intro!;
+    audioUrl = Urls.host + widget.products.intro!;
     _durationState =
         Rx.combineLatest2<Duration, PlaybackEvent, ProgressBarState>(
             audioPlayer.positionStream,
@@ -61,9 +55,7 @@ class _IntroAudioState extends State<IntroAudio> {
                   buffered: playbackEvent.bufferedPosition,
                   total: playbackEvent.duration!,
                 ));
-    // _init();
-    // audioPlayerHandler.loadUrl(introUrl);
-    getIt<PageManager>().init(widget.productsList);
+    _init();
   }
 
   Future<void> _init() async {
@@ -85,14 +77,11 @@ class _IntroAudioState extends State<IntroAudio> {
   void dispose() {
     super.dispose();
     audioPlayer.dispose();
-    getIt<PageManager>().dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
-    final pageManager = getIt<PageManager>();
-
     return SizedBox(
       height: MediaQuery.of(context).size.height / 2 + 120,
       width: MediaQuery.of(context).size.width,
@@ -171,20 +160,26 @@ class _IntroAudioState extends State<IntroAudio> {
             const SizedBox(height: 70),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ValueListenableBuilder<ProgressBarState>(
-                  valueListenable: pageManager.progressNotifier,
-                  builder: (context, value, _) {
+              child: StreamBuilder<ProgressBarState>(
+                  stream: _durationState,
+                  builder: (context, snapshot) {
+                    final durationState = snapshot.data;
+                    position = durationState?.current ?? Duration.zero;
+                    final buffered = durationState?.buffered ?? Duration.zero;
+                    duration = durationState?.total ?? Duration.zero;
                     return ProgressBar(
-                      progress: value.current,
-                      buffered: value.buffered,
-                      total: value.total,
+                      progress: position,
+                      buffered: buffered,
+                      total: duration,
                       thumbColor: MyColors.primaryColor,
                       thumbGlowColor: MyColors.primaryColor,
                       timeLabelTextStyle: const TextStyle(color: MyColors.gray),
                       progressBarColor: MyColors.primaryColor,
                       bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
                       baseBarColor: MyColors.border1,
-                      onSeek: pageManager.seek,
+                      onSeek: (position) {
+                        audioPlayer.seek(position);
+                      },
                     );
                     // });
                   }),
@@ -199,58 +194,57 @@ class _IntroAudioState extends State<IntroAudio> {
                     "assets/images/replay_5.svg",
                   ),
                 ),
-                PlayButton(),
-                // CircleAvatar(
-                //   radius: 36,
-                //   backgroundColor: MyColors.primaryColor,
-                //   child: StreamBuilder<PlayerState>(
-                //     stream: audioPlayer.playerStateStream,
-                //     builder: (context, snapshot) {
-                //       final playerState = snapshot.data;
-                //       final processingState = playerState?.processingState;
-                //       final playing = playerState?.playing;
-                //       if (processingState == ProcessingState.loading ||
-                //           processingState == ProcessingState.buffering) {
-                //         return const Center(
-                //           child: CircularProgressIndicator(color: Colors.white),
-                //         );
-                //       } else if (playing != true) {
-                //         return IconButton(
-                //           padding: EdgeInsets.zero,
-                //           icon: const Icon(
-                //             Icons.play_arrow_rounded,
-                //             color: Colors.white,
-                //             size: 40.0,
-                //           ),
-                //           onPressed: audioPlayer.play,
-                //         );
-                //       } else if (processingState != ProcessingState.completed) {
-                //         return IconButton(
-                //           padding: EdgeInsets.zero,
-                //           icon: const Icon(
-                //             Icons.pause_rounded,
-                //             color: Colors.white,
-                //             size: 40.0,
-                //           ),
-                //           onPressed: () {
-                //             print(position);
-                //             audioPlayer.pause();
-                //           },
-                //         );
-                //       } else {
-                //         return IconButton(
-                //           padding: EdgeInsets.zero,
-                //           icon: const Icon(
-                //             Icons.replay,
-                //             color: Colors.white,
-                //             size: 40.0,
-                //           ),
-                //           onPressed: () => audioPlayer.seek(Duration.zero),
-                //         );
-                //       }
-                //     },
-                //   ),
-                // ),
+                CircleAvatar(
+                  radius: 36,
+                  backgroundColor: MyColors.primaryColor,
+                  child: StreamBuilder<PlayerState>(
+                    stream: audioPlayer.playerStateStream,
+                    builder: (context, snapshot) {
+                      final playerState = snapshot.data;
+                      final processingState = playerState?.processingState;
+                      final playing = playerState?.playing;
+                      if (processingState == ProcessingState.loading ||
+                          processingState == ProcessingState.buffering) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        );
+                      } else if (playing != true) {
+                        return IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(
+                            Icons.play_arrow_rounded,
+                            color: Colors.white,
+                            size: 40.0,
+                          ),
+                          onPressed: audioPlayer.play,
+                        );
+                      } else if (processingState != ProcessingState.completed) {
+                        return IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(
+                            Icons.pause_rounded,
+                            color: Colors.white,
+                            size: 40.0,
+                          ),
+                          onPressed: () {
+                            print(position);
+                            audioPlayer.pause();
+                          },
+                        );
+                      } else {
+                        return IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(
+                            Icons.replay,
+                            color: Colors.white,
+                            size: 40.0,
+                          ),
+                          onPressed: () => audioPlayer.seek(Duration.zero),
+                        );
+                      }
+                    },
+                  ),
+                ),
                 InkWell(
                   onTap: buttonForward15Seconds,
                   child: SvgPicture.asset(
@@ -341,39 +335,5 @@ class _IntroAudioState extends State<IntroAudio> {
     } else if (duration < position) {
       audioPlayer.seek(duration);
     }
-  }
-}
-
-class PlayButton extends StatelessWidget {
-  const PlayButton({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    final pageManager = getIt<PageManager>();
-    return ValueListenableBuilder<ButtonState>(
-      valueListenable: pageManager.playButtonNotifier,
-      builder: (_, value, __) {
-        switch (value) {
-          case ButtonState.loading:
-            return Container(
-              margin: EdgeInsets.all(8.0),
-              width: 32.0,
-              height: 32.0,
-              child: CircularProgressIndicator(),
-            );
-          case ButtonState.paused:
-            return IconButton(
-              icon: Icon(Icons.play_arrow),
-              iconSize: 32.0,
-              onPressed: pageManager.play,
-            );
-          case ButtonState.playing:
-            return IconButton(
-              icon: Icon(Icons.pause),
-              iconSize: 32.0,
-              onPressed: pageManager.pause,
-            );
-        }
-      },
-    );
   }
 }

@@ -6,10 +6,8 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
-import 'package:goodali/models/user_info.dart';
-import 'package:goodali/screens/Auth/enable_biometric.dart';
+import 'package:goodali/screens/Auth/forgot_password.dart';
 import 'package:provider/provider.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class LoginBottomSheet extends StatefulWidget {
@@ -144,7 +142,22 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 150),
+            const SizedBox(height: 70),
+            Align(
+              alignment: Alignment.center,
+              child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ForgotPassword()));
+                  },
+                  child: const Text(
+                    "Нууц үг мартсан",
+                    style: TextStyle(color: MyColors.primaryColor),
+                  )),
+            ),
+            const SizedBox(height: 50),
           ],
         ),
       ),
@@ -314,7 +327,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                         ]),
                   ),
                 ),
-                const SizedBox(height: 150)
+                const SizedBox(height: 160)
               ]),
             ],
           ),

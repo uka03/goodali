@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/constans.dart';
 
 import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/article_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/get_mood_list.dart';
@@ -12,6 +13,9 @@ import 'package:goodali/models/mood_item.dart';
 import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/models/qpay.dart';
 import 'package:goodali/controller/http.dart';
+import 'dart:developer' as developer;
+
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Connection {
   static Future<Map<String, dynamic>> userRegister(
@@ -26,9 +30,20 @@ class Connection {
       } else {
         return {"success": false, "message": response.data['msg']};
       }
-    } catch (error) {
-      print("error $error");
-      return {"status": false, "message": error.toString()};
+    } on DioError catch (e) {
+      print(e.type);
+      if (e.type == DioErrorType.other) {
+        showTopSnackBar(
+            context,
+            const CustomTopSnackBar(
+                type: 0, text: "Интернет холболтоо шалгана уу."));
+      } else if (e.type == DioErrorType.receiveTimeout) {
+        showTopSnackBar(
+            context,
+            const CustomTopSnackBar(
+                type: 0, text: "Сервертэй холбогдоход алдаа гарлаа"));
+      }
+      return {};
     }
   }
 
@@ -46,8 +61,19 @@ class Connection {
       } else {
         return [];
       }
-    } catch (error) {
-      print("error $error");
+    } on DioError catch (e) {
+      print(e.type);
+      if (e.type == DioErrorType.other) {
+        showTopSnackBar(
+            context,
+            const CustomTopSnackBar(
+                type: 0, text: "Интернет холболтоо шалгана уу."));
+      } else if (e.type == DioErrorType.receiveTimeout) {
+        showTopSnackBar(
+            context,
+            const CustomTopSnackBar(
+                type: 0, text: "Сервертэй холбогдоход алдаа гарлаа"));
+      }
       return [];
     }
   }
@@ -272,6 +298,82 @@ class Connection {
       print("error $error");
 
       return {'succes': false};
+    }
+  }
+
+  static Future<List<Products>> getBougthAlbums(BuildContext context) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .get(Urls.getBoughtAlbums);
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => Products.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      }
+      {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error $error");
+
+      return [];
+    }
+  }
+
+  static Future<List<Products>> getAllLectures(BuildContext context) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .get(Urls.getAllLectures);
+      print("get all lectures");
+      developer.log(response.data);
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => Products.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error all lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>> forgotPassword(
+      BuildContext context, String email) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypeNone)
+          .post(Urls.forgotPassword, data: {"email": email});
+
+      print(response.data);
+      if (response.statusCode == 200 && response.data["status"] == 1) {
+        return {"success": true, "message": response.data["message"]};
+      } else if (response.statusCode == 401) {
+        return {"success": false, "message": response.data["message"]};
+      } else {
+        print("error");
+        return {"success": false, "message": response.data["message"]};
+      }
+    } on DioError catch (e) {
+      if (e.type == DioErrorType.other) {
+        showTopSnackBar(
+            context,
+            const CustomTopSnackBar(
+                type: 0, text: "Интернет холболтоо шалгана уу."));
+      }
+      return {};
     }
   }
 }

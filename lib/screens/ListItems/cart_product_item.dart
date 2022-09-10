@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
-import 'package:goodali/Widgets/image_viewer.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:provider/provider.dart';
 
@@ -21,18 +21,16 @@ class CartProductItem extends StatelessWidget {
           decoration: BoxDecoration(
               color: MyColors.input, borderRadius: BorderRadius.circular(12)),
           child: Stack(children: [
-            Positioned(
-              top: 20,
-              left: 20,
-              child:
-                  Container(height: 36, width: 36, color: Colors.indigo[200]),
-              // ClipRRect(
-              //     borderRadius: BorderRadius.circular(4),
-              //     child: ImageViewer(
-              //         imgPath: products.banner ?? "",
-              //         width: 36,
-              //         height: 36))
-            ),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  color: Colors.pink,
+                )
+                // ImageView(
+                //     imgPath: products.banner ?? "", width: 36, height: 36)
+                ),
             Positioned(
               top: 20,
               left: 70,

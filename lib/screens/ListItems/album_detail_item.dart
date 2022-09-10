@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
+import 'package:goodali/Widgets/image_view.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/intro_audio.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer' as developer;
 
 class AlbumDetailItem extends StatefulWidget {
   final Products products;
   final List<Products> productsList;
   final String albumName;
+  final bool isBought;
 
   const AlbumDetailItem(
       {Key? key,
       required this.products,
       required this.albumName,
-      required this.productsList})
+      required this.productsList,
+      required this.isBought})
       : super(key: key);
 
   @override
@@ -40,7 +46,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
       position = event;
     });
     audioPlayer.durationStream.listen((event) {
-      duration = event!;
+      duration = event ?? Duration.zero;
     });
 
     audioPlayer.playingStream.listen((event) {
@@ -60,8 +66,11 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     if (widget.products.intro == null) {
       print("audio null");
     } else {
-      String url = "https://staging.goodali.mn" + widget.products.intro!;
-      await audioPlayer.setUrl(url);
+      String url = widget.isBought
+          ? widget.products.audio ?? ""
+          : widget.products.intro ?? "";
+      developer.log(Urls.host + url);
+      await audioPlayer.setUrl(Urls.host + url);
     }
   }
 
@@ -70,7 +79,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     final cart = Provider.of<CartProvider>(context);
     return GestureDetector(
       onTap: () {
-        showIntroAudioModal();
+        widget.isBought ? showAudioModal() : showIntroAudioModal();
         audioPlayer.dispose();
       },
       child: Column(
@@ -80,13 +89,18 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(height: 40, width: 40, color: Colors.indigo[200]),
-              // ClipRRect(
-              //     borderRadius: BorderRadius.circular(4),
-              //     child: ImageViewer(
-              //         imgPath: widget.products.banner ?? "",
-              //         width: 40,
-              //         height: 40)),
+              ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    color: Colors.pink,
+                  )
+                  // ImageView(
+                  //     imgPath: widget.products.banner ?? "",
+                  //     width: 40,
+                  //     height: 40)
+                  ),
               const SizedBox(width: 15),
               Expanded(
                 child: Column(
@@ -211,6 +225,30 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                 return IntroAudio(
                     products: widget.products,
                     productsList: widget.productsList);
+              },
+            ));
+  }
+
+  showAudioModal() {
+    showModalBottomSheet(
+        context: context,
+        isDismissible: false,
+        enableDrag: true,
+        backgroundColor: Colors.white,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (_) => StatefulBuilder(
+              builder: (BuildContext context,
+                  void Function(void Function()) setState) {
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height - 80,
+                  child: PlayAudio(
+                    products: widget.products,
+                    albumName: widget.albumName,
+                  ),
+                );
               },
             ));
   }

@@ -83,9 +83,20 @@ class Auth with ChangeNotifier {
         notifyListeners();
         return {'success': false, "message": response.data['message']};
       }
-    } catch (e) {
-      print("error $e");
-      return {'success': false, "message": "Алдаа гарлаа дахин оролдоно уу"};
+    } on DioError catch (e) {
+      print(e.type);
+      if (e.type == DioErrorType.other) {
+        showTopSnackBar(
+            context,
+            const CustomTopSnackBar(
+                type: 0, text: "Интернет холболтоо шалгана уу."));
+      } else if (e.type == DioErrorType.receiveTimeout) {
+        showTopSnackBar(
+            context,
+            const CustomTopSnackBar(
+                type: 0, text: "Сервертэй холбогдоход алдаа гарлаа"));
+      }
+      return {};
     }
   }
 

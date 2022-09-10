@@ -8,7 +8,9 @@ import 'package:provider/provider.dart';
 
 class SimpleAppBar extends StatelessWidget with PreferredSizeWidget {
   final String? title;
-  const SimpleAppBar({Key? key, this.title}) : super(key: key);
+  final bool noCard;
+  const SimpleAppBar({Key? key, this.title, this.noCard = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,36 +23,39 @@ class SimpleAppBar extends StatelessWidget with PreferredSizeWidget {
         onPressed: () => Navigator.pop(context),
       ),
       actions: [
-        Padding(
-            padding: const EdgeInsets.only(right: 10.0),
-            child: CircleAvatar(
-              radius: 22,
-              backgroundColor: MyColors.input,
-              child: Consumer<CartProvider>(
-                builder: (context, value, child) => Badge(
-                  showBadge: value.getCounter() < 0 || value.getCounter() == 0
-                      ? false
-                      : true,
-                  badgeContent: Text(
-                    value.getCounter() < 0
-                        ? "0"
-                        : value.getCounter().toString(),
-                    style: const TextStyle(color: Colors.white),
+        noCard
+            ? Container()
+            : Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: MyColors.input,
+                  child: Consumer<CartProvider>(
+                    builder: (context, value, child) => Badge(
+                      showBadge:
+                          value.getCounter() < 0 || value.getCounter() == 0
+                              ? false
+                              : true,
+                      badgeContent: Text(
+                        value.getCounter() < 0
+                            ? "0"
+                            : value.getCounter().toString(),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      animationDuration: const Duration(milliseconds: 600),
+                      child: IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const CartScreen()));
+                          },
+                          splashRadius: 10,
+                          icon: const Icon(IconlyLight.buy,
+                              size: 28, color: MyColors.black)),
+                    ),
                   ),
-                  animationDuration: const Duration(milliseconds: 600),
-                  child: IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const CartScreen()));
-                      },
-                      splashRadius: 10,
-                      icon: const Icon(IconlyLight.buy,
-                          size: 28, color: MyColors.black)),
-                ),
-              ),
-            )),
+                ))
       ],
       iconTheme: const IconThemeData(color: MyColors.black),
       title: Text(

@@ -1,9 +1,5 @@
-import 'package:goodali/Utils/constans.dart';
-
 class Urls {
-  static String host = isStaging
-      ? "https://staging.goodali.mn/api"
-      : 'https://staging.goodali.mn/api';
+  static String host = 'https://dev.goodali.mn/api';
 
   static final signin = "$host/signin";
   static final signup = "$host/signup";
@@ -20,4 +16,7 @@ class Urls {
   static final editUserData = "$host/edit_user_data";
   static final lectureList = "$host/lecture_list";
   static final uploadUserAvatar = "$host/upload_user_avatar";
+  static final getBoughtAlbums = "$host/get_albums";
+  static final getAllLectures = "$host/all_lectures";
+  static final forgotPassword = "$host/password_recovery";
 }

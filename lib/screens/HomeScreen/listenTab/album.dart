@@ -4,7 +4,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
-import 'package:goodali/screens/ProfileScreen/bought.dart';
+import 'package:goodali/screens/ProfileScreen/my_courses.dart';
 
 class AlbumLecture extends StatefulWidget {
   final int audioLength;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Widgets/image_viewer.dart';
 import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';

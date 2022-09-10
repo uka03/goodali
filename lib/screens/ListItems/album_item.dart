@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
-import 'package:goodali/Widgets/image_viewer.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 
@@ -23,16 +23,19 @@ class AlbumItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(height: 160, width: 160, color: Colors.indigo[200]),
-          // SizedBox(
-          //   height: 160,
-          //   width: 160,
-          //   child: ClipRRect(
-          //       borderRadius: BorderRadius.circular(15),
-          //       child: ImageViewer(
-          //         imgPath: albumData.banner ?? '',
-          //       )),
-          // ),
+          SizedBox(
+            height: 160,
+            width: 160,
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Container(
+                  color: Colors.pink,
+                )
+                // ImageView(
+                //   imgPath: albumData.banner ?? '',
+                // )
+                ),
+          ),
           const SizedBox(height: 10),
           Text(
             albumData.title?.capitalize() ?? "",

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Widgets/image_viewer.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/qpay.dart';
@@ -54,7 +54,7 @@ class _QpayPaymentState extends State<QpayPayment> {
                         const SizedBox(width: 20),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: ImageViewer(
+                          child: ImageView(
                               imgPath: widget.qpayUrls[index].logo!,
                               width: 32,
                               height: 32,
