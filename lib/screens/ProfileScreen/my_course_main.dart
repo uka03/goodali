@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ProfileScreen/my_courses_detail.dart';
 import 'package:goodali/screens/blank.dart';
 
 class MyCourseMain extends StatefulWidget {
-  const MyCourseMain({Key? key}) : super(key: key);
+  final Products courseItem;
+  final List<Products> courseListItem;
+  const MyCourseMain(
+      {Key? key, required this.courseItem, required this.courseListItem})
+      : super(key: key);
 
   @override
   State<MyCourseMain> createState() => _MyCourseMainState();
@@ -41,61 +47,83 @@ class _MyCourseMainState extends State<MyCourseMain> {
                 ),
               ];
             },
-            body: InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: ((context) => const MyCoursesDetail())));
-              },
-              child: ListView.builder(
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      width: double.infinity,
-                      child: Row(
-                        children: [
-                          Container(
-                            color: Colors.purple,
-                            height: 48,
-                            width: 48,
-                          ),
-                          const SizedBox(width: 15),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: const [
-                              Text("Удиртгал",
-                                  style: TextStyle(
-                                      color: MyColors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              Text(
-                                "4/4 daalgwar",
-                                style: TextStyle(
-                                    color: MyColors.gray, fontSize: 12),
-                              )
-                            ],
-                          ),
-                          const Spacer(),
-                          const CircleAvatar(
-                            radius: 11,
-                            backgroundColor: MyColors.success,
-                            child: Icon(
-                              Icons.done,
-                              color: Colors.white,
-                              size: 18,
+            body: FutureBuilder(
+                future: getBoughtCoursesItems(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) =>
+                                    const MyCoursesDetail())));
+                      },
+                      child: ListView.builder(
+                        itemCount: 6,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              width: double.infinity,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    color: Colors.purple,
+                                    height: 48,
+                                    width: 48,
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text(
+                                          widget.courseListItem[index].name ??
+                                              "",
+                                          style: const TextStyle(
+                                              color: MyColors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold)),
+                                      Text(
+                                        "4/4 daalgwar",
+                                        style: TextStyle(
+                                            color: MyColors.gray, fontSize: 12),
+                                      )
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  const CircleAvatar(
+                                    radius: 11,
+                                    backgroundColor: MyColors.success,
+                                    child: Icon(
+                                      Icons.done,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                        ],
+                          );
+                        },
                       ),
-                    ),
-                  );
-                },
-              ),
-            )));
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: MyColors.primaryColor,
+                      ),
+                    );
+                  }
+                })));
+  }
+
+  Future<List<Products>> getBoughtCoursesItems() async {
+    return Connection.getBoughtCoursesItems(
+        context, widget.courseItem.id.toString());
   }
 }

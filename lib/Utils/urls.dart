@@ -19,4 +19,6 @@ class Urls {
   static final getBoughtAlbums = "$host/get_albums";
   static final getAllLectures = "$host/all_lectures";
   static final forgotPassword = "$host/password_recovery";
+  static final getCourses = "$host/get_trainings";
+  static final getCoursesItem = "$host/items/";
 }

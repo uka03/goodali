@@ -77,10 +77,10 @@ class _ListenTabbarState extends State<ListenTabbar> {
                                   fontWeight: FontWeight.bold)),
                           IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const MyCourseMain()));
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (_) => const MyCourseMain()));
                               },
                               icon: const Icon(IconlyLight.arrow_right))
                         ],

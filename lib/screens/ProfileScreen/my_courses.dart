@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
+import 'package:goodali/screens/ListItems/course_products_item.dart';
 import 'package:goodali/screens/ProfileScreen/my_online_course.dart';
 import 'package:iconly/iconly.dart';
 
@@ -16,15 +18,16 @@ class MyCourses extends StatefulWidget {
 
 class _MyCoursesState extends State<MyCourses> {
   String albumName = "";
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.wait([getAllLectures()]),
+      future: Future.wait([getAllLectures(), getBoughtCourses()]),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
-          // List<Products> myAlbums = snapshot.data[0];
           List<Products> allLectures = snapshot.data[0];
-          List<Products> allListProducts = [...allLectures];
+          List<Products> myCourses = snapshot.data[1];
+          List<Products> allListProducts = [...allLectures, ...myCourses];
 
           if (allListProducts.isEmpty) {
             return Column(
@@ -41,12 +44,16 @@ class _MyCoursesState extends State<MyCourses> {
           } else {
             return Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  allLecturesWidget(allLectures)
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    onlineCourses(myCourses),
+                    const SizedBox(height: 10),
+                    allLecturesWidget(allLectures),
+                  ],
+                ),
               ),
             );
           }
@@ -58,36 +65,32 @@ class _MyCoursesState extends State<MyCourses> {
     );
   }
 
-  Widget albums(List<Products> myAlbums) {
-    return ListView.builder(
-        itemCount: myAlbums.length,
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemBuilder: ((context, index) {
-          albumName = myAlbums[index].title ?? "";
-          return Text(myAlbums[index].title ?? "",
-              style: const TextStyle(
-                  color: MyColors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold));
-        }));
-  }
-
   Widget allLecturesWidget(List<Products> allLectures) {
     return ListView.builder(
         itemCount: allLectures.length,
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemBuilder: (context, index) {
-          if (albumName != allLectures[index].albumTitle) {
-            albumName = allLectures[index].albumTitle ?? "fff";
+          String empty = "";
+          if (albumName == allLectures[index].albumTitle) {
+            empty = "";
+          } else {
+            empty = albumName;
           }
-          // albumName = allLectures[index].albumTitle ?? "fff";
-          print("albumName $albumName");
-          print(allLectures[index].albumTitle);
+          if (albumName != allLectures[index].albumTitle) {
+            albumName = allLectures[index].albumTitle ?? "";
+            empty = albumName;
+          }
+
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (albumName == allLectures[index].albumTitle) Text(albumName),
+              Text(empty,
+                  style: const TextStyle(
+                      color: MyColors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
               AlbumDetailItem(
                   isBought: true,
                   products: allLectures[index],
@@ -98,15 +101,15 @@ class _MyCoursesState extends State<MyCourses> {
         });
   }
 
-  Widget onlineCourses() {
+  Widget onlineCourses(List<Products> myCourses) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 10),
         const Text("Онлайн сургалт",
-            textAlign: TextAlign.left,
             style: TextStyle(
                 color: MyColors.black,
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold)),
         const SizedBox(height: 20),
         ListView.builder(
@@ -114,85 +117,20 @@ class _MyCoursesState extends State<MyCourses> {
             shrinkWrap: true,
             itemCount: 1,
             itemBuilder: (BuildContext context, int index) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Stack(children: [
-                  Container(
-                    height: 170,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        color: Colors.pink[300],
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  Positioned(
-                    left: 20,
-                    top: 30,
-                    child: Text(
-                      "Очирын бороо",
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Positioned(
-                    left: 20,
-                    top: 62,
-                    child: Row(
-                      children: [
-                        Text(
-                          "Эхлэх огноо:",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          " 2022.06.18",
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 20,
-                    left: 20,
-                    child: GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const MyOnlineCourse())),
-                      child: Container(
-                        height: 40,
-                        width: 130,
-                        decoration: BoxDecoration(
-                            color: MyColors.input,
-                            borderRadius: BorderRadius.circular(6)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              " Дэлгэрэнгүй",
-                              style: TextStyle(
-                                  color: MyColors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Icon(IconlyLight.arrow_right_2)
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                ]),
-              );
+              return CourseProductsListItem(
+                  isBought: true,
+                  courseProducts: myCourses[index],
+                  courseProductsList: myCourses);
             }),
       ],
     );
   }
 
-  Future<List<Products>> getBougthAlbums() {
-    return Connection.getBougthAlbums(context);
-  }
-
   Future<List<Products>> getAllLectures() async {
     return Connection.getAllLectures(context);
+  }
+
+  Future<List<Products>> getBoughtCourses() async {
+    return Connection.getBoughtCourses(context);
   }
 }

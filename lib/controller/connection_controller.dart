@@ -375,4 +375,50 @@ class Connection {
       return {};
     }
   }
+
+  static Future<List<Products>> getBoughtCourses(BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypebearer).get(Urls.getCourses);
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => Products.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error all lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<List<Products>> getBoughtCoursesItems(
+      BuildContext context, String id) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .get(Urls.getCoursesItem + id);
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => Products.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error all lectures $error");
+
+      return [];
+    }
+  }
 }

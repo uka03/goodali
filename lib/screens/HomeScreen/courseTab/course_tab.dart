@@ -50,7 +50,10 @@ class _CourseTabbarState extends State<CourseTabbar> {
                 shrinkWrap: true,
                 itemCount: products.length,
                 itemBuilder: (BuildContext context, int index) =>
-                    CourseProductsListItem(courseProducts: products[index]));
+                    CourseProductsListItem(
+                      courseProducts: products[index],
+                      courseProductsList: products,
+                    ));
           } else {
             return Center(
               child: Container(

@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
+import 'package:goodali/screens/ProfileScreen/my_course_main.dart';
 import 'package:iconly/iconly.dart';
 
 class CourseProductsListItem extends StatefulWidget {
   final Products courseProducts;
-  const CourseProductsListItem({Key? key, required this.courseProducts})
+  final List<Products> courseProductsList;
+  final bool isBought;
+  const CourseProductsListItem(
+      {Key? key,
+      required this.courseProducts,
+      this.isBought = false,
+      required this.courseProductsList})
       : super(key: key);
 
   @override
@@ -27,7 +36,7 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
           width: double.infinity,
           child: Text("error while fetching image"),
         ),
-        // ImageViewer(imgPath: widget.courseProducts.banner ?? "")
+        // ImageView(imgPath: widget.courseProducts.banner ?? ""),
         Positioned(
           left: 20,
           top: 30,
@@ -53,7 +62,7 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
         //             TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         //       ),
         //     ],
-        //   ),
+        //   ),isBought
         // ),
         Positioned(
           bottom: 20,
@@ -62,8 +71,12 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) =>
-                        CourseDetail(courseProducts: widget.courseProducts))),
+                    builder: (_) => widget.isBought
+                        ? MyCourseMain(
+                            courseItem: widget.courseProducts,
+                            courseListItem: widget.courseProductsList,
+                          )
+                        : CourseDetail(courseProducts: widget.courseProducts))),
             // MaterialPageRoute(
             //     builder: (_) =>
             //         CourseList(id: widget.products.id.toString()))),
