@@ -11,6 +11,8 @@ class Products {
   String? body;
   int? order;
   String? traingName;
+  String? albumTitle;
+  String? lectureTitle;
 
   Products(
       {this.audio,
@@ -24,10 +26,14 @@ class Products {
       this.name,
       this.order,
       this.status,
-      this.traingName});
+      this.traingName,
+      this.albumTitle,
+      this.lectureTitle});
 
   Products.fromJson(Map<String, dynamic> json) {
     audio = json['audio'];
+    albumTitle = json['album_title'] ?? "";
+    lectureTitle = json['lecture_title'] ?? "";
     banner = json['banner'] ?? "";
     id = json['id'] ?? 0;
     price = json['price'] ?? 0;
@@ -55,6 +61,8 @@ class Products {
     data['order'] = order;
     data['status'] = status;
     data['t_name'] = traingName;
+    data['album_title'] = albumTitle;
+    data['lecture_title'] = lectureTitle;
 
     return data;
   }

@@ -26,7 +26,7 @@ class _CustomTopSnackBarState extends State<CustomTopSnackBar> {
         return CustomSnackBar.error(
             textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
             iconRotationAngle: 0,
-            iconPositionTop: -10,
+            iconPositionTop: 0,
             iconPositionLeft: 15,
             icon: const Icon(Icons.close, color: MyColors.error, size: 24),
             backgroundColor: Colors.white,
@@ -34,7 +34,7 @@ class _CustomTopSnackBarState extends State<CustomTopSnackBar> {
       case 1:
         return CustomSnackBar.success(
             iconRotationAngle: 0,
-            iconPositionTop: -10,
+            iconPositionTop: 0,
             iconPositionLeft: 15,
             textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
             icon: const Icon(Icons.done, color: MyColors.success, size: 24),

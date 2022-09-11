@@ -106,64 +106,69 @@ class _PlayAudioState extends State<PlayAudio> {
   }
 
   initForOthers(String url) async {
-    isExited = await audioPlayer.existedInLocal(url: url);
-    duration = await audioPlayer.setUrl(url).then((value) {
-          setState(() => isLoading = false);
-          return value;
-        }) ??
-        Duration.zero;
-    print("isExited $isExited");
-    if (isExited == true) {
-      int saveddouble = 0;
-      WidgetsBinding.instance?.addPostFrameCallback((_) async {
-        saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
-            .getPosition(widget.products.id ?? 0);
+    try {
+      isExited = await audioPlayer.existedInLocal(url: url);
+      duration = await audioPlayer.setUrl(url).then((value) {
+            setState(() => isLoading = false);
+            return value;
+          }) ??
+          Duration.zero;
+
+      print("isExited $isExited");
+      if (isExited == true) {
+        int saveddouble = 0;
+        WidgetsBinding.instance?.addPostFrameCallback((_) async {
+          saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
+              .getPosition(widget.products.id ?? 0);
+        });
+
+        setState(() {
+          isLoading = false;
+        });
+        position = Duration(milliseconds: saveddouble);
+      }
+      // else {
+      //   await audioPlayer.dynamicSet(url: url);
+      // }
+
+      MediaItem item = MediaItem(
+        id: url,
+        title: widget.products.title ?? "",
+        duration: duration,
+        // artUri: Uri.parse(moodItem[_current.toInt()].banner!),
+      );
+
+      developer.log("edit ${item.id}");
+      developer.log("edit ${item.duration}");
+
+      _durationState =
+          Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
+              audioHandler.mediaItem,
+              AudioService.position,
+              _bufferedPositionStream,
+              (mediaItem, position, buffered) => DurationState(
+                    progress: position,
+                    buffered: buffered,
+                    total: mediaItem?.duration,
+                  ));
+
+      AudioSession.instance.then((audioSession) async {
+        await audioSession.configure(const AudioSessionConfiguration.speech());
+        _handleInterruptions(audioSession);
       });
 
       setState(() {
-        isLoading = false;
+        if (isExited) {
+          audioHandler.seek(position);
+          // audioHandler.play()
+        } else {
+          developer.log("edit ${item.duration}");
+          audioHandler.playMediaItem(item);
+        }
       });
-      position = Duration(milliseconds: saveddouble);
+    } catch (e) {
+      print(e);
     }
-    // else {
-    //   await audioPlayer.dynamicSet(url: url);
-    // }
-
-    MediaItem item = MediaItem(
-      id: url,
-      title: widget.products.title ?? "",
-      duration: duration,
-      // artUri: Uri.parse(moodItem[_current.toInt()].banner!),
-    );
-
-    developer.log("edit ${item.id}");
-    developer.log("edit ${item.duration}");
-
-    _durationState =
-        Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
-            audioHandler.mediaItem,
-            AudioService.position,
-            _bufferedPositionStream,
-            (mediaItem, position, buffered) => DurationState(
-                  progress: position,
-                  buffered: buffered,
-                  total: mediaItem?.duration,
-                ));
-
-    AudioSession.instance.then((audioSession) async {
-      await audioSession.configure(const AudioSessionConfiguration.speech());
-      _handleInterruptions(audioSession);
-    });
-
-    setState(() {
-      if (isExited) {
-        audioHandler.seek(position);
-        // audioHandler.play()
-      } else {
-        developer.log("edit ${item.duration}");
-        audioHandler.playMediaItem(item);
-      }
-    });
   }
 
   initForChinesePhone(String url) {
@@ -293,7 +298,7 @@ class _PlayAudioState extends State<PlayAudio> {
             ),
             const SizedBox(height: 10),
             Text(
-              widget.products.title?.capitalize() ?? "",
+              widget.products.lectureTitle?.capitalize() ?? "",
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 24,

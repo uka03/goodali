@@ -55,7 +55,6 @@ dependencies:
   device_info_plus: ^4.0.0
   cached_network_image: ^3.2.0
   pin_code_fields: ^7.4.0
-  status_change: ^2.0.0
 
 dev_dependencies:
   flutter_test:

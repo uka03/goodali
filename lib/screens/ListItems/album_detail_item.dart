@@ -70,7 +70,11 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           ? widget.products.audio ?? ""
           : widget.products.intro ?? "";
       developer.log(Urls.host + url);
-      await audioPlayer.setUrl(Urls.host + url);
+      try {
+        await audioPlayer.setUrl(Urls.host + url);
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
@@ -107,7 +111,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.products.title ?? "",
+                      widget.isBought
+                          ? widget.products.lectureTitle ?? ""
+                          : widget.products.title ?? "",
                       maxLines: 1,
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
@@ -176,27 +182,13 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
               IconButton(
                   splashRadius: 20,
                   onPressed: () {
-                    cart.addItemsIndex(widget.products.productId!);
-                    if (!cart.sameItemCheck) {
-                      cart.addProducts(widget.products);
-                      cart.addTotalPrice(
-                          widget.products.price?.toDouble() ?? 0.0);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Сагсанд амжилттай нэмэгдлээ"),
-                        backgroundColor: MyColors.success,
-                        duration: Duration(seconds: 1),
-                        behavior: SnackBarBehavior.floating,
-                      ));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Product is already added in cart"),
-                        backgroundColor: MyColors.error,
-                        duration: Duration(seconds: 1),
-                        behavior: SnackBarBehavior.floating,
-                      ));
-                    }
+                    widget.isBought ? downloadAudio() : addToCard(cart);
                   },
-                  icon: const Icon(IconlyLight.buy, color: MyColors.gray)),
+                  icon: Icon(
+                      widget.isBought
+                          ? IconlyLight.arrow_down
+                          : IconlyLight.buy,
+                      color: MyColors.gray)),
               IconButton(
                   splashRadius: 20,
                   onPressed: () {},
@@ -228,6 +220,29 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
               },
             ));
   }
+
+  addToCard(cart) {
+    cart.addItemsIndex(widget.products.productId!);
+    if (!cart.sameItemCheck) {
+      cart.addProducts(widget.products);
+      cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Сагсанд амжилттай нэмэгдлээ"),
+        backgroundColor: MyColors.success,
+        duration: Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Product is already added in cart"),
+        backgroundColor: MyColors.error,
+        duration: Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ));
+    }
+  }
+
+  downloadAudio() {}
 
   showAudioModal() {
     showModalBottomSheet(

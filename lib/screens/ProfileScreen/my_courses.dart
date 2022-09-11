@@ -19,12 +19,12 @@ class _MyCoursesState extends State<MyCourses> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.wait([getBougthAlbums(), getAllLectures()]),
+      future: Future.wait([getAllLectures()]),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
-          List<Products> myAlbums = snapshot.data[0];
-          List<Products> allLectures = snapshot.data[1];
-          List<Products> allListProducts = [...myAlbums, ...allLectures];
+          // List<Products> myAlbums = snapshot.data[0];
+          List<Products> allLectures = snapshot.data[0];
+          List<Products> allListProducts = [...allLectures];
 
           if (allListProducts.isEmpty) {
             return Column(
@@ -44,7 +44,6 @@ class _MyCoursesState extends State<MyCourses> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  albums(myAlbums),
                   const SizedBox(height: 10),
                   allLecturesWidget(allLectures)
                 ],
@@ -79,11 +78,24 @@ class _MyCoursesState extends State<MyCourses> {
         itemCount: allLectures.length,
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemBuilder: (context, index) => AlbumDetailItem(
-            isBought: true,
-            products: allLectures[index],
-            albumName: albumName,
-            productsList: allLectures));
+        itemBuilder: (context, index) {
+          if (albumName != allLectures[index].albumTitle) {
+            albumName = allLectures[index].albumTitle ?? "fff";
+          }
+          // albumName = allLectures[index].albumTitle ?? "fff";
+          print("albumName $albumName");
+          print(allLectures[index].albumTitle);
+          return Column(
+            children: [
+              if (albumName == allLectures[index].albumTitle) Text(albumName),
+              AlbumDetailItem(
+                  isBought: true,
+                  products: allLectures[index],
+                  albumName: albumName,
+                  productsList: allLectures),
+            ],
+          );
+        });
   }
 
   Widget onlineCourses() {

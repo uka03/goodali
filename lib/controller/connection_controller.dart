@@ -7,6 +7,7 @@ import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/article_model.dart';
+import 'package:goodali/models/my_all_lectures.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/models/mood_item.dart';
@@ -330,8 +331,6 @@ class Connection {
       final response = await Http()
           .getDio(context, headerTypebearer)
           .get(Urls.getAllLectures);
-      print("get all lectures");
-      developer.log(response.data);
 
       if (response.statusCode == 200) {
         return (response.data as List)
