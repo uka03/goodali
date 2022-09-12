@@ -36,8 +36,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isFirstTime = false;
-
   @override
   void initState() {
     super.initState();
@@ -76,14 +74,13 @@ class _MyAppState extends State<MyApp> {
                   future: SharedPreferences.getInstance(),
                   builder:
                       (context, AsyncSnapshot<SharedPreferences> snapshot) {
-                    print(snapshot.data?.getBool("isFirstTime"));
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
                       case ConnectionState.waiting:
                         return const Blank();
                       default:
                         if (!snapshot.hasError) {
-                          return snapshot.data?.getBool("isFirstTime") == false
+                          return snapshot.data?.getBool("isFirstTime") == null
                               ? const IntroScreen()
                               : snapshot.data?.getBool("first_biometric") ==
                                       true

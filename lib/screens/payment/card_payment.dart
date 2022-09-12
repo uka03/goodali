@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class CardPayment extends StatefulWidget {
@@ -28,8 +30,10 @@ class _CardPaymentState extends State<CardPayment> {
 
   @override
   Widget build(BuildContext context) {
+    final card = Provider.of<CartProvider>(context);
+
     return Scaffold(
-      appBar: const SimpleAppBar(),
+      appBar: const SimpleAppBar(noCard: true),
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: WebView(
@@ -42,6 +46,7 @@ class _CardPaymentState extends State<CardPayment> {
           },
           gestureNavigationEnabled: true,
           onPageFinished: (String value) {
+            card.removeAllProducts();
             print("onPageFinished $value");
             // if (value.contains(other)) {
 

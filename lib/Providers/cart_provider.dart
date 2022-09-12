@@ -113,6 +113,13 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeAllProducts() {
+    _productsId.clear();
+    _items.clear();
+    _setPrefItems();
+    notifyListeners();
+  }
+
   List<Products> get cartItem {
     _getPrefItems();
     return _items;

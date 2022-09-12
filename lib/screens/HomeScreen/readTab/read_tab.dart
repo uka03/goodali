@@ -6,7 +6,7 @@ import 'package:goodali/screens/HomeScreen/readTab/article_detail.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/HomeScreen/readTab/online_book.dart';
 import 'package:goodali/screens/ListItems/article_item.dart';
-import 'package:goodali/screens/ProfileScreen/my_courses.dart';
+import 'package:goodali/screens/ProfileScreen/my_bought_courses.dart';
 import 'package:iconly/iconly.dart';
 
 class ReadTabbar extends StatefulWidget {

@@ -29,14 +29,14 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: Stack(children: [
-        Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12), color: Colors.pink[100]),
-          height: 170,
-          width: double.infinity,
-          child: Text("error while fetching image"),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: ImageView(
+              imgPath: widget.courseProducts.banner ?? "",
+              height: 170,
+              width: double.infinity),
         ),
-        // ImageView(imgPath: widget.courseProducts.banner ?? ""),
+
         Positioned(
           left: 20,
           top: 30,

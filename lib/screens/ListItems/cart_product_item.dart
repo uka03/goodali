@@ -21,16 +21,20 @@ class CartProductItem extends StatelessWidget {
           decoration: BoxDecoration(
               color: MyColors.input, borderRadius: BorderRadius.circular(12)),
           child: Stack(children: [
-            ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  color: Colors.pink,
-                )
-                // ImageView(
-                //     imgPath: products.banner ?? "", width: 36, height: 36)
-                ),
+            Positioned(
+              top: 14,
+              left: 14,
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    color: Colors.pink,
+                  )
+                  // ImageView(
+                  //     imgPath: products.banner ?? "", width: 36, height: 36)
+                  ),
+            ),
             Positioned(
               top: 20,
               left: 70,

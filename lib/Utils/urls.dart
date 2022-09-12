@@ -1,5 +1,6 @@
 class Urls {
   static String host = 'https://dev.goodali.mn/api';
+  static String networkPath = 'https://dev.goodali.mn';
 
   static final signin = "$host/signin";
   static final signup = "$host/signup";

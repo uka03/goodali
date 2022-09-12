@@ -97,9 +97,9 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   @override
-  // ignore: avoid_renaming_method_parameters
   Future<void> playMediaItem(MediaItem item) async {
     mediaItem.add(item);
+    print("player media item");
     updateMediaItem(item);
     _player.setAudioSource(AudioSource.uri(Uri.parse(item.id)));
   }

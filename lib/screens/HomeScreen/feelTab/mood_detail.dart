@@ -47,6 +47,7 @@ class _MoodDetailState extends State<MoodDetail> {
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
+  Duration savedPosition = Duration.zero;
 
   double _current = 0;
   bool isLoading = true;
@@ -126,23 +127,12 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   initForOthers(String url) async {
-    isExited = await audioPlayer.existedInLocal(url: url);
+    await audioPlayer.dynamicSet(url: url);
     duration = await audioPlayer.setUrl(url).then((value) {
           setState(() => isLoading = false);
           return value;
         }) ??
         Duration.zero;
-    print("isExited $isExited");
-    if (isExited == true) {
-      int saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
-          .getPosition(moodItem[_current.toInt()].id ?? 0);
-      setState(() {
-        isLoading = false;
-      });
-      position = Duration(milliseconds: saveddouble);
-    } else {
-      await audioPlayer.dynamicSet(url: url);
-    }
 
     MediaItem item = MediaItem(
       id: url,
@@ -170,9 +160,15 @@ class _MoodDetailState extends State<MoodDetail> {
       _handleInterruptions(audioSession);
     });
 
+    int saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
+        .getPosition(moodItem[_current.toInt()].id ?? 0);
+
+    print("saveddouble $saveddouble");
+    savedPosition = Duration(milliseconds: saveddouble);
+
     setState(() {
-      if (isExited) {
-        audioHandler.seek(position);
+      if (saveddouble != 0) {
+        audioHandler.seek(savedPosition);
         // audioHandler.play()
       } else {
         audioHandler.playMediaItem(item);
@@ -296,7 +292,7 @@ class _MoodDetailState extends State<MoodDetail> {
                       itemBuilder: ((context, index) {
                         url = moodItem[index].audio == "Audio failed to upload"
                             ? ""
-                            : Urls.host + moodItem[index].audio!;
+                            : Urls.networkPath + moodItem[index].audio!;
 
                         if (moodItem[index].audio == "Audio failed to upload") {
                           return Padding(
@@ -514,8 +510,7 @@ class _MoodDetailState extends State<MoodDetail> {
                     await audioHandler.play();
                     AudioPlayerModel _audio = AudioPlayerModel(
                         productID: moodItem[_current.toInt()].id,
-                        audioPosition: position.inMilliseconds,
-                        audioDuration: duration.inMilliseconds);
+                        audioPosition: position.inMilliseconds);
                     audioPosition.addAudioPosition(_audio);
                   },
                 ),
@@ -666,8 +661,7 @@ class _MoodDetailState extends State<MoodDetail> {
                   onPressed: () {
                     AudioPlayerModel _audio = AudioPlayerModel(
                         productID: moodItem[_current.toInt()].id,
-                        audioPosition: position.inMilliseconds,
-                        audioDuration: duration.inMilliseconds);
+                        audioPosition: position.inMilliseconds);
                     audioPosition.addAudioPosition(_audio);
                     audioHandler.pause();
                   },

@@ -40,6 +40,8 @@ class _PlayAudioState extends State<PlayAudio> {
   Stream<DurationState>? _durationState;
   Stream<DurationState>? _progressBarState;
   int currentview = 0;
+  int saveddouble = 0;
+
   List<Widget> pages = [];
   AudioPlayer audioPlayer = AudioPlayer();
   PlayerState? playerState;
@@ -66,13 +68,12 @@ class _PlayAudioState extends State<PlayAudio> {
     getDeviceModel();
     pages = [playAudio(), audioDesc()];
 
-    url = Urls.host + widget.products.audio!;
+    url = Urls.networkPath + widget.products.audio!;
   }
 
   @override
   void dispose() {
     super.dispose();
-
     audioPlayer.dispose();
   }
 
@@ -107,29 +108,11 @@ class _PlayAudioState extends State<PlayAudio> {
 
   initForOthers(String url) async {
     try {
-      isExited = await audioPlayer.existedInLocal(url: url);
       duration = await audioPlayer.setUrl(url).then((value) {
             setState(() => isLoading = false);
             return value;
           }) ??
           Duration.zero;
-
-      print("isExited $isExited");
-      if (isExited == true) {
-        int saveddouble = 0;
-        WidgetsBinding.instance?.addPostFrameCallback((_) async {
-          saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
-              .getPosition(widget.products.id ?? 0);
-        });
-
-        setState(() {
-          isLoading = false;
-        });
-        position = Duration(milliseconds: saveddouble);
-      }
-      // else {
-      //   await audioPlayer.dynamicSet(url: url);
-      // }
 
       MediaItem item = MediaItem(
         id: url,
@@ -140,6 +123,11 @@ class _PlayAudioState extends State<PlayAudio> {
 
       developer.log("edit ${item.id}");
       developer.log("edit ${item.duration}");
+
+      saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
+          .getPosition(widget.products.productId ?? 0);
+
+      savedPos = Duration(milliseconds: saveddouble);
 
       _durationState =
           Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
@@ -158,8 +146,9 @@ class _PlayAudioState extends State<PlayAudio> {
       });
 
       setState(() {
-        if (isExited) {
-          audioHandler.seek(position);
+        if (saveddouble != 0) {
+          print("savedPos $savedPos");
+          audioHandler.seek(savedPos);
           // audioHandler.play()
         } else {
           developer.log("edit ${item.duration}");
@@ -243,7 +232,7 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   Widget build(BuildContext context) {
     // final saveAudio = Provider.of<AudioPlayerProvider>(context, listen: false);
-    return pages[currentview];
+    return playAudio();
   }
 
   buttonBackWard5Seconds() {
@@ -391,7 +380,7 @@ class _PlayAudioState extends State<PlayAudio> {
           final position = durationState?.progress ?? Duration.zero;
           final buffered = durationState?.buffered ?? Duration.zero;
           final duration = durationState?.total ?? Duration.zero;
-          print(duration);
+
           return ProgressBar(
             progress: position,
             buffered: buffered,
@@ -408,8 +397,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
               AudioPlayerModel _audio = AudioPlayerModel(
                   productID: widget.products.id,
-                  audioPosition: position.inMilliseconds,
-                  audioDuration: duration.inMilliseconds);
+                  audioPosition: position.inMilliseconds);
               audioPosition.addAudioPosition(_audio);
             },
           );
@@ -476,8 +464,7 @@ class _PlayAudioState extends State<PlayAudio> {
             onPressed: () {
               AudioPlayerModel _audio = AudioPlayerModel(
                   productID: widget.products.id,
-                  audioPosition: position.inMilliseconds,
-                  audioDuration: duration.inMilliseconds);
+                  audioPosition: position.inMilliseconds);
               audioPosition.addAudioPosition(_audio);
               audioHandler.pause();
             },

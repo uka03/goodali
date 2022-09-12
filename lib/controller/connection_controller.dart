@@ -7,6 +7,7 @@ import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/article_model.dart';
+import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/models/my_all_lectures.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/get_mood_list.dart';
@@ -398,7 +399,7 @@ class Connection {
     }
   }
 
-  static Future<List<Products>> getBoughtCoursesItems(
+  static Future<List<CoursesItems>> getBoughtCoursesItems(
       BuildContext context, String id) async {
     try {
       final response = await Http()
@@ -407,7 +408,7 @@ class Connection {
 
       if (response.statusCode == 200) {
         return (response.data as List)
-            .map((e) => Products.fromJson(e))
+            .map((e) => CoursesItems.fromJson(e))
             .toList();
       } else if (response.statusCode == 401) {
         return [];

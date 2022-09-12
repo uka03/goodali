@@ -69,9 +69,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
       String url = widget.isBought
           ? widget.products.audio ?? ""
           : widget.products.intro ?? "";
-      developer.log(Urls.host + url);
+      developer.log(Urls.networkPath + url);
       try {
-        await audioPlayer.setUrl(Urls.host + url);
+        await audioPlayer.setUrl(Urls.networkPath + url);
       } catch (e) {
         print(e);
       }

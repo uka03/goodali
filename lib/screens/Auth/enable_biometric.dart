@@ -54,8 +54,7 @@ class _EnableBiometricState extends State<EnableBiometric> {
             const SizedBox(height: 10),
             TextButton(
                 onPressed: () {
-                  Provider.of<Auth>(context, listen: false)
-                      .firstBiometricScreen();
+                  Provider.of<Auth>(context, listen: false).noNeedBiometric();
                 },
                 child: const Text(
                   "Алгасах",

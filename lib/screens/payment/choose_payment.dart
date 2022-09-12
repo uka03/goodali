@@ -24,7 +24,7 @@ class _ChoosePaymentState extends State<ChoosePayment> {
   Widget build(BuildContext context) {
     print(widget.productIDs);
     return Scaffold(
-      appBar: const SimpleAppBar(),
+      appBar: const SimpleAppBar(noCard: true),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: Column(

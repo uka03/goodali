@@ -31,11 +31,13 @@ class AudioPlayerProvider with ChangeNotifier {
         .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
         .toList();
     _audioItems = decodedProduct;
+    print("productID $productID");
 
-    _position =
-        _audioItems.isNotEmpty ? _audioItems.last.audioPosition ?? 0 : 0;
-    _duration =
-        _audioItems.isNotEmpty ? _audioItems.last.audioDuration ?? 0 : 0;
+    for (var item in _audioItems) {
+      if (productID == item.productID) {
+        _position = _audioItems.isNotEmpty ? item.audioPosition ?? 0 : 0;
+      }
+    }
 
     notifyListeners();
   }
@@ -45,16 +47,9 @@ class AudioPlayerProvider with ChangeNotifier {
     return _position;
   }
 
-  int getDuration(int productID) {
-    _getPrefItems(productID);
-    return _duration;
-  }
-
   void addAudioPosition(AudioPlayerModel audio) {
     AudioPlayerModel audioItem = AudioPlayerModel(
-        productID: audio.productID,
-        audioPosition: audio.audioPosition,
-        audioDuration: audio.audioDuration);
+        productID: audio.productID, audioPosition: audio.audioPosition);
     print("inProvider ${audio.audioPosition}");
     _audioItems.add(audioItem);
     print(_audioItems);

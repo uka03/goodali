@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/screens/Auth/enable_biometric.dart';
@@ -169,6 +170,8 @@ class _SettingsState extends State<Settings> {
                   onPressed: () {
                     Navigator.popUntil(context, (route) => route.isFirst);
                     Provider.of<Auth>(context, listen: false).logOut(context);
+                    Provider.of<CartProvider>(context, listen: false)
+                        .removeAllProducts();
                   },
                   child: const Text(
                     "ТИЙМ",

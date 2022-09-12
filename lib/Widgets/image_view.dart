@@ -19,11 +19,16 @@ class ImageView extends StatelessWidget {
           ? imgPath
           : imgPath == ""
               ? ""
-              : Urls.host + imgPath,
-      // progressIndicatorBuilder: (context, url, downloadProgress) =>
-      //     CircularProgressIndicator(value: downloadProgress.progress),
-      placeholder: (context, url) =>
-          Container(width: width, height: height, color: Colors.purple),
+              : Urls.networkPath + imgPath,
+      progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+        child: CircularProgressIndicator(
+            color: MyColors.primaryColor,
+            strokeWidth: 2,
+            value: downloadProgress.progress),
+      ),
+      height: height,
+      width: width,
+      fit: BoxFit.cover,
       errorWidget: (context, url, error) => SizedBox(
           width: width,
           height: height,

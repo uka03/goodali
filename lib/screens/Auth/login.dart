@@ -8,6 +8,7 @@ import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/screens/Auth/forgot_password.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class LoginBottomSheet extends StatefulWidget {
@@ -357,6 +358,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   }
 
   userSignin() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
     var sendData = {
       "email": emailController.text,
       "password": passwordController.text
@@ -366,7 +368,9 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
     Navigator.pop(context);
 
     if (data['success'] == true) {
-      Provider.of<Auth>(context, listen: false).canBiometrics();
+      if (!preferences.containsKey("first_biometric")) {
+        Provider.of<Auth>(context, listen: false).canBiometrics();
+      }
       Navigator.pop(context, data['userInfo']);
     } else {
       showTopSnackBar(

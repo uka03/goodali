@@ -44,8 +44,8 @@ class _IntroAudioState extends State<IntroAudio> {
   @override
   void initState() {
     super.initState();
-    introUrl = Urls.host + widget.products.intro!;
-    audioUrl = Urls.host + widget.products.intro!;
+    introUrl = Urls.networkPath + widget.products.intro!;
+    audioUrl = Urls.networkPath + widget.products.audio!;
     _durationState =
         Rx.combineLatest2<Duration, PlaybackEvent, ProgressBarState>(
             audioPlayer.positionStream,

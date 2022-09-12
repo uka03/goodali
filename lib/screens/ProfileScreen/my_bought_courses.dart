@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/course_products_item.dart';
-import 'package:goodali/screens/ProfileScreen/my_online_course.dart';
-import 'package:iconly/iconly.dart';
 
 class MyCourses extends StatefulWidget {
   const MyCourses({Key? key}) : super(key: key);

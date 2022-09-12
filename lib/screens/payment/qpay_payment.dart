@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/qpay.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -19,8 +21,10 @@ class QpayPayment extends StatefulWidget {
 class _QpayPaymentState extends State<QpayPayment> {
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context);
+
     return Scaffold(
-      appBar: const SimpleAppBar(),
+      appBar: const SimpleAppBar(noCard: true),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: Column(
@@ -39,6 +43,7 @@ class _QpayPaymentState extends State<QpayPayment> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
+                    cart.removeAllProducts();
                     openBankApp(widget.qpayUrls[index].link ?? "");
                   },
                   child: Container(

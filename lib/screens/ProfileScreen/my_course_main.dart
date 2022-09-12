@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ProfileScreen/my_courses_detail.dart';
 import 'package:goodali/screens/blank.dart';
@@ -18,6 +21,8 @@ class MyCourseMain extends StatefulWidget {
 
 class _MyCourseMainState extends State<MyCourseMain> {
   String title = 'Очирын бороо';
+  int allTasks = 0;
+  int doneTasks = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +54,10 @@ class _MyCourseMainState extends State<MyCourseMain> {
             },
             body: FutureBuilder(
                 future: getBoughtCoursesItems(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData &&
+                      snapshot.connectionState == ConnectionState.done) {
+                    List<CoursesItems> coursesItemList = snapshot.data;
                     return InkWell(
                       onTap: () {
                         Navigator.push(
@@ -62,51 +69,73 @@ class _MyCourseMainState extends State<MyCourseMain> {
                       child: ListView.builder(
                         itemCount: 6,
                         itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              width: double.infinity,
-                              child: Row(
-                                children: [
-                                  Container(
-                                    color: Colors.purple,
-                                    height: 48,
-                                    width: 48,
-                                  ),
-                                  const SizedBox(width: 15),
-                                  Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                          widget.courseListItem[index].name ??
-                                              "",
-                                          style: const TextStyle(
-                                              color: MyColors.black,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold)),
-                                      Text(
-                                        "4/4 daalgwar",
-                                        style: TextStyle(
-                                            color: MyColors.gray, fontSize: 12),
+                          allTasks = coursesItemList[index].allTask ?? 0;
+                          doneTasks = coursesItemList[index].done ?? 0;
+                          String tasks = doneTasks.toString() +
+                              "/" +
+                              doneTasks.toString() +
+                              "даалгавар";
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            height: 70,
+                            width: double.infinity,
+                            child: Row(
+                              children: [
+                                Container(
+                                  color: Colors.purple,
+                                  height: 48,
+                                  width: 48,
+                                ),
+                                // ImageView(
+                                //   imgPath:
+                                //       coursesItemList[index].banner ?? "",
+                                //   height: 48,
+                                //   width: 48,
+                                // ),
+                                const SizedBox(width: 15),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                        coursesItemList[index]
+                                                .name
+                                                ?.capitalize() ??
+                                            "",
+                                        style: const TextStyle(
+                                            color: MyColors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      tasks,
+                                      style: TextStyle(
+                                          color: MyColors.gray, fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                                const Spacer(),
+                                allTasks == doneTasks
+                                    ? const CircleAvatar(
+                                        radius: 11,
+                                        backgroundColor: MyColors.success,
+                                        child: Icon(
+                                          Icons.done,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
                                       )
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  const CircleAvatar(
-                                    radius: 11,
-                                    backgroundColor: MyColors.success,
-                                    child: Icon(
-                                      Icons.done,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                ],
-                              ),
+                                    : Container(
+                                        height: 20,
+                                        width: 20,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                                width: 1,
+                                                color: MyColors.gray)),
+                                      ),
+                                const SizedBox(width: 10),
+                              ],
                             ),
                           );
                         },
@@ -122,7 +151,7 @@ class _MyCourseMainState extends State<MyCourseMain> {
                 })));
   }
 
-  Future<List<Products>> getBoughtCoursesItems() async {
+  Future<List<CoursesItems>> getBoughtCoursesItems() async {
     return Connection.getBoughtCoursesItems(
         context, widget.courseItem.id.toString());
   }

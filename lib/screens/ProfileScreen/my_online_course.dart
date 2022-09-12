@@ -10,8 +10,6 @@ class MyOnlineCourse extends StatefulWidget {
 }
 
 class _MyOnlineCourseState extends State<MyOnlineCourse> {
-  final List<String> _processes = ["1", "2", "3", "4"];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -15,8 +15,6 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Auth with ChangeNotifier {
   final LocalAuthentication localAuth = LocalAuthentication();
-  bool? isFirstTime;
-
   bool _isAuth = false;
   bool get isAuth => _isAuth;
 
@@ -36,16 +34,11 @@ class Auth with ChangeNotifier {
 
   Auth() {
     print("ene ehend bnuu");
-    checkIntro();
-  }
-
-  Future checkIntro() async {
-    final prefs = await SharedPreferences.getInstance();
-    isFirstTime = prefs.getBool("isFirstTime") ?? true;
   }
 
   Future<void> removeIntroScreen(BuildContext context) async {
-    isFirstTime = true;
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("isFirstTime", true);
     notifyListeners();
   }
 
@@ -109,7 +102,7 @@ class Auth with ChangeNotifier {
     final preferences = await SharedPreferences.getInstance();
     try {
       _canBiometric = await localAuth.canCheckBiometrics;
-      preferences.setBool("first_biometric", _canBiometric);
+      preferences.setBool("first_biometric", true);
       notifyListeners();
     } on PlatformException catch (e) {
       _canBiometric = false;
@@ -118,17 +111,15 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> firstBiometricScreen() async {
-    final preferences = await SharedPreferences.getInstance();
-    _canBiometric = false;
-    preferences.setBool("first_biometric", _canBiometric);
+  Future<void> enableBiometric() async {
+    _isBiometric = true;
+    authenticate();
     notifyListeners();
   }
 
-  Future<void> enableBiometric() async {
-    _isBiometric = true;
-    firstBiometricScreen();
-    authenticate();
+  Future<void> noNeedBiometric() async {
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setBool("first_biometric", false);
     notifyListeners();
   }
 
@@ -182,7 +173,6 @@ class Auth with ChangeNotifier {
           biometricOnly: true,
         ),
       );
-      firstBiometricScreen();
       String email = prefs.getString("email") ?? "";
       String password = prefs.getString("password") ?? "";
       if (email != "" && password != "") {

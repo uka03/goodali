@@ -61,8 +61,11 @@ class Http {
         }
       }, onError: (e, handler) async {
         if (e.type == DioErrorType.connectTimeout) {
-          showTopSnackBar(context,
-              CustomTopSnackBar(type: 0, text: "http dotor Aldaa garlaa"));
+          showTopSnackBar(
+              context,
+              CustomTopSnackBar(
+                  type: 0,
+                  text: "Интернэт холболтоо шалгаад, дахин оролдоно уу "));
         } else if (e.type == DioErrorType.receiveTimeout) {
           print("DIO RECEIVE TIME OUT");
         }
