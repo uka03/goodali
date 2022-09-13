@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
@@ -71,20 +73,20 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                            height: imageSize,
-                            width: imageSize,
-                            color: Colors.indigo[200]),
-                        // Opacity(
-                        //   opacity: imageOpacity.clamp(0, 1),
-                        //   child: ClipRRect(
-                        //     borderRadius: BorderRadius.circular(14),
-                        //     child: ImageViewer(
-                        //         imgPath: widget.products.banner ?? "",
-                        //         width: imageSize,
-                        //         height: imageSize),
-                        //   ),
-                        // ),
+                        // Container(
+                        //     height: imageSize,
+                        //     width: imageSize,
+                        //     color: Colors.indigo[200]),
+                        Opacity(
+                          opacity: imageOpacity.clamp(0, 1),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: ImageView(
+                                imgPath: widget.products.banner ?? "",
+                                width: imageSize,
+                                height: imageSize),
+                          ),
+                        ),
                         const SizedBox(height: 80)
                       ],
                     )),

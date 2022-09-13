@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/info.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/products_model.dart';
+import 'dart:developer' as developer;
 
 import 'package:goodali/screens/HomeScreen/courseTab/course_list.dart';
 
@@ -20,6 +22,14 @@ class CourseDetail extends StatefulWidget {
 
 class _CourseDetailState extends State<CourseDetail> {
   @override
+  void initState() {
+    print(widget.courseProducts.body);
+    developer.log(widget.courseProducts.body.toString());
+    // print(object)
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: const SimpleAppBar(),
@@ -27,23 +37,23 @@ class _CourseDetailState extends State<CourseDetail> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                  height: 200,
-                  width: double.infinity,
-                  color: Colors.yellowAccent,
-                  child: Center(
-                    child: Text("Error while fetching image"),
-                  )),
-              // ImageViewer(
-              //   imgPath: widget.courseProducts.banner ?? "",
-              //   height: 200,
-              // )
+              // Container(
+              //     height: 200,
+              //     width: double.infinity,
+              //     color: Colors.yellowAccent,
+              //     child: Center(
+              //       child: Text("Error while fetching image"),
+              //     )),
+              ImageView(
+                imgPath: widget.courseProducts.banner ?? "",
+                height: 200,
+              ),
               Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
-                      Text(widget.courseProducts.title ?? "",
+                      Text(widget.courseProducts.name ?? "",
                           style: const TextStyle(
                               color: MyColors.black,
                               fontSize: 24,

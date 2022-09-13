@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:just_audio/just_audio.dart' as ja;
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -54,6 +55,7 @@ class _MoodDetailState extends State<MoodDetail> {
   bool isExited = false;
 
   String url = "";
+  String imgUrl = "";
   String manuFacturer = "";
 
   Widget rightButton = const Text(
@@ -72,7 +74,13 @@ class _MoodDetailState extends State<MoodDetail> {
   void initState() {
     super.initState();
     getDeviceModel();
-    getMoodList();
+    getMoodList().then((value) {
+      moodItem = value;
+      if (value.length == 1) {
+        print("url $url");
+        playAudio(Urls.networkPath + moodItem.first.audio!);
+      }
+    });
     _pageController.addListener(() {
       setState(() {
         _current = _pageController.page!;
@@ -127,57 +135,60 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   initForOthers(String url) async {
-    await audioPlayer.dynamicSet(url: url);
-    duration = await audioPlayer.setUrl(url).then((value) {
-          setState(() => isLoading = false);
-          return value;
-        }) ??
-        Duration.zero;
+    try {
+      await audioPlayer.dynamicSet(url: url);
+      duration = await audioPlayer.setUrl(url).then((value) {
+            setState(() => isLoading = false);
+            return value;
+          }) ??
+          Duration.zero;
 
-    MediaItem item = MediaItem(
-      id: url,
-      title: moodItem[_current.toInt()].title ?? "",
-      duration: duration,
-      // artUri: Uri.parse(moodItem[_current.toInt()].banner!),
-    );
+      MediaItem item = MediaItem(
+        id: url,
+        title: moodItem[_current.toInt()].title ?? "",
+        duration: duration,
+        // artUri: Uri.parse(moodItem[_current.toInt()].banner!),
+      );
 
-    developer.log("edit ${item.id}");
-    developer.log("edit ${item.duration}");
+      developer.log("edit ${item.id}");
+      developer.log("edit ${item.duration}");
 
-    _durationState =
-        Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
-            audioHandler.mediaItem,
-            AudioService.position,
-            _bufferedPositionStream,
-            (mediaItem, position, buffered) => DurationState(
-                  progress: position,
-                  buffered: buffered,
-                  total: mediaItem?.duration,
-                ));
+      _durationState =
+          Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
+              audioHandler.mediaItem,
+              AudioService.position,
+              _bufferedPositionStream,
+              (mediaItem, position, buffered) => DurationState(
+                    progress: position,
+                    buffered: buffered,
+                    total: mediaItem?.duration,
+                  ));
 
-    AudioSession.instance.then((audioSession) async {
-      await audioSession.configure(const AudioSessionConfiguration.speech());
-      _handleInterruptions(audioSession);
-    });
+      AudioSession.instance.then((audioSession) async {
+        await audioSession.configure(const AudioSessionConfiguration.speech());
+        _handleInterruptions(audioSession);
+      });
 
-    int saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
-        .getPosition(moodItem[_current.toInt()].id ?? 0);
+      int saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
+          .getPosition(moodItem[_current.toInt()].id ?? 0);
 
-    print("saveddouble $saveddouble");
-    savedPosition = Duration(milliseconds: saveddouble);
+      print("saveddouble $saveddouble");
+      savedPosition = Duration(milliseconds: saveddouble);
 
-    setState(() {
-      if (saveddouble != 0) {
-        audioHandler.seek(savedPosition);
-        // audioHandler.play()
-      } else {
-        audioHandler.playMediaItem(item);
-      }
-    });
+      setState(() {
+        if (saveddouble != 0) {
+          audioHandler.seek(savedPosition);
+          // audioHandler.play()
+        } else {
+          audioHandler.playMediaItem(item);
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   initForChinesePhone(String url) {
-    developer.log(url);
     setState(() {
       audioPlayer.setUrl(url);
     });
@@ -290,6 +301,10 @@ class _MoodDetailState extends State<MoodDetail> {
                         }
                       },
                       itemBuilder: ((context, index) {
+                        imgUrl =
+                            moodItem[index].banner == "Image failed to upload"
+                                ? ""
+                                : moodItem[index].banner!;
                         url = moodItem[index].audio == "Audio failed to upload"
                             ? ""
                             : Urls.networkPath + moodItem[index].audio!;
@@ -323,8 +338,7 @@ class _MoodDetailState extends State<MoodDetail> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (moodItem[index].banner != "")
-                                  banner(Urls.host + moodItem[index].banner!),
+                                if (imgUrl != "") banner(imgUrl),
                                 const SizedBox(height: 40),
                                 HtmlWidget(
                                   moodItem[index].title!,
@@ -431,21 +445,22 @@ class _MoodDetailState extends State<MoodDetail> {
     );
   }
 
-  Widget banner(String url) {
+  Widget banner(String imgUrl) {
     return Center(
       child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            height: 260,
-            width: 260,
-            color: Colors.deepPurple[200],
-          )
-          // ImageViewer(
-          //   imgPath: url,
-          //   height: 260,
-          //   width: 260,
-          // ),
-          ),
+        borderRadius: BorderRadius.circular(14),
+        child:
+            // Container(
+            //   height: 260,
+            //   width: 260,
+            //   color: Colors.deepPurple[200],
+            // )
+            ImageView(
+          imgPath: imgUrl,
+          height: 260,
+          width: 260,
+        ),
+      ),
     );
   }
 

@@ -57,6 +57,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isBiometric = Provider.of<Auth>(context).loginWithBio;
+
     return Scaffold(
       body: Consumer<Auth>(
         builder: (BuildContext context, value, Widget? child) {

@@ -95,16 +95,16 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
             children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    color: Colors.pink,
-                  )
-                  // ImageView(
-                  //     imgPath: widget.products.banner ?? "",
-                  //     width: 40,
-                  //     height: 40)
-                  ),
+                  child:
+                      // Container(
+                      //   width: 40,
+                      //   height: 40,
+                      //   color: Colors.pink,
+                      // )
+                      ImageView(
+                          imgPath: widget.products.banner ?? "",
+                          width: 40,
+                          height: 40)),
               const SizedBox(width: 15),
               Expanded(
                 child: Column(
