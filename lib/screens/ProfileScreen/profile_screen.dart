@@ -37,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   checkLoginWithBio() async {
     final prefs = await SharedPreferences.getInstance();
-    loginWithBio = prefs.getBool("login_biometric")!;
+    loginWithBio = prefs.getBool("login_biometric") ?? false;
     print("getCheckBiometric $loginWithBio");
   }
 
@@ -57,8 +57,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isBiometric = Provider.of<Auth>(context).loginWithBio;
-
     return Scaffold(
       body: Consumer<Auth>(
         builder: (BuildContext context, value, Widget? child) {

@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:goodali/Utils/constans.dart';
+import 'package:goodali/Utils/global_variables.dart';
 import 'package:goodali/controller/http.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
@@ -141,8 +142,6 @@ class Auth with ChangeNotifier {
       if (_authenticated) {
         prefs.setBool("login_biometric", _authenticated);
         _canBiometric = false;
-        showTopSnackBar(context,
-            const CustomTopSnackBar(type: 1, text: "Амжилттай хадгалагдлаа"));
       }
       notifyListeners();
     } on PlatformException catch (e) {

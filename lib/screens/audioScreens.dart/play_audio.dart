@@ -6,6 +6,7 @@ import 'package:audio_session/audio_session.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/audio_provider.dart';
@@ -13,12 +14,15 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
-import 'package:just_audio/just_audio.dart' as ja;
+
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/controller/audio_player_handler.dart';
+import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
+import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_cache/just_audio_cache.dart';
@@ -42,7 +46,6 @@ class _PlayAudioState extends State<PlayAudio> {
   int currentview = 0;
   int saveddouble = 0;
 
-  List<Widget> pages = [];
   AudioPlayer audioPlayer = AudioPlayer();
   PlayerState? playerState;
 
@@ -56,17 +59,12 @@ class _PlayAudioState extends State<PlayAudio> {
   bool isExited = false;
   bool isLoading = true;
 
-  final _player = ja.AudioPlayer(
-    handleInterruptions: false,
-    androidApplyAudioAttributes: false,
-    handleAudioSessionActivation: false,
-  );
+  Stream<FileResponse>? fileStream;
 
   @override
   void initState() {
     super.initState();
     getDeviceModel();
-    pages = [playAudio(), audioDesc()];
 
     url = Urls.networkPath + widget.products.audio!;
   }
@@ -142,7 +140,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
       AudioSession.instance.then((audioSession) async {
         await audioSession.configure(const AudioSessionConfiguration.speech());
-        _handleInterruptions(audioSession);
+        AudioSessionSettings.handleInterruption(audioSession);
       });
 
       setState(() {
@@ -160,6 +158,12 @@ class _PlayAudioState extends State<PlayAudio> {
     }
   }
 
+  void _downloadFile() {
+    setState(() {
+      fileStream = DefaultCacheManager().getFileStream(url, withProgress: true);
+    });
+  }
+
   initForChinesePhone(String url) {
     setState(() {
       audioPlayer.setUrl(url);
@@ -173,60 +177,6 @@ class _PlayAudioState extends State<PlayAudio> {
                   buffered: playbackEvent.bufferedPosition,
                   total: playbackEvent.duration!,
                 ));
-  }
-
-  void _handleInterruptions(AudioSession audioSession) {
-    bool playInterrupted = false;
-    audioSession.becomingNoisyEventStream.listen((_) {
-      print('PAUSE');
-      _player.pause();
-    });
-    _player.playingStream.listen((playing) {
-      playInterrupted = false;
-      if (playing) {
-        audioSession.setActive(true);
-      }
-    });
-    audioSession.interruptionEventStream.listen((event) {
-      print('interruption begin: ${event.begin}');
-      print('interruption type: ${event.type}');
-      if (event.begin) {
-        switch (event.type) {
-          case AudioInterruptionType.duck:
-            if (audioSession.androidAudioAttributes!.usage ==
-                AndroidAudioUsage.game) {
-              _player.setVolume(_player.volume / 2);
-            }
-            playInterrupted = false;
-            break;
-          case AudioInterruptionType.pause:
-          case AudioInterruptionType.unknown:
-            if (_player.playing) {
-              _player.pause();
-              playInterrupted = true;
-            }
-            break;
-        }
-      } else {
-        switch (event.type) {
-          case AudioInterruptionType.duck:
-            _player.setVolume(min(1.0, _player.volume * 2));
-            playInterrupted = false;
-            break;
-          case AudioInterruptionType.pause:
-            if (playInterrupted) _player.play();
-            playInterrupted = false;
-            break;
-          case AudioInterruptionType.unknown:
-            playInterrupted = false;
-            break;
-        }
-      }
-    });
-    audioSession.devicesChangedEventStream.listen((event) {
-      print('Devices added: ${event.devicesAdded}');
-      print('Devices removed: ${event.devicesRemoved}');
-    });
   }
 
   @override
@@ -298,27 +248,19 @@ class _PlayAudioState extends State<PlayAudio> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Column(
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        IconlyLight.arrow_down,
-                        color: MyColors.gray,
-                      ),
-                      splashRadius: 1,
-                    ),
-                    const Text("Татах",
-                        style: TextStyle(fontSize: 12, color: MyColors.gray))
-                  ],
+                DownloadPage(
+                  fileStream: fileStream,
+                  downloadFile: _downloadFile,
                 ),
                 Column(
                   children: [
                     IconButton(
                       onPressed: () {
-                        setState(() {
-                          currentview = 1;
-                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AudioDescription(
+                                    description: widget.products.body ?? "")));
                       },
                       icon: const Icon(
                         IconlyLight.info_square,
@@ -521,41 +463,6 @@ class _PlayAudioState extends State<PlayAudio> {
           );
         }
       },
-    );
-  }
-
-  Widget audioDesc() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                currentview = 0;
-              });
-            },
-            icon: const Icon(
-              IconlyLight.arrow_left,
-              color: MyColors.gray,
-            ),
-            splashRadius: 1,
-          ),
-          const SizedBox(height: 20),
-          const Align(
-            alignment: Alignment.center,
-            child: Text("Тайлбар",
-                style: TextStyle(
-                    color: MyColors.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(height: 20),
-          HtmlWidget(widget.products.body ?? "",
-              textStyle: const TextStyle(color: MyColors.gray))
-        ],
-      ),
     );
   }
 }

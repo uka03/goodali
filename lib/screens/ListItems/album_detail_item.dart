@@ -7,8 +7,8 @@ import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/intro_audio.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/play_audio.dart';
+import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
+import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
