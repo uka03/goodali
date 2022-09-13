@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
@@ -48,9 +49,9 @@ class _CardPaymentState extends State<CardPayment> {
           onPageFinished: (String value) {
             card.removeAllProducts();
             print("onPageFinished $value");
-            // if (value.contains(other)) {
-
-            // }
+            if (value.contains("status_code=000")) {
+              readResponse();
+            }
           },
           onProgress: (int progress) {
             print('Webview is loading $progress');
@@ -58,5 +59,22 @@ class _CardPaymentState extends State<CardPayment> {
         ),
       ),
     );
+  }
+
+  void readResponse() async {
+    final response = await _webViewController
+        ?.runJavascriptReturningResult("document.documentElement.innerText");
+
+    Map<String, dynamic> data =
+        Map<String, dynamic>.from(json.decode(response ?? ""));
+
+    var status = data["status"];
+    var message = data["output"];
+    print("status $status");
+    if (status == 1) {
+      print("etsesttsts neg ym bollooooo");
+    } else {
+      print("sfondfndnf errorrdolooo");
+    }
   }
 }

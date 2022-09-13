@@ -20,7 +20,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   void initState() {
-    biometric = Provider.of<Auth>(context, listen: false).checkBiometric();
+    biometric = Provider.of<Auth>(context, listen: false).isBiometric;
     print("biometric $biometric");
     super.initState();
   }

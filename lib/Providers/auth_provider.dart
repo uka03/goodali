@@ -139,6 +139,7 @@ class Auth with ChangeNotifier {
         _canBiometric = false;
         notifyListeners();
       }
+      notifyListeners();
     } on PlatformException catch (e) {
       print(e);
     }
