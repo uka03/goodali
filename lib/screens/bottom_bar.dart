@@ -1,15 +1,11 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
-import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
-import 'package:goodali/screens/Auth/enable_biometric.dart';
-import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:goodali/screens/HomeScreen/home_screen.dart';
 import 'package:goodali/screens/ForumScreen/forum_screen.dart';
 import 'package:goodali/screens/ProfileScreen/settings.dart';
-import 'package:goodali/screens/intro_screen.dart';
 import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
@@ -83,13 +79,15 @@ class _BottomTabbarState extends State<BottomTabbar> {
           onTabTapped(value!);
         },
       ),
-      body: Stack(children: [
-        renderView(0, const HomeScreen()),
-        renderView(1, const ForumScreen()),
-        renderView(2, const ProfileScreen()),
-      ]),
+      body: _widgetOptions.elementAt(selectedIndex),
     );
   }
+
+  final List<Widget> _widgetOptions = <Widget>[
+    const HomeScreen(),
+    const ForumScreen(),
+    const ProfileScreen(),
+  ];
 
   void onTabTapped(int index) {
     setState(() {

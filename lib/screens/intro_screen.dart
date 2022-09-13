@@ -140,11 +140,9 @@ class _IntroScreenState extends State<IntroScreen> {
                   borderRadius: BorderRadius.circular(12)),
               child: RawMaterialButton(
                 onPressed: () async {
-                  final prefs = await SharedPreferences.getInstance();
                   _pageController.nextPage(
                       curve: _kCurve, duration: _kDuration);
                   if (_current == 2.0) {
-                    prefs.setBool("isFirstTime", true);
                     Provider.of<Auth>(context, listen: false)
                         .removeIntroScreen(context);
                   }

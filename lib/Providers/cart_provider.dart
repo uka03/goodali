@@ -31,7 +31,6 @@ class CartProvider with ChangeNotifier {
     prefs.setStringList("product_list_ids", productIdString);
     prefs.setStringList("product_list", encodedProducts);
     prefs.setDouble('total_price', _totalPrice);
-
     notifyListeners();
   }
 

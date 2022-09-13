@@ -12,6 +12,7 @@ import 'package:goodali/screens/bottom_bar.dart';
 import 'package:goodali/screens/intro_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as developer;
 
 late AudioHandler audioHandler;
 
@@ -80,6 +81,10 @@ class _MyAppState extends State<MyApp> {
                         return const Blank();
                       default:
                         if (!snapshot.hasError) {
+                          developer.log(
+                              "biometric ${snapshot.data?.getBool("first_biometric")}");
+                          developer.log(
+                              "intro ${snapshot.data?.getBool("isFirstTime")}");
                           return snapshot.data?.getBool("isFirstTime") == null
                               ? const IntroScreen()
                               : snapshot.data?.getBool("first_biometric") ==

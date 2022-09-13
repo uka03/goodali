@@ -31,7 +31,7 @@ class AlbumItem extends StatelessWidget {
                 child: Container(
                   color: Colors.pink,
                 )
-                // ImageView(
+                //     ImageView(
                 //   imgPath: albumData.banner ?? '',
                 // )
                 ),

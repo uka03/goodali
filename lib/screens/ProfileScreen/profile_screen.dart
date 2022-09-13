@@ -26,10 +26,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? changedName;
   bool isChanged = false;
   String? avatarPath;
+  bool loginWithBio = false;
 
   @override
   void initState() {
+    print("jfnjdnfndkjnf");
+    checkLoginWithBio();
     super.initState();
+  }
+
+  checkLoginWithBio() async {
+    final prefs = await SharedPreferences.getInstance();
+    loginWithBio = prefs.getBool("login_biometric")!;
+    print("getCheckBiometric $loginWithBio");
   }
 
   Future<UserInfo?> userData() async {
@@ -48,8 +57,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isBiometric = Provider.of<Auth>(context).checkBiometric();
-
     return Scaffold(
       body: Consumer<Auth>(
         builder: (BuildContext context, value, Widget? child) {
@@ -175,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: CustomElevatedButton(
                   text: "Нэвтрэх",
                   onPress: () {
-                    isBiometric
+                    loginWithBio
                         ? value.authenticateWithBiometrics(context)
                         : showLoginModal();
                   },

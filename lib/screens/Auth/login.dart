@@ -368,6 +368,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
     Navigator.pop(context);
 
     if (data['success'] == true) {
+      print("firstbio ${preferences.containsKey("first_biometric")}");
       if (!preferences.containsKey("first_biometric")) {
         Provider.of<Auth>(context, listen: false).canBiometrics();
       }

@@ -129,7 +129,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
                 padding: const EdgeInsets.only(right: 20.0),
                 child: AlbumItem(
                   albumData: albumList[index],
-                  audioLength: audioLength.length,
+                  audioLength: 0,
                 ),
               )),
     );

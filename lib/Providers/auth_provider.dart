@@ -23,8 +23,8 @@ class Auth with ChangeNotifier {
 
   bool? firstBiometric;
 
-  bool _isBiometric = false;
-  bool get isBiometric => _isBiometric;
+  bool _loginWithBio = false;
+  bool get loginWithBio => _loginWithBio;
 
   void changeStatus(bool status) {
     print("change status");
@@ -37,6 +37,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> removeIntroScreen(BuildContext context) async {
+    print("removeIntroScreen");
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool("isFirstTime", true);
     notifyListeners();
@@ -99,10 +100,11 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> canBiometrics() async {
-    final preferences = await SharedPreferences.getInstance();
     try {
+      final preferences = await SharedPreferences.getInstance();
       _canBiometric = await localAuth.canCheckBiometrics;
       preferences.setBool("first_biometric", true);
+
       notifyListeners();
     } on PlatformException catch (e) {
       _canBiometric = false;
@@ -111,9 +113,11 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> enableBiometric() async {
-    _isBiometric = true;
-    authenticate();
+  Future<void> enableBiometric(BuildContext context) async {
+    final preferences = await SharedPreferences.getInstance();
+    _loginWithBio = true;
+    preferences.setBool("first_biometric", false);
+    authenticate(context);
     notifyListeners();
   }
 
@@ -123,7 +127,7 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> authenticate() async {
+  Future<void> authenticate(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     try {
       bool _authenticated = await localAuth.authenticate(
@@ -134,11 +138,13 @@ class Auth with ChangeNotifier {
           biometricOnly: true,
         ),
       );
-      prefs.setBool("login_biometric", _authenticated);
       if (_authenticated) {
+        prefs.setBool("login_biometric", _authenticated);
         _canBiometric = false;
-        notifyListeners();
+        showTopSnackBar(context,
+            const CustomTopSnackBar(type: 1, text: "Амжилттай хадгалагдлаа"));
       }
+      notifyListeners();
     } on PlatformException catch (e) {
       print(e);
     }
@@ -147,19 +153,9 @@ class Auth with ChangeNotifier {
   Future<void> disableBiometric() async {
     print(" huruunii hee haagdlaa");
     final prefs = await SharedPreferences.getInstance();
-    _isBiometric = false;
-    prefs.setBool("login_biometric", _isBiometric);
+    _loginWithBio = false;
+    prefs.setBool("login_biometric", _loginWithBio);
     notifyListeners();
-  }
-
-  Future<void> getCheckBiometric() async {
-    final prefs = await SharedPreferences.getInstance();
-    _isBiometric = prefs.getBool("login_biometric") ?? false;
-  }
-
-  bool checkBiometric() {
-    getCheckBiometric();
-    return _isBiometric;
   }
 
   Future<void> authenticateWithBiometrics(BuildContext context) async {

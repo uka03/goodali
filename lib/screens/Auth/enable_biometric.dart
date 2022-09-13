@@ -48,7 +48,8 @@ class _EnableBiometricState extends State<EnableBiometric> {
             const Spacer(),
             CustomElevatedButton(
                 onPress: () {
-                  Provider.of<Auth>(context, listen: false).enableBiometric();
+                  Provider.of<Auth>(context, listen: false)
+                      .enableBiometric(context);
                 },
                 text: "Таниулах"),
             const SizedBox(height: 10),
