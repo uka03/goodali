@@ -246,7 +246,9 @@ class _IntroAudioState extends State<IntroAudio> {
                   ),
                 ),
                 InkWell(
-                  onTap: buttonForward15Seconds,
+                  onTap: () {
+                    Utils.buttonForward15Seconds(position, duration);
+                  },
                   child: SvgPicture.asset(
                     "assets/images/forward_15.svg",
                   ),

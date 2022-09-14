@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/main.dart';
 import 'package:html/parser.dart';
 
 Color getRandomColors() {
@@ -67,5 +68,31 @@ class Utils {
         barrierDismissible: false,
         context: context,
         builder: (BuildContext context) => alert);
+  }
+
+  static buttonForward15Seconds(
+    Duration position,
+    Duration duration,
+  ) {
+    position = position + const Duration(seconds: 15);
+
+    if (duration > position) {
+      audioHandler.seek(position);
+    } else if (duration < position) {
+      audioHandler.seek(duration);
+    }
+  }
+
+  static buttonBackWard5Seconds(
+    Duration position,
+    Duration duration,
+  ) {
+    position = position - const Duration(seconds: 5);
+
+    if (position < const Duration(seconds: 0)) {
+      audioHandler.seek(const Duration(seconds: 0));
+    } else {
+      audioHandler.seek(position);
+    }
   }
 }

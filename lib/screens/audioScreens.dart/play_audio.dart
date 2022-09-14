@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math';
+import 'dart:ui';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
@@ -18,14 +20,18 @@ import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/controller/audio_player_handler.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
+import 'package:goodali/screens/audioScreens.dart/audio_progress_bar.dart';
 import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_cache/just_audio_cache.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:developer' as developer;
@@ -43,6 +49,8 @@ class PlayAudio extends StatefulWidget {
 class _PlayAudioState extends State<PlayAudio> {
   Stream<DurationState>? _durationState;
   Stream<DurationState>? _progressBarState;
+  final ReceivePort _port = ReceivePort();
+
   int currentview = 0;
   int saveddouble = 0;
 
@@ -59,20 +67,42 @@ class _PlayAudioState extends State<PlayAudio> {
   bool isExited = false;
   bool isLoading = true;
 
-  Stream<FileResponse>? fileStream;
-
   @override
   void initState() {
     super.initState();
     getDeviceModel();
 
     url = Urls.networkPath + widget.products.audio!;
+
+    IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
+    _port.listen((dynamic data) {
+      String id = data[0];
+      DownloadTaskStatus status = data[1];
+      int progress = data[2];
+      setState(() {});
+    });
+
+    FlutterDownloader.registerCallback(downloadCallback);
+  }
+
+  @pragma('vm:entry-point')
+  static void downloadCallback(
+      String id, DownloadTaskStatus status, int progress) {
+    print(
+      'Callback on background isolate: '
+      'task ($id) is in status ($status) and process ($progress)',
+    );
+    final SendPort? send =
+        IsolateNameServer.lookupPortByName('downloader_send_port');
+    send?.send([id, status, progress]);
   }
 
   @override
   void dispose() {
-    super.dispose();
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
     audioPlayer.dispose();
+    super.dispose();
   }
 
   getDeviceModel() async {
@@ -84,25 +114,17 @@ class _PlayAudioState extends State<PlayAudio> {
     } else if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
     }
-    _init(url);
+    if (manuFacturer == "samsung" || Platform.isIOS) {
+      print(" samsunggg bnsndsj");
+      initForOthers(url);
+    } else {
+      initForChinesePhone(url);
+    }
   }
 
   Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
       .map((state) => state.bufferedPosition)
       .distinct();
-
-  Future<void> _init(String url) async {
-    try {
-      if (manuFacturer == "samsung" || Platform.isIOS) {
-        print(" samsunggg bnsndsj");
-        initForOthers(url);
-      } else {
-        initForChinesePhone(url);
-      }
-    } catch (e) {
-      debugPrint('An error occured $e');
-    }
-  }
 
   initForOthers(String url) async {
     try {
@@ -116,7 +138,7 @@ class _PlayAudioState extends State<PlayAudio> {
         id: url,
         title: widget.products.title ?? "",
         duration: duration,
-        // artUri: Uri.parse(moodItem[_current.toInt()].banner!),
+        artUri: Uri.parse(Urls.networkPath + widget.products.banner!),
       );
 
       developer.log("edit ${item.id}");
@@ -127,41 +149,34 @@ class _PlayAudioState extends State<PlayAudio> {
 
       savedPos = Duration(milliseconds: saveddouble);
 
-      _durationState =
-          Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
-              audioHandler.mediaItem,
-              AudioService.position,
-              _bufferedPositionStream,
-              (mediaItem, position, buffered) => DurationState(
-                    progress: position,
-                    buffered: buffered,
-                    total: mediaItem?.duration,
-                  ));
-
-      AudioSession.instance.then((audioSession) async {
-        await audioSession.configure(const AudioSessionConfiguration.speech());
-        AudioSessionSettings.handleInterruption(audioSession);
-      });
-
       setState(() {
+        _durationState =
+            Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
+                audioHandler.mediaItem,
+                AudioService.position,
+                _bufferedPositionStream,
+                (mediaItem, position, buffered) => DurationState(
+                      progress: position,
+                      buffered: buffered,
+                      total: mediaItem?.duration,
+                    ));
+
         if (saveddouble != 0) {
           print("savedPos $savedPos");
           audioHandler.seek(savedPos);
           // audioHandler.play()
         } else {
-          developer.log("edit ${item.duration}");
           audioHandler.playMediaItem(item);
         }
+      });
+
+      AudioSession.instance.then((audioSession) async {
+        await audioSession.configure(const AudioSessionConfiguration.speech());
+        AudioSessionSettings.handleInterruption(audioSession);
       });
     } catch (e) {
       print(e);
     }
-  }
-
-  void _downloadFile() {
-    setState(() {
-      fileStream = DefaultCacheManager().getFileStream(url, withProgress: true);
-    });
   }
 
   initForChinesePhone(String url) {
@@ -179,30 +194,27 @@ class _PlayAudioState extends State<PlayAudio> {
                 ));
   }
 
+  Future download(String url) async {
+    var status = await Permission.storage.request();
+    if (status.isGranted) {
+      final baseStorage;
+      if (Platform.isIOS) {
+        baseStorage = await getApplicationDocumentsDirectory();
+      } else {
+        baseStorage = await getExternalStorageDirectory();
+      }
+
+      await FlutterDownloader.enqueue(
+          url: url,
+          savedDir: baseStorage!.path,
+          showNotification: true,
+          openFileFromNotification: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final saveAudio = Provider.of<AudioPlayerProvider>(context, listen: false);
     return playAudio();
-  }
-
-  buttonBackWard5Seconds() {
-    position = position - const Duration(seconds: 5);
-
-    if (position < const Duration(seconds: 0)) {
-      audioHandler.seek(const Duration(seconds: 0));
-    } else {
-      audioHandler.seek(position);
-    }
-  }
-
-  buttonForward15Seconds() {
-    position = position + const Duration(seconds: 15);
-
-    if (duration > position) {
-      audioHandler.seek(position);
-    } else if (duration < position) {
-      audioHandler.seek(duration);
-    }
   }
 
   Widget playAudio() {
@@ -220,16 +232,14 @@ class _PlayAudioState extends State<PlayAudio> {
                   borderRadius: BorderRadius.circular(10)),
             ),
             const SizedBox(height: 40),
-            Container(
-              width: 220,
-              height: 220,
-              color: Colors.pink,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: ImageView(
+                imgPath: widget.products.banner ?? "",
+                width: 220,
+                height: 220,
+              ),
             ),
-            // ImageView(
-            //   imgPath: widget.products.banner ?? "",
-            //   width: 220,
-            //   height: 220,
-            // ),
             const SizedBox(height: 40),
             Text(
               widget.albumName,
@@ -248,9 +258,19 @@ class _PlayAudioState extends State<PlayAudio> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                DownloadPage(
-                  fileStream: fileStream,
-                  downloadFile: _downloadFile,
+                Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        download(url);
+                      },
+                      icon: const Icon(IconlyLight.arrow_down,
+                          color: MyColors.gray),
+                      splashRadius: 1,
+                    ),
+                    const Text("Татах",
+                        style: TextStyle(fontSize: 12, color: MyColors.gray))
+                  ],
                 ),
                 Column(
                   children: [
@@ -286,7 +306,9 @@ class _PlayAudioState extends State<PlayAudio> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 InkWell(
-                  onTap: buttonBackWard5Seconds,
+                  onTap: () {
+                    Utils.buttonBackWard5Seconds(position, duration);
+                  },
                   child: SvgPicture.asset(
                     "assets/images/replay_5.svg",
                   ),
@@ -298,7 +320,9 @@ class _PlayAudioState extends State<PlayAudio> {
                         ? playerButton()
                         : playerButtonforChinese()),
                 InkWell(
-                  onTap: buttonForward15Seconds,
+                  onTap: () {
+                    Utils.buttonForward15Seconds(position, duration);
+                  },
                   child: SvgPicture.asset(
                     "assets/images/forward_15.svg",
                   ),
@@ -315,61 +339,22 @@ class _PlayAudioState extends State<PlayAudio> {
     final audioPosition =
         Provider.of<AudioPlayerProvider>(context, listen: false);
 
-    return StreamBuilder<DurationState>(
-        stream: _durationState,
-        builder: (context, snapshot) {
-          final durationState = snapshot.data;
-          final position = durationState?.progress ?? Duration.zero;
-          final buffered = durationState?.buffered ?? Duration.zero;
-          final duration = durationState?.total ?? Duration.zero;
-
-          return ProgressBar(
-            progress: position,
-            buffered: buffered,
-            total: duration,
-            thumbColor: MyColors.primaryColor,
-            thumbGlowColor: MyColors.primaryColor,
-            timeLabelTextStyle: const TextStyle(color: MyColors.gray),
-            progressBarColor: MyColors.primaryColor,
-            bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
-            baseBarColor: MyColors.border1,
-            onSeek: (duration) async {
-              await audioHandler.seek(duration);
-              await audioHandler.play();
-
-              AudioPlayerModel _audio = AudioPlayerModel(
-                  productID: widget.products.id,
-                  audioPosition: position.inMilliseconds);
-              audioPosition.addAudioPosition(_audio);
-            },
-          );
-        });
+    return AudioProgressBar(
+      durationState: _durationState ?? const Stream.empty(),
+      productID: widget.products.id ?? 0,
+      audioPosition: audioPosition,
+    );
   }
 
   Widget audioPlayerChinesePhone() {
-    return StreamBuilder<DurationState>(
-        stream: _progressBarState,
-        builder: (context, snapshot) {
-          final durationState = snapshot.data;
-          final position = durationState?.progress ?? Duration.zero;
-          final buffered = durationState?.buffered ?? Duration.zero;
-          duration = durationState?.total ?? Duration.zero;
-          return ProgressBar(
-            progress: position,
-            buffered: buffered,
-            total: duration,
-            thumbColor: MyColors.primaryColor,
-            thumbGlowColor: MyColors.primaryColor,
-            timeLabelTextStyle: const TextStyle(color: MyColors.gray),
-            progressBarColor: MyColors.primaryColor,
-            bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
-            baseBarColor: MyColors.border1,
-            onSeek: (duration) async {
-              await audioPlayer.seek(duration);
-              await audioPlayer.play();
-            },
-          );
-        });
+    final audioPosition =
+        Provider.of<AudioPlayerProvider>(context, listen: false);
+    return AudioProgressBar(
+      durationState: _progressBarState!,
+      productID: widget.products.id ?? 0,
+      audioPosition: audioPosition,
+      isChinese: true,
+    );
   }
 
   Widget playerButton() {

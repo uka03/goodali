@@ -28,13 +28,13 @@ class AlbumItem extends StatelessWidget {
             width: 160,
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Container(
-                  color: Colors.pink,
-                )
-                //     ImageView(
-                //   imgPath: albumData.banner ?? '',
-                // )
-                ),
+                child:
+                    // Container(
+                    //   color: Colors.pink,
+                    // )
+                    ImageView(
+                  imgPath: albumData.banner ?? '',
+                )),
           ),
           const SizedBox(height: 10),
           Text(
