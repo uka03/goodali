@@ -65,23 +65,27 @@ class _CourseListListItemState extends State<CourseListListItem> {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      cart.addItemsIndex(widget.products.productId!);
+                    onTap: widget.products.isBought == true
+                        ? null
+                        : () {
+                            cart.addItemsIndex(widget.products.productId!);
 
-                      if (!cart.sameItemCheck) {
-                        cart.addProducts(widget.products);
-                        cart.addTotalPrice(
-                            widget.products.price?.toDouble() ?? 0.0);
+                            if (!cart.sameItemCheck) {
+                              cart.addProducts(widget.products);
+                              cart.addTotalPrice(
+                                  widget.products.price?.toDouble() ?? 0.0);
 
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const CartScreen()));
-                      } else {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (_) => CartScreen()));
-                      }
-                    },
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const CartScreen()));
+                            } else {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const CartScreen()));
+                            }
+                          },
                     child: Container(
                       height: 40,
                       width: 120,

@@ -44,6 +44,8 @@ class _PlayAudioState extends State<PlayAudio> {
   AudioPlayer audioPlayer = AudioPlayer();
   Stream<DurationState>? _durationState;
   Future<FileInfo>? fileFuture;
+  Stream<FileResponse>? fileStream;
+
   FileInfo? fileInfo;
 
   int currentview = 0;
@@ -83,6 +85,9 @@ class _PlayAudioState extends State<PlayAudio> {
         await CustomCacheManager.instance.getFileFromCache(url).then((value) {
       return value;
     });
+    fileStream = DefaultCacheManager().getFileStream(url, withProgress: true);
+
+    developer.log(fileInfo?.file.path ?? "jfn");
     initForOthers(url, fileInfo);
   }
 
@@ -223,25 +228,26 @@ class _PlayAudioState extends State<PlayAudio> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                if (fileInfo == null)
-                  Column(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          _downloadFile();
-                        },
-                        icon: const Icon(IconlyLight.arrow_down,
-                            color: MyColors.gray),
-                        splashRadius: 1,
+                (fileStream == null)
+                    ? Column(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              _downloadFile();
+                            },
+                            icon: const Icon(IconlyLight.arrow_down,
+                                color: MyColors.gray),
+                            splashRadius: 1,
+                          ),
+                          const Text("Татах",
+                              style:
+                                  TextStyle(fontSize: 12, color: MyColors.gray))
+                        ],
+                      )
+                    : DownloadPage(
+                        fileStream: fileFuture,
+                        downloadFile: _downloadFile,
                       ),
-                      const Text("Татах",
-                          style: TextStyle(fontSize: 12, color: MyColors.gray))
-                    ],
-                  ),
-                DownloadPage(
-                  fileStream: fileFuture,
-                  downloadFile: _downloadFile,
-                ),
                 Column(
                   children: [
                     IconButton(

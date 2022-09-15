@@ -43,12 +43,14 @@ class _CourseListState extends State<CourseList> {
 
   Widget courseList() {
     return Consumer<Auth>(builder: (context, value, child) {
+      print("value23 ${value.isAuth}");
       return FutureBuilder(
         future: value.isAuth ? getTrainingDetailLogged() : getTrainingDetail(),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
             List<Products> listItem = snapshot.data;
+            print(listItem.length);
             return ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,

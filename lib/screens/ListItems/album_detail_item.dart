@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/file.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
@@ -38,10 +41,12 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   bool isClicked = false;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
+  FileInfo? fileInfo;
+  File? audioFile;
+  String url = "";
 
   @override
   void initState() {
-    setAudio();
     audioPlayer.positionStream.listen((event) {
       position = event;
     });
@@ -52,7 +57,11 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     audioPlayer.playingStream.listen((event) {
       isPlaying = event;
     });
-
+    url = widget.products.isBought == true
+        ? widget.products.audio ?? ""
+        : widget.products.intro ?? "";
+    getCachedFile(url);
+    developer.log(url);
     super.initState();
   }
 
@@ -62,20 +71,43 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     audioPlayer.dispose();
   }
 
-  Future<void> setAudio() async {
-    if (widget.products.intro == null) {
-      print("audio null");
-    } else {
-      String url = widget.isBought
-          ? widget.products.audio ?? ""
-          : widget.products.intro ?? "";
-      developer.log(Urls.networkPath + url);
-      try {
+  Future<void> setAudio(String url, FileInfo? fileInfo) async {
+    try {
+      if (fileInfo != null) {
+        audioFile = fileInfo.file;
+        duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
+              return value;
+            }) ??
+            Duration.zero;
+      } else {
         await audioPlayer.setUrl(Urls.networkPath + url);
-      } catch (e) {
-        print(e);
       }
+    } catch (e) {
+      print(e);
     }
+  }
+
+  getCachedFile(String url) async {
+    fileInfo =
+        await CustomCacheManager.instance.getFileFromCache(url).then((value) {
+      return value;
+    });
+
+    if (fileInfo != null) {
+      developer.log(fileInfo!.file.path);
+
+      audioFile = fileInfo!.file;
+      duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
+            return value;
+          }) ??
+          Duration.zero;
+    } else if (widget.isBought == false) {
+      duration = await audioPlayer.setUrl(Urls.networkPath + url).then((value) {
+            return value;
+          }) ??
+          Duration.zero;
+    }
+    setAudio(url, fileInfo);
   }
 
   @override
@@ -182,13 +214,17 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
               IconButton(
                   splashRadius: 20,
                   onPressed: () {
-                    widget.isBought ? downloadAudio() : addToCard(cart);
+                    widget.products.isBought == true
+                        ? downloadAudio()
+                        : addToCard(cart);
                   },
                   icon: Icon(
-                      widget.isBought
+                      widget.isBought || widget.products.isBought == true
                           ? IconlyLight.arrow_down
                           : IconlyLight.buy,
-                      color: MyColors.gray)),
+                      color: fileInfo != null
+                          ? MyColors.primaryColor
+                          : MyColors.gray)),
               IconButton(
                   splashRadius: 20,
                   onPressed: () {},

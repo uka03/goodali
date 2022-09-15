@@ -186,6 +186,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   Future<List<Products>> getLectureListLogged() async {
-    return await Connection.getLectureListLogged(context);
+    return await Connection.getLectureListLogged(
+        context, widget.products.id.toString());
   }
 }

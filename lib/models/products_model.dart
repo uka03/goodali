@@ -13,6 +13,7 @@ class Products {
   String? traingName;
   String? albumTitle;
   String? lectureTitle;
+  bool? isBought;
 
   Products(
       {this.audio,
@@ -28,7 +29,8 @@ class Products {
       this.status,
       this.traingName,
       this.albumTitle,
-      this.lectureTitle});
+      this.lectureTitle,
+      this.isBought});
 
   Products.fromJson(Map<String, dynamic> json) {
     audio = json['audio'];
@@ -45,6 +47,7 @@ class Products {
     order = json['order'] ?? 0;
     status = json['status'] ?? 0;
     traingName = json['t_name'] ?? "";
+    isBought = json['is_bought'] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -63,6 +66,7 @@ class Products {
     data['t_name'] = traingName;
     data['album_title'] = albumTitle;
     data['lecture_title'] = lectureTitle;
+    data['is_bought'] = isBought;
 
     return data;
   }
