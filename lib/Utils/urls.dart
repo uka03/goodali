@@ -22,4 +22,7 @@ class Urls {
   static final forgotPassword = "$host/password_recovery";
   static final getCourses = "$host/get_trainings";
   static final getCoursesItem = "$host/items/";
+  static final albumListLogged = "$host/album_list_logged";
+  static final lectureListLogged = "$host/lecture_list_logged";
+  static final trainingDetailLogged = "$host/training_detail_logged";
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
@@ -30,20 +31,23 @@ class _EditProfileState extends State<EditProfile> {
   final ImagePicker _picker = ImagePicker();
   XFile? image;
   XFile? camerPhoto;
+  File? fileImage;
 
   bool isChanged = false;
+  bool isImageChanged = false;
 
   @override
   void initState() {
     emailController.text = widget.userInfo?.email ?? "";
     nicknameController.text = widget.userInfo?.nickname ?? "";
+    print(widget.userInfo?.avatarPath);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(),
+      appBar: const SimpleAppBar(noCard: true),
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height - 100,
@@ -51,13 +55,33 @@ class _EditProfileState extends State<EditProfile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Align(
-                alignment: Alignment.center,
-                child: CircleAvatar(
-                  radius: 70,
-                  backgroundColor: MyColors.secondary,
-                ),
-              ),
+              Align(
+                  alignment: Alignment.center,
+                  child: widget.userInfo?.avatarPath != null && !isImageChanged
+                      ? CircleAvatar(
+                          radius: 70,
+                          child: ClipOval(
+                            child: ImageView(
+                              imgPath: widget.userInfo?.avatarPath ?? "",
+                              height: 160,
+                              width: 160,
+                            ),
+                          ))
+                      : fileImage != null && isImageChanged
+                          ? CircleAvatar(
+                              radius: 70,
+                              child: ClipOval(
+                                child: Image.file(
+                                  fileImage!,
+                                  height: 160,
+                                  width: 160,
+                                  fit: BoxFit.cover,
+                                ),
+                              ))
+                          : const CircleAvatar(
+                              radius: 70,
+                              backgroundColor: MyColors.border1,
+                            )),
               const SizedBox(height: 20),
               Align(
                 alignment: Alignment.center,
@@ -134,7 +158,16 @@ class _EditProfileState extends State<EditProfile> {
               ),
               const Spacer(),
               CustomElevatedButton(
-                  text: "Хадгалах", onPress: isChanged ? editUserData : null),
+                  text: "Хадгалах",
+                  onPress: isChanged
+                      ? () {
+                          Utils.showLoaderDialog(context);
+                          editUserData();
+                          if (fileImage != null) {
+                            uploadImage(fileImage!);
+                          }
+                        }
+                      : null),
               const SizedBox(height: 30),
             ],
           ),
@@ -178,10 +211,16 @@ class _EditProfileState extends State<EditProfile> {
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          camerPhoto = await _picker.pickImage(
-                              source: ImageSource.camera);
-                          checkImage(camerPhoto!);
-                          Utils.showLoaderDialog(context);
+                          camerPhoto = await _picker
+                              .pickImage(source: ImageSource.camera)
+                              .whenComplete(() => Navigator.pop(context));
+                          if (camerPhoto != null) {
+                            setState(() {
+                              isChanged = true;
+                              isImageChanged = true;
+                              fileImage = File(camerPhoto!.path);
+                            });
+                          }
                         },
                         child: Container(
                           height: 125,
@@ -204,10 +243,16 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          image = await _picker.pickImage(
-                              source: ImageSource.gallery);
-                          checkImage(image!);
-                          Utils.showLoaderDialog(context);
+                          image = await _picker
+                              .pickImage(source: ImageSource.gallery)
+                              .whenComplete(() => Navigator.pop(context));
+                          if (image != null) {
+                            setState(() {
+                              isChanged = true;
+                              isImageChanged = true;
+                              fileImage = File(image!.path);
+                            });
+                          }
                         },
                         child: Container(
                           height: 125,
@@ -237,31 +282,23 @@ class _EditProfileState extends State<EditProfile> {
         });
   }
 
-  checkImage(XFile image) {
-    File fileImage = File(image.path);
-
-    uploadImage(fileImage);
-  }
-
   uploadImage(File imageFile) async {
     var stream = await Connection.uploadUserAvatar(context, imageFile);
-    print(stream["success"]);
-    Navigator.pop(context);
+
     if (stream["success"]) {
       showTopSnackBar(context,
           const CustomTopSnackBar(type: 1, text: "Амжилттай солигдлоо"));
-      Navigator.pop(context);
     } else {
       showTopSnackBar(
           context,
           const CustomTopSnackBar(
               type: 0, text: "Алдаа гарлаа дахин оролдоно уу"));
-      Navigator.pop(context);
     }
   }
 
   editUserData() async {
     var data = await Connection.editUserData(context, nicknameController.text);
+    Navigator.pop(context);
     if (data['succes'] == true) {
       showTopSnackBar(context,
           const CustomTopSnackBar(type: 1, text: "Амжилттай солигдлоо"));

@@ -78,26 +78,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
-                                  child: Container(
+                                  child:
+                                      // Container(
+                                      //   width: 70,
+                                      //   height: 70,
+                                      //   color: Colors.pink,
+                                      // )
+                                      ImageView(
+                                    imgPath: userInfo.avatarPath ?? "",
                                     width: 70,
                                     height: 70,
-                                    color: Colors.pink,
-                                  )
-                                  // ImageView(
-                                  //   imgPath: userInfo.avatarPath ?? "",
-                                  //   width: 70,
-                                  //   height: 70,
-                                  // )
-                                  ),
+                                  )),
                               const SizedBox(width: 16),
                               Wrap(
                                 direction: Axis.vertical,
                                 spacing: 8,
                                 children: [
                                   Text(
-                                    isChanged
-                                        ? changedName ?? ""
-                                        : userInfo.nickname ?? "",
+                                    userInfo.nickname ?? "",
                                     style: const TextStyle(
                                         fontSize: 20,
                                         color: MyColors.black,
@@ -121,8 +119,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         (value) {
                                       if (value != null) {
                                         setState(() {
-                                          isChanged = true;
                                           changedName = value['name'];
+                                          avatarPath = value["avatar"];
                                         });
                                       }
                                     });

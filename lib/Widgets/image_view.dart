@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 
@@ -26,6 +28,7 @@ class ImageView extends StatelessWidget {
             strokeWidth: 2,
             value: downloadProgress.progress),
       ),
+      cacheManager: CustomCacheManager.instance,
       height: height,
       width: width,
       fit: BoxFit.cover,

@@ -1,17 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:math';
-import 'dart:ui';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/audio_provider.dart';
+import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
@@ -20,21 +17,18 @@ import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/controller/audio_player_handler.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_progress_bar.dart';
 import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_cache/just_audio_cache.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:developer' as developer;
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlayAudio extends StatefulWidget {
   final Products products;
@@ -47,22 +41,26 @@ class PlayAudio extends StatefulWidget {
 }
 
 class _PlayAudioState extends State<PlayAudio> {
+  AudioPlayer audioPlayer = AudioPlayer();
   Stream<DurationState>? _durationState;
-  Stream<DurationState>? _progressBarState;
-  final ReceivePort _port = ReceivePort();
+  Future<FileInfo>? fileFuture;
+  FileInfo? fileInfo;
 
   int currentview = 0;
   int saveddouble = 0;
+  int progress = 0;
 
-  AudioPlayer audioPlayer = AudioPlayer();
   PlayerState? playerState;
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   Duration savedPos = Duration.zero;
 
+  File? audioFile;
+
   String url = "";
   String manuFacturer = "";
+  String taskId = "";
 
   bool isExited = false;
   bool isLoading = true;
@@ -70,69 +68,53 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   void initState() {
     super.initState();
-    getDeviceModel();
-
     url = Urls.networkPath + widget.products.audio!;
-
-    IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
-    _port.listen((dynamic data) {
-      String id = data[0];
-      DownloadTaskStatus status = data[1];
-      int progress = data[2];
-      setState(() {});
-    });
-
-    FlutterDownloader.registerCallback(downloadCallback);
-  }
-
-  @pragma('vm:entry-point')
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    print(
-      'Callback on background isolate: '
-      'task ($id) is in status ($status) and process ($progress)',
-    );
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send?.send([id, status, progress]);
+    getCachedFile(url);
   }
 
   @override
   void dispose() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
     audioPlayer.dispose();
     super.dispose();
   }
 
-  getDeviceModel() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      manuFacturer = androidInfo.manufacturer ?? "";
-      print("manuFacturer $manuFacturer");
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    }
-    if (manuFacturer == "samsung" || Platform.isIOS) {
-      print(" samsunggg bnsndsj");
-      initForOthers(url);
-    } else {
-      initForChinesePhone(url);
-    }
+  getCachedFile(String url) async {
+    fileInfo =
+        await CustomCacheManager.instance.getFileFromCache(url).then((value) {
+      return value;
+    });
+    initForOthers(url, fileInfo);
+  }
+
+  void _downloadFile() {
+    setState(() {
+      fileFuture = CustomCacheManager.instance.downloadFile(url);
+      print("fileStream ");
+    });
   }
 
   Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
       .map((state) => state.bufferedPosition)
       .distinct();
 
-  initForOthers(String url) async {
+  initForOthers(String url, FileInfo? fileInfo) async {
     try {
-      duration = await audioPlayer.setUrl(url).then((value) {
-            setState(() => isLoading = false);
-            return value;
-          }) ??
-          Duration.zero;
+      if (fileInfo != null) {
+        developer.log(fileInfo.file.path);
+
+        audioFile = fileInfo.file;
+        duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
+              setState(() => isLoading = false);
+              return value;
+            }) ??
+            Duration.zero;
+      } else {
+        duration = await audioPlayer.setUrl(url).then((value) {
+              setState(() => isLoading = false);
+              return value;
+            }) ??
+            Duration.zero;
+      }
 
       MediaItem item = MediaItem(
         id: url,
@@ -143,32 +125,26 @@ class _PlayAudioState extends State<PlayAudio> {
 
       developer.log("edit ${item.id}");
       developer.log("edit ${item.duration}");
+      getSavedPosition();
+      if (savedPos == Duration.zero) {
+        print(Duration.zero);
+        setState(() {
+          _durationState =
+              Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
+                  audioHandler.mediaItem,
+                  AudioService.position,
+                  _bufferedPositionStream,
+                  (mediaItem, position, buffered) => DurationState(
+                        progress: position,
+                        buffered: buffered,
+                        total: mediaItem?.duration,
+                      ));
 
-      saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
-          .getPosition(widget.products.productId ?? 0);
-
-      savedPos = Duration(milliseconds: saveddouble);
-
-      setState(() {
-        _durationState =
-            Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
-                audioHandler.mediaItem,
-                AudioService.position,
-                _bufferedPositionStream,
-                (mediaItem, position, buffered) => DurationState(
-                      progress: position,
-                      buffered: buffered,
-                      total: mediaItem?.duration,
-                    ));
-
-        if (saveddouble != 0) {
-          print("savedPos $savedPos");
-          audioHandler.seek(savedPos);
-          // audioHandler.play()
-        } else {
           audioHandler.playMediaItem(item);
-        }
-      });
+
+          {}
+        });
+      }
 
       AudioSession.instance.then((audioSession) async {
         await audioSession.configure(const AudioSessionConfiguration.speech());
@@ -179,36 +155,25 @@ class _PlayAudioState extends State<PlayAudio> {
     }
   }
 
-  initForChinesePhone(String url) {
-    setState(() {
-      audioPlayer.setUrl(url);
-    });
-    _progressBarState =
-        Rx.combineLatest2<Duration, PlaybackEvent, DurationState>(
-            audioPlayer.positionStream,
-            audioPlayer.playbackEventStream,
-            (position, playbackEvent) => DurationState(
-                  progress: position,
-                  buffered: playbackEvent.bufferedPosition,
-                  total: playbackEvent.duration!,
-                ));
-  }
+  getSavedPosition() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
+    List<AudioPlayerModel> decodedProduct = decodedAudioString
+        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
+        .toList();
 
-  Future download(String url) async {
-    var status = await Permission.storage.request();
-    if (status.isGranted) {
-      final baseStorage;
-      if (Platform.isIOS) {
-        baseStorage = await getApplicationDocumentsDirectory();
-      } else {
-        baseStorage = await getExternalStorageDirectory();
+    for (var item in decodedProduct) {
+      if (widget.products.id == item.productID) {
+        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
+    }
+    savedPos = Duration(milliseconds: saveddouble);
+    if (saveddouble != 0) {
+      print("savedPos $savedPos");
 
-      await FlutterDownloader.enqueue(
-          url: url,
-          savedDir: baseStorage!.path,
-          showNotification: true,
-          openFileFromNotification: true);
+      audioHandler.seek(savedPos);
+
+      // audioHandler.play()
     }
   }
 
@@ -258,19 +223,24 @@ class _PlayAudioState extends State<PlayAudio> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Column(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        download(url);
-                      },
-                      icon: const Icon(IconlyLight.arrow_down,
-                          color: MyColors.gray),
-                      splashRadius: 1,
-                    ),
-                    const Text("Татах",
-                        style: TextStyle(fontSize: 12, color: MyColors.gray))
-                  ],
+                if (fileInfo == null)
+                  Column(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          _downloadFile();
+                        },
+                        icon: const Icon(IconlyLight.arrow_down,
+                            color: MyColors.gray),
+                        splashRadius: 1,
+                      ),
+                      const Text("Татах",
+                          style: TextStyle(fontSize: 12, color: MyColors.gray))
+                    ],
+                  ),
+                DownloadPage(
+                  fileStream: fileFuture,
+                  downloadFile: _downloadFile,
                 ),
                 Column(
                   children: [
@@ -296,19 +266,14 @@ class _PlayAudioState extends State<PlayAudio> {
             ),
             const SizedBox(height: 40),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: manuFacturer == "samsung" || Platform.isIOS
-                  ? audioPlayerWidget()
-                  : audioPlayerChinesePhone(),
-            ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: audioPlayerWidget()),
             const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 InkWell(
-                  onTap: () {
-                    Utils.buttonBackWard5Seconds(position, duration);
-                  },
+                  onTap: buttonBackWard5Seconds,
                   child: SvgPicture.asset(
                     "assets/images/replay_5.svg",
                   ),
@@ -316,13 +281,9 @@ class _PlayAudioState extends State<PlayAudio> {
                 CircleAvatar(
                     radius: 36,
                     backgroundColor: MyColors.primaryColor,
-                    child: manuFacturer == "samsung" || Platform.isIOS
-                        ? playerButton()
-                        : playerButtonforChinese()),
+                    child: playerButton()),
                 InkWell(
-                  onTap: () {
-                    Utils.buttonForward15Seconds(position, duration);
-                  },
+                  onTap: buttonForward15Seconds,
                   child: SvgPicture.asset(
                     "assets/images/forward_15.svg",
                   ),
@@ -339,22 +300,35 @@ class _PlayAudioState extends State<PlayAudio> {
     final audioPosition =
         Provider.of<AudioPlayerProvider>(context, listen: false);
 
-    return AudioProgressBar(
-      durationState: _durationState ?? const Stream.empty(),
-      productID: widget.products.id ?? 0,
-      audioPosition: audioPosition,
-    );
-  }
+    return StreamBuilder<DurationState>(
+        stream: _durationState,
+        builder: (context, snapshot) {
+          final durationState = snapshot.data;
+          position = durationState?.progress ?? Duration.zero;
+          final buffered = durationState?.buffered ?? Duration.zero;
+          duration = durationState?.total ?? Duration.zero;
 
-  Widget audioPlayerChinesePhone() {
-    final audioPosition =
-        Provider.of<AudioPlayerProvider>(context, listen: false);
-    return AudioProgressBar(
-      durationState: _progressBarState!,
-      productID: widget.products.id ?? 0,
-      audioPosition: audioPosition,
-      isChinese: true,
-    );
+          return ProgressBar(
+            progress: position,
+            buffered: buffered,
+            total: duration,
+            thumbColor: MyColors.primaryColor,
+            thumbGlowColor: MyColors.primaryColor,
+            timeLabelTextStyle: const TextStyle(color: MyColors.gray),
+            progressBarColor: MyColors.primaryColor,
+            bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
+            baseBarColor: MyColors.border1,
+            onSeek: (duration) async {
+              await audioHandler.seek(duration);
+              await audioHandler.play();
+
+              AudioPlayerModel _audio = AudioPlayerModel(
+                  productID: widget.products.id,
+                  audioPosition: position.inMilliseconds);
+              audioPosition.addAudioPosition(_audio);
+            },
+          );
+        });
   }
 
   Widget playerButton() {
@@ -401,53 +375,24 @@ class _PlayAudioState extends State<PlayAudio> {
     );
   }
 
-  Widget playerButtonforChinese() {
-    return StreamBuilder<PlayerState>(
-      stream: audioPlayer.playerStateStream,
-      builder: (context, snapshot) {
-        final playerState = snapshot.data;
-        final processingState = playerState?.processingState;
-        final playing = playerState?.playing;
-        if (processingState == ProcessingState.loading ||
-            processingState == ProcessingState.buffering) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.white),
-          );
-        } else if (playing != true) {
-          return IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.play_arrow_rounded,
-              color: Colors.white,
-              size: 40.0,
-            ),
-            onPressed: audioPlayer.play,
-          );
-        } else if (processingState != ProcessingState.completed) {
-          return IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.pause_rounded,
-              color: Colors.white,
-              size: 40.0,
-            ),
-            onPressed: () {
-              print(position);
-              audioPlayer.pause();
-            },
-          );
-        } else {
-          return IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.replay,
-              color: Colors.white,
-              size: 40.0,
-            ),
-            onPressed: () => audioPlayer.seek(Duration.zero),
-          );
-        }
-      },
-    );
+  buttonForward15Seconds() {
+    position = position + const Duration(seconds: 15);
+    print(position);
+    print(duration);
+    if (duration > position) {
+      audioHandler.seek(position);
+    } else if (duration < position) {
+      audioHandler.seek(duration);
+    }
+  }
+
+  buttonBackWard5Seconds() {
+    position = position - const Duration(seconds: 5);
+
+    if (position < const Duration(seconds: 0)) {
+      audioHandler.seek(const Duration(seconds: 0));
+    } else {
+      audioHandler.seek(position);
+    }
   }
 }

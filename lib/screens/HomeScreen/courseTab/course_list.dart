@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/course_list_item.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
 
 class CourseList extends StatefulWidget {
   final String id;
@@ -40,28 +42,34 @@ class _CourseListState extends State<CourseList> {
   }
 
   Widget courseList() {
-    return FutureBuilder(
-      future: getTrainingDetail(),
-      builder: (context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          List<Products> listItem = snapshot.data;
-          return ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: listItem.length,
-              itemBuilder: (BuildContext context, int index) =>
-                  CourseListListItem(products: listItem[index]));
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(color: MyColors.primaryColor),
-          );
-        }
-      },
-    );
+    return Consumer<Auth>(builder: (context, value, child) {
+      return FutureBuilder(
+        future: value.isAuth ? getTrainingDetailLogged() : getTrainingDetail(),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            List<Products> listItem = snapshot.data;
+            return ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: listItem.length,
+                itemBuilder: (BuildContext context, int index) =>
+                    CourseListListItem(products: listItem[index]));
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(color: MyColors.primaryColor),
+            );
+          }
+        },
+      );
+    });
   }
 
   Future<List<Products>> getTrainingDetail() {
     return Connection.getTrainingDetail(context, widget.id.toString());
+  }
+
+  Future<List<Products>> getTrainingDetailLogged() {
+    return Connection.getTrainingDetailLogged(context, widget.id.toString());
   }
 }

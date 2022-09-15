@@ -65,47 +65,47 @@ class _ListenTabbarState extends State<ListenTabbar> {
                     ),
                   ),
                   albumLecture(context, albumList!),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text("Подкаст",
-                              style: TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold)),
-                          IconButton(
-                              onPressed: () {
-                                // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (_) => const MyCourseMain()));
-                              },
-                              icon: const Icon(IconlyLight.arrow_right))
-                        ],
-                      )),
-                  podcast(context),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text("Видео",
-                              style: TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold)),
-                          IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const IntroScreen()));
-                              },
-                              icon: const Icon(IconlyLight.arrow_right))
-                        ],
-                      )),
+                  // Padding(
+                  //     padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  //     child: Row(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //       children: [
+                  //         const Text("Подкаст",
+                  //             style: TextStyle(
+                  //                 color: MyColors.black,
+                  //                 fontSize: 24,
+                  //                 fontWeight: FontWeight.bold)),
+                  //         IconButton(
+                  //             onPressed: () {
+                  //               // Navigator.push(
+                  //               //     context,
+                  //               //     MaterialPageRoute(
+                  //               //         builder: (_) => const MyCourseMain()));
+                  //             },
+                  //             icon: const Icon(IconlyLight.arrow_right))
+                  //       ],
+                  //     )),
+                  // podcast(context),
+                  // Padding(
+                  //     padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  //     child: Row(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //       children: [
+                  //         const Text("Видео",
+                  //             style: TextStyle(
+                  //                 color: MyColors.black,
+                  //                 fontSize: 24,
+                  //                 fontWeight: FontWeight.bold)),
+                  //         IconButton(
+                  //             onPressed: () {
+                  //               Navigator.push(
+                  //                   context,
+                  //                   MaterialPageRoute(
+                  //                       builder: (_) => const IntroScreen()));
+                  //             },
+                  //             icon: const Icon(IconlyLight.arrow_right))
+                  //       ],
+                  //     )),
                 ],
               );
             } else {

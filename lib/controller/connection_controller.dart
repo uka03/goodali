@@ -422,4 +422,76 @@ class Connection {
       return [];
     }
   }
+
+  static Future<List<Products>> getalbumListLogged(BuildContext context) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.albumListLogged);
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => Products.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error logged lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<List<Products>> getLectureListLogged(
+      BuildContext context, String id) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.lectureListLogged, data: {"album_id": id});
+      print("response.data");
+      print(response.data);
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => Products.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error logged lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<List<Products>> getTrainingDetailLogged(
+      BuildContext context, String id) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.trainingDetailLogged, data: {"training_id": id});
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => Products.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error logged lectures $error");
+
+      return [];
+    }
+  }
 }

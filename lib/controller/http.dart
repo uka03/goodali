@@ -17,7 +17,8 @@ class Http {
   static Http? _instance;
   factory Http() => _instance ?? Http._();
 
-  BaseOptions options = BaseOptions(receiveTimeout: 7000, connectTimeout: 6000);
+  BaseOptions options =
+      BaseOptions(receiveTimeout: 20000, connectTimeout: 10000);
   Http._() {
     try {
       _dio = Dio(options);

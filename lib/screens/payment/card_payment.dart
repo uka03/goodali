@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class CardPayment extends StatefulWidget {
@@ -50,7 +51,7 @@ class _CardPaymentState extends State<CardPayment> {
             card.removeAllProducts();
             print("onPageFinished $value");
             if (value.contains("status_code=000")) {
-              readResponse();
+              readResponse(context);
             }
           },
           onProgress: (int progress) {
@@ -61,20 +62,25 @@ class _CardPaymentState extends State<CardPayment> {
     );
   }
 
-  void readResponse() async {
+  void readResponse(context) async {
     final response = await _webViewController
         ?.runJavascriptReturningResult("document.documentElement.innerText");
 
     Map<String, dynamic> data =
         Map<String, dynamic>.from(json.decode(response ?? ""));
 
-    var status = data["status"];
-    var message = data["output"];
-    print("status $status");
-    if (status == 1) {
+    // var status = data["status"];
+    String message = data["message"];
+    // print("status $status");
+    if (message.contains("ok")) {
+      showTopSnackBar(
+          context, const CustomTopSnackBar(type: 1, text: "Амжилттай"));
       print("etsesttsts neg ym bollooooo");
+      Navigator.pop(context);
     } else {
       print("sfondfndnf errorrdolooo");
+      showTopSnackBar(
+          context, const CustomTopSnackBar(type: 0, text: "Алдаа гарлаа"));
     }
   }
 }

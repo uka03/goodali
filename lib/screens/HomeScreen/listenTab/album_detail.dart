@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/image_view.dart';
@@ -23,6 +24,7 @@ class AlbumDetail extends StatefulWidget {
 
 class _AlbumDetailState extends State<AlbumDetail> {
   late final Future future = getAlbumLectures();
+  late final Future futureLogged = getLectureListLogged();
 
   ScrollController? _controller;
   double imageSize = 0;
@@ -59,93 +61,98 @@ class _AlbumDetailState extends State<AlbumDetail> {
     final cart = Provider.of<CartProvider>(context);
     return Scaffold(
         appBar: const SimpleAppBar(),
-        body: FutureBuilder(
-          future: future,
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.hasData) {
-              List<Products> lectureList = snapshot.data;
-              return Stack(children: [
-                Container(
-                    height: containerHeight,
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Container(
-                        //     height: imageSize,
-                        //     width: imageSize,
-                        //     color: Colors.indigo[200]),
-                        Opacity(
-                          opacity: imageOpacity.clamp(0, 1),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: ImageView(
-                                imgPath: widget.products.banner ?? "",
-                                width: imageSize,
-                                height: imageSize),
-                          ),
-                        ),
-                        const SizedBox(height: 80)
-                      ],
-                    )),
-                SingleChildScrollView(
-                  controller: _controller,
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(children: [
-                    SizedBox(height: initialSize + 32),
-                    Text(
-                      widget.products.title ?? "",
-                      style: const TextStyle(
-                          fontSize: 20,
-                          color: MyColors.black,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: CustomReadMoreText(
-                          text: widget.products.body ?? "",
-                          textAlign: TextAlign.center,
+        body: Consumer<Auth>(
+          builder: (context, value, child) {
+            return FutureBuilder(
+              future: value.isAuth ? futureLogged : future,
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  List<Products> lectureList = snapshot.data;
+                  return Stack(children: [
+                    Container(
+                        height: containerHeight,
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Container(
+                            //     height: imageSize,
+                            //     width: imageSize,
+                            //     color: Colors.indigo[200]),
+                            Opacity(
+                              opacity: imageOpacity.clamp(0, 1),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: ImageView(
+                                    imgPath: widget.products.banner ?? "",
+                                    width: imageSize,
+                                    height: imageSize),
+                              ),
+                            ),
+                            const SizedBox(height: 80)
+                          ],
                         )),
-                    const SizedBox(height: 20),
-                    const Divider(endIndent: 20, indent: 20),
-                    lecture(context, lectureList),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: CustomElevatedButton(
-                          text: "Худалдаж авах",
-                          onPress: () {
-                            cart.addItemsIndex(widget.products.productId!);
-                            if (!cart.sameItemCheck) {
-                              cart.addProducts(widget.products);
-                              cart.addTotalPrice(
-                                  widget.products.price?.toDouble() ?? 0.0);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CartScreen()));
-                            } else {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CartScreen()));
-                            }
-                          }),
+                    SingleChildScrollView(
+                      controller: _controller,
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(children: [
+                        SizedBox(height: initialSize + 32),
+                        Text(
+                          widget.products.title ?? "",
+                          style: const TextStyle(
+                              fontSize: 20,
+                              color: MyColors.black,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: CustomReadMoreText(
+                              text: widget.products.body ?? "",
+                              textAlign: TextAlign.center,
+                            )),
+                        const SizedBox(height: 20),
+                        const Divider(endIndent: 20, indent: 20),
+                        lecture(context, lectureList),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: CustomElevatedButton(
+                              text: "Худалдаж авах",
+                              onPress: () {
+                                cart.addItemsIndex(widget.products.productId!);
+                                if (!cart.sameItemCheck) {
+                                  cart.addProducts(widget.products);
+                                  cart.addTotalPrice(
+                                      widget.products.price?.toDouble() ?? 0.0);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const CartScreen()));
+                                } else {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const CartScreen()));
+                                }
+                              }),
+                        ),
+                        const SizedBox(height: 50),
+                      ]),
                     ),
-                    const SizedBox(height: 50),
-                  ]),
-                ),
-              ]);
-            } else {
-              return const Center(
-                  child:
-                      CircularProgressIndicator(color: MyColors.primaryColor));
-            }
+                  ]);
+                } else {
+                  return const Center(
+                      child: CircularProgressIndicator(
+                          color: MyColors.primaryColor));
+                }
+              },
+            );
           },
         ));
   }
@@ -173,12 +180,12 @@ class _AlbumDetailState extends State<AlbumDetail> {
     );
   }
 
-  Future<List<Products>> getProducts() {
-    return Connection.getProducts(context, "1");
-  }
-
   Future<List<Products>> getAlbumLectures() async {
     return await Connection.getAlbumLectures(
         context, widget.products.id.toString());
+  }
+
+  Future<List<Products>> getLectureListLogged() async {
+    return await Connection.getLectureListLogged(context);
   }
 }

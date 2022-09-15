@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
 import 'package:goodali/screens/ProfileScreen/my_bought_courses.dart';
+import 'package:provider/provider.dart';
 
 class AlbumLecture extends StatefulWidget {
   final int audioLength;
@@ -53,19 +55,23 @@ class _AlbumLectureState extends State<AlbumLecture> {
           },
           body: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: FutureBuilder(
-                future: getProducts(),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    List<Products> albumList = snapshot.data;
-                    return albumLecture(context, albumList);
-                  } else {
-                    return const Center(
-                        child: CircularProgressIndicator(
-                            color: MyColors.primaryColor));
-                  }
-                }),
+            child: Consumer<Auth>(
+              builder: (context, value, state) {
+                return FutureBuilder(
+                    future: value.isAuth ? getalbumListLogged() : getProducts(),
+                    builder: (context, AsyncSnapshot snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done &&
+                          snapshot.hasData) {
+                        List<Products> albumList = snapshot.data;
+                        return albumLecture(context, albumList);
+                      } else {
+                        return const Center(
+                            child: CircularProgressIndicator(
+                                color: MyColors.primaryColor));
+                      }
+                    });
+              },
+            ),
           )),
     );
   }
@@ -90,5 +96,9 @@ class _AlbumLectureState extends State<AlbumLecture> {
 
   Future<List<Products>> getProducts() {
     return Connection.getProducts(context, "0");
+  }
+
+  Future<List<Products>> getalbumListLogged() {
+    return Connection.getalbumListLogged(context);
   }
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/models/item_holder.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_progress_bar.dart';
 
 class Downloaded extends StatefulWidget {
@@ -12,6 +10,11 @@ class Downloaded extends StatefulWidget {
 }
 
 class _DownloadedState extends State<Downloaded> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
