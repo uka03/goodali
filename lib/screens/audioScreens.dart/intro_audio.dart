@@ -5,6 +5,7 @@ import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/progress_notifier.dart';
 import 'package:goodali/models/products_model.dart';
@@ -101,13 +102,18 @@ class _IntroAudioState extends State<IntroAudio> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                ImageView(
+                  imgPath: widget.products.banner ?? "",
                   width: 36,
                   height: 36,
-                  decoration: BoxDecoration(
-                      color: MyColors.gray,
-                      borderRadius: BorderRadius.circular(10)),
                 ),
+                // Container(
+                //   width: 36,
+                //   height: 36,
+                //   decoration: BoxDecoration(
+                //       color: MyColors.gray,
+                //       borderRadius: BorderRadius.circular(10)),
+                // ),
                 const SizedBox(width: 20),
                 Expanded(
                   child: Column(

@@ -44,6 +44,7 @@ class _PlayAudioState extends State<PlayAudio> {
   AudioPlayer audioPlayer = AudioPlayer();
   Stream<DurationState>? _durationState;
   Future<FileInfo>? fileFuture;
+  Stream<FileResponse>? fileStream;
 
   FileInfo? fileInfo;
 
@@ -88,7 +89,8 @@ class _PlayAudioState extends State<PlayAudio> {
 
   void _downloadFile() {
     setState(() {
-      fileFuture = CustomCacheManager.instance.downloadFile(url);
+      fileStream =
+          CustomCacheManager.instance.getFileStream(url, withProgress: true);
       print("fileStream ");
     });
   }
@@ -229,26 +231,10 @@ class _PlayAudioState extends State<PlayAudio> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                (fileInfo == null)
-                    ? Column(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _downloadFile();
-                            },
-                            icon: const Icon(IconlyLight.arrow_down,
-                                color: MyColors.gray),
-                            splashRadius: 1,
-                          ),
-                          const Text("Татах",
-                              style:
-                                  TextStyle(fontSize: 12, color: MyColors.gray))
-                        ],
-                      )
-                    : DownloadPage(
-                        fileStream: fileFuture,
-                        downloadFile: _downloadFile,
-                      ),
+                DownloadPage(
+                  fileStream: fileFuture,
+                  downloadFile: _downloadFile,
+                ),
                 Column(
                   children: [
                     IconButton(

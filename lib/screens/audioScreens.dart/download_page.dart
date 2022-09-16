@@ -48,12 +48,13 @@ class DownloadPage extends StatelessWidget {
           return Column(
             children: [
               IconButton(
-                onPressed: () {},
-                icon:
-                    const Icon(IconlyLight.arrow_down, color: MyColors.success),
+                onPressed: () {
+                  downloadFile();
+                },
+                icon: const Icon(IconlyLight.arrow_down, color: MyColors.gray),
                 splashRadius: 1,
               ),
-              const Text("Татагдсан",
+              const Text("Татах",
                   style: TextStyle(fontSize: 12, color: MyColors.gray))
             ],
           );
@@ -62,3 +63,6 @@ class DownloadPage extends StatelessWidget {
     );
   }
 }
+// (fileStream == null)
+//                     ? 
+//                     :

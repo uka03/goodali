@@ -51,7 +51,11 @@ class _CardPaymentState extends State<CardPayment> {
             card.removeAllProducts();
             print("onPageFinished $value");
             if (value.contains("status_code=000")) {
-              readResponse(context);
+              showTopSnackBar(
+                  context, const CustomTopSnackBar(type: 1, text: "Амжилттай"));
+            } else {
+              showTopSnackBar(context,
+                  const CustomTopSnackBar(type: 0, text: "Алдаа гарлаа"));
             }
           },
           onProgress: (int progress) {
@@ -73,14 +77,10 @@ class _CardPaymentState extends State<CardPayment> {
     String message = data["message"];
     // print("status $status");
     if (message.contains("ok")) {
-      showTopSnackBar(
-          context, const CustomTopSnackBar(type: 1, text: "Амжилттай"));
       print("etsesttsts neg ym bollooooo");
       Navigator.pop(context);
     } else {
       print("sfondfndnf errorrdolooo");
-      showTopSnackBar(
-          context, const CustomTopSnackBar(type: 0, text: "Алдаа гарлаа"));
     }
   }
 }

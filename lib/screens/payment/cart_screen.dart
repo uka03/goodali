@@ -95,45 +95,49 @@ class _CartScreenState extends State<CartScreen> {
               }
             },
           )),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("Нийт төлөх дүн: ",
-                  style: TextStyle(color: MyColors.gray)),
-              Consumer<CartProvider>(
-                builder: (context, value, child) => Text(
-                    value.getTotalPrice().toInt().toString() + "₮",
-                    style: const TextStyle(
-                        color: MyColors.primaryColor,
-                        fontWeight: FontWeight.bold)),
-              )
-            ],
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: CustomElevatedButton(
-              onPress: () {
-                if (isAuth == true) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ChoosePayment(productIDs: productIds)));
-                } else {
-                  showTopSnackBar(
-                      context,
-                      const CustomTopSnackBar(
-                          type: 0, text: "Нэвтэрч орон үргэлжлүүлнэ үү..."));
-                }
-              },
-              text: "Худалдаж авах",
+      floatingActionButton: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Нийт төлөх дүн: ",
+                    style: TextStyle(color: MyColors.gray)),
+                Consumer<CartProvider>(
+                  builder: (context, value, child) => Text(
+                      value.getTotalPrice().toInt().toString() + "₮",
+                      style: const TextStyle(
+                          color: MyColors.primaryColor,
+                          fontWeight: FontWeight.bold)),
+                )
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: CustomElevatedButton(
+                onPress: () {
+                  if (isAuth == true) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ChoosePayment(productIDs: productIds)));
+                  } else {
+                    showTopSnackBar(
+                        context,
+                        const CustomTopSnackBar(
+                            type: 0, text: "Нэвтэрч орон үргэлжлүүлнэ үү..."));
+                  }
+                },
+                text: "Худалдаж авах",
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
