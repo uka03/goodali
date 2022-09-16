@@ -44,7 +44,6 @@ class _PlayAudioState extends State<PlayAudio> {
   AudioPlayer audioPlayer = AudioPlayer();
   Stream<DurationState>? _durationState;
   Future<FileInfo>? fileFuture;
-  Stream<FileResponse>? fileStream;
 
   FileInfo? fileInfo;
 
@@ -81,11 +80,7 @@ class _PlayAudioState extends State<PlayAudio> {
   }
 
   getCachedFile(String url) async {
-    fileInfo =
-        await CustomCacheManager.instance.getFileFromCache(url).then((value) {
-      return value;
-    });
-    fileStream = DefaultCacheManager().getFileStream(url, withProgress: true);
+    fileInfo = await checkCacheFor(url);
 
     developer.log(fileInfo?.file.path ?? "jfn");
     initForOthers(url, fileInfo);
@@ -96,6 +91,12 @@ class _PlayAudioState extends State<PlayAudio> {
       fileFuture = CustomCacheManager.instance.downloadFile(url);
       print("fileStream ");
     });
+  }
+
+  Future<FileInfo?> checkCacheFor(String url) async {
+    final FileInfo? value =
+        await CustomCacheManager.instance.getFileFromCache(url);
+    return value;
   }
 
   Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
@@ -228,7 +229,7 @@ class _PlayAudioState extends State<PlayAudio> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                (fileStream == null)
+                (fileInfo == null)
                     ? Column(
                         children: [
                           IconButton(
