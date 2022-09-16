@@ -19,7 +19,9 @@ class AlbumItem extends StatelessWidget {
       onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => AlbumDetail(products: albumData))),
+              builder: (context) => AlbumDetail(
+                    products: albumData,
+                  ))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

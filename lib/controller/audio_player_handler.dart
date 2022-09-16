@@ -29,9 +29,10 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     return PlaybackState(
       controls: [
         // MediaControl.rewind,
+        MediaControl.skipToPrevious,
         if (_player.playing) MediaControl.pause else MediaControl.play,
-        // MediaControl.stop,
-        // MediaControl.fastForward,
+        MediaControl.stop,
+        MediaControl.skipToNext,
       ],
       systemActions: const {
         MediaAction.seek,
@@ -48,7 +49,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
       updatePosition: _player.position,
       bufferedPosition: _player.bufferedPosition,
       speed: _player.speed,
-      queueIndex: event.currentIndex,
+      // queueIndex: event.currentIndex,
     );
   }
 

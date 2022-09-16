@@ -23,13 +23,13 @@ class AlbumDetailItem extends StatefulWidget {
   final String albumName;
   final bool isBought;
 
-  const AlbumDetailItem(
-      {Key? key,
-      required this.products,
-      required this.albumName,
-      required this.productsList,
-      required this.isBought})
-      : super(key: key);
+  const AlbumDetailItem({
+    Key? key,
+    required this.products,
+    required this.albumName,
+    required this.productsList,
+    required this.isBought,
+  }) : super(key: key);
 
   @override
   State<AlbumDetailItem> createState() => _AlbumDetailItemState();
@@ -57,11 +57,20 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     audioPlayer.playingStream.listen((event) {
       isPlaying = event;
     });
-    url = widget.products.isBought == true
-        ? widget.products.audio ?? ""
-        : widget.products.intro ?? "";
+    String audioURL = Urls.networkPath + widget.products.audio!;
+    String introURL = Urls.networkPath + widget.products.intro!;
+
+    print(widget.products.isBought);
+    url = widget.isBought == true
+        ? audioURL
+        : widget.products.isBought == true
+            ? audioURL
+            : introURL;
+
+    print(url);
+
     getCachedFile(url);
-    developer.log(url);
+
     super.initState();
   }
 
@@ -80,7 +89,8 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
             }) ??
             Duration.zero;
       } else {
-        await audioPlayer.setUrl(Urls.networkPath + url);
+        print(url);
+        audioPlayer.setUrl(url);
       }
     } catch (e) {
       print(e);
@@ -88,26 +98,15 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   }
 
   getCachedFile(String url) async {
-    fileInfo =
-        await CustomCacheManager.instance.getFileFromCache(url).then((value) {
-      return value;
-    });
+    fileInfo = await checkCachefor(url);
 
-    if (fileInfo != null) {
-      developer.log(fileInfo!.file.path);
-
-      audioFile = fileInfo!.file;
-      duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
-            return value;
-          }) ??
-          Duration.zero;
-    } else if (widget.isBought == false) {
-      duration = await audioPlayer.setUrl(Urls.networkPath + url).then((value) {
-            return value;
-          }) ??
-          Duration.zero;
-    }
     setAudio(url, fileInfo);
+  }
+
+  Future<FileInfo?> checkCachefor(String url) async {
+    final FileInfo? value =
+        await CustomCacheManager.instance.getFileFromCache(url);
+    return value;
   }
 
   @override
@@ -211,20 +210,22 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
               Text(formatTime(duration - position) + "мин",
                   style: const TextStyle(fontSize: 12, color: MyColors.black)),
               const Spacer(),
-              IconButton(
-                  splashRadius: 20,
-                  onPressed: () {
-                    widget.products.isBought == true
-                        ? downloadAudio()
-                        : addToCard(cart);
-                  },
-                  icon: Icon(
-                      widget.isBought || widget.products.isBought == true
-                          ? IconlyLight.arrow_down
-                          : IconlyLight.buy,
-                      color: fileInfo != null
-                          ? MyColors.primaryColor
-                          : MyColors.gray)),
+              widget.products.isBought == false
+                  ? IconButton(
+                      splashRadius: 20,
+                      onPressed: () {
+                        widget.products.isBought == true
+                            ? downloadAudio()
+                            : addToCard(cart);
+                      },
+                      icon: Icon(
+                          widget.isBought
+                              ? IconlyLight.arrow_down
+                              : IconlyLight.buy,
+                          color: fileInfo != null
+                              ? MyColors.primaryColor
+                              : MyColors.gray))
+                  : Container(),
               IconButton(
                   splashRadius: 20,
                   onPressed: () {},

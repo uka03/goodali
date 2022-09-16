@@ -102,10 +102,13 @@ class _IntroAudioState extends State<IntroAudio> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ImageView(
-                  imgPath: widget.products.banner ?? "",
-                  width: 36,
-                  height: 36,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: ImageView(
+                    imgPath: widget.products.banner ?? "",
+                    width: 36,
+                    height: 36,
+                  ),
                 ),
                 // Container(
                 //   width: 36,

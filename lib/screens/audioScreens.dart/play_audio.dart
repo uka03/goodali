@@ -50,7 +50,6 @@ class _PlayAudioState extends State<PlayAudio> {
 
   int currentview = 0;
   int saveddouble = 0;
-  int progress = 0;
 
   PlayerState? playerState;
 
@@ -77,6 +76,7 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   void dispose() {
     audioPlayer.dispose();
+
     super.dispose();
   }
 
@@ -84,13 +84,14 @@ class _PlayAudioState extends State<PlayAudio> {
     fileInfo = await checkCacheFor(url);
 
     developer.log(fileInfo?.file.path ?? "jfn");
-    initForOthers(url, fileInfo);
+    _initAudioPlayer(url, fileInfo);
   }
 
   void _downloadFile() {
     setState(() {
       fileStream =
           CustomCacheManager.instance.getFileStream(url, withProgress: true);
+
       print("fileStream ");
     });
   }
@@ -105,24 +106,36 @@ class _PlayAudioState extends State<PlayAudio> {
       .map((state) => state.bufferedPosition)
       .distinct();
 
-  initForOthers(String url, FileInfo? fileInfo) async {
+  _initAudioPlayer(String url, FileInfo? fileInfo) async {
     try {
       if (fileInfo != null) {
         developer.log(fileInfo.file.path);
 
         audioFile = fileInfo.file;
+        audioPlayer.setFilePath(audioFile!.path);
         duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
               setState(() => isLoading = false);
               return value;
             }) ??
             Duration.zero;
       } else {
+        developer.log(url);
         duration = await audioPlayer.setUrl(url).then((value) {
               setState(() => isLoading = false);
               return value;
             }) ??
             Duration.zero;
       }
+      audioPlayer.positionStream.listen((event) {
+        if (event.inMilliseconds != 0) {
+          AudioPlayerModel _audio = AudioPlayerModel(
+              productID: widget.products.id,
+              audioPosition: event.inMilliseconds);
+          print(_audio);
+          Provider.of<AudioPlayerProvider>(context, listen: false)
+              .addAudioPosition(_audio);
+        }
+      });
 
       MediaItem item = MediaItem(
         id: url,
@@ -133,9 +146,8 @@ class _PlayAudioState extends State<PlayAudio> {
 
       developer.log("edit ${item.id}");
       developer.log("edit ${item.duration}");
-      getSavedPosition();
-      if (savedPos == Duration.zero) {
-        print(Duration.zero);
+      getSavedPosition().then((value) {
+        developer.log(value.toString());
         setState(() {
           _durationState =
               Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
@@ -147,12 +159,15 @@ class _PlayAudioState extends State<PlayAudio> {
                         buffered: buffered,
                         total: mediaItem?.duration,
                       ));
-
-          audioHandler.playMediaItem(item);
+          if (value == Duration.zero) {
+            audioHandler.playMediaItem(item);
+          } else {
+            audioHandler.seek(value);
+          }
 
           {}
         });
-      }
+      });
 
       AudioSession.instance.then((audioSession) async {
         await audioSession.configure(const AudioSessionConfiguration.speech());
@@ -163,26 +178,22 @@ class _PlayAudioState extends State<PlayAudio> {
     }
   }
 
-  getSavedPosition() async {
+  Future getSavedPosition() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
     List<AudioPlayerModel> decodedProduct = decodedAudioString
         .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
         .toList();
 
+    // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
       if (widget.products.id == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
     }
-    savedPos = Duration(milliseconds: saveddouble);
-    if (saveddouble != 0) {
-      print("savedPos $savedPos");
-
-      audioHandler.seek(savedPos);
-
-      // audioHandler.play()
-    }
+    position = Duration(milliseconds: saveddouble);
+    print("position $position");
+    return position;
   }
 
   @override
@@ -231,10 +242,24 @@ class _PlayAudioState extends State<PlayAudio> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                DownloadPage(
-                  fileStream: fileFuture,
-                  downloadFile: _downloadFile,
-                ),
+                fileInfo != null
+                    ? Column(
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(IconlyLight.arrow_down,
+                                color: MyColors.primaryColor),
+                            splashRadius: 1,
+                          ),
+                          const Text("Татсан",
+                              style:
+                                  TextStyle(fontSize: 12, color: MyColors.gray))
+                        ],
+                      )
+                    : DownloadPage(
+                        fileStream: fileStream,
+                        downloadFile: _downloadFile,
+                        products: widget.products),
                 Column(
                   children: [
                     IconButton(
@@ -297,9 +322,13 @@ class _PlayAudioState extends State<PlayAudio> {
         stream: _durationState,
         builder: (context, snapshot) {
           final durationState = snapshot.data;
-          position = durationState?.progress ?? Duration.zero;
+          position = savedPos == Duration.zero
+              ? durationState?.progress ?? Duration.zero
+              : position;
           final buffered = durationState?.buffered ?? Duration.zero;
-          duration = durationState?.total ?? Duration.zero;
+          duration = savedPos == Duration.zero
+              ? durationState?.total ?? Duration.zero
+              : duration;
 
           return ProgressBar(
             progress: position,
@@ -314,11 +343,6 @@ class _PlayAudioState extends State<PlayAudio> {
             onSeek: (duration) async {
               await audioHandler.seek(duration);
               await audioHandler.play();
-
-              AudioPlayerModel _audio = AudioPlayerModel(
-                  productID: widget.products.id,
-                  audioPosition: position.inMilliseconds);
-              audioPosition.addAudioPosition(_audio);
             },
           );
         });

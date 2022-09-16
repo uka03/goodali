@@ -160,22 +160,27 @@ class _AlbumDetailState extends State<AlbumDetail> {
   Widget lecture(BuildContext context, List<Products> product) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: ListView.separated(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        padding: const EdgeInsets.only(bottom: 15),
-        itemBuilder: (BuildContext context, int index) {
-          return AlbumDetailItem(
-              products: product[index],
-              isBought: false,
-              albumName: widget.products.title!,
-              productsList: product);
-        },
-        itemCount: product.length,
-        separatorBuilder: (BuildContext context, int index) => const Divider(
-          endIndent: 18,
-          indent: 18,
-        ),
+      child: Column(
+        children: [
+          ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            padding: const EdgeInsets.only(bottom: 15),
+            itemBuilder: (BuildContext context, int index) {
+              return AlbumDetailItem(
+                  products: product[index],
+                  isBought: false,
+                  albumName: widget.products.title!,
+                  productsList: product);
+            },
+            itemCount: product.length,
+            separatorBuilder: (BuildContext context, int index) =>
+                const Divider(
+              endIndent: 18,
+              indent: 18,
+            ),
+          ),
+        ],
       ),
     );
   }
