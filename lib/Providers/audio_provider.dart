@@ -51,6 +51,7 @@ class AudioPlayerProvider with ChangeNotifier {
     AudioPlayerModel audioItem = AudioPlayerModel(
         productID: audio.productID, audioPosition: audio.audioPosition);
     print("inProvider ${audio.audioPosition}");
+    print("inProviderID ${audio.productID}");
     _audioItems.add(audioItem);
     print(_audioItems);
     _setPrefItems();

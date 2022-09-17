@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -11,6 +12,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/audio_session.dart';
 import 'package:just_audio/just_audio.dart' as ja;
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -26,6 +28,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:developer' as developer;
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MoodDetail extends StatefulWidget {
   final String moodListId;
@@ -49,6 +53,7 @@ class _MoodDetailState extends State<MoodDetail> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   Duration savedPosition = Duration.zero;
+  int saveddouble = 0;
 
   double _current = 0;
   bool isLoading = true;
@@ -73,12 +78,13 @@ class _MoodDetailState extends State<MoodDetail> {
   @override
   void initState() {
     super.initState();
-    getDeviceModel();
+
     getMoodList().then((value) {
       moodItem = value;
       if (value.length == 1) {
         print("url $url");
-        playAudio(Urls.networkPath + moodItem.first.audio!);
+        initForOthers(Urls.networkPath + moodItem.first.audio!,
+            moodItem[_current.toInt() + 1].id ?? 0);
       }
     });
     _pageController.addListener(() {
@@ -108,34 +114,13 @@ class _MoodDetailState extends State<MoodDetail> {
     super.dispose();
   }
 
-  getDeviceModel() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      manuFacturer = androidInfo.manufacturer ?? "";
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    }
-  }
-
   Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
       .map((state) => state.bufferedPosition)
       .distinct();
 
-  Future<void> playAudio(String url) async {
+  initForOthers(String url, int id) async {
     try {
-      if (manuFacturer == "samsung" || Platform.isIOS) {
-        initForOthers(url);
-      } else {
-        initForChinesePhone(url);
-      }
-    } catch (e) {
-      debugPrint('An error occured $e');
-    }
-  }
-
-  initForOthers(String url) async {
-    try {
+      print(url);
       await audioPlayer.dynamicSet(url: url);
       duration = await audioPlayer.setUrl(url).then((value) {
             setState(() => isLoading = false);
@@ -164,97 +149,57 @@ class _MoodDetailState extends State<MoodDetail> {
                     total: mediaItem?.duration,
                   ));
 
-      AudioSession.instance.then((audioSession) async {
-        await audioSession.configure(const AudioSessionConfiguration.speech());
-        _handleInterruptions(audioSession);
+      getSavedPosition(id).then((value) {
+        developer.log(value.toString());
+        setState(() {
+          _durationState =
+              Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
+                  audioHandler.mediaItem,
+                  AudioService.position,
+                  _bufferedPositionStream,
+                  (mediaItem, position, buffered) => DurationState(
+                      progress: position,
+                      buffered: buffered,
+                      total: mediaItem?.duration));
+          print("duration $duration");
+          if (value == Duration.zero) {
+            audioHandler.playMediaItem(item);
+          } else {
+            print(value);
+            audioHandler.seek(value);
+          }
+
+          {}
+        });
       });
 
-      int saveddouble = Provider.of<AudioPlayerProvider>(context, listen: false)
-          .getPosition(moodItem[_current.toInt()].id ?? 0);
-
-      print("saveddouble $saveddouble");
-      savedPosition = Duration(milliseconds: saveddouble);
-
-      setState(() {
-        if (saveddouble != 0) {
-          audioHandler.seek(savedPosition);
-          // audioHandler.play()
-        } else {
-          audioHandler.playMediaItem(item);
-        }
+      AudioSession.instance.then((audioSession) async {
+        await audioSession.configure(const AudioSessionConfiguration.speech());
+        AudioSessionSettings.handleInterruption(audioSession);
       });
     } catch (e) {
       print(e);
     }
   }
 
-  initForChinesePhone(String url) {
-    setState(() {
-      audioPlayer.setUrl(url);
-    });
-    _progressBarState =
-        Rx.combineLatest2<Duration, PlaybackEvent, DurationState>(
-            audioPlayer.positionStream,
-            audioPlayer.playbackEventStream,
-            (position, playbackEvent) => DurationState(
-                  progress: position,
-                  buffered: playbackEvent.bufferedPosition,
-                  total: playbackEvent.duration!,
-                ));
-  }
+  Future getSavedPosition(int moodItemID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
+    List<AudioPlayerModel> decodedProduct = decodedAudioString
+        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
+        .toList();
 
-  void _handleInterruptions(AudioSession audioSession) {
-    bool playInterrupted = false;
-    audioSession.becomingNoisyEventStream.listen((_) {
-      print('PAUSE');
-      _player.pause();
-    });
-    _player.playingStream.listen((playing) {
-      playInterrupted = false;
-      if (playing) {
-        audioSession.setActive(true);
+    // developer.log(decodedProduct.first.audioPosition.toString());
+    for (var item in decodedProduct) {
+      print(moodItemID);
+      print(item.productID);
+      if (moodItemID == item.productID) {
+        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
-    });
-    audioSession.interruptionEventStream.listen((event) {
-      print('interruption begin: ${event.begin}');
-      print('interruption type: ${event.type}');
-      if (event.begin) {
-        switch (event.type) {
-          case AudioInterruptionType.duck:
-            if (audioSession.androidAudioAttributes!.usage ==
-                AndroidAudioUsage.game) {
-              _player.setVolume(_player.volume / 2);
-            }
-            playInterrupted = false;
-            break;
-          case AudioInterruptionType.pause:
-          case AudioInterruptionType.unknown:
-            if (_player.playing) {
-              _player.pause();
-              playInterrupted = true;
-            }
-            break;
-        }
-      } else {
-        switch (event.type) {
-          case AudioInterruptionType.duck:
-            _player.setVolume(min(1.0, _player.volume * 2));
-            playInterrupted = false;
-            break;
-          case AudioInterruptionType.pause:
-            if (playInterrupted) _player.play();
-            playInterrupted = false;
-            break;
-          case AudioInterruptionType.unknown:
-            playInterrupted = false;
-            break;
-        }
-      }
-    });
-    audioSession.devicesChangedEventStream.listen((event) {
-      print('Devices added: ${event.devicesAdded}');
-      print('Devices removed: ${event.devicesRemoved}');
-    });
+    }
+    position = Duration(milliseconds: saveddouble);
+    print("position $position");
+    return position;
   }
 
   @override
@@ -296,8 +241,11 @@ class _MoodDetailState extends State<MoodDetail> {
                       controller: _pageController,
                       itemCount: moodItem.length,
                       onPageChanged: (int page) {
+                        print(page);
+                        print(moodItem.length);
                         if (url != "") {
-                          playAudio(url);
+                          initForOthers(
+                              url, moodItem[_current.toInt() + 1].id ?? 0);
                         }
                       },
                       itemBuilder: ((context, index) {
@@ -354,9 +302,7 @@ class _MoodDetailState extends State<MoodDetail> {
                                       color: Colors.white, fontSize: 16),
                                 ),
                                 const SizedBox(height: 20),
-                                manuFacturer == "samsung" || Platform.isIOS
-                                    ? audioPlayerWidget()
-                                    : audioPlayerChinesePhone(),
+                                audioPlayerWidget()
                               ],
                             ),
                           );
@@ -464,36 +410,6 @@ class _MoodDetailState extends State<MoodDetail> {
     );
   }
 
-  Widget audioPlayerChinesePhone() {
-    return StreamBuilder<DurationState>(
-        stream: _progressBarState,
-        builder: (context, snapshot) {
-          final durationState = snapshot.data;
-          final position = durationState?.progress ?? Duration.zero;
-          final buffered = durationState?.buffered ?? Duration.zero;
-          duration = durationState?.total ?? Duration.zero;
-          return Column(
-            children: [
-              ProgressBar(
-                progress: position,
-                buffered: buffered,
-                total: duration,
-                thumbColor: Colors.white,
-                thumbGlowColor: MyColors.primaryColor,
-                timeLabelTextStyle: const TextStyle(color: MyColors.gray),
-                progressBarColor: Colors.white,
-                bufferedBarColor: Colors.white54,
-                baseBarColor: isExited ? Colors.white54 : Colors.white10,
-                onSeek: (position) {
-                  audioPlayer.seek(position);
-                },
-              ),
-              playerButtonChinesePhone(position, duration)
-            ],
-          );
-        });
-  }
-
   Widget audioPlayerWidget() {
     final audioPosition =
         Provider.of<AudioPlayerProvider>(context, listen: false);
@@ -523,10 +439,6 @@ class _MoodDetailState extends State<MoodDetail> {
                     await audioHandler.seek(position);
 
                     await audioHandler.play();
-                    AudioPlayerModel _audio = AudioPlayerModel(
-                        productID: moodItem[_current.toInt()].id,
-                        audioPosition: position.inMilliseconds);
-                    audioPosition.addAudioPosition(_audio);
                   },
                 ),
                 const SizedBox(height: 20),
@@ -535,95 +447,6 @@ class _MoodDetailState extends State<MoodDetail> {
             ),
           );
         });
-  }
-
-  Widget playerButtonChinesePhone(Duration position, Duration duration) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        InkWell(
-          onTap: () {
-            position = position - const Duration(seconds: 5);
-
-            if (position < const Duration(seconds: 0)) {
-              audioPlayer.seek(const Duration(seconds: 0));
-            } else {
-              audioPlayer.seek(position);
-            }
-          },
-          child: SvgPicture.asset(
-            "assets/images/replay_5.svg",
-            color: Colors.white,
-          ),
-        ),
-        CircleAvatar(
-          radius: 36,
-          backgroundColor: Colors.white,
-          child: StreamBuilder<PlayerState>(
-            stream: audioPlayer.playerStateStream,
-            builder: (context, snapshot) {
-              final playerState = snapshot.data;
-              final processingState = playerState?.processingState;
-              final playing = playerState?.playing;
-              if (processingState == ProcessingState.loading ||
-                  processingState == ProcessingState.buffering) {
-                return const Center(
-                  child:
-                      CircularProgressIndicator(color: MyColors.primaryColor),
-                );
-              } else if (playing != true) {
-                return IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(
-                    Icons.play_arrow_rounded,
-                    color: MyColors.primaryColor,
-                    size: 40.0,
-                  ),
-                  onPressed: audioPlayer.play,
-                );
-              } else if (processingState != ProcessingState.completed) {
-                return IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(
-                    Icons.pause_rounded,
-                    color: MyColors.primaryColor,
-                    size: 40.0,
-                  ),
-                  onPressed: () {
-                    audioPlayer.pause();
-                  },
-                );
-              } else {
-                return IconButton(
-                  padding: EdgeInsets.zero,
-                  icon: const Icon(
-                    Icons.replay,
-                    color: MyColors.primaryColor,
-                    size: 40.0,
-                  ),
-                  onPressed: () => audioPlayer.seek(Duration.zero),
-                );
-              }
-            },
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            position = position + const Duration(seconds: 15);
-
-            if (duration > position) {
-              audioPlayer.seek(position);
-            } else if (duration < position) {
-              audioPlayer.seek(duration);
-            }
-          },
-          child: SvgPicture.asset(
-            "assets/images/forward_15.svg",
-            color: Colors.white,
-          ),
-        ),
-      ],
-    );
   }
 
   Widget playerButton(Duration position, Duration duration) {

@@ -58,40 +58,50 @@ class _MyCourseMainState extends State<MyCourseMain> {
                   if (snapshot.hasData &&
                       snapshot.connectionState == ConnectionState.done) {
                     List<CoursesItems> coursesItemList = snapshot.data;
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) =>
-                                    const MyCoursesDetail())));
-                      },
-                      child: ListView.builder(
-                        itemCount: 6,
-                        itemBuilder: (context, index) {
-                          allTasks = coursesItemList[index].allTask ?? 0;
-                          doneTasks = coursesItemList[index].done ?? 0;
-                          String tasks = doneTasks.toString() +
-                              "/" +
-                              doneTasks.toString() +
-                              "даалгавар";
-                          return Container(
+                    return ListView.builder(
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                        allTasks = coursesItemList[index].allTask ?? 0;
+                        doneTasks = coursesItemList[index].done ?? 0;
+
+                        String tasks = doneTasks.toString() +
+                            "/" +
+                            allTasks.toString() +
+                            " даалгавар";
+                        print("tasks $tasks");
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => MyCoursesDetail(
+                                        lessonName:
+                                            coursesItemList[index].name ?? "",
+                                        coursesItems:
+                                            coursesItemList[index]))));
+                          },
+                          child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             height: 70,
                             width: double.infinity,
                             child: Row(
                               children: [
-                                Container(
-                                  color: Colors.purple,
-                                  height: 48,
-                                  width: 48,
-                                ),
-                                // ImageView(
-                                //   imgPath:
-                                //       coursesItemList[index].banner ?? "",
-                                //   height: 48,
-                                //   width: 48,
-                                // ),
+                                (coursesItemList[index].banner !=
+                                        "Image failed to upload")
+                                    ? ImageView(
+                                        imgPath:
+                                            coursesItemList[index].banner ?? "",
+                                        height: 48,
+                                        width: 48,
+                                      )
+                                    : Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                                BorderRadius.circular(4)),
+                                        height: 48,
+                                        width: 48,
+                                      ),
                                 const SizedBox(width: 15),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +119,7 @@ class _MyCourseMainState extends State<MyCourseMain> {
                                     const SizedBox(height: 8),
                                     Text(
                                       tasks,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           color: MyColors.gray, fontSize: 12),
                                     )
                                   ],
@@ -137,9 +147,9 @@ class _MyCourseMainState extends State<MyCourseMain> {
                                 const SizedBox(width: 10),
                               ],
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     );
                   } else {
                     return const Center(

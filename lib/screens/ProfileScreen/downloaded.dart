@@ -28,7 +28,9 @@ class _DownloadedState extends State<Downloaded> {
             return ListView.builder(
                 itemCount: value.items.length,
                 itemBuilder: (context, index) {
-                  return DownloadedLectureItem(products: value.items[index]);
+                  return DownloadedLectureItem(
+                      products: value.downloadedItem[index],
+                      audioURL: value.downloadedPath[index]);
                 });
           } else {
             return const Center(

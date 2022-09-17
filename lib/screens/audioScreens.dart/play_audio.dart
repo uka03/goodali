@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Providers/audio_provider.dart';
@@ -33,7 +34,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PlayAudio extends StatefulWidget {
   final Products products;
   final String albumName;
-  const PlayAudio({Key? key, required this.products, required this.albumName})
+  final bool? isDownloaded;
+  final String? downloadedAudioPath;
+  const PlayAudio(
+      {Key? key,
+      required this.products,
+      required this.albumName,
+      this.isDownloaded = false,
+      this.downloadedAudioPath})
       : super(key: key);
 
   @override
@@ -69,6 +77,7 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   void initState() {
     super.initState();
+
     url = Urls.networkPath + widget.products.audio!;
     getCachedFile(url);
   }
@@ -129,7 +138,7 @@ class _PlayAudioState extends State<PlayAudio> {
       audioPlayer.positionStream.listen((event) {
         if (event.inMilliseconds != 0) {
           AudioPlayerModel _audio = AudioPlayerModel(
-              productID: widget.products.id,
+              productID: widget.products.productId,
               audioPosition: event.inMilliseconds);
           print(_audio);
           Provider.of<AudioPlayerProvider>(context, listen: false)
@@ -146,6 +155,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
       developer.log("edit ${item.id}");
       developer.log("edit ${item.duration}");
+
       getSavedPosition().then((value) {
         developer.log(value.toString());
         setState(() {
@@ -155,13 +165,14 @@ class _PlayAudioState extends State<PlayAudio> {
                   AudioService.position,
                   _bufferedPositionStream,
                   (mediaItem, position, buffered) => DurationState(
-                        progress: position,
-                        buffered: buffered,
-                        total: mediaItem?.duration,
-                      ));
+                      progress: position,
+                      buffered: buffered,
+                      total: mediaItem?.duration));
+          print("duration $duration");
           if (value == Duration.zero) {
             audioHandler.playMediaItem(item);
           } else {
+            print(value);
             audioHandler.seek(value);
           }
 
@@ -187,7 +198,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
     // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
-      if (widget.products.id == item.productID) {
+      if (widget.products.productId == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
     }
@@ -380,8 +391,9 @@ class _PlayAudioState extends State<PlayAudio> {
               size: 40.0,
             ),
             onPressed: () {
+              print("judujbds ${widget.products.id}");
               AudioPlayerModel _audio = AudioPlayerModel(
-                  productID: widget.products.id,
+                  productID: widget.products.productId,
                   audioPosition: position.inMilliseconds);
               audioPosition.addAudioPosition(_audio);
               audioHandler.pause();

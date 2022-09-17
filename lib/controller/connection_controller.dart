@@ -7,6 +7,8 @@ import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/article_model.dart';
+import 'package:goodali/models/course_lessons_model.dart';
+import 'package:goodali/models/course_lessons_tasks.dart';
 import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/models/my_all_lectures.dart';
 import 'package:goodali/models/products_model.dart';
@@ -481,6 +483,54 @@ class Connection {
       if (response.statusCode == 200) {
         return (response.data as List)
             .map((e) => Products.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error logged lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<List<CourseLessons>> getCoursesLessons(
+      BuildContext context, String id) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .get(Urls.getCoursesLessons + id);
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => CourseLessons.fromJson(e))
+            .toList();
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        print("error");
+        return [];
+      }
+    } catch (error) {
+      print("error logged lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<List<CourseLessonsTasks>> getCoursesTasks(
+      BuildContext context, String id) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .get(Urls.getCoursesTasks + "54");
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => CourseLessonsTasks.fromJson(e))
             .toList();
       } else if (response.statusCode == 401) {
         return [];

@@ -25,4 +25,6 @@ class Urls {
   static final albumListLogged = "$host/album_list_logged";
   static final lectureListLogged = "$host/lecture_list_logged";
   static final trainingDetailLogged = "$host/training_detail_logged";
+  static final getCoursesLessons = "$host/lessons/";
+  static final getCoursesTasks = "$host/tasks/";
 }

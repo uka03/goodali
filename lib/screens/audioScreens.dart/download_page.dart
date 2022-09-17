@@ -20,19 +20,21 @@ class DownloadPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final downloadAudio = Provider.of<AudioDownloadProvider>(context);
+    final downloadAudio =
+        Provider.of<AudioDownloadProvider>(context, listen: false);
     return StreamBuilder<FileResponse>(
       stream: fileStream,
       builder: (context, AsyncSnapshot snapshot) {
         // print(snapshot.data.originalUrl);
         var loading = !snapshot.hasData || snapshot.data is DownloadProgress;
         if (snapshot.hasData) {
-          bool finished = (snapshot.data as DownloadProgress).progress == 1;
-          String audioPath = (snapshot.data as DownloadProgress).originalUrl;
-          if (finished == true) {
-            downloadAudio.addAudio(products, audioPath);
-          }
           if (loading) {
+            bool finished = (snapshot.data as DownloadProgress).progress == 1;
+            String audioPath = (snapshot.data as DownloadProgress).originalUrl;
+            if (finished == true) {
+              downloadAudio.addAudio(products, audioPath);
+              print("finiiiisheeeeeed");
+            }
             double? percent = (snapshot.data as DownloadProgress).progress;
 
             int percentInt = (percent! * 100).ceilToDouble().toInt();

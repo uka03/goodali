@@ -214,7 +214,8 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   ? IconButton(
                       splashRadius: 20,
                       onPressed: () {
-                        widget.products.isBought == true
+                        widget.products.isBought == true ||
+                                widget.isBought == true
                             ? downloadAudio()
                             : addToCard(cart);
                       },
