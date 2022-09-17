@@ -502,7 +502,7 @@ class Connection {
     try {
       final response = await Http()
           .getDio(context, headerTypebearer)
-          .get(Urls.getCoursesLessons + id);
+          .get(Urls.getCoursesLessons + "7");
 
       if (response.statusCode == 200) {
         return (response.data as List)

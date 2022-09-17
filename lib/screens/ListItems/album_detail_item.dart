@@ -22,21 +22,24 @@ class AlbumDetailItem extends StatefulWidget {
   final List<Products> productsList;
   final String albumName;
   final bool isBought;
+  final int index;
+  final AudioPlayer audioPlayer;
 
-  const AlbumDetailItem({
-    Key? key,
-    required this.products,
-    required this.albumName,
-    required this.productsList,
-    required this.isBought,
-  }) : super(key: key);
+  const AlbumDetailItem(
+      {Key? key,
+      required this.products,
+      required this.albumName,
+      required this.productsList,
+      required this.isBought,
+      this.index = 0,
+      required this.audioPlayer})
+      : super(key: key);
 
   @override
   State<AlbumDetailItem> createState() => _AlbumDetailItemState();
 }
 
 class _AlbumDetailItemState extends State<AlbumDetailItem> {
-  late final AudioPlayer audioPlayer = AudioPlayer();
   bool isPlaying = false;
   bool isClicked = false;
   Duration duration = Duration.zero;
@@ -47,14 +50,14 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   @override
   void initState() {
-    audioPlayer.positionStream.listen((event) {
+    widget.audioPlayer.positionStream.listen((event) {
       position = event;
     });
-    audioPlayer.durationStream.listen((event) {
+    widget.audioPlayer.durationStream.listen((event) {
       duration = event ?? Duration.zero;
     });
 
-    audioPlayer.playingStream.listen((event) {
+    widget.audioPlayer.playingStream.listen((event) {
       isPlaying = event;
     });
     String audioURL = Urls.networkPath + widget.products.audio!;
@@ -77,20 +80,21 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   @override
   void dispose() {
     super.dispose();
-    audioPlayer.dispose();
+    // audioPlayer.dispose();
   }
 
   Future<void> setAudio(String url, FileInfo? fileInfo) async {
     try {
       if (fileInfo != null) {
         audioFile = fileInfo.file;
-        duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
-              return value;
-            }) ??
-            Duration.zero;
+        duration =
+            await widget.audioPlayer.setFilePath(audioFile!.path).then((value) {
+                  return value;
+                }) ??
+                Duration.zero;
       } else {
         print(url);
-        audioPlayer.setUrl(url);
+        widget.audioPlayer.setUrl(url);
       }
     } catch (e) {
       print(e);
@@ -114,8 +118,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     final cart = Provider.of<CartProvider>(context);
     return GestureDetector(
       onTap: () {
-        widget.isBought ? showAudioModal() : showIntroAudioModal();
-        audioPlayer.dispose();
+        widget.isBought || widget.products.isBought == true
+            ? showAudioModal()
+            : showIntroAudioModal();
+        widget.audioPlayer.dispose();
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -173,9 +179,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                       isClicked = true;
                     });
                     if (isPlaying) {
-                      await audioPlayer.pause();
+                      await widget.audioPlayer.pause();
                     } else {
-                      await audioPlayer.play();
+                      await widget.audioPlayer.play();
                     }
                   },
                   icon: Icon(
@@ -198,9 +204,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                         onChanged: (duration) async {
                           final position =
                               Duration(microseconds: (duration * 1000).toInt());
-                          await audioPlayer.seek(position);
+                          await widget.audioPlayer.seek(position);
 
-                          await audioPlayer.play();
+                          await widget.audioPlayer.play();
                         },
                       ),
                     ),

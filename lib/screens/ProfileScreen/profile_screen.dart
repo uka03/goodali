@@ -8,7 +8,7 @@ import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/Auth/pincode_feild.dart';
-import 'package:goodali/screens/ProfileScreen/my_bought_courses.dart';
+import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_bought_courses.dart';
 import 'package:goodali/screens/ProfileScreen/downloaded.dart';
 import 'package:goodali/screens/ProfileScreen/edit_profile.dart';
 import 'package:provider/provider.dart';

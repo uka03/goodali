@@ -5,8 +5,8 @@ import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
-import 'package:goodali/screens/ProfileScreen/my_course_main.dart';
-import 'package:goodali/screens/ProfileScreen/my_courses_detail.dart';
+import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_course_main.dart';
+import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_courses_detail.dart';
 import 'package:goodali/screens/intro_screen.dart';
 import 'package:iconly/iconly.dart';
 
@@ -127,10 +127,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
           itemCount: albumList.length,
           itemBuilder: (BuildContext context, int index) => Padding(
                 padding: const EdgeInsets.only(right: 20.0),
-                child: AlbumItem(
-                  albumData: albumList[index],
-                  audioLength: 0,
-                ),
+                child: AlbumItem(albumData: albumList[index]),
               )),
     );
   }

@@ -11,6 +11,7 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class AlbumDetail extends StatefulWidget {
@@ -23,6 +24,7 @@ class AlbumDetail extends StatefulWidget {
 }
 
 class _AlbumDetailState extends State<AlbumDetail> {
+  late final List<AudioPlayer> audioPlayer = [];
   late final Future future = getAlbumLectures();
   late final Future futureLogged = getLectureListLogged();
 
@@ -167,10 +169,13 @@ class _AlbumDetailState extends State<AlbumDetail> {
             shrinkWrap: true,
             padding: const EdgeInsets.only(bottom: 15),
             itemBuilder: (BuildContext context, int index) {
+              audioPlayer.add(AudioPlayer());
               return AlbumDetailItem(
                   products: product[index],
                   isBought: false,
+                  index: index,
                   albumName: widget.products.title!,
+                  audioPlayer: audioPlayer[index],
                   productsList: product);
             },
             itemCount: product.length,

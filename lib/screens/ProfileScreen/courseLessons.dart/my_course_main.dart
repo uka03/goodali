@@ -5,7 +5,7 @@ import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/screens/ProfileScreen/my_courses_detail.dart';
+import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_courses_detail.dart';
 import 'package:goodali/screens/blank.dart';
 
 class MyCourseMain extends StatefulWidget {
@@ -88,11 +88,15 @@ class _MyCourseMainState extends State<MyCourseMain> {
                               children: [
                                 (coursesItemList[index].banner !=
                                         "Image failed to upload")
-                                    ? ImageView(
-                                        imgPath:
-                                            coursesItemList[index].banner ?? "",
-                                        height: 48,
-                                        width: 48,
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: ImageView(
+                                          imgPath:
+                                              coursesItemList[index].banner ??
+                                                  "",
+                                          height: 48,
+                                          width: 48,
+                                        ),
                                       )
                                     : Container(
                                         decoration: BoxDecoration(

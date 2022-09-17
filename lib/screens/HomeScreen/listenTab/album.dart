@@ -5,7 +5,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
-import 'package:goodali/screens/ProfileScreen/my_bought_courses.dart';
+import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_bought_courses.dart';
 import 'package:provider/provider.dart';
 
 class AlbumLecture extends StatefulWidget {
@@ -87,10 +87,7 @@ class _AlbumLectureState extends State<AlbumLecture> {
             mainAxisExtent: 230,
             crossAxisSpacing: 20),
         itemBuilder: (BuildContext context, int index) => Center(
-              child: AlbumItem(
-                albumData: albumList[index],
-                audioLength: widget.audioLength,
-              ),
+              child: AlbumItem(albumData: albumList[index]),
             ));
   }
 

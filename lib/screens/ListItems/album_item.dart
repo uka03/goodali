@@ -8,10 +8,8 @@ import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 
 class AlbumItem extends StatelessWidget {
   final Products albumData;
-  final int audioLength;
-  const AlbumItem(
-      {Key? key, required this.albumData, required this.audioLength})
-      : super(key: key);
+
+  const AlbumItem({Key? key, required this.albumData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +43,7 @@ class AlbumItem extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            audioLength.toString() + " audio",
+            albumData.audioCount!.toString() + " audio",
             style: const TextStyle(fontSize: 12, color: MyColors.border2),
           ),
         ],

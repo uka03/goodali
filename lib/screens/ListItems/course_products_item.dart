@@ -5,7 +5,7 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
-import 'package:goodali/screens/ProfileScreen/my_course_main.dart';
+import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_course_main.dart';
 import 'package:iconly/iconly.dart';
 
 class CourseProductsListItem extends StatefulWidget {

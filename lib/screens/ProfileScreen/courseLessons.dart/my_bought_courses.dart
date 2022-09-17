@@ -5,6 +5,7 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/course_products_item.dart';
+import 'package:just_audio/just_audio.dart';
 
 class MyCourses extends StatefulWidget {
   const MyCourses({Key? key}) : super(key: key);
@@ -14,6 +15,7 @@ class MyCourses extends StatefulWidget {
 }
 
 class _MyCoursesState extends State<MyCourses> {
+  late final List<AudioPlayer> audioPlayer = [];
   String albumName = "";
 
   @override
@@ -68,6 +70,7 @@ class _MyCoursesState extends State<MyCourses> {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemBuilder: (context, index) {
+          audioPlayer.add(AudioPlayer());
           String empty = "";
           if (albumName == allLectures[index].albumTitle) {
             empty = "";
@@ -90,6 +93,7 @@ class _MyCoursesState extends State<MyCourses> {
               const SizedBox(height: 20),
               AlbumDetailItem(
                   isBought: true,
+                  audioPlayer: audioPlayer[index],
                   products: allLectures[index],
                   albumName: albumName,
                   productsList: allLectures),

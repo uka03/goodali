@@ -33,7 +33,9 @@ class CartProductItem extends StatelessWidget {
                       //   color: Colors.pink,
                       // )
                       ImageView(
-                          imgPath: products.banner ?? "",
+                          imgPath: products.banner == ""
+                              ? products.trainingBanner ?? ""
+                              : products.banner ?? "",
                           width: 36,
                           height: 36)),
             ),

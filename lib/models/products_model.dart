@@ -14,6 +14,8 @@ class Products {
   String? albumTitle;
   String? lectureTitle;
   bool? isBought;
+  int? audioCount;
+  String? trainingBanner;
 
   Products(
       {this.audio,
@@ -30,7 +32,9 @@ class Products {
       this.traingName,
       this.albumTitle,
       this.lectureTitle,
-      this.isBought});
+      this.audioCount,
+      this.isBought,
+      this.trainingBanner});
 
   Products.fromJson(Map<String, dynamic> json) {
     audio = json['audio'];
@@ -48,6 +52,8 @@ class Products {
     status = json['status'] ?? 0;
     traingName = json['t_name'] ?? "";
     isBought = json['is_bought'] ?? false;
+    audioCount = json['audio_count'] ?? 0;
+    trainingBanner = json['t_banner'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -67,6 +73,8 @@ class Products {
     data['album_title'] = albumTitle;
     data['lecture_title'] = lectureTitle;
     data['is_bought'] = isBought;
+    data["audio_count"] = audioCount;
+    data['t_banner'] = trainingBanner;
 
     return data;
   }

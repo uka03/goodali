@@ -18,7 +18,7 @@ class Http {
   factory Http() => _instance ?? Http._();
 
   BaseOptions options =
-      BaseOptions(receiveTimeout: 20000, connectTimeout: 10000);
+      BaseOptions(receiveTimeout: 30000, connectTimeout: 30000);
   Http._() {
     try {
       _dio = Dio(options);
@@ -64,11 +64,15 @@ class Http {
         if (e.type == DioErrorType.connectTimeout) {
           showTopSnackBar(
               context,
-              CustomTopSnackBar(
+              const CustomTopSnackBar(
                   type: 0,
                   text: "Интернэт холболтоо шалгаад, дахин оролдоно уу "));
         } else if (e.type == DioErrorType.receiveTimeout) {
           print("DIO RECEIVE TIME OUT");
+          showTopSnackBar(
+              context,
+              const CustomTopSnackBar(
+                  type: 0, text: "Сервертэй холбогдоход алдаа гарлаа."));
         }
 
         if (e.response?.statusCode == 401) {
