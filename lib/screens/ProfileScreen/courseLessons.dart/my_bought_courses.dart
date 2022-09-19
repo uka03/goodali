@@ -65,66 +65,74 @@ class _MyCoursesState extends State<MyCourses> {
   }
 
   Widget allLecturesWidget(List<Products> allLectures) {
-    return ListView.builder(
-        itemCount: allLectures.length,
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          audioPlayer.add(AudioPlayer());
-          String empty = "";
-          if (albumName == allLectures[index].albumTitle) {
-            empty = "";
-          } else {
-            empty = albumName;
-          }
-          if (albumName != allLectures[index].albumTitle) {
-            albumName = allLectures[index].albumTitle ?? "";
-            empty = albumName;
-          }
+    if (allLectures.isEmpty) {
+      return Container();
+    } else {
+      return ListView.builder(
+          itemCount: allLectures.length,
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            audioPlayer.add(AudioPlayer());
+            String empty = "";
+            if (albumName == allLectures[index].albumTitle) {
+              empty = "";
+            } else {
+              empty = albumName;
+            }
+            if (albumName != allLectures[index].albumTitle) {
+              albumName = allLectures[index].albumTitle ?? "";
+              empty = albumName;
+            }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(empty,
-                  style: const TextStyle(
-                      color: MyColors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              AlbumDetailItem(
-                  isBought: true,
-                  audioPlayer: audioPlayer[index],
-                  products: allLectures[index],
-                  albumName: albumName,
-                  productsList: allLectures),
-            ],
-          );
-        });
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(empty,
+                    style: const TextStyle(
+                        color: MyColors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                AlbumDetailItem(
+                    isBought: true,
+                    audioPlayer: audioPlayer[index],
+                    products: allLectures[index],
+                    albumName: albumName,
+                    productsList: allLectures),
+              ],
+            );
+          });
+    }
   }
 
   Widget onlineCourses(List<Products> myCourses) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 10),
-        const Text("Онлайн сургалт",
-            style: TextStyle(
-                color: MyColors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold)),
-        const SizedBox(height: 20),
-        ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: 1,
-            itemBuilder: (BuildContext context, int index) {
-              return CourseProductsListItem(
-                  isBought: true,
-                  courseProducts: myCourses[index],
-                  courseProductsList: myCourses);
-            }),
-      ],
-    );
+    if (myCourses.isEmpty) {
+      return Container();
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10),
+          const Text("Онлайн сургалт",
+              style: TextStyle(
+                  color: MyColors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: 1,
+              itemBuilder: (BuildContext context, int index) {
+                return CourseProductsListItem(
+                    isBought: true,
+                    courseProducts: myCourses[index],
+                    courseProductsList: myCourses);
+              }),
+        ],
+      );
+    }
   }
 
   Future<List<Products>> getAllLectures() async {

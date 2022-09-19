@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -59,8 +59,7 @@ dependencies:
   path_provider: ^2.0.11
   flutter_cache_manager: ^3.3.0
   video_player: ^2.4.7
-  chewie: ^1.3.5
-  youtube_player_flutter: ^8.0.0
+  youtube_player_iframe: ^2.2.2
 
 dev_dependencies:
   flutter_test:
@@ -78,7 +77,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -105,7 +103,6 @@ flutter:
   #       - asset: assets/fonts/Gilroy-Thin.ttf
   #       - asset: assets/fonts/Gilroy-Bold.ttf
   #         weight: 700
-        
 
   #
   # For details regarding fonts from package dependencies,

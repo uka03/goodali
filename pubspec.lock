@@ -107,7 +107,7 @@ packages:
     source: hosted
     version: "1.3.1"
   chewie:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: chewie
       url: "https://pub.dartlang.org"
@@ -1085,13 +1085,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.3.1"
-  youtube_player_flutter:
+  youtube_player_iframe:
     dependency: "direct main"
     description:
-      name: youtube_player_flutter
+      name: youtube_player_iframe
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.0.0"
+    version: "2.2.2"
 sdks:
   dart: ">=2.16.1 <3.0.0"
   flutter: ">=2.10.0"

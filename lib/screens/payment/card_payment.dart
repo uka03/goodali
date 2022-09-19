@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:provider/provider.dart';
@@ -51,14 +52,26 @@ class _CardPaymentState extends State<CardPayment> {
             card.removeAllProducts();
             print("onPageFinished $value");
             if (value.contains("status_code=000")) {
-              showTopSnackBar(
-                  context, const CustomTopSnackBar(type: 1, text: "Амжилттай"));
-              Navigator.pop(context);
-            } else {
-              showTopSnackBar(context,
-                  const CustomTopSnackBar(type: 0, text: "Алдаа гарлаа"));
-              Navigator.pop(context);
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(
+                    content: Text("Амжилттай"),
+                    backgroundColor: MyColors.success,
+                    duration: Duration(seconds: 1),
+                    behavior: SnackBarBehavior.floating,
+                  ))
+                  .closed
+                  .then((value) {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              });
             }
+            // else {
+
+            // }
+          },
+          onWebResourceError: (onWebResourceError) {
+            showTopSnackBar(context,
+                const CustomTopSnackBar(type: 0, text: "Алдаа гарлаа"));
           },
           onProgress: (int progress) {
             print('Webview is loading $progress');

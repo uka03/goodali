@@ -40,7 +40,7 @@ class AudioDownloadProvider with ChangeNotifier {
     _audioPath.add(audioPath);
     _items.add(cartItem);
     _setPrefItems();
-    notifyListeners();
+    // notifyListeners();
   }
 
   void removeAudio(Products cartItem, String audioPath) {

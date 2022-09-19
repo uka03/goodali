@@ -1,13 +1,34 @@
-class CourseLessons {
+class CourseLesson {
+  int? id;
+  Lesson? lesson;
+
+  CourseLesson({this.id, this.lesson});
+
+  CourseLesson.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    lesson = json['lesson'] != null ? Lesson.fromJson(json['lesson']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    if (lesson != null) {
+      data['lesson'] = lesson!.toJson();
+    }
+    return data;
+  }
+}
+
+class Lesson {
   String? banner;
   String? expiry;
   int? id;
-  bool? isBought;
+  String? isBought;
   String? name;
 
-  CourseLessons({this.banner, this.expiry, this.id, this.isBought, this.name});
+  Lesson({this.banner, this.expiry, this.id, this.isBought, this.name});
 
-  CourseLessons.fromJson(Map<String, dynamic> json) {
+  Lesson.fromJson(Map<String, dynamic> json) {
     banner = json['banner'];
     expiry = json['expiry'];
     id = json['id'];

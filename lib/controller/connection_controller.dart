@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -497,17 +498,24 @@ class Connection {
     }
   }
 
-  static Future<List<CourseLessons>> getCoursesLessons(
+  static Future<List<CourseLesson>> getCoursesLessons(
       BuildContext context, String id) async {
+    print("getCoursesLessons");
     try {
       final response = await Http()
           .getDio(context, headerTypebearer)
-          .get(Urls.getCoursesLessons + "7");
+          .get(Urls.getCoursesLessons + id);
+      print("response.data");
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => CourseLessons.fromJson(e))
-            .toList();
+        List<CourseLesson> lessonData = [];
+
+        for (var item in (response.data as List)) {
+          lessonData
+              .add(CourseLesson.fromJson(Map<String, dynamic>.from(item)));
+        }
+
+        return lessonData;
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -524,9 +532,10 @@ class Connection {
   static Future<List<CourseLessonsTasksModel>> getCoursesTasks(
       BuildContext context, String id) async {
     try {
+      print("idididi $id");
       final response = await Http()
           .getDio(context, headerTypebearer)
-          .get(Urls.getCoursesTasks + "54");
+          .get(Urls.getCoursesTasks + id);
 
       if (response.statusCode == 200) {
         return (response.data as List)

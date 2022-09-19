@@ -29,10 +29,13 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
   late final Future future = getCoursesLessons();
 
   int type = 0;
+  String id = "";
 
   List<CourseLessonsTasksModel> allTasks = [];
   List<String> tasksName = [];
   bool isLoading = true;
+
+  List<CourseLesson> lessonIdData = [];
 
   String taskType = "Унших материал";
 
@@ -79,12 +82,12 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.done &&
                   snapshot.hasData) {
-                List<CourseLessons> courseLessons = snapshot.data;
-                if (courseLessons.isNotEmpty) {
+                List<Lesson?> lessons = snapshot.data;
+                if (lessons.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: courseLessons.length,
+                    itemCount: lessons.length,
                     itemBuilder: (context, index) {
                       return Card(
                           elevation: 0,
@@ -99,10 +102,10 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                 onExpansionChanged: (value) {
                                   if (value) {
                                     getCoursesTasks(
-                                        courseLessons[index].id.toString());
+                                        lessonIdData[index].id.toString());
                                   }
                                 },
-                                title: Text(courseLessons[index].name ?? ""),
+                                title: Text(lessons[index]?.name ?? ""),
                                 children: [
                                   ListTile(
                                     title: const Text("Унших"),
@@ -114,9 +117,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                                   CourseReadingTasks(
                                                       courseReadingTasks:
                                                           allTasks,
-                                                      title:
-                                                          courseLessons[index]
-                                                              .name)));
+                                                      title: lessons[index]
+                                                          ?.name)));
                                     },
                                   ),
                                   ListTile(
@@ -129,9 +131,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                                   CourseReadingTasks(
                                                       courseReadingTasks:
                                                           allTasks,
-                                                      title:
-                                                          courseLessons[index]
-                                                              .name)));
+                                                      title: lessons[index]
+                                                          ?.name)));
                                     },
                                   ),
                                   ListTile(
@@ -144,9 +145,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                                   CourseReadingTasks(
                                                       courseReadingTasks:
                                                           allTasks,
-                                                      title:
-                                                          courseLessons[index]
-                                                              .name)));
+                                                      title: lessons[index]
+                                                          ?.name)));
                                     },
                                   ),
                                   ListTile(
@@ -159,9 +159,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                                   CourseReadingTasks(
                                                       courseReadingTasks:
                                                           allTasks,
-                                                      title:
-                                                          courseLessons[index]
-                                                              .name)));
+                                                      title: lessons[index]
+                                                          ?.name)));
                                     },
                                   ),
                                   ListTile(
@@ -174,9 +173,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                                   CourseReadingTasks(
                                                       courseReadingTasks:
                                                           allTasks,
-                                                      title:
-                                                          courseLessons[index]
-                                                              .name)));
+                                                      title: lessons[index]
+                                                          ?.name)));
                                     },
                                   ),
                                   ListTile(
@@ -189,9 +187,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                                   CourseReadingTasks(
                                                       courseReadingTasks:
                                                           allTasks,
-                                                      title:
-                                                          courseLessons[index]
-                                                              .name)));
+                                                      title: lessons[index]
+                                                          ?.name)));
                                     },
                                   ),
                                   ListTile(
@@ -204,9 +201,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                                   CourseReadingTasks(
                                                       courseReadingTasks:
                                                           allTasks,
-                                                      title:
-                                                          courseLessons[index]
-                                                              .name)));
+                                                      title: lessons[index]
+                                                          ?.name)));
                                     },
                                   ),
                                 ]),
@@ -230,15 +226,21 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
     );
   }
 
-  Future<List<CourseLessons>> getCoursesLessons() async {
-    return Connection.getCoursesLessons(
+  Future<List<Lesson?>> getCoursesLessons() async {
+    List<Lesson?> courseLessons = [];
+    lessonIdData = await Connection.getCoursesLessons(
         context, widget.coursesItems.id.toString());
+    if (lessonIdData != []) {
+      for (var item in lessonIdData) {
+        courseLessons.add(item.lesson);
+      }
+    }
+    return courseLessons;
   }
 
   Future<List<CourseLessonsTasksModel>> getCoursesTasks(String id) async {
     print("course lessons tasks $id");
-    allTasks = await Connection.getCoursesTasks(
-        context, widget.coursesItems.id.toString());
+    allTasks = await Connection.getCoursesTasks(context, id);
     print("kdffh ${allTasks.length}");
     setState(() {
       isLoading = false;
