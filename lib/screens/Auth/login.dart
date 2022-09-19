@@ -98,7 +98,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               keyboardType: TextInputType.number,
               style: TextStyle(color: textFieldColor),
               decoration: const InputDecoration(
-                hintText: "Нууц үг",
+                hintText: "Пин код",
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: MyColors.border1, width: 0.5),
                 ),
@@ -154,7 +154,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                             builder: (context) => const ForgotPassword()));
                   },
                   child: const Text(
-                    "Нууц үг мартсан",
+                    "Пин код мартсан",
                     style: TextStyle(color: MyColors.primaryColor),
                   )),
             ),
@@ -268,7 +268,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                     return "4 оронтой байх";
                   }
                   if (value.isEmpty) {
-                    return "Нууц үг оруулна уу.";
+                    return "Пин код оруулна уу.";
                   }
                   return null;
                 },
@@ -277,7 +277,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 textInputAction: TextInputAction.done,
                 style: TextStyle(color: textFieldColor),
                 decoration: const InputDecoration(
-                  hintText: "Нууц үг",
+                  hintText: "Пин код",
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: MyColors.border1, width: 0.5),
                   ),

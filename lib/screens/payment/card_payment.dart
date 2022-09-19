@@ -53,9 +53,11 @@ class _CardPaymentState extends State<CardPayment> {
             if (value.contains("status_code=000")) {
               showTopSnackBar(
                   context, const CustomTopSnackBar(type: 1, text: "Амжилттай"));
+              Navigator.pop(context);
             } else {
               showTopSnackBar(context,
                   const CustomTopSnackBar(type: 0, text: "Алдаа гарлаа"));
+              Navigator.pop(context);
             }
           },
           onProgress: (int progress) {

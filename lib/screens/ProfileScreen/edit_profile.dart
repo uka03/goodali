@@ -120,6 +120,11 @@ class _EditProfileState extends State<EditProfile> {
                   controller: phoneController,
                   cursorColor: MyColors.primaryColor,
                   keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    setState(() {
+                      isChanged = true;
+                    });
+                  },
                   decoration: const InputDecoration(
                     enabledBorder: UnderlineInputBorder(
                       borderSide:

@@ -521,7 +521,7 @@ class Connection {
     }
   }
 
-  static Future<List<CourseLessonsTasks>> getCoursesTasks(
+  static Future<List<CourseLessonsTasksModel>> getCoursesTasks(
       BuildContext context, String id) async {
     try {
       final response = await Http()
@@ -530,7 +530,7 @@ class Connection {
 
       if (response.statusCode == 200) {
         return (response.data as List)
-            .map((e) => CourseLessonsTasks.fromJson(e))
+            .map((e) => CourseLessonsTasksModel.fromJson(e))
             .toList();
       } else if (response.statusCode == 401) {
         return [];
