@@ -5,7 +5,11 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_textfield.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
+import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/course_lessons_tasks.dart';
+import 'package:goodali/models/task_answer.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class CourseReadingTasks extends StatefulWidget {
@@ -22,9 +26,8 @@ class CourseReadingTasks extends StatefulWidget {
 class _CourseReadingTasksState extends State<CourseReadingTasks> {
   List<TextEditingController> _controllers = [];
   YoutubePlayerController? _ytbPlayerController;
-  // YoutubePlayerController? _controller;
-
-  bool _isPlayerReady = false;
+  List<TaskAnswers> taskAnswerList = [];
+  List<bool> _checkboxValue = [];
 
   @override
   void initState() {
@@ -56,7 +59,9 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-
+    for (TextEditingController c in _controllers) {
+      c.dispose();
+    }
     _ytbPlayerController?.close();
     super.dispose();
   }
@@ -74,89 +79,144 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: SimpleAppBar(title: widget.title ?? ""),
-        body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: ListView.builder(
-              itemCount: widget.courseReadingTasks.length,
-              itemBuilder: (context, index) {
-                _controllers.add(TextEditingController());
-                if (widget.courseReadingTasks[index].videoUrl != "") {
-                  WidgetsBinding.instance!.addPostFrameCallback((_) {
-                    initiliazeVideo(widget.courseReadingTasks[index].videoUrl);
-                  });
+      appBar: SimpleAppBar(title: widget.title ?? ""),
+      body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: ListView.builder(
+            itemCount: widget.courseReadingTasks.length,
+            itemBuilder: (context, index) {
+              _controllers.add(TextEditingController());
+              for (var i = 0; i < widget.courseReadingTasks.length; i++) {
+                if (widget.courseReadingTasks[index].isAnswer == 3 ||
+                    widget.courseReadingTasks[index].isAnswer == 4 ||
+                    widget.courseReadingTasks[index].isAnswer == 2) {
+                  _checkboxValue.add(false);
                 }
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      widget.courseReadingTasks[index].body != ""
-                          ? HtmlWidget(
-                              widget.courseReadingTasks[index].body ?? "")
-                          : Container(),
-                      (widget.courseReadingTasks[index].question != "")
-                          ? Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10.0),
-                              child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    widget.courseReadingTasks[index].question ??
-                                        "",
-                                    style: const TextStyle(
-                                        color: MyColors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18),
-                                  )),
-                            )
-                          : Container(),
-                      const SizedBox(height: 10),
-                      (widget.courseReadingTasks[index].isAnswer == 1)
-                          ? CustomTextField(
-                              controller: _controllers[index],
-                              hintText: "Хариулт",
-                              maxLength: 2000)
-                          : Container(),
-                      if (widget.courseReadingTasks[index].videoUrl != "")
-                        YoutubePlayerControllerProvider(
-                          controller: _ytbPlayerController ??
-                              YoutubePlayerController(
-                                  initialVideoId: widget
-                                          .courseReadingTasks[index].videoUrl ??
-                                      ""),
-                          child: const YoutubePlayerIFrame(
-                            aspectRatio: 16 / 9,
-                          ),
+              }
+              _checkboxValue.add(false);
+              if (widget.courseReadingTasks[index].videoUrl != "") {
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
+                  initiliazeVideo(widget.courseReadingTasks[index].videoUrl);
+                });
+              }
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    widget.courseReadingTasks[index].body != ""
+                        ? HtmlWidget(
+                            widget.courseReadingTasks[index].body ?? "")
+                        : Container(),
+                    (widget.courseReadingTasks[index].question != "")
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  widget.courseReadingTasks[index].question ??
+                                      "",
+                                  style: const TextStyle(
+                                      color: MyColors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                )),
+                          )
+                        : Container(),
+                    const SizedBox(height: 10),
+                    (widget.courseReadingTasks[index].isAnswer == 1)
+                        ? CustomTextField(
+                            controller: _controllers[index],
+                            hintText: "Хариулт",
+                            maxLength: 2000)
+                        : Container(),
+                    if (widget.courseReadingTasks[index].type == 2 ||
+                        widget.courseReadingTasks[index].type == 3)
+                      CheckboxListTile(
+                          activeColor: MyColors.success,
+                          selectedTileColor: MyColors.success,
+                          title: const Text("Аудио сонссон"),
+                          value: _checkboxValue[index],
+                          onChanged: (value) {
+                            setState(() {
+                              _checkboxValue[index] = value!;
+                            });
+                          }),
+                    if (widget.courseReadingTasks[index].type == 2 ||
+                        widget.courseReadingTasks[index].type == 3)
+                      CustomTextField(
+                          controller: _controllers[index],
+                          hintText: "Хариулт",
+                          maxLength: 2000),
+                    if (widget.courseReadingTasks[index].videoUrl != "")
+                      YoutubePlayerControllerProvider(
+                        controller: _ytbPlayerController ??
+                            YoutubePlayerController(
+                                initialVideoId:
+                                    widget.courseReadingTasks[index].videoUrl ??
+                                        ""),
+                        child: const YoutubePlayerIFrame(
+                          aspectRatio: 16 / 9,
                         ),
-                    ],
-                  ),
-                );
-              },
-            )),
-        persistentFooterButtons: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 25),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: MyColors.border1, width: 0.5)),
-                  child: Text(
-                    "1/3",
-                    style: TextStyle(color: MyColors.black),
-                  ),
+                      ),
+                    if (widget.courseReadingTasks[index].type == 4)
+                      CheckboxListTile(
+                          activeColor: MyColors.success,
+                          selectedTileColor: MyColors.success,
+                          title: const Text("Видео үзсэн"),
+                          value: _checkboxValue[index],
+                          onChanged: (value) {
+                            setState(() {
+                              _checkboxValue[index] = value!;
+                            });
+                          }),
+                    if (widget.courseReadingTasks[index].type == 4)
+                      CustomTextField(
+                          controller: _controllers[index],
+                          hintText: "Хариулт",
+                          maxLength: 2000),
+                    (widget.courseReadingTasks[index].type == 5 ||
+                            widget.courseReadingTasks[index].type == 6)
+                        ? CustomTextField(
+                            controller: _controllers[index],
+                            hintText: "Хариулт",
+                            maxLength: 2000)
+                        : Container(),
+                  ],
                 ),
-                SizedBox(
-                    width: MediaQuery.of(context).size.width / 2 + 40,
-                    child:
-                        CustomElevatedButton(onPress: () {}, text: "Дараах ")),
-              ],
-            ),
-          )
-        ]);
+              );
+            },
+          )),
+      persistentFooterButtons: [
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: CustomElevatedButton(
+                onPress: () {
+                  print(widget.courseReadingTasks.length);
+                  print(_controllers.length);
+
+                  for (var i = 0; i < widget.courseReadingTasks.length; i++) {
+                    TaskAnswers taskAnswers = TaskAnswers(
+                        isAnswered: _controllers[i].text == "" ? 0 : 1,
+                        taskFieldData: _controllers[i].text);
+                    taskAnswerList.add(taskAnswers);
+                    saveAnswer(
+                        widget.courseReadingTasks[i].id.toString(),
+                        _controllers[i].text,
+                        _controllers[i].text == "" ? 0 : 1);
+                    print(i);
+                  }
+                },
+                text: "Хадгалах")),
+      ],
+    );
+  }
+
+  saveAnswer(String taskId, String textFieldData, int isAnswered) {
+    Map answerData = {
+      "task_id": taskId,
+      "text_field_data": textFieldData,
+      "is_answered": isAnswered
+    };
+    Connection.saveAnswer(context, answerData);
   }
 }

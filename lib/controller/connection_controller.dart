@@ -553,4 +553,26 @@ class Connection {
       return [];
     }
   }
+
+  static Future<Map<String, dynamic>> saveAnswer(
+      BuildContext context, dynamic data) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.saveAnswerData, data: data);
+
+      if (response.statusCode == 200) {
+        return {};
+      } else if (response.statusCode == 401) {
+        return {};
+      } else {
+        print("error");
+        return {};
+      }
+    } catch (error) {
+      print("error logged lectures $error");
+
+      return {};
+    }
+  }
 }

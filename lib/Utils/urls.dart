@@ -27,4 +27,5 @@ class Urls {
   static final trainingDetailLogged = "$host/training_detail_logged";
   static final getCoursesLessons = "$host/lessons/";
   static final getCoursesTasks = "$host/tasks/";
+  static final saveAnswerData = "$host/set_answer_api";
 }
