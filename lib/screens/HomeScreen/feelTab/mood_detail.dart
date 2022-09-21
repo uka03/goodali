@@ -40,6 +40,7 @@ class MoodDetail extends StatefulWidget {
 }
 
 class _MoodDetailState extends State<MoodDetail> {
+  AudioPlayerProvider _audioPlayerProvider = AudioPlayerProvider();
   late final Future futureMoodItem = getMoodList();
   final PageController _pageController = PageController();
   final _kDuration = const Duration(milliseconds: 300);
@@ -78,6 +79,10 @@ class _MoodDetailState extends State<MoodDetail> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _audioPlayerProvider =
+          Provider.of<AudioPlayerProvider>(context, listen: false);
+    });
 
     getMoodList().then((value) {
       moodItem = value;
@@ -110,7 +115,12 @@ class _MoodDetailState extends State<MoodDetail> {
 
   @override
   void dispose() {
-    // _durationState.timeout(timeLimit)
+    // AudioPlayerModel _audio = AudioPlayerModel(
+    //     productID: moodItem[_current.toInt()].id,
+    //     audioPosition: position.inMilliseconds);
+    // _audioPlayerProvider.addAudioPosition(_audio);
+    // print("dispose");
+    audioPlayer.dispose();
     super.dispose();
   }
 
@@ -411,8 +421,6 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   Widget audioPlayerWidget() {
-    final audioPosition =
-        Provider.of<AudioPlayerProvider>(context, listen: false);
     return StreamBuilder<DurationState>(
         stream: _durationState,
         builder: (context, snapshot) {
@@ -450,9 +458,7 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   Widget playerButton(Duration position, Duration duration) {
-    final audioPosition = Provider.of<AudioPlayerProvider>(
-      context,
-    );
+    final audioPosition = Provider.of<AudioPlayerProvider>(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [

@@ -1,14 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_textfield.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/course_lessons_tasks.dart';
 import 'package:goodali/models/task_answer.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
@@ -25,9 +33,17 @@ class CourseReadingTasks extends StatefulWidget {
 
 class _CourseReadingTasksState extends State<CourseReadingTasks> {
   List<TextEditingController> _controllers = [];
+  late final AudioPlayer audioPlayer = AudioPlayer();
   YoutubePlayerController? _ytbPlayerController;
   List<TaskAnswers> taskAnswerList = [];
   List<bool> _checkboxValue = [];
+
+  bool isPlaying = false;
+
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
+  Duration savedPosition = Duration.zero;
+  int saveddouble = 0;
 
   @override
   void initState() {
@@ -39,6 +55,57 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
+    audioPlayer.positionStream.listen((event) {
+      position = event;
+    });
+    audioPlayer.durationStream.listen((event) {
+      duration = event ?? Duration.zero;
+    });
+
+    audioPlayer.playingStream.listen((event) {
+      isPlaying = event;
+    });
+  }
+
+  initiliazeAudio(String audioURl, int id) async {
+    duration = await audioPlayer.setUrl(audioURl).then((value) {
+          // setState(() => isLoading = false);
+          return value;
+        }) ??
+        Duration.zero;
+    getSavedPosition(id).then((value) {
+      setState(() {
+        print("duration $duration");
+        if (value == Duration.zero) {
+        } else {
+          print(value);
+          audioPlayer.seek(value);
+        }
+
+        {}
+      });
+    });
+  }
+
+  Future getSavedPosition(int moodItemID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
+    List<AudioPlayerModel> decodedProduct = decodedAudioString
+        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
+        .toList();
+
+    // developer.log(decodedProduct.first.audioPosition.toString());
+    for (var item in decodedProduct) {
+      print(moodItemID);
+      print(item.productID);
+      if (moodItemID == item.productID) {
+        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
+      }
+    }
+    position = Duration(milliseconds: saveddouble);
+    print("position $position");
+    return position;
   }
 
   initiliazeVideo(videoUrl) {
@@ -99,6 +166,13 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
                   initiliazeVideo(widget.courseReadingTasks[index].videoUrl);
                 });
               }
+              if (widget.courseReadingTasks[index].listenAudio != "") {
+                WidgetsBinding.instance!.addPostFrameCallback((_) {
+                  initiliazeAudio(
+                      widget.courseReadingTasks[index].listenAudio ?? '',
+                      widget.courseReadingTasks[index].id?.toInt() ?? 0);
+                });
+              }
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -135,6 +209,7 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
                           activeColor: MyColors.success,
                           selectedTileColor: MyColors.success,
                           title: const Text("Аудио сонссон"),
+                          controlAffinity: ListTileControlAffinity.leading,
                           value: _checkboxValue[index],
                           onChanged: (value) {
                             setState(() {
@@ -164,6 +239,7 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
                           selectedTileColor: MyColors.success,
                           title: const Text("Видео үзсэн"),
                           value: _checkboxValue[index],
+                          controlAffinity: ListTileControlAffinity.leading,
                           onChanged: (value) {
                             setState(() {
                               _checkboxValue[index] = value!;
@@ -207,6 +283,46 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
                   }
                 },
                 text: "Хадгалах")),
+      ],
+    );
+  }
+
+  Widget audioPlayerWidget() {
+    final audioPosition =
+        Provider.of<AudioPlayerProvider>(context, listen: false);
+    return Row(
+      children: [
+        CircleAvatar(
+          backgroundColor: MyColors.input,
+          child: IconButton(
+            splashRadius: 20,
+            padding: EdgeInsets.zero,
+            onPressed: () async {
+              if (isPlaying) {
+                audioPlayer.pause();
+              } else {
+                await audioPlayer.play();
+              }
+            },
+            icon: Icon(
+              isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              size: 30,
+              color: MyColors.black,
+            ),
+          ),
+        ),
+        Slider(
+          value: position.inSeconds.toDouble(),
+          max: duration.inSeconds.toDouble(),
+          activeColor: MyColors.primaryColor,
+          inactiveColor: MyColors.border1,
+          onChanged: (duration) async {
+            final position = Duration(microseconds: (duration * 1000).toInt());
+            await audioPlayer.seek(position);
+
+            await audioPlayer.play();
+          },
+        ),
       ],
     );
   }

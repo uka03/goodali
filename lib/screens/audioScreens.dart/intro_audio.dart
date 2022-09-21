@@ -123,7 +123,7 @@ class _IntroAudioState extends State<IntroAudio> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.products.title?.capitalize() ?? "",
+                        widget.products.title ?? "",
                         style: const TextStyle(
                             fontSize: 16,
                             height: 1.6,

@@ -25,7 +25,7 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
+
   TextEditingController nicknameController = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
@@ -102,29 +102,6 @@ class _EditProfileState extends State<EditProfile> {
                   controller: emailController,
                   cursorColor: MyColors.primaryColor,
                   readOnly: true,
-                  decoration: const InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
-                    ),
-                  )),
-              const SizedBox(height: 24),
-              const Text("Утасны дугаар",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: MyColors.gray)),
-              const SizedBox(height: 20),
-              TextField(
-                  controller: phoneController,
-                  cursorColor: MyColors.primaryColor,
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      isChanged = true;
-                    });
-                  },
                   decoration: const InputDecoration(
                     enabledBorder: UnderlineInputBorder(
                       borderSide:

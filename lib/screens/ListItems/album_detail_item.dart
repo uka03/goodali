@@ -17,13 +17,18 @@ import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as developer;
 
+typedef SetIndex = void Function(int index);
+
 class AlbumDetailItem extends StatefulWidget {
+  final SetIndex setIndex;
   final Products products;
+  final Products? albumProducts;
   final List<Products> productsList;
   final String albumName;
   final bool isBought;
-  final int index;
   final AudioPlayer audioPlayer;
+  final List<AudioPlayer> audioPlayerList;
+  final int currentIndex;
 
   const AlbumDetailItem(
       {Key? key,
@@ -31,8 +36,11 @@ class AlbumDetailItem extends StatefulWidget {
       required this.albumName,
       required this.productsList,
       required this.isBought,
-      this.index = 0,
-      required this.audioPlayer})
+      required this.audioPlayer,
+      required this.audioPlayerList,
+      required this.currentIndex,
+      required this.setIndex,
+      this.albumProducts})
       : super(key: key);
 
   @override
@@ -48,6 +56,8 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   File? audioFile;
   String url = "";
 
+  int currentIndex = 0;
+
   @override
   void initState() {
     widget.audioPlayer.positionStream.listen((event) {
@@ -60,6 +70,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     widget.audioPlayer.playingStream.listen((event) {
       isPlaying = event;
     });
+
     String audioURL = Urls.networkPath + widget.products.audio!;
     String introURL = Urls.networkPath + widget.products.intro!;
 
@@ -80,7 +91,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   @override
   void dispose() {
     super.dispose();
-    // audioPlayer.dispose();
+    widget.audioPlayer.dispose();
   }
 
   Future<void> setAudio(String url, FileInfo? fileInfo) async {
@@ -103,7 +114,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   getCachedFile(String url) async {
     fileInfo = await checkCachefor(url);
-
     setAudio(url, fileInfo);
   }
 
@@ -177,9 +187,13 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   onPressed: () async {
                     setState(() {
                       isClicked = true;
+                      currentIndex =
+                          widget.audioPlayerList.indexOf(widget.audioPlayer);
                     });
+                    widget.setIndex(currentIndex);
+
                     if (isPlaying) {
-                      await widget.audioPlayer.pause();
+                      widget.audioPlayer.pause();
                     } else {
                       await widget.audioPlayer.play();
                     }
@@ -266,7 +280,8 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   }
 
   addToCard(cart) {
-    cart.addItemsIndex(widget.products.productId!);
+    cart.addItemsIndex(widget.products.productId!,
+        albumID: widget.albumProducts?.productId!);
     if (!cart.sameItemCheck) {
       cart.addProducts(widget.products);
       cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);

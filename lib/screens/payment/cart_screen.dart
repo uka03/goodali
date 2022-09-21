@@ -4,13 +4,12 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
-import 'package:goodali/Widgets/top_snack_bar.dart';
+import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/payment/choose_payment.dart';
 import 'package:goodali/screens/payment/payment_history.dart';
 import 'package:goodali/screens/ListItems/cart_product_item.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -127,10 +126,14 @@ class _CartScreenState extends State<CartScreen> {
                             builder: (context) =>
                                 ChoosePayment(productIDs: productIds)));
                   } else {
-                    showTopSnackBar(
-                        context,
-                        const CustomTopSnackBar(
-                            type: 0, text: "Нэвтэрч орон үргэлжлүүлнэ үү..."));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                        backgroundColor: MyColors.error,
+                        behavior: SnackBarBehavior.floating,
+                        action: SnackBarAction(
+                            onPressed: () => showLoginModal(),
+                            label: 'Нэвтрэх',
+                            textColor: Colors.white)));
                   }
                 },
                 text: "Худалдаж авах",
@@ -141,5 +144,17 @@ class _CartScreenState extends State<CartScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  showLoginModal() {
+    showModalBottomSheet(
+        context: context,
+        isDismissible: false,
+        enableDrag: true,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (BuildContext context) => const LoginBottomSheet());
   }
 }

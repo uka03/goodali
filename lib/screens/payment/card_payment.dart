@@ -65,9 +65,6 @@ class _CardPaymentState extends State<CardPayment> {
                 Navigator.pop(context);
               });
             }
-            // else {
-
-            // }
           },
           onWebResourceError: (onWebResourceError) {
             showTopSnackBar(context,

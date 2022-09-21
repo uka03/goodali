@@ -76,19 +76,41 @@ class CartProvider with ChangeNotifier {
   }
 
 // products items
-  void addItemsIndex(int index) {
+  void addItemsIndex(int index,
+      {List<int> albumProductIDs = const [], int albumID = 0}) {
     print(index);
     print(_productsId);
-    print(_productsId.any((index) => index == index));
-    if (_productsId.any((element) => element == index)) {
+
+    if (_productsId.any((element) => element == index || element == albumID)) {
       _sameItemCheck = true;
       notifyListeners();
     } else {
-      _productsId.add(index);
+      print("albumProductIDs $albumProductIDs");
+      if (albumProductIDs.isNotEmpty) {
+        print("iisheee orj ireed bgn bhdaaa");
+        for (var item in albumProductIDs) {
+          if (_productsId.contains(item)) {
+            print(item);
+            _productsId.remove(item);
+            print(_productsId);
+            _items.removeWhere((element) {
+              var data = element.productId == item;
+              _totalPrice = _totalPrice - element.price!;
+              return data;
+            });
+          }
+        }
+        _productsId.add(index);
+      } else {
+        print("albumProductIDssdisd $albumProductIDs");
+        _productsId.add(index);
+      }
+
       _sameItemCheck = false;
       _setPrefItems();
       notifyListeners();
     }
+    print(_productsId);
     _getPrefItems();
     notifyListeners();
   }

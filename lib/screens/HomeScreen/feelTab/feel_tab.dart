@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -47,20 +48,12 @@ class _FeelTabbarState extends State<FeelTabbar> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                                color: MyColors.gray,
-                                borderRadius: BorderRadius.circular(4)),
-                            // child: Image.network(
-                            //   moodMain[0].banner ?? "",
-                            //   errorBuilder: (context, error, stackTrace) =>
-                            //       const Icon(
-                            //     Icons.close,
-                            //     color: Colors.white,
-                            //   ),
-                            // ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: ImageView(
+                                imgPath: moodMain[0].banner ?? "",
+                                width: 30,
+                                height: 30),
                           ),
                           const SizedBox(width: 15),
                           Expanded(

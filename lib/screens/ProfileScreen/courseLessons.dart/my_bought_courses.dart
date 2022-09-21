@@ -17,7 +17,7 @@ class MyCourses extends StatefulWidget {
 class _MyCoursesState extends State<MyCourses> {
   late final List<AudioPlayer> audioPlayer = [];
   String albumName = "";
-
+  int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -84,7 +84,11 @@ class _MyCoursesState extends State<MyCourses> {
               albumName = allLectures[index].albumTitle ?? "";
               empty = albumName;
             }
-
+            for (var i = 0; i < audioPlayer.length; i++) {
+              if (currentIndex != i) {
+                audioPlayer[i].pause();
+              }
+            }
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -95,11 +99,19 @@ class _MyCoursesState extends State<MyCourses> {
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
                 AlbumDetailItem(
-                    isBought: true,
-                    audioPlayer: audioPlayer[index],
-                    products: allLectures[index],
-                    albumName: albumName,
-                    productsList: allLectures),
+                  isBought: true,
+                  audioPlayer: audioPlayer[index],
+                  products: allLectures[index],
+                  albumName: albumName,
+                  productsList: allLectures,
+                  audioPlayerList: audioPlayer,
+                  currentIndex: currentIndex,
+                  setIndex: (int index) {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                  },
+                ),
               ],
             );
           });
