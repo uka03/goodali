@@ -207,24 +207,11 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: MyColors.input,
-            child: IconButton(
-              splashRadius: 10,
-              onPressed: () {},
-              icon: const Icon(IconlyLight.filter, color: MyColors.gray),
-            ),
-          ),
-          const SizedBox(width: 18),
-          CircleAvatar(
-            radius: 24,
             backgroundColor: MyColors.primaryColor,
             child: IconButton(
               splashRadius: 10,
-              onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => CreatePost()));
-              },
-              icon: const Icon(IconlyLight.edit, color: Colors.white),
+              onPressed: () {},
+              icon: const Icon(IconlyLight.filter, color: Colors.white),
             ),
           ),
         ],

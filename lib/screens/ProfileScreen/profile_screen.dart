@@ -160,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const Expanded(
                           child: TabBarView(
-                            children: [MyCourses(), Downloaded()],
+                            children: [Downloaded(), MyCourses()],
                           ),
                         )
                       ],

@@ -20,9 +20,16 @@ class MyCourseMain extends StatefulWidget {
 }
 
 class _MyCourseMainState extends State<MyCourseMain> {
-  String title = 'Очирын бороо';
+  String title = '';
   int allTasks = 0;
   int doneTasks = 0;
+
+  @override
+  void initState() {
+    title = widget.courseItem.name ?? "";
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +52,7 @@ class _MyCourseMainState extends State<MyCourseMain> {
                         alignment: Alignment.topLeft,
                         child: Text(title,
                             style: const TextStyle(
-                                fontSize: 32,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: MyColors.black)),
                       )),

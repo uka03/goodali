@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -8,14 +11,19 @@ import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/models/audio_player_model.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
+
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 typedef SetIndex = void Function(int index);
 
@@ -29,6 +37,8 @@ class AlbumDetailItem extends StatefulWidget {
   final AudioPlayer audioPlayer;
   final List<AudioPlayer> audioPlayerList;
   final int currentIndex;
+  // final Duration duration;
+  // final Dura
 
   const AlbumDetailItem(
       {Key? key,
@@ -52,6 +62,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   bool isClicked = false;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
+
+  double sliderValue = 0.0;
+  Duration savedPosition = Duration.zero;
+  int saveddouble = 0;
   FileInfo? fileInfo;
   File? audioFile;
   String url = "";
@@ -60,16 +74,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   @override
   void initState() {
-    widget.audioPlayer.positionStream.listen((event) {
-      position = event;
-    });
-    widget.audioPlayer.durationStream.listen((event) {
-      duration = event ?? Duration.zero;
-    });
-
-    widget.audioPlayer.playingStream.listen((event) {
-      isPlaying = event;
-    });
+    widget.audioPlayer.setLoopMode(LoopMode.off);
 
     String audioURL = Urls.networkPath + widget.products.audio!;
     String introURL = Urls.networkPath + widget.products.intro!;
@@ -94,8 +99,25 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     widget.audioPlayer.dispose();
   }
 
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+    if (state == AppLifecycleState.paused) {
+      widget.audioPlayer.stop();
+    }
+  }
+
   Future<void> setAudio(String url, FileInfo? fileInfo) async {
     try {
+      widget.audioPlayer.positionStream.listen((event) {
+        position = event;
+      });
+      widget.audioPlayer.durationStream.listen((event) {
+        duration = event ?? Duration.zero;
+      });
+
+      widget.audioPlayer.playingStream.listen((event) {
+        isPlaying = event;
+      });
       if (fileInfo != null) {
         audioFile = fileInfo.file;
         duration =
@@ -105,11 +127,46 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                 Duration.zero;
       } else {
         print(url);
-        widget.audioPlayer.setUrl(url);
+        widget.audioPlayer.setUrl(url).then((value) {
+          duration = value ?? Duration.zero;
+          getSavedPosition(widget.products.productId!).then((value) {
+            developer.log(value.toString());
+            if (value != Duration.zero) {
+              savedPosition = value;
+              position = savedPosition;
+              // if (position != Duration.zero) {
+              //   widget.audioPlayer.seek(position);
+              // }
+              widget.audioPlayer.setUrl(url, initialPosition: position);
+            } else {}
+          });
+        });
+
+        widget.audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(url)));
       }
     } catch (e) {
       print(e);
     }
+  }
+
+  Future getSavedPosition(int moodItemID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
+    List<AudioPlayerModel> decodedProduct = decodedAudioString
+        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
+        .toList();
+
+    // developer.log(decodedProduct.first.audioPosition.toString());
+    for (var item in decodedProduct) {
+      print(moodItemID);
+      print(item.productID);
+      if (moodItemID == item.productID) {
+        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
+      }
+    }
+    savedPosition = Duration(milliseconds: saveddouble);
+    print("position $savedPosition");
+    return savedPosition;
   }
 
   getCachedFile(String url) async {
@@ -126,6 +183,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
+    final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return GestureDetector(
       onTap: () {
         widget.isBought || widget.products.isBought == true
@@ -191,11 +249,14 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                           widget.audioPlayerList.indexOf(widget.audioPlayer);
                     });
                     widget.setIndex(currentIndex);
-
+                    AudioPlayerModel _audio = AudioPlayerModel(
+                        productID: widget.products.productId,
+                        audioPosition: position.inMilliseconds);
+                    _audioPlayerProvider.addAudioPosition(_audio);
                     if (isPlaying) {
                       widget.audioPlayer.pause();
                     } else {
-                      await widget.audioPlayer.play();
+                      widget.audioPlayer.play();
                     }
                   },
                   icon: Icon(
@@ -205,23 +266,35 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   ),
                 ),
               ),
-              if (isClicked)
+              if (isClicked || savedPosition != Duration.zero)
                 Row(
                   children: [
+                    const SizedBox(width: 14),
                     SizedBox(
-                      width: 100,
-                      child: Slider(
-                        value: position.inSeconds.toDouble(),
-                        max: duration.inSeconds.toDouble(),
-                        activeColor: MyColors.primaryColor,
-                        inactiveColor: MyColors.border1,
-                        onChanged: (duration) async {
-                          final position =
-                              Duration(microseconds: (duration * 1000).toInt());
-                          await widget.audioPlayer.seek(position);
-
-                          await widget.audioPlayer.play();
-                        },
+                      width: 90,
+                      child: SfLinearGauge(
+                        minimum: 0,
+                        maximum: duration.inSeconds.toDouble() / 10,
+                        showLabels: false,
+                        showAxisTrack: false,
+                        showTicks: false,
+                        ranges: [
+                          LinearGaugeRange(
+                            position: LinearElementPosition.inside,
+                            edgeStyle: LinearEdgeStyle.bothCurve,
+                            startValue: 0,
+                            color: MyColors.border1,
+                            endValue: duration.inSeconds.toDouble() / 10,
+                          ),
+                        ],
+                        barPointers: [
+                          LinearBarPointer(
+                              position: LinearElementPosition.inside,
+                              edgeStyle: LinearEdgeStyle.bothCurve,
+                              color: MyColors.primaryColor,
+                              // color: MyColors.border1,
+                              value: position.inSeconds.toDouble() / 10)
+                        ],
                       ),
                     ),
                   ],

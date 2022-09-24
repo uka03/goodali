@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
       child: Consumer<Auth>(
         builder: (context, value, child) {
           return MaterialApp(
-              navigatorKey: NavigationService.navigatorKey,
+              // navigatorKey: NavigationService.navigatorKey,
               title: 'Goodali',
               debugShowCheckedModeBanner: false,
               theme: ThemeData(

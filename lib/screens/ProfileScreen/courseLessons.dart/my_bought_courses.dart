@@ -135,7 +135,7 @@ class _MyCoursesState extends State<MyCourses> {
           ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: 1,
+              itemCount: myCourses.length,
               itemBuilder: (BuildContext context, int index) {
                 return CourseProductsListItem(
                     isBought: true,

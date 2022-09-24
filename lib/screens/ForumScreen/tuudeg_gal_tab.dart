@@ -3,14 +3,14 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:iconly/iconly.dart';
 
-class TuudegGal extends StatefulWidget {
-  const TuudegGal({Key? key}) : super(key: key);
+class NuutsBulgem extends StatefulWidget {
+  const NuutsBulgem({Key? key}) : super(key: key);
 
   @override
-  State<TuudegGal> createState() => _TuudegGalState();
+  State<NuutsBulgem> createState() => _NuutsBulgemState();
 }
 
-class _TuudegGalState extends State<TuudegGal> {
+class _NuutsBulgemState extends State<NuutsBulgem> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,26 +55,14 @@ class _TuudegGalState extends State<TuudegGal> {
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: MyColors.input,
-            child: IconButton(
-              splashRadius: 10,
-              onPressed: () {},
-              icon: Icon(IconlyLight.filter, color: MyColors.gray),
-            ),
-          ),
-          const SizedBox(width: 18),
-          CircleAvatar(
-            radius: 24,
             backgroundColor: MyColors.primaryColor,
             child: IconButton(
               splashRadius: 10,
-              onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => CreatePost()));
-              },
-              icon: Icon(IconlyLight.edit, color: Colors.white),
+              onPressed: () {},
+              icon: const Icon(IconlyLight.filter, color: Colors.white),
             ),
           ),
+          const SizedBox(width: 18),
         ],
       ),
     );

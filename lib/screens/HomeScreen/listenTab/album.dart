@@ -3,15 +3,11 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
-import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_bought_courses.dart';
 import 'package:provider/provider.dart';
 
 class AlbumLecture extends StatefulWidget {
-  final int audioLength;
-
-  const AlbumLecture({Key? key, required this.audioLength}) : super(key: key);
+  const AlbumLecture({Key? key}) : super(key: key);
 
   @override
   State<AlbumLecture> createState() => _AlbumLectureState();

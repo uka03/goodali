@@ -47,23 +47,17 @@ class _DownloadedLectureItemState extends State<DownloadedLectureItem> {
             children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child:
-                      // Container(
-                      //   width: 40,
-                      //   height: 40,
-                      //   color: Colors.pink,
-                      // )
-                      ImageView(
-                          imgPath: widget.products.banner ?? "",
-                          width: 40,
-                          height: 40)),
+                  child: ImageView(
+                      imgPath: widget.products.banner ?? "",
+                      width: 40,
+                      height: 40)),
               const SizedBox(width: 15),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.products.lectureTitle ?? "",
+                      widget.products.title ?? "",
                       maxLines: 1,
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
@@ -82,13 +76,23 @@ class _DownloadedLectureItemState extends State<DownloadedLectureItem> {
           const SizedBox(height: 14),
           Align(
             alignment: Alignment.bottomRight,
-            child: IconButton(
-                splashRadius: 20,
-                onPressed: () {
-                  // _removeFile();
-                  // downloadAudio.removeAudio(widget.products, widget.audioURL);
-                },
-                icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                    splashRadius: 20,
+                    onPressed: () {},
+                    icon: const Icon(IconlyLight.arrow_down,
+                        size: 20, color: MyColors.primaryColor)),
+                IconButton(
+                    splashRadius: 20,
+                    onPressed: () {
+                      // _removeFile();
+                      // downloadAudio.removeAudio(widget.products, widget.audioURL);
+                    },
+                    icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
+              ],
+            ),
           ),
           const SizedBox(height: 12)
         ],

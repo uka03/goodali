@@ -47,7 +47,7 @@ class AudioPlayerProvider with ChangeNotifier {
     return _position;
   }
 
-  void addAudioPosition(AudioPlayerModel audio) {
+  Future addAudioPosition(AudioPlayerModel audio) async {
     AudioPlayerModel audioItem = AudioPlayerModel(
         productID: audio.productID, audioPosition: audio.audioPosition);
     print("inProvider ${audio.audioPosition}");

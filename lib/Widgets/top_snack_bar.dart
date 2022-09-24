@@ -24,17 +24,19 @@ class _CustomTopSnackBarState extends State<CustomTopSnackBar> {
     switch (widget.type) {
       case 0:
         return CustomSnackBar.error(
+            messagePadding: const EdgeInsets.symmetric(horizontal: 5),
             textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
             iconRotationAngle: 0,
-            iconPositionTop: 27,
+            iconPositionTop: -4,
             iconPositionLeft: 15,
             icon: const Icon(Icons.close, color: MyColors.error, size: 24),
             backgroundColor: Colors.white,
             message: widget.text ?? "");
       case 1:
         return CustomSnackBar.success(
+            messagePadding: const EdgeInsets.symmetric(horizontal: 5),
             iconRotationAngle: 0,
-            iconPositionTop: 27,
+            iconPositionTop: -4,
             iconPositionLeft: 15,
             textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
             icon: const Icon(Icons.done, color: MyColors.success, size: 24),

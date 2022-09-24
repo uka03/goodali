@@ -83,6 +83,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
               if (snapshot.connectionState == ConnectionState.done &&
                   snapshot.hasData) {
                 List<Lesson?> lessons = snapshot.data;
+                print("uhfouhf ${lessons.length}");
                 if (lessons.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,
@@ -98,14 +99,19 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                 collapsedIconColor: MyColors.gray,
                                 collapsedTextColor: MyColors.gray,
                                 iconColor: MyColors.gray,
-                                textColor: MyColors.gray,
+                                // textColor:
                                 onExpansionChanged: (value) {
                                   if (value) {
                                     getCoursesTasks(
                                         lessonIdData[index].id.toString());
                                   }
                                 },
-                                title: Text(lessons[index]?.name ?? ""),
+                                title: Text(
+                                  lessons[index]?.name ?? "",
+                                  style: TextStyle(
+                                    color: MyColors.gray,
+                                  ),
+                                ),
                                 children: [
                                   ListTile(
                                     title: const Text("Унших"),
@@ -239,9 +245,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
   }
 
   Future<List<CourseLessonsTasksModel>> getCoursesTasks(String id) async {
-    print("course lessons tasks $id");
     allTasks = await Connection.getCoursesTasks(context, id);
-    print("kdffh ${allTasks.length}");
+
     setState(() {
       isLoading = false;
     });

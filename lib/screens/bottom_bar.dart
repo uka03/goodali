@@ -75,11 +75,12 @@ class _BottomTabbarState extends State<BottomTabbar> {
               label: "Би")
         ],
         currentIndex: selectedIndex,
+        type: BottomNavigationBarType.fixed,
         onTap: (int? value) {
           onTabTapped(value!);
         },
       ),
-      body: _widgetOptions.elementAt(selectedIndex),
+      body: _widgetOptions[selectedIndex],
     );
   }
 

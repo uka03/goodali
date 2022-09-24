@@ -17,7 +17,10 @@ import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/models/mood_item.dart';
 import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/models/qpay.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:goodali/controller/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -385,6 +388,12 @@ class Connection {
       final response =
           await Http().getDio(context, headerTypebearer).get(Urls.getCourses);
 
+      print("getBoughtCourses ${response.data}");
+      print((response.data as List)
+          .map((e) => Products.fromJson(e))
+          .toList()
+          .length);
+
       if (response.statusCode == 200) {
         return (response.data as List)
             .map((e) => Products.fromJson(e))
@@ -396,7 +405,7 @@ class Connection {
         return [];
       }
     } catch (error) {
-      print("error all lectures $error");
+      print("error all training $error");
 
       return [];
     }
@@ -428,12 +437,16 @@ class Connection {
 
   static Future<List<Products>> getalbumListLogged(BuildContext context) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.albumListLogged);
+      var prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+      var url = Uri.parse(Urls.albumListLogged);
+      var response =
+          await http.post(url, headers: {"Authorization": "Bearer $token"});
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        return (response.data as List)
+        return (jsonDecode(response.body) as List)
             .map((e) => Products.fromJson(e))
             .toList();
       } else if (response.statusCode == 401) {

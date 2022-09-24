@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -9,12 +12,15 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class AlbumDetail extends StatefulWidget {
   final Products products;
@@ -45,6 +51,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
   bool isPlaying = false;
   bool isClicked = false;
   int currentIndex = 1;
+  Duration savedPosition = Duration.zero;
+  int saveddouble = 0;
 
   @override
   void initState() {
@@ -82,118 +90,167 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
   setAlbumIntroAudio() {
     try {
-      introAudioPlayer.setUrl(Urls.networkPath + widget.products.audio!);
+      introAudioPlayer
+          .setUrl(Urls.networkPath + widget.products.audio!)
+          .then((value) {
+        duration = value ?? Duration.zero;
+        getSavedPosition(widget.products.productId!).then((value) {
+          if (value != Duration.zero) {
+            savedPosition = value;
+            position = savedPosition;
+            // if (position != Duration.zero) {
+            //   introAudioPlayer.seek(position);
+            // }
+            introAudioPlayer.setUrl(Urls.networkPath + widget.products.audio!,
+                initialPosition: position);
+          } else {}
+        });
+      });
     } catch (e) {
       print(e);
     }
   }
 
+  Future getSavedPosition(int moodItemID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
+    List<AudioPlayerModel> decodedProduct = decodedAudioString
+        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
+        .toList();
+
+    // developer.log(decodedProduct.first.audioPosition.toString());
+    for (var item in decodedProduct) {
+      print(moodItemID);
+      print(item.productID);
+      if (moodItemID == item.productID) {
+        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
+      }
+    }
+    Duration savedPosition = Duration(milliseconds: saveddouble);
+    print("position $savedPosition");
+    return savedPosition;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     final cart = Provider.of<CartProvider>(context);
-    return Scaffold(
-        appBar: const SimpleAppBar(),
-        body: Consumer<Auth>(
-          builder: (context, value, child) {
-            return FutureBuilder(
-              future: value.isAuth ? futureLogged : future,
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  List<Products> lectureList = snapshot.data;
-                  return Stack(children: [
-                    Container(
-                        height: containerHeight,
-                        width: MediaQuery.of(context).size.width,
-                        alignment: Alignment.center,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Container(
-                            //     height: imageSize,
-                            //     width: imageSize,
-                            //     color: Colors.indigo[200]),
-                            Opacity(
-                              opacity: imageOpacity.clamp(0, 1),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(14),
-                                child: ImageView(
-                                    imgPath: widget.products.banner ?? "",
-                                    width: imageSize,
-                                    height: imageSize),
+    return WillPopScope(
+      onWillPop: () async {
+        print("onwiilppaoop");
+        // AudioPlayerModel _audio = AudioPlayerModel(
+        //     productID: widget.products.productId,
+        //     audioPosition: position.inMilliseconds);
+        // _audioPlayerProvider.addAudioPosition(_audio);
+        return true;
+      },
+      child: Scaffold(
+          appBar: const SimpleAppBar(),
+          body: Consumer<Auth>(
+            builder: (context, value, child) {
+              return FutureBuilder(
+                future: value.isAuth ? futureLogged : future,
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    List<Products> lectureList = snapshot.data;
+                    return Stack(children: [
+                      Container(
+                          height: containerHeight,
+                          width: MediaQuery.of(context).size.width,
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Container(
+                              //     height: imageSize,
+                              //     width: imageSize,
+                              //     color: Colors.indigo[200]),
+                              Opacity(
+                                opacity: imageOpacity.clamp(0, 1),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: ImageView(
+                                      imgPath: widget.products.banner ?? "",
+                                      width: imageSize,
+                                      height: imageSize),
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 80)
-                          ],
-                        )),
-                    SingleChildScrollView(
-                      controller: _controller,
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(children: [
-                        SizedBox(height: initialSize + 32),
-                        Text(
-                          widget.products.title ?? "",
-                          style: const TextStyle(
-                              fontSize: 20,
-                              color: MyColors.black,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 20),
-                        Padding(
+                              const SizedBox(height: 80)
+                            ],
+                          )),
+                      SingleChildScrollView(
+                        controller: _controller,
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(children: [
+                          SizedBox(height: initialSize + 32),
+                          Text(
+                            widget.products.title ?? "",
+                            style: const TextStyle(
+                                fontSize: 20,
+                                color: MyColors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 20),
+                          Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20.0),
+                              child: CustomReadMoreText(
+                                text: widget.products.body ?? "",
+                                textAlign: TextAlign.center,
+                              )),
+                          const SizedBox(height: 20),
+                          const Divider(endIndent: 20, indent: 20),
+                          lecture(context, lectureList),
+                          const SizedBox(height: 20),
+                          Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 20.0),
-                            child: CustomReadMoreText(
-                              text: widget.products.body ?? "",
-                              textAlign: TextAlign.center,
-                            )),
-                        const SizedBox(height: 20),
-                        const Divider(endIndent: 20, indent: 20),
-                        lecture(context, lectureList),
-                        const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: CustomElevatedButton(
-                              text: "Худалдаж авах",
-                              onPress: () {
-                                for (var item in lectureList) {
-                                  albumProductsList.add(item.productId!);
-                                }
-                                cart.addItemsIndex(widget.products.productId!,
-                                    albumProductIDs: albumProductsList);
-                                if (!cart.sameItemCheck) {
-                                  cart.addProducts(widget.products);
-                                  cart.addTotalPrice(
-                                      widget.products.price?.toDouble() ?? 0.0);
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const CartScreen()));
-                                } else {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const CartScreen()));
-                                }
-                              }),
-                        ),
-                        const SizedBox(height: 50),
-                      ]),
-                    ),
-                  ]);
-                } else {
-                  return const Center(
-                      child: CircularProgressIndicator(
-                          color: MyColors.primaryColor));
-                }
-              },
-            );
-          },
-        ));
+                            child: CustomElevatedButton(
+                                text: "Худалдаж авах",
+                                onPress: () {
+                                  for (var item in lectureList) {
+                                    albumProductsList.add(item.productId!);
+                                  }
+                                  cart.addItemsIndex(widget.products.productId!,
+                                      albumProductIDs: albumProductsList);
+                                  if (!cart.sameItemCheck) {
+                                    cart.addProducts(widget.products);
+                                    cart.addTotalPrice(
+                                        widget.products.price?.toDouble() ??
+                                            0.0);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CartScreen()));
+                                  } else {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CartScreen()));
+                                  }
+                                }),
+                          ),
+                          const SizedBox(height: 50),
+                        ]),
+                      ),
+                    ]);
+                  } else {
+                    return const Center(
+                        child: CircularProgressIndicator(
+                            color: MyColors.primaryColor));
+                  }
+                },
+              );
+            },
+          )),
+    );
   }
 
   Widget lecture(BuildContext context, List<Products> product) {
+    final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -250,7 +307,10 @@ class _AlbumDetailState extends State<AlbumDetail> {
                             isClicked = true;
                             currentIndex = audioPlayer.length + 1;
                           });
-
+                          AudioPlayerModel _audio = AudioPlayerModel(
+                              productID: widget.products.productId,
+                              audioPosition: position.inMilliseconds);
+                          _audioPlayerProvider.addAudioPosition(_audio);
                           if (isPlaying) {
                             introAudioPlayer.pause();
                           } else {
@@ -266,17 +326,35 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         ),
                       ),
                     ),
-                    if (isClicked)
+                    if (isClicked || savedPosition != Duration.zero)
                       Row(
                         children: [
+                          const SizedBox(width: 14),
                           SizedBox(
-                            width: 100,
-                            child: Slider(
-                              value: position.inSeconds.toDouble(),
-                              max: duration.inSeconds.toDouble(),
-                              activeColor: MyColors.primaryColor,
-                              inactiveColor: MyColors.border1,
-                              onChanged: (duration) async {},
+                            width: 90,
+                            child: SfLinearGauge(
+                              minimum: 0,
+                              maximum: duration.inSeconds.toDouble() / 10,
+                              showLabels: false,
+                              showAxisTrack: false,
+                              showTicks: false,
+                              ranges: [
+                                LinearGaugeRange(
+                                  position: LinearElementPosition.inside,
+                                  edgeStyle: LinearEdgeStyle.bothCurve,
+                                  startValue: 0,
+                                  color: MyColors.border1,
+                                  endValue: duration.inSeconds.toDouble() / 10,
+                                ),
+                              ],
+                              barPointers: [
+                                LinearBarPointer(
+                                    position: LinearElementPosition.inside,
+                                    edgeStyle: LinearEdgeStyle.bothCurve,
+                                    color: MyColors.primaryColor,
+                                    // color: MyColors.border1,
+                                    value: position.inSeconds.toDouble() / 10)
+                              ],
                             ),
                           ),
                         ],

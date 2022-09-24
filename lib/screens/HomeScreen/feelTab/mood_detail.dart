@@ -113,6 +113,13 @@ class _MoodDetailState extends State<MoodDetail> {
     });
   }
 
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+    if (state == AppLifecycleState.paused) {
+      audioPlayer.stop();
+    }
+  }
+
   @override
   void dispose() {
     // AudioPlayerModel _audio = AudioPlayerModel(
@@ -214,6 +221,7 @@ class _MoodDetailState extends State<MoodDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final audioPosition = Provider.of<AudioPlayerProvider>(context);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -224,179 +232,199 @@ class _MoodDetailState extends State<MoodDetail> {
               Color(0xff84A3F7),
             ]),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
+      child: WillPopScope(
+        onWillPop: () async {
+          print("onwillpop");
+          AudioPlayerModel _audio = AudioPlayerModel(
+              productID: moodItem[_current.toInt()].id,
+              audioPosition: position.inMilliseconds);
+          audioPosition.addAudioPosition(_audio);
+          return false;
+        },
+        child: Scaffold(
           backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: false,
-          leading: IconButton(
-            icon: const Icon(IconlyLight.arrow_left, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
-          iconTheme: const IconThemeData(color: MyColors.black),
-        ),
-        body: Stack(alignment: Alignment.bottomCenter, children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: FutureBuilder(
-              future: futureMoodItem,
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  moodItem = snapshot.data;
-
-                  return PageView.builder(
-                      controller: _pageController,
-                      itemCount: moodItem.length,
-                      onPageChanged: (int page) {
-                        print(page);
-                        print(moodItem.length);
-                        if (url != "") {
-                          initForOthers(
-                              url, moodItem[_current.toInt() + 1].id ?? 0);
-                        }
-                      },
-                      itemBuilder: ((context, index) {
-                        imgUrl =
-                            moodItem[index].banner == "Image failed to upload"
-                                ? ""
-                                : moodItem[index].banner!;
-                        url = moodItem[index].audio == "Audio failed to upload"
-                            ? ""
-                            : Urls.networkPath + moodItem[index].audio!;
-
-                        if (moodItem[index].audio == "Audio failed to upload") {
-                          return Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 20),
-                                HtmlWidget(
-                                  moodItem[index].title!,
-                                  textStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
-                                ),
-                                const SizedBox(height: 40),
-                                HtmlWidget(
-                                  moodItem[index].body!,
-                                  textStyle: const TextStyle(
-                                      color: Colors.white, fontSize: 16),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          return Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (imgUrl != "") banner(imgUrl),
-                                const SizedBox(height: 40),
-                                HtmlWidget(
-                                  moodItem[index].title!,
-                                  textStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
-                                ),
-                                const SizedBox(height: 40),
-                                HtmlWidget(
-                                  moodItem[index].body!,
-                                  textStyle: const TextStyle(
-                                      color: Colors.white, fontSize: 16),
-                                ),
-                                const SizedBox(height: 20),
-                                audioPlayerWidget()
-                              ],
-                            ),
-                          );
-                        }
-                      }));
-                } else {
-                  return const Center(
-                    child:
-                        CircularProgressIndicator(color: MyColors.primaryColor),
-                  );
-                }
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: false,
+            leading: IconButton(
+              icon: const Icon(IconlyLight.arrow_left, color: Colors.white),
+              onPressed: () {
+                print(position.inMilliseconds);
+                AudioPlayerModel _audio = AudioPlayerModel(
+                    productID: moodItem[_current.toInt()].id,
+                    audioPosition: position.inMilliseconds);
+                audioPosition
+                    .addAudioPosition(_audio)
+                    .whenComplete(() => Navigator.pop(context));
               },
             ),
+            iconTheme: const IconThemeData(color: MyColors.black),
           ),
-          _current != 0
-              ? Positioned(
-                  bottom: 50,
-                  left: 35,
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12)),
-                    child: RawMaterialButton(
-                      onPressed: () {
-                        _pageController.previousPage(
-                            curve: _kCurve, duration: _kDuration);
-                      },
-                      child: const Icon(IconlyLight.arrow_left,
-                          color: MyColors.black),
-                    ),
-                  ))
-              : Container(),
-          Positioned(
-              bottom: 50,
-              right: 35,
-              child: Container(
-                height: 50,
-                width: 100,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12)),
-                child: RawMaterialButton(
-                  onPressed: () async {
-                    _pageController.nextPage(
-                        curve: _kCurve, duration: _kDuration);
+          body: Stack(alignment: Alignment.bottomCenter, children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: FutureBuilder(
+                future: futureMoodItem,
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    moodItem = snapshot.data;
 
-                    // if (url != "") {
-                    //   print("duusgah");
-                    //   playAudio(url);
-                    // }
-                    if (_current == moodItem.length - 1) {
-                      audioPlayer.dispose();
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: rightButton,
-                ),
-              )),
-          Positioned(
-              top: 0,
-              right: 0,
-              left: 0,
-              child: Row(
-                children: moodItem
-                    .map((entry) => (moodItem.indexOf(entry) - 1 == _current)
-                        ? Container(
-                            width: MediaQuery.of(context).size.width /
-                                moodItem.length,
-                            height: 2.0,
-                            color: Colors.white.withOpacity(0.4),
-                          )
-                        : Container(
-                            width: MediaQuery.of(context).size.width /
-                                moodItem.length,
-                            height: 2.0,
-                            color: (_current >= moodItem.indexOf(entry))
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.4),
-                          ))
-                    .toList(),
-              )),
-        ]),
+                    return PageView.builder(
+                        controller: _pageController,
+                        itemCount: moodItem.length,
+                        onPageChanged: (int page) {
+                          print(page);
+                          print(moodItem.length);
+                          if (url != "") {
+                            initForOthers(
+                                url, moodItem[_current.toInt() + 1].id ?? 0);
+                          }
+                        },
+                        itemBuilder: ((context, index) {
+                          imgUrl =
+                              moodItem[index].banner == "Image failed to upload"
+                                  ? ""
+                                  : moodItem[index].banner!;
+                          url =
+                              moodItem[index].audio == "Audio failed to upload"
+                                  ? ""
+                                  : Urls.networkPath + moodItem[index].audio!;
+
+                          if (moodItem[index].audio ==
+                              "Audio failed to upload") {
+                            return Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 20),
+                                  HtmlWidget(
+                                    moodItem[index].title!,
+                                    textStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  ),
+                                  const SizedBox(height: 40),
+                                  HtmlWidget(
+                                    moodItem[index].body!,
+                                    textStyle: const TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (imgUrl != "") banner(imgUrl),
+                                  const SizedBox(height: 40),
+                                  HtmlWidget(
+                                    moodItem[index].title!,
+                                    textStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  ),
+                                  const SizedBox(height: 40),
+                                  HtmlWidget(
+                                    moodItem[index].body!,
+                                    textStyle: const TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  audioPlayerWidget()
+                                ],
+                              ),
+                            );
+                          }
+                        }));
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                          color: MyColors.primaryColor),
+                    );
+                  }
+                },
+              ),
+            ),
+            _current != 0
+                ? Positioned(
+                    bottom: 50,
+                    left: 35,
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12)),
+                      child: RawMaterialButton(
+                        onPressed: () {
+                          _pageController.previousPage(
+                              curve: _kCurve, duration: _kDuration);
+                        },
+                        child: const Icon(IconlyLight.arrow_left,
+                            color: MyColors.black),
+                      ),
+                    ))
+                : Container(),
+            Positioned(
+                bottom: 50,
+                right: 35,
+                child: Container(
+                  height: 50,
+                  width: 100,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12)),
+                  child: RawMaterialButton(
+                    onPressed: () async {
+                      _pageController.nextPage(
+                          curve: _kCurve, duration: _kDuration);
+
+                      // if (url != "") {
+                      //   print("duusgah");
+                      //   playAudio(url);
+                      // }
+                      if (_current == moodItem.length - 1) {
+                        audioPlayer.dispose();
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: rightButton,
+                  ),
+                )),
+            Positioned(
+                top: 0,
+                right: 0,
+                left: 0,
+                child: Row(
+                  children: moodItem
+                      .map((entry) => (moodItem.indexOf(entry) - 1 == _current)
+                          ? Container(
+                              width: MediaQuery.of(context).size.width /
+                                  moodItem.length,
+                              height: 2.0,
+                              color: Colors.white.withOpacity(0.4),
+                            )
+                          : Container(
+                              width: MediaQuery.of(context).size.width /
+                                  moodItem.length,
+                              height: 2.0,
+                              color: (_current >= moodItem.indexOf(entry))
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.4),
+                            ))
+                      .toList(),
+                )),
+          ]),
+        ),
       ),
     );
   }
@@ -425,9 +453,9 @@ class _MoodDetailState extends State<MoodDetail> {
         stream: _durationState,
         builder: (context, snapshot) {
           final durationState = snapshot.data;
-          final position = durationState?.progress ?? Duration.zero;
+          position = durationState?.progress ?? Duration.zero;
           final buffered = durationState?.buffered ?? Duration.zero;
-          final duration = durationState?.total ?? Duration.zero;
+          duration = durationState?.total ?? Duration.zero;
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -503,11 +531,12 @@ class _MoodDetailState extends State<MoodDetail> {
                     size: 40.0,
                   ),
                   onPressed: () {
-                    AudioPlayerModel _audio = AudioPlayerModel(
-                        productID: moodItem[_current.toInt()].id,
-                        audioPosition: position.inMilliseconds);
-                    audioPosition.addAudioPosition(_audio);
-                    audioHandler.pause();
+                    audioHandler.pause().then((value) {
+                      AudioPlayerModel _audio = AudioPlayerModel(
+                          productID: moodItem[_current.toInt()].id,
+                          audioPosition: position.inMilliseconds);
+                      audioPosition.addAudioPosition(_audio);
+                    });
                   },
                 );
               }

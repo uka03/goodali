@@ -23,17 +23,17 @@ class Lesson {
   String? banner;
   String? expiry;
   int? id;
-  String? isBought;
+  bool? isBought;
   String? name;
 
   Lesson({this.banner, this.expiry, this.id, this.isBought, this.name});
 
   Lesson.fromJson(Map<String, dynamic> json) {
-    banner = json['banner'];
-    expiry = json['expiry'];
-    id = json['id'];
-    isBought = json['is_bought'];
-    name = json['name'];
+    banner = json['banner'] ?? "";
+    expiry = json['expiry'] ?? "";
+    id = json['id'] ?? 0;
+    isBought = json['is_bought'] ?? false;
+    name = json['name'] ?? "";
   }
 
   Map<String, dynamic> toJson() {

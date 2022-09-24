@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_textfield.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
@@ -69,6 +70,7 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
   }
 
   initiliazeAudio(String audioURl, int id) async {
+    print(audioURl);
     duration = await audioPlayer.setUrl(audioURl).then((value) {
           // setState(() => isLoading = false);
           return value;
@@ -147,121 +149,133 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: SimpleAppBar(title: widget.title ?? ""),
-      body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: ListView.builder(
-            itemCount: widget.courseReadingTasks.length,
-            itemBuilder: (context, index) {
-              _controllers.add(TextEditingController());
-              for (var i = 0; i < widget.courseReadingTasks.length; i++) {
-                if (widget.courseReadingTasks[index].isAnswer == 3 ||
-                    widget.courseReadingTasks[index].isAnswer == 4 ||
-                    widget.courseReadingTasks[index].isAnswer == 2) {
+      body: widget.courseReadingTasks.isEmpty
+          ? const Center(
+              child: Text("Хичээл хоосон байна",
+                  style: TextStyle(color: MyColors.gray)),
+            )
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: ListView.builder(
+                itemCount: widget.courseReadingTasks.length,
+                itemBuilder: (context, index) {
+                  _controllers.add(TextEditingController());
+                  for (var i = 0; i < widget.courseReadingTasks.length; i++) {
+                    if (widget.courseReadingTasks[index].isAnswer == 3 ||
+                        widget.courseReadingTasks[index].isAnswer == 4 ||
+                        widget.courseReadingTasks[index].isAnswer == 2) {
+                      _checkboxValue.add(false);
+                    }
+                  }
                   _checkboxValue.add(false);
-                }
-              }
-              _checkboxValue.add(false);
-              if (widget.courseReadingTasks[index].videoUrl != "") {
-                WidgetsBinding.instance!.addPostFrameCallback((_) {
-                  initiliazeVideo(widget.courseReadingTasks[index].videoUrl);
-                });
-              }
-              if (widget.courseReadingTasks[index].listenAudio != "") {
-                WidgetsBinding.instance!.addPostFrameCallback((_) {
-                  initiliazeAudio(
-                      widget.courseReadingTasks[index].listenAudio ?? '',
-                      widget.courseReadingTasks[index].id?.toInt() ?? 0);
-                });
-              }
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    widget.courseReadingTasks[index].body != ""
-                        ? HtmlWidget(
-                            widget.courseReadingTasks[index].body ?? "")
-                        : Container(),
-                    (widget.courseReadingTasks[index].question != "")
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                            child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  widget.courseReadingTasks[index].question ??
-                                      "",
-                                  style: const TextStyle(
-                                      color: MyColors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
-                                )),
-                          )
-                        : Container(),
-                    const SizedBox(height: 10),
-                    (widget.courseReadingTasks[index].isAnswer == 1)
-                        ? CustomTextField(
-                            controller: _controllers[index],
-                            hintText: "Хариулт",
-                            maxLength: 2000)
-                        : Container(),
-                    if (widget.courseReadingTasks[index].type == 2 ||
-                        widget.courseReadingTasks[index].type == 3)
-                      CheckboxListTile(
-                          activeColor: MyColors.success,
-                          selectedTileColor: MyColors.success,
-                          title: const Text("Аудио сонссон"),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          value: _checkboxValue[index],
-                          onChanged: (value) {
-                            setState(() {
-                              _checkboxValue[index] = value!;
-                            });
-                          }),
-                    if (widget.courseReadingTasks[index].type == 2 ||
-                        widget.courseReadingTasks[index].type == 3)
-                      CustomTextField(
-                          controller: _controllers[index],
-                          hintText: "Хариулт",
-                          maxLength: 2000),
-                    if (widget.courseReadingTasks[index].videoUrl != "")
-                      YoutubePlayerControllerProvider(
-                        controller: _ytbPlayerController ??
-                            YoutubePlayerController(
-                                initialVideoId:
-                                    widget.courseReadingTasks[index].videoUrl ??
+                  if (widget.courseReadingTasks[index].videoUrl != "") {
+                    WidgetsBinding.instance!.addPostFrameCallback((_) {
+                      initiliazeVideo(
+                          widget.courseReadingTasks[index].videoUrl);
+                    });
+                  }
+                  // if (widget.courseReadingTasks[index].listenAudio != "" ||
+                  //     widget.courseReadingTasks[index].listenAudio !=
+                  //         "Audio failed to upload") {
+                  //   WidgetsBinding.instance!.addPostFrameCallback((_) {
+                  //     initiliazeAudio(
+                  //         Urls.networkPath +
+                  //             widget.courseReadingTasks[index].listenAudio!,
+                  //         widget.courseReadingTasks[index].id?.toInt() ?? 0);
+                  //   });
+                  // }
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        widget.courseReadingTasks[index].body != ""
+                            ? HtmlWidget(
+                                widget.courseReadingTasks[index].body ?? "")
+                            : Container(),
+                        (widget.courseReadingTasks[index].question != "")
+                            ? Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      widget.courseReadingTasks[index]
+                                              .question ??
+                                          "",
+                                      style: const TextStyle(
+                                          color: MyColors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    )),
+                              )
+                            : Container(),
+                        const SizedBox(height: 10),
+                        (widget.courseReadingTasks[index].isAnswer == 1)
+                            ? CustomTextField(
+                                controller: _controllers[index],
+                                hintText: "Хариулт",
+                                maxLength: 2000)
+                            : Container(),
+                        if (widget.courseReadingTasks[index].type == 2 ||
+                            widget.courseReadingTasks[index].type == 3)
+                          CheckboxListTile(
+                              activeColor: MyColors.success,
+                              selectedTileColor: MyColors.success,
+                              title: const Text("Аудио сонссон"),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              value: _checkboxValue[index],
+                              onChanged: (value) {
+                                setState(() {
+                                  _checkboxValue[index] = value!;
+                                });
+                              }),
+                        if (widget.courseReadingTasks[index].type == 2 ||
+                            widget.courseReadingTasks[index].type == 3)
+                          CustomTextField(
+                              controller: _controllers[index],
+                              hintText: "Хариулт",
+                              maxLength: 2000),
+                        if (widget.courseReadingTasks[index].videoUrl != "")
+                          YoutubePlayerControllerProvider(
+                            controller: _ytbPlayerController ??
+                                YoutubePlayerController(
+                                    initialVideoId: widget
+                                            .courseReadingTasks[index]
+                                            .videoUrl ??
                                         ""),
-                        child: const YoutubePlayerIFrame(
-                          aspectRatio: 16 / 9,
-                        ),
-                      ),
-                    if (widget.courseReadingTasks[index].type == 4)
-                      CheckboxListTile(
-                          activeColor: MyColors.success,
-                          selectedTileColor: MyColors.success,
-                          title: const Text("Видео үзсэн"),
-                          value: _checkboxValue[index],
-                          controlAffinity: ListTileControlAffinity.leading,
-                          onChanged: (value) {
-                            setState(() {
-                              _checkboxValue[index] = value!;
-                            });
-                          }),
-                    if (widget.courseReadingTasks[index].type == 4)
-                      CustomTextField(
-                          controller: _controllers[index],
-                          hintText: "Хариулт",
-                          maxLength: 2000),
-                    (widget.courseReadingTasks[index].type == 5 ||
-                            widget.courseReadingTasks[index].type == 6)
-                        ? CustomTextField(
-                            controller: _controllers[index],
-                            hintText: "Хариулт",
-                            maxLength: 2000)
-                        : Container(),
-                  ],
-                ),
-              );
-            },
-          )),
+                            child: const YoutubePlayerIFrame(
+                              aspectRatio: 16 / 9,
+                            ),
+                          ),
+                        if (widget.courseReadingTasks[index].type == 4)
+                          CheckboxListTile(
+                              activeColor: MyColors.success,
+                              selectedTileColor: MyColors.success,
+                              title: const Text("Видео үзсэн"),
+                              value: _checkboxValue[index],
+                              controlAffinity: ListTileControlAffinity.leading,
+                              onChanged: (value) {
+                                setState(() {
+                                  _checkboxValue[index] = value!;
+                                });
+                              }),
+                        if (widget.courseReadingTasks[index].type == 4)
+                          CustomTextField(
+                              controller: _controllers[index],
+                              hintText: "Хариулт",
+                              maxLength: 2000),
+                        (widget.courseReadingTasks[index].type == 5 ||
+                                widget.courseReadingTasks[index].type == 6)
+                            ? CustomTextField(
+                                controller: _controllers[index],
+                                hintText: "Хариулт",
+                                maxLength: 2000)
+                            : Container(),
+                      ],
+                    ),
+                  );
+                },
+              )),
       persistentFooterButtons: [
         Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),

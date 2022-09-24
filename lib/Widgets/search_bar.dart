@@ -4,7 +4,8 @@ import 'package:goodali/screens/Auth/search_screen.dart';
 import 'package:iconly/iconly.dart';
 
 class SearchBar extends StatelessWidget {
-  const SearchBar({Key? key}) : super(key: key);
+  final String? title;
+  const SearchBar({Key? key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +29,8 @@ class SearchBar extends StatelessWidget {
                 showSearch(context: context, delegate: SearchScreen());
               },
               cursorColor: MyColors.primaryColor,
-              decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: "Хайх..."),
+              decoration: InputDecoration(
+                  border: InputBorder.none, hintText: title ?? "Хайх..."),
             ),
           ),
         ],

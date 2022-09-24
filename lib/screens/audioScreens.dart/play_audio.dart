@@ -5,7 +5,6 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Providers/audio_provider.dart';
@@ -21,7 +20,6 @@ import 'package:goodali/models/audio_player_model.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
-import 'package:goodali/screens/audioScreens.dart/audio_progress_bar.dart';
 import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
@@ -77,6 +75,7 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   void initState() {
     super.initState();
+    // print(widget.products.);
 
     url = Urls.networkPath + widget.products.audio!;
     getCachedFile(url);
@@ -242,7 +241,7 @@ class _PlayAudioState extends State<PlayAudio> {
             ),
             const SizedBox(height: 10),
             Text(
-              widget.products.lectureTitle?.capitalize() ?? "",
+              widget.products.title?.capitalize() ?? "",
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 24,
