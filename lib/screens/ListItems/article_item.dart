@@ -26,33 +26,14 @@ class ArtcileItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(articleModel.title ?? "",
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: MyColors.black,
                     )),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text("4 min unshih",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: MyColors.primaryColor,
-                        )),
-                    SizedBox(width: 5),
-                    Icon(Icons.circle, color: MyColors.primaryColor, size: 4),
-                    SizedBox(width: 5),
-                    Text("2022.03.18",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: MyColors.primaryColor,
-                        ))
-                  ],
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   articleModel.body ?? "",
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 12, color: MyColors.gray, height: 1.5),
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,

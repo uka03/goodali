@@ -50,7 +50,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                   onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ArticleDetail())),
+                          builder: (context) => ArticleDetail(
+                              articleItem: widget.articleModel[index]))),
                   child: ArtcileItem(
                     articleModel: widget.articleModel[index],
                   )),

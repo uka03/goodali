@@ -1,45 +1,58 @@
 import 'dart:convert';
 
+import 'package:audio_service/audio_service.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
-import 'package:goodali/Widgets/custom_textfield.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
-import 'package:goodali/Widgets/top_snack_bar.dart';
+
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/course_lessons_tasks.dart';
+
 import 'package:goodali/models/task_answer.dart';
+import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-class CourseReadingTasks extends StatefulWidget {
+class CourseTasks extends StatefulWidget {
   final String? title;
-  final List<CourseLessonsTasksModel> courseReadingTasks;
-  const CourseReadingTasks(
-      {Key? key, this.title, required this.courseReadingTasks})
+  final List<CourseLessonsTasksModel> courseTasks;
+
+  const CourseTasks({Key? key, this.title, required this.courseTasks})
       : super(key: key);
 
   @override
-  State<CourseReadingTasks> createState() => _CourseReadingTasksState();
+  State<CourseTasks> createState() => _CourseTasksState();
 }
 
-class _CourseReadingTasksState extends State<CourseReadingTasks> {
+class _CourseTasksState extends State<CourseTasks> {
   List<TextEditingController> _controllers = [];
   late final AudioPlayer audioPlayer = AudioPlayer();
   YoutubePlayerController? _ytbPlayerController;
   List<TaskAnswers> taskAnswerList = [];
-  List<bool> _checkboxValue = [];
 
+  final PageController _pageController = PageController();
+
+  List<bool> _checkboxValue = [];
+  final _kDuration = const Duration(milliseconds: 300);
+  final _kCurve = Curves.easeIn;
   bool isPlaying = false;
+  bool isLoading = true;
+  double _current = 0;
+  Stream<DurationState>? _durationState;
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
@@ -57,25 +70,30 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
       DeviceOrientation.portraitDown,
     ]);
 
-    audioPlayer.positionStream.listen((event) {
-      position = event;
-    });
-    audioPlayer.durationStream.listen((event) {
-      duration = event ?? Duration.zero;
-    });
-
-    audioPlayer.playingStream.listen((event) {
-      isPlaying = event;
+    _pageController.addListener(() {
+      setState(() {
+        _current = _pageController.page!;
+      });
     });
   }
 
   initiliazeAudio(String audioURl, int id) async {
     print(audioURl);
-    duration = await audioPlayer.setUrl(audioURl).then((value) {
-          // setState(() => isLoading = false);
+    await audioPlayer.setUrl(audioURl).then((value) {
+          setState(() => isLoading = false);
           return value;
         }) ??
         Duration.zero;
+
+    _durationState = Rx.combineLatest2<PlaybackEvent, Duration, DurationState>(
+        audioPlayer.playbackEventStream,
+        AudioService.position,
+        (playbackEvent, position) => DurationState(
+              progress: position,
+              buffered: playbackEvent.bufferedPosition,
+              total: playbackEvent.duration,
+            ));
+
     getSavedPosition(id).then((value) {
       setState(() {
         print("duration $duration");
@@ -84,8 +102,6 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
           print(value);
           audioPlayer.seek(value);
         }
-
-        {}
       });
     });
   }
@@ -148,197 +164,300 @@ class _CourseReadingTasksState extends State<CourseReadingTasks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SimpleAppBar(title: widget.title ?? ""),
-      body: widget.courseReadingTasks.isEmpty
-          ? const Center(
-              child: Text("Хичээл хоосон байна",
-                  style: TextStyle(color: MyColors.gray)),
-            )
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: ListView.builder(
-                itemCount: widget.courseReadingTasks.length,
-                itemBuilder: (context, index) {
-                  _controllers.add(TextEditingController());
-                  for (var i = 0; i < widget.courseReadingTasks.length; i++) {
-                    if (widget.courseReadingTasks[index].isAnswer == 3 ||
-                        widget.courseReadingTasks[index].isAnswer == 4 ||
-                        widget.courseReadingTasks[index].isAnswer == 2) {
-                      _checkboxValue.add(false);
-                    }
-                  }
-                  _checkboxValue.add(false);
-                  if (widget.courseReadingTasks[index].videoUrl != "") {
-                    WidgetsBinding.instance!.addPostFrameCallback((_) {
-                      initiliazeVideo(
-                          widget.courseReadingTasks[index].videoUrl);
-                    });
-                  }
-                  // if (widget.courseReadingTasks[index].listenAudio != "" ||
-                  //     widget.courseReadingTasks[index].listenAudio !=
-                  //         "Audio failed to upload") {
-                  //   WidgetsBinding.instance!.addPostFrameCallback((_) {
-                  //     initiliazeAudio(
-                  //         Urls.networkPath +
-                  //             widget.courseReadingTasks[index].listenAudio!,
-                  //         widget.courseReadingTasks[index].id?.toInt() ?? 0);
-                  //   });
-                  // }
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        widget.courseReadingTasks[index].body != ""
-                            ? HtmlWidget(
-                                widget.courseReadingTasks[index].body ?? "")
-                            : Container(),
-                        (widget.courseReadingTasks[index].question != "")
-                            ? Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10.0),
-                                child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      widget.courseReadingTasks[index]
-                                              .question ??
-                                          "",
-                                      style: const TextStyle(
-                                          color: MyColors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    )),
-                              )
-                            : Container(),
-                        const SizedBox(height: 10),
-                        (widget.courseReadingTasks[index].isAnswer == 1)
-                            ? CustomTextField(
-                                controller: _controllers[index],
-                                hintText: "Хариулт",
-                                maxLength: 2000)
-                            : Container(),
-                        if (widget.courseReadingTasks[index].type == 2 ||
-                            widget.courseReadingTasks[index].type == 3)
-                          CheckboxListTile(
-                              activeColor: MyColors.success,
-                              selectedTileColor: MyColors.success,
-                              title: const Text("Аудио сонссон"),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              value: _checkboxValue[index],
-                              onChanged: (value) {
-                                setState(() {
-                                  _checkboxValue[index] = value!;
-                                });
-                              }),
-                        if (widget.courseReadingTasks[index].type == 2 ||
-                            widget.courseReadingTasks[index].type == 3)
-                          CustomTextField(
-                              controller: _controllers[index],
-                              hintText: "Хариулт",
-                              maxLength: 2000),
-                        if (widget.courseReadingTasks[index].videoUrl != "")
-                          YoutubePlayerControllerProvider(
-                            controller: _ytbPlayerController ??
-                                YoutubePlayerController(
-                                    initialVideoId: widget
-                                            .courseReadingTasks[index]
-                                            .videoUrl ??
-                                        ""),
-                            child: const YoutubePlayerIFrame(
-                              aspectRatio: 16 / 9,
-                            ),
-                          ),
-                        if (widget.courseReadingTasks[index].type == 4)
-                          CheckboxListTile(
-                              activeColor: MyColors.success,
-                              selectedTileColor: MyColors.success,
-                              title: const Text("Видео үзсэн"),
-                              value: _checkboxValue[index],
-                              controlAffinity: ListTileControlAffinity.leading,
-                              onChanged: (value) {
-                                setState(() {
-                                  _checkboxValue[index] = value!;
-                                });
-                              }),
-                        if (widget.courseReadingTasks[index].type == 4)
-                          CustomTextField(
-                              controller: _controllers[index],
-                              hintText: "Хариулт",
-                              maxLength: 2000),
-                        (widget.courseReadingTasks[index].type == 5 ||
-                                widget.courseReadingTasks[index].type == 6)
-                            ? CustomTextField(
-                                controller: _controllers[index],
-                                hintText: "Хариулт",
-                                maxLength: 2000)
-                            : Container(),
-                      ],
-                    ),
-                  );
-                },
-              )),
-      persistentFooterButtons: [
-        Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: CustomElevatedButton(
-                onPress: () {
-                  print(widget.courseReadingTasks.length);
-                  print(_controllers.length);
+        appBar: SimpleAppBar(title: widget.title ?? ""),
+        body: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: widget.courseTasks.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    _controllers.add(TextEditingController());
+                    switch (widget.courseTasks[index].type) {
+                      case 0:
+                      case 1:
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                          child: type0(widget.courseTasks[index], index),
+                        );
+                      // case 1:
+                      //   return Padding(
+                      //     padding: const EdgeInsets.all(20),
+                      //     child: type1(widget.courseTasks[index], index),
+                      //   );
+                      case 2:
+                        initiliazeAudio(
+                            Urls.networkPath +
+                                widget.courseTasks[index].listenAudio!,
+                            widget.courseTasks[index].id ?? 0);
 
-                  for (var i = 0; i < widget.courseReadingTasks.length; i++) {
-                    TaskAnswers taskAnswers = TaskAnswers(
-                        isAnswered: _controllers[i].text == "" ? 0 : 1,
-                        taskFieldData: _controllers[i].text);
-                    taskAnswerList.add(taskAnswers);
-                    saveAnswer(
-                        widget.courseReadingTasks[i].id.toString(),
-                        _controllers[i].text,
-                        _controllers[i].text == "" ? 0 : 1);
-                    print(i);
-                  }
-                },
-                text: "Хадгалах")),
+                        return Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: listen(widget.courseTasks[index]),
+                        );
+
+                      case 4:
+                        WidgetsBinding.instance!.addPostFrameCallback((_) {
+                          initiliazeVideo(Urls.networkPath +
+                              widget.courseTasks[index].videoUrl!);
+                        });
+                        return Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: video(widget.courseTasks[index]),
+                        );
+
+                      case 5:
+                      case 6:
+                        return Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: exercise(widget.courseTasks[index], index),
+                        );
+
+                      default:
+                        return Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: type0(widget.courseTasks[index], index),
+                        );
+                    }
+                  }),
+            ),
+            // _current != 0
+            //     ? Container()
+            //     : Container(),
+            Positioned(
+                bottom: 30,
+                // right: 35,
+                child: Container(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12)),
+                  child: CustomElevatedButton(
+                      onPress: () async {
+                        _pageController.nextPage(
+                            curve: _kCurve, duration: _kDuration);
+                      },
+                      text: "Дараах"),
+                )),
+          ],
+        ));
+  }
+
+  Widget type0(CourseLessonsTasksModel courseTask, int index) {
+    return SingleChildScrollView(
+        child: Column(
+      children: [
+        if (courseTask.body != "" || courseTask.body!.isNotEmpty)
+          HtmlWidget(courseTask.body ?? ""),
+        Text(courseTask.question ?? ""),
+        TextField(
+            controller: _controllers[index],
+            cursorColor: MyColors.primaryColor,
+            decoration: const InputDecoration(
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: MyColors.primaryColor),
+              ),
+            )),
       ],
+    ));
+  }
+
+  Widget type1(CourseLessonsTasksModel courseTask, int index) {
+    return Column(
+      children: [
+        if (courseTask.body != "" || courseTask.body!.isNotEmpty)
+          HtmlWidget(courseTask.body ?? ""),
+        Text(courseTask.question ?? ""),
+        TextField(
+            controller: _controllers[index],
+            cursorColor: MyColors.primaryColor,
+            decoration: const InputDecoration(
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: MyColors.primaryColor),
+              ),
+            )),
+      ],
+    );
+  }
+
+  Widget exercise(CourseLessonsTasksModel courseTask, int index) {
+    return Column(
+      children: [
+        Text(courseTask.question ?? ""),
+        TextField(
+            controller: _controllers[index],
+            cursorColor: MyColors.primaryColor,
+            decoration: const InputDecoration(
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: MyColors.primaryColor),
+              ),
+            )),
+      ],
+    );
+  }
+
+  Widget video(CourseLessonsTasksModel courseTask) {
+    return Column(
+      children: [
+        YoutubePlayerControllerProvider(
+          controller: _ytbPlayerController ??
+              YoutubePlayerController(
+                  initialVideoId: courseTask.videoUrl ?? ""),
+          child: const YoutubePlayerIFrame(
+            aspectRatio: 16 / 9,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget listen(CourseLessonsTasksModel courseTask) {
+    return Column(
+      children: [audioPlayerWidget()],
     );
   }
 
   Widget audioPlayerWidget() {
     final audioPosition =
         Provider.of<AudioPlayerProvider>(context, listen: false);
+    return StreamBuilder<DurationState>(
+        stream: _durationState,
+        builder: (context, snapshot) {
+          final durationState = snapshot.data;
+          position = durationState?.progress ?? Duration.zero;
+          final buffered = durationState?.buffered ?? Duration.zero;
+          duration = durationState?.total ?? Duration.zero;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                ProgressBar(
+                  progress: position,
+                  buffered: buffered,
+                  total: duration,
+                  thumbColor: Colors.white,
+                  thumbGlowColor: MyColors.primaryColor,
+                  timeLabelTextStyle: const TextStyle(color: MyColors.gray),
+                  progressBarColor: Colors.white,
+                  bufferedBarColor: Colors.white54,
+                  baseBarColor: Colors.white10,
+                  onSeek: (duration) async {
+                    final position = duration;
+                    await audioHandler.seek(position);
+
+                    await audioHandler.play();
+                  },
+                ),
+                const SizedBox(height: 20),
+                playerButton(position, duration)
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget playerButton(Duration position, Duration duration) {
+    final audioPosition = Provider.of<AudioPlayerProvider>(context);
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+        InkWell(
+          onTap: () {
+            buttonBackWard5Seconds(position);
+          },
+          child: SvgPicture.asset("assets/images/replay_5.svg",
+              color: Colors.white),
+        ),
         CircleAvatar(
-          backgroundColor: MyColors.input,
-          child: IconButton(
-            splashRadius: 20,
-            padding: EdgeInsets.zero,
-            onPressed: () async {
-              if (isPlaying) {
-                audioPlayer.pause();
+          radius: 36,
+          backgroundColor: Colors.white,
+          child: StreamBuilder<bool>(
+            stream: audioHandler.playbackState
+                .map((state) => state.playing)
+                .distinct(),
+            builder: (context, snapshot) {
+              final playing = snapshot.data ?? false;
+
+              if (isLoading) {
+                return const CircularProgressIndicator(
+                    color: MyColors.primaryColor);
+              } else if (playing != true) {
+                return IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: MyColors.primaryColor,
+                    size: 40.0,
+                  ),
+                  onPressed: () {
+                    audioHandler.play();
+                  },
+                );
               } else {
-                await audioPlayer.play();
+                return IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.pause_rounded,
+                    color: MyColors.primaryColor,
+                    size: 40.0,
+                  ),
+                  onPressed: () {
+                    // audioHandler.pause().then((value) {
+                    //   AudioPlayerModel _audio = AudioPlayerModel(
+                    //       productID: moodItem[_current.toInt()].id,
+                    //       audioPosition: position.inMilliseconds);
+                    //   audioPosition.addAudioPosition(_audio);
+                    // });
+                  },
+                );
               }
             },
-            icon: Icon(
-              isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-              size: 30,
-              color: MyColors.black,
-            ),
           ),
         ),
-        Slider(
-          value: position.inSeconds.toDouble(),
-          max: duration.inSeconds.toDouble(),
-          activeColor: MyColors.primaryColor,
-          inactiveColor: MyColors.border1,
-          onChanged: (duration) async {
-            final position = Duration(microseconds: (duration * 1000).toInt());
-            await audioPlayer.seek(position);
-
-            await audioPlayer.play();
+        InkWell(
+          onTap: () {
+            buttonForward15Seconds(position, duration);
           },
+          child: SvgPicture.asset("assets/images/forward_15.svg",
+              color: Colors.white),
         ),
       ],
     );
+  }
+
+  buttonBackWard5Seconds(Duration position) {
+    position = position - const Duration(seconds: 5);
+
+    if (position < const Duration(seconds: 0)) {
+      audioHandler.seek(const Duration(seconds: 0));
+    } else {
+      audioHandler.seek(position);
+    }
+  }
+
+  buttonForward15Seconds(Duration position, Duration duration) {
+    position = position + const Duration(seconds: 15);
+
+    if (duration > position) {
+      audioHandler.seek(position);
+    } else if (duration < position) {
+      audioHandler.seek(duration);
+    }
   }
 
   saveAnswer(String taskId, String textFieldData, int isAnswered) {

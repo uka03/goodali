@@ -217,7 +217,7 @@ class Connection {
   static Future<List<ArticleModel>> getArticle(BuildContext context) async {
     try {
       final response =
-          await Http().getDio(context, headerTypebearer).post(Urls.getArticle);
+          await Http().getDio(context, headerTypeNone).post(Urls.getArticle);
       print(response.data);
       if (response.statusCode == 200) {
         return (response.data as List)

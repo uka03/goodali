@@ -119,8 +119,11 @@ class _ReadTabbarState extends State<ReadTabbar> {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: articleList.length,
         itemBuilder: (context, index) => GestureDetector(
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const ArticleDetail())),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ArticleDetail(articleItem: articleList[index]))),
             child: ArtcileItem(articleModel: articleList[index])));
   }
 

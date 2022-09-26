@@ -300,6 +300,7 @@ class _MoodDetailState extends State<MoodDetail> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  banner(imgUrl),
                                   const SizedBox(height: 20),
                                   HtmlWidget(
                                     moodItem[index].title!,
@@ -323,7 +324,7 @@ class _MoodDetailState extends State<MoodDetail> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (imgUrl != "") banner(imgUrl),
+                                  banner(imgUrl),
                                   const SizedBox(height: 40),
                                   HtmlWidget(
                                     moodItem[index].title!,

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/models/article_model.dart';
+import 'package:goodali/screens/blank.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class ArticleDetail extends StatefulWidget {
-  const ArticleDetail({Key? key}) : super(key: key);
+  final ArticleModel articleItem;
+  const ArticleDetail({Key? key, required this.articleItem}) : super(key: key);
 
   @override
   State<ArticleDetail> createState() => _ArticleDetailState();
@@ -48,13 +51,13 @@ class _ArticleDetailState extends State<ArticleDetail> {
                 color: Colors.yellowAccent,
               ),
               const SizedBox(height: 20),
-              const Align(
+              Align(
                 alignment: Alignment.center,
                 child: SizedBox(
                   width: 300,
-                  child: const Text("Агуу анагаагчид болон асар зовогсод",
+                  child: Text(widget.articleItem.title ?? "",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: MyColors.black,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -62,31 +65,10 @@ class _ArticleDetailState extends State<ArticleDetail> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                    "Чи хаашаа ч зорьсон бай, хамаагүй, яг одоо байгаа цэгээсээ л эхэлнэ. Алив зүйлийг эхлэхдээ будилах, ялимгүй аргалчих гэсэн эрмэлзлээсээ болоод төлөх гэсэн биш даялаад явчихвал хүссэн үр дүнгээ хүссэн хугацаандаа авахгүй байх, их үнээр авах болчихдог учраас би аль болох үнэн байхыг хичээдэг. “Харамч хүн хоёр төлдөг. Яаруу хүн хоцордог.” гэсэн үгийг санаж явдаг даа. Өмнөх сургалтуудын үеэр эхний удиртгал бүлгүүдийг алгасаад шууд үндсэн бүлэг рүүгээ орсон ээжүүд тэнд  ямар асуултууд гарч болох вэ? Таны бүртгэлтэй и-мэйл хаягааг хүргэгдсэн хөтөч дэвтэрийнхэ холбоос дээр дарж дэлгэрэнгүй танилцаарай.",
-                    style: TextStyle(
-                        fontSize: 14, height: 1.8, color: MyColors.black)),
-              ),
-              const SizedBox(height: 40),
-              Align(
-                alignment: Alignment.center,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 170,
-                    width: 170,
-                    color: Colors.pink[200],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 40),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                    "Алив зүйлийг эхлэхдээ будилах, ялимгүй аргалчих гэсэн эрмэлзлээсээ болоод төлөх гэсэн биш даялаад явчихвал хүссэн үр дүнгээ хүссэн хугацаандаа авахгүй байх, их үнээр авах болчихдог учраас би аль болох үнэн байхыг хичээдэг. “Харамч хүн хоёр төлдөг. Яаруу хүн хоцордог.” гэсэн үгийг санаж явдаг даа. Өмнөх сургалтуудын үеэр эхний удиртгал бүлгүүдийг алгасаад шууд үндсэн бүлэг рүүгээ орсон ээжүүд тэнд  ямар асуултууд гарч болох вэ?.",
-                    style: TextStyle(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(widget.articleItem.body ?? "",
+                    style: const TextStyle(
                         fontSize: 14, height: 1.8, color: MyColors.black)),
               ),
               const SizedBox(height: 40),
@@ -100,7 +82,7 @@ class _ArticleDetailState extends State<ArticleDetail> {
                         height: 1.7)),
               ),
               const SizedBox(height: 30),
-              similarArticle()
+              // similarArticle()
             ],
           ),
         ),
@@ -133,8 +115,8 @@ class _ArticleDetailState extends State<ArticleDetail> {
       itemBuilder: (context, index) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: GestureDetector(
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const ArticleDetail())),
+          onTap: () => Navigator.push(
+              context, MaterialPageRoute(builder: (context) => const Blank())),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

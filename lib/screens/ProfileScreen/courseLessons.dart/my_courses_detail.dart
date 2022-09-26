@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
-import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/course_lessons_model.dart';
 import 'package:goodali/models/course_lessons_tasks.dart';
 import 'package:goodali/models/courses_item.dart';
-import 'package:goodali/screens/ProfileScreen/courseLessons.dart/course_lessons_tasks.dart';
-import 'package:video_player/video_player.dart';
+import 'package:goodali/screens/ProfileScreen/courseLessons.dart/course_lesson.dart';
+import 'package:iconly/iconly.dart';
 
 class MyCoursesDetail extends StatefulWidget {
   final CoursesItems coursesItems;
@@ -32,6 +31,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
   String id = "";
 
   List<CourseLessonsTasksModel> allTasks = [];
+  List<int> lessonID = [];
   List<String> tasksName = [];
   bool isLoading = true;
 
@@ -53,12 +53,17 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
         child: Column(children: [
           const SizedBox(height: 20),
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: ImageView(
-                imgPath: widget.coursesItems.banner ?? "",
+              borderRadius: BorderRadius.circular(12),
+              child:
+                  //  ImageView(
+                  //     imgPath: widget.coursesItems.banner ?? "",
+                  //     width: 190,
+                  //     height: 190),
+                  Container(
+                color: Colors.blueGrey,
                 width: 190,
-                height: 190),
-          ),
+                height: 190,
+              )),
           const SizedBox(height: 20),
           Text(
             widget.lessonName,
@@ -68,151 +73,62 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                 fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
-          Padding(
+          const Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: CustomReadMoreText(
                 text:
                     "Чиний амьдралыг уг үндсээр нь хувиргах трансформац-хөтөлбөрийн эхний бүлгийг нээж байгаад баяр хүргэе! Удиртгал хэсгийг уншаагүй бол заавал уншихыг зөвлөж ",
                 textAlign: TextAlign.center,
               )),
-          const SizedBox(height: 10),
-          const Divider(endIndent: 20, indent: 20),
+          const SizedBox(height: 20),
           FutureBuilder(
             future: future,
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.done &&
                   snapshot.hasData) {
                 List<Lesson?> lessons = snapshot.data;
-                print("uhfouhf ${lessons.length}");
+
                 if (lessons.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: lessons.length,
                     itemBuilder: (context, index) {
-                      return Card(
-                          elevation: 0,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 36.0, left: 6.0, right: 6.0, bottom: 6.0),
-                            child: ExpansionTile(
-                                collapsedIconColor: MyColors.gray,
-                                collapsedTextColor: MyColors.gray,
-                                iconColor: MyColors.gray,
-                                // textColor:
-                                onExpansionChanged: (value) {
-                                  if (value) {
-                                    getCoursesTasks(
-                                        lessonIdData[index].id.toString());
-                                  }
-                                },
-                                title: Text(
-                                  lessons[index]?.name ?? "",
-                                  style: TextStyle(
-                                    color: MyColors.gray,
-                                  ),
+                      print(lessons[index]?.expiry);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Card(
+                            elevation: 0,
+                            child: ListTile(
+                              iconColor: MyColors.black,
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => CourseLessonType(
+                                            title: lessons[index]?.name ?? "",
+                                            id: lessonID[index].toString())));
+                              },
+                              // subtitle: Row(children: [
+                              //   const Text(""),
+                              //   const Spacer(),
+                              //   Text(lessons[index]?.expiry != null ||
+                              //           lessons[index]?.expiry != "" ||
+                              //           lessons[index]!.expiry!.isNotEmpty
+                              //       ? dateTimeFormatter(
+                              //           lessons[index]?.expiry ?? "")
+                              //       : ""),
+                              // ]),
+                              trailing: const Icon(IconlyLight.arrow_right_2,
+                                  size: 18, color: MyColors.gray),
+                              title: Text(
+                                lessons[index]?.name ?? "",
+                                style: const TextStyle(
+                                  color: MyColors.black,
                                 ),
-                                children: [
-                                  ListTile(
-                                    title: const Text("Унших"),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CourseReadingTasks(
-                                                      courseReadingTasks:
-                                                          allTasks,
-                                                      title: lessons[index]
-                                                          ?.name)));
-                                    },
-                                  ),
-                                  ListTile(
-                                    title: const Text("Бичих"),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CourseReadingTasks(
-                                                      courseReadingTasks:
-                                                          allTasks,
-                                                      title: lessons[index]
-                                                          ?.name)));
-                                    },
-                                  ),
-                                  ListTile(
-                                    title: const Text("Сонсох"),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CourseReadingTasks(
-                                                      courseReadingTasks:
-                                                          allTasks,
-                                                      title: lessons[index]
-                                                          ?.name)));
-                                    },
-                                  ),
-                                  ListTile(
-                                    title: const Text("Хийх"),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CourseReadingTasks(
-                                                      courseReadingTasks:
-                                                          allTasks,
-                                                      title: lessons[index]
-                                                          ?.name)));
-                                    },
-                                  ),
-                                  ListTile(
-                                    title: const Text("Үзэх"),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CourseReadingTasks(
-                                                      courseReadingTasks:
-                                                          allTasks,
-                                                      title: lessons[index]
-                                                          ?.name)));
-                                    },
-                                  ),
-                                  ListTile(
-                                    title: const Text("Мэдрэх"),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CourseReadingTasks(
-                                                      courseReadingTasks:
-                                                          allTasks,
-                                                      title: lessons[index]
-                                                          ?.name)));
-                                    },
-                                  ),
-                                  ListTile(
-                                    title: const Text("Судлах"),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CourseReadingTasks(
-                                                      courseReadingTasks:
-                                                          allTasks,
-                                                      title: lessons[index]
-                                                          ?.name)));
-                                    },
-                                  ),
-                                ]),
-                          ));
+                              ),
+                            )),
+                      );
                     },
                   );
                 } else {
@@ -239,33 +155,9 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
     if (lessonIdData != []) {
       for (var item in lessonIdData) {
         courseLessons.add(item.lesson);
+        lessonID.add(item.id ?? 0);
       }
     }
     return courseLessons;
-  }
-
-  Future<List<CourseLessonsTasksModel>> getCoursesTasks(String id) async {
-    allTasks = await Connection.getCoursesTasks(context, id);
-
-    setState(() {
-      isLoading = false;
-    });
-    for (var item in allTasks) {
-      if (item.type == 0 ||
-          item.type == 2 ||
-          item.type == 3 ||
-          item.type == 5 ||
-          item.type == 6) {
-        taskType = "Унших материал";
-      } else if (item.type == 1) {
-        taskType = "Сонсох";
-      } else if (item.type == 4) {
-        taskType = "Видео";
-      }
-      tasksName.add(taskType);
-      tasksName = tasksName.toSet().toList();
-    }
-
-    return allTasks;
   }
 }

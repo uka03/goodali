@@ -1,10 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/main.dart';
 import 'package:html/parser.dart';
+import 'package:intl/intl.dart';
 
 Color getRandomColors() {
   final colors =
@@ -21,6 +20,13 @@ extension StringExtension on String {
   String capitalize() {
     return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
+}
+
+String dateTimeFormatter(String dateTime) {
+  final dateFormatter = DateFormat("yyyy-MM-dd");
+  DateTime formatdate = dateFormatter.parse(dateTime);
+
+  return dateFormatter.format(formatdate);
 }
 
 int generateRandomCode(int minValue, int maxValue) {
