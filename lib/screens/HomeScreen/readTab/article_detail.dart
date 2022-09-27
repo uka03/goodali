@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/article_model.dart';
 import 'package:goodali/screens/blank.dart';
@@ -46,9 +48,10 @@ class _ArticleDetailState extends State<ArticleDetail> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              ImageView(
+                imgPath: widget.articleItem.banner ?? "",
                 height: 200,
-                color: Colors.yellowAccent,
+                width: double.infinity,
               ),
               const SizedBox(height: 20),
               Align(
@@ -67,8 +70,8 @@ class _ArticleDetailState extends State<ArticleDetail> {
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(widget.articleItem.body ?? "",
-                    style: const TextStyle(
+                child: HtmlWidget(widget.articleItem.body ?? "",
+                    textStyle: const TextStyle(
                         fontSize: 14, height: 1.8, color: MyColors.black)),
               ),
               const SizedBox(height: 40),

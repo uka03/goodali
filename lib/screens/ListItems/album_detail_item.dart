@@ -96,11 +96,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   @override
   void dispose() {
     super.dispose();
-    widget.audioPlayer.dispose();
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print(state);
+    developer.log(state.toString());
     if (state == AppLifecycleState.paused) {
       widget.audioPlayer.stop();
     }
@@ -142,7 +141,8 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           });
         });
 
-        widget.audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(url)));
+        await widget.audioPlayer
+            .setAudioSource(AudioSource.uri(Uri.parse(url)));
       }
     } catch (e) {
       print(e);
@@ -158,8 +158,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
     // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
-      print(moodItemID);
-      print(item.productID);
       if (moodItemID == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }

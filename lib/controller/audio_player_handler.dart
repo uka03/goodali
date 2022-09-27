@@ -102,7 +102,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     mediaItem.add(item);
     print("player media item");
     // updateMediaItem(item);
-    _player.setAudioSource(AudioSource.uri(Uri.parse(item.id)));
+    await _player.setAudioSource(AudioSource.uri(Uri.parse(item.id)));
   }
 
   @override
