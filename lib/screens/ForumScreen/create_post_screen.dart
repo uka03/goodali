@@ -19,7 +19,10 @@ class _CreatePostState extends State<CreatePost> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(title: "Пост нэмэх"),
+      appBar: const SimpleAppBar(
+        title: "Пост нэмэх",
+        noCard: true,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),

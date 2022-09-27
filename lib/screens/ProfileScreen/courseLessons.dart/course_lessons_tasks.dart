@@ -11,6 +11,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
@@ -24,14 +25,17 @@ import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class CourseTasks extends StatefulWidget {
   final String? title;
   final List<CourseLessonsTasksModel> courseTasks;
+  final int? initialPage;
 
-  const CourseTasks({Key? key, this.title, required this.courseTasks})
+  const CourseTasks(
+      {Key? key, this.title, required this.courseTasks, this.initialPage})
       : super(key: key);
 
   @override
@@ -44,7 +48,8 @@ class _CourseTasksState extends State<CourseTasks> {
   YoutubePlayerController? _ytbPlayerController;
   List<TaskAnswers> taskAnswerList = [];
 
-  final PageController _pageController = PageController();
+  late final PageController _pageController =
+      PageController(initialPage: widget.initialPage ?? 0);
 
   List<bool> _checkboxValue = [];
   final _kDuration = const Duration(milliseconds: 300);
@@ -62,13 +67,18 @@ class _CourseTasksState extends State<CourseTasks> {
   @override
   void initState() {
     super.initState();
-
+    print(widget.initialPage);
     _setOrientation([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    for (var i = 0; i < widget.courseTasks.length; i++) {
+      _controllers.add(TextEditingController());
+      _checkboxValue.add(false);
+    }
+    _current = widget.initialPage?.toDouble() ?? 1.0;
 
     _pageController.addListener(() {
       setState(() {
@@ -176,7 +186,6 @@ class _CourseTasksState extends State<CourseTasks> {
                   itemCount: widget.courseTasks.length,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
-                    _controllers.add(TextEditingController());
                     switch (widget.courseTasks[index].type) {
                       case 0:
                       case 1:
@@ -201,14 +210,10 @@ class _CourseTasksState extends State<CourseTasks> {
                         );
 
                       case 4:
-                        WidgetsBinding.instance!.addPostFrameCallback((_) {
-                          initiliazeVideo(Urls.networkPath +
-                              widget.courseTasks[index].videoUrl!);
-                        });
-                        return Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: video(widget.courseTasks[index]),
-                        );
+                        initiliazeVideo(Urls.networkPath +
+                            widget.courseTasks[index].videoUrl!);
+
+                        return video(widget.courseTasks[index], index);
 
                       case 5:
                       case 6:
@@ -225,25 +230,96 @@ class _CourseTasksState extends State<CourseTasks> {
                     }
                   }),
             ),
-            // _current != 0
-            //     ? Container()
-            //     : Container(),
             Positioned(
                 bottom: 30,
                 // right: 35,
                 child: Container(
-                  height: 50,
                   width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12)),
-                  child: CustomElevatedButton(
-                      onPress: () async {
-                        _pageController.nextPage(
-                            curve: _kCurve, duration: _kDuration);
-                      },
-                      text: "Дараах"),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 70,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border:
+                                Border.all(color: MyColors.gray, width: 0.5),
+                            borderRadius: BorderRadius.circular(14)),
+                        child: Center(
+                          child: Wrap(children: [
+                            Text(
+                              ((_current + 1).toInt()).toString(),
+                              style: const TextStyle(
+                                  color: MyColors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const Text("/",
+                                style: TextStyle(
+                                  color: MyColors.black,
+                                  fontSize: 16,
+                                )),
+                            Text(widget.courseTasks.length.toString(),
+                                style: const TextStyle(
+                                    color: MyColors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold)),
+                          ]),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: CustomElevatedButton(
+                              onPress: () async {
+                                _pageController.nextPage(
+                                    curve: _kCurve, duration: _kDuration);
+                                saveAnswer(
+                                        widget.courseTasks[_current.toInt()].id
+                                            .toString(),
+                                        widget.courseTasks[_current.toInt()]
+                                                        .type ==
+                                                    4 ||
+                                                widget
+                                                        .courseTasks[
+                                                            _current.toInt()]
+                                                        .type ==
+                                                    2
+                                            ? _checkboxValue[_current.toInt()]
+                                                .toString()
+                                            : _controllers[_current.toInt()]
+                                                .text,
+                                        _controllers[_current.toInt()].text ==
+                                                    "" ||
+                                                _checkboxValue[
+                                                        _current.toInt()] ==
+                                                    false
+                                            ? 0
+                                            : 1)
+                                    .then((value) {
+                                  if (value == true) {
+                                    if (_current + 1 ==
+                                        widget.courseTasks.length) {
+                                      showTopSnackBar(
+                                          context,
+                                          const CustomTopSnackBar(
+                                            type: 1,
+                                            text: "Амжилттай хадгалагдлаа",
+                                          ));
+                                      Navigator.pop(context, _current);
+                                    }
+                                  }
+                                });
+                              },
+                              text: _current + 1 == widget.courseTasks.length
+                                  ? "Дуусгах"
+                                  : "Дараах"),
+                        ),
+                      ),
+                    ],
+                  ),
                 )),
           ],
         ));
@@ -252,21 +328,34 @@ class _CourseTasksState extends State<CourseTasks> {
   Widget type0(CourseLessonsTasksModel courseTask, int index) {
     return SingleChildScrollView(
         child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(height: 10),
         if (courseTask.body != "" || courseTask.body!.isNotEmpty)
           HtmlWidget(courseTask.body ?? ""),
-        Text(courseTask.question ?? ""),
-        TextField(
-            controller: _controllers[index],
-            cursorColor: MyColors.primaryColor,
-            decoration: const InputDecoration(
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.border1, width: 0.5),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.primaryColor),
-              ),
-            )),
+        Text(courseTask.question ?? "",
+            style: const TextStyle(
+                color: MyColors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 20)),
+        if (courseTask.isAnswer == 1)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: TextField(
+                controller: _controllers[index],
+                cursorColor: MyColors.primaryColor,
+                maxLength: 2000,
+                maxLines: null,
+                decoration: const InputDecoration(
+                  hintText: "Хариулт",
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.primaryColor),
+                  ),
+                )),
+          ),
       ],
     ));
   }
@@ -311,15 +400,40 @@ class _CourseTasksState extends State<CourseTasks> {
     );
   }
 
-  Widget video(CourseLessonsTasksModel courseTask) {
+  Widget video(CourseLessonsTasksModel courseTask, int index) {
     return Column(
       children: [
-        YoutubePlayerControllerProvider(
-          controller: _ytbPlayerController ??
-              YoutubePlayerController(
-                  initialVideoId: courseTask.videoUrl ?? ""),
-          child: const YoutubePlayerIFrame(
-            aspectRatio: 16 / 9,
+        _ytbPlayerController?.value.isReady != null
+            ? YoutubePlayerControllerProvider(
+                controller: _ytbPlayerController ??
+                    YoutubePlayerController(
+                        initialVideoId: courseTask.videoUrl ?? ""),
+                child: const YoutubePlayerIFrame(
+                  aspectRatio: 16 / 9,
+                ),
+              )
+            : const CircularProgressIndicator(color: MyColors.primaryColor),
+        const Spacer(),
+        Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: MyColors.border1)),
+          margin: const EdgeInsets.only(bottom: 110, left: 20, right: 20),
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Row(
+            children: [
+              Checkbox(
+                  shape: const CircleBorder(),
+                  activeColor: MyColors.success,
+                  value: _checkboxValue[index],
+                  onChanged: (value) {
+                    setState(() {
+                      _checkboxValue[index] = value!;
+                    });
+                  }),
+              const Text("Видеог дуустал нь үзсэн.",
+                  style: TextStyle(color: MyColors.black)),
+            ],
           ),
         )
       ],
@@ -460,12 +574,14 @@ class _CourseTasksState extends State<CourseTasks> {
     }
   }
 
-  saveAnswer(String taskId, String textFieldData, int isAnswered) {
+  Future saveAnswer(String taskId, String textFieldData, int isAnswered) async {
     Map answerData = {
       "task_id": taskId,
       "text_field_data": textFieldData,
       "is_answered": isAnswered
     };
-    Connection.saveAnswer(context, answerData);
+    print(answerData);
+    var data = await Connection.saveAnswer(context, answerData);
+    return data['success'] ? true : false;
   }
 }

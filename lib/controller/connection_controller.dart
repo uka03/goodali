@@ -218,7 +218,7 @@ class Connection {
     try {
       final response =
           await Http().getDio(context, headerTypeNone).post(Urls.getArticle);
-      print(response.data);
+
       if (response.statusCode == 200) {
         return (response.data as List)
             .map((e) => ArticleModel.fromJson(e))
@@ -575,9 +575,9 @@ class Connection {
           .post(Urls.saveAnswerData, data: data);
 
       if (response.statusCode == 200) {
-        return {};
+        return {"success": true};
       } else if (response.statusCode == 401) {
-        return {};
+        return {"success": false};
       } else {
         print("error");
         return {};

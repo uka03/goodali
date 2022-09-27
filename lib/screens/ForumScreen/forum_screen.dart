@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/Widgets/search_bar.dart';
+import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:goodali/screens/ForumScreen/human_nature_tab.dart';
 import 'package:goodali/screens/ForumScreen/tuudeg_gal_tab.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
@@ -44,6 +45,8 @@ class _ForumScreenState extends State<ForumScreen> {
                       child: TextField(
                         onTap: () {
                           FocusManager.instance.primaryFocus?.unfocus();
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => CreatePost()));
                         },
                         cursorColor: MyColors.primaryColor,
                         decoration: const InputDecoration(

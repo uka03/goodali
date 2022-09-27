@@ -4,6 +4,7 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
@@ -67,27 +68,27 @@ class _ListenTabbarState extends State<ListenTabbar> {
                       ),
                     ),
                     albumLecture(context, albumList!),
-                    // Padding(
-                    //     padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //       children: [
-                    //         const Text("Подкаст",
-                    //             style: TextStyle(
-                    //                 color: MyColors.black,
-                    //                 fontSize: 24,
-                    //                 fontWeight: FontWeight.bold)),
-                    //         IconButton(
-                    //             onPressed: () {
-                    //               // Navigator.push(
-                    //               //     context,
-                    //               //     MaterialPageRoute(
-                    //               //         builder: (_) => const MyCourseMain()));
-                    //             },
-                    //             icon: const Icon(IconlyLight.arrow_right))
-                    //       ],
-                    //     )),
-                    // podcast(context),
+                    Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Подкаст",
+                                style: TextStyle(
+                                    color: MyColors.black,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold)),
+                            IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => const Podcast()));
+                                },
+                                icon: const Icon(IconlyLight.arrow_right))
+                          ],
+                        )),
+                    podcast(context),
                     Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20.0),
                         child: Row(

@@ -124,7 +124,10 @@ class _ReadTabbarState extends State<ReadTabbar> {
                 MaterialPageRoute(
                     builder: (context) =>
                         ArticleDetail(articleItem: articleList[index]))),
-            child: ArtcileItem(articleModel: articleList[index])));
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15.0),
+              child: ArtcileItem(articleModel: articleList[index]),
+            )));
   }
 
   Future<List<ArticleModel>> getArticle() {

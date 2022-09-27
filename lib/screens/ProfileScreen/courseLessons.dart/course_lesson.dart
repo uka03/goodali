@@ -17,10 +17,18 @@ class CourseLessonType extends StatefulWidget {
 
 class _CourseLessonTypeState extends State<CourseLessonType> {
   late final future = getCoursesTasks(widget.id);
+  int initialPage = 0;
   List<CourseLessonsTasksModel> allTasks = [];
   List<String> tasksName = [];
   String taskType = "Унших материал";
   bool isLoading = true;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,18 +52,25 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
                       itemCount: taskList.length,
                       itemBuilder: (context, index) {
                         return InkWell(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => CourseTasks(
-                                      title: widget.title,
-                                      courseTasks: taskList))),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => CourseTasks(
+                                        initialPage: index,
+                                        title: widget.title,
+                                        courseTasks: taskList))).then((value) {
+                              if (value != null) {
+                                initialPage = value;
+                              }
+                            });
+                          },
                           focusColor: MyColors.input,
                           splashColor: MyColors.input,
                           hoverColor: MyColors.input,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 20),
+                                vertical: 20, horizontal: 20),
                             child: Row(
                               children: [
                                 Text(
@@ -65,6 +80,7 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
                                     style: const TextStyle(
                                         color: MyColors.black, fontSize: 16)),
                                 const Spacer(),
+
                                 Container(
                                   height: 20,
                                   width: 20,
@@ -73,6 +89,15 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
                                       border: Border.all(
                                           width: 1.5, color: MyColors.border1)),
                                 )
+                                // : const CircleAvatar(
+                                //     radius: 11,
+                                //     backgroundColor: MyColors.success,
+                                //     child: Icon(
+                                //       Icons.done,
+                                //       color: Colors.white,
+                                //       size: 18,
+                                //     ),
+                                //   )
                               ],
                             ),
                           ),
