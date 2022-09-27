@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/Widgets/custom_readmore_text.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_all_tab.dart';
@@ -37,11 +40,15 @@ class _ListenTabbarState extends State<ListenTabbar> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Consumer<Auth>(
           builder: (context, value, child) => FutureBuilder(
-            future: value.isAuth ? getalbumListLogged() : getProducts(),
+            future: Future.wait([
+              value.isAuth ? getalbumListLogged() : getProducts(),
+              getPodcastList()
+            ]),
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.done &&
                   snapshot.hasData) {
-                albumList = snapshot.data;
+                albumList = snapshot.data[0];
+                List<PodcastListModel> podcastList = snapshot.data[1];
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +95,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
                                 icon: const Icon(IconlyLight.arrow_right))
                           ],
                         )),
-                    podcast(context),
+                    podcast(context, podcastList),
                     Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20.0),
                         child: Row(
@@ -137,7 +144,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
     );
   }
 
-  Widget podcast(BuildContext context) {
+  Widget podcast(BuildContext context, List<PodcastListModel> podcastList) {
     return ListView.separated(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
@@ -150,35 +157,31 @@ class _ListenTabbarState extends State<ListenTabbar> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                      color: Colors.blue[100],
-                      borderRadius: BorderRadius.circular(6)),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: ImageView(
+                      height: 40,
+                      width: 40,
+                      imgPath: podcastList[index].banner ?? ""),
                 ),
                 const SizedBox(width: 15),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        "#25 Гоо Даль-ийн дэвэлт...",
+                        podcastList[index].title ?? "",
                         maxLines: 1,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: MyColors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 10),
-                      Text(
-                        "Энэ хэсэгт аудио подкастын тайлбар байна. Аудиог огт тоглуулаагүй, эхлүүлээгүй байвал ингэж харагдана, текст багтахгүй хэтэрсэн бол...",
-                        style: TextStyle(
-                          color: MyColors.gray,
-                          fontSize: 12,
-                        ),
+                      const SizedBox(height: 10),
+                      CustomReadMoreText(
+                        text: podcastList[index].body ?? "",
                       ),
                     ],
                   ),
@@ -219,7 +222,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
           ],
         );
       },
-      itemCount: 3,
+      itemCount: podcastList.length,
       separatorBuilder: (BuildContext context, int index) => const Divider(
         endIndent: 18,
         indent: 18,
@@ -233,5 +236,9 @@ class _ListenTabbarState extends State<ListenTabbar> {
 
   Future<List<Products>> getalbumListLogged() {
     return Connection.getalbumListLogged(context);
+  }
+
+  Future<List<PodcastListModel>> getPodcastList() {
+    return Connection.getPodcastList(context);
   }
 }

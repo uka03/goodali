@@ -125,7 +125,7 @@ class _ReadTabbarState extends State<ReadTabbar> {
                     builder: (context) =>
                         ArticleDetail(articleItem: articleList[index]))),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 15.0),
+              padding: const EdgeInsets.only(top: 20.0),
               child: ArtcileItem(articleModel: articleList[index]),
             )));
   }

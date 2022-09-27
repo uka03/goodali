@@ -88,6 +88,13 @@ class _AlbumDetailState extends State<AlbumDetail> {
     setAlbumIntroAudio();
   }
 
+  @override
+  void dispose() {
+    introAudioPlayer.dispose();
+    audioPlayer.map((e) => e.dispose());
+    super.dispose();
+  }
+
   setAlbumIntroAudio() {
     try {
       introAudioPlayer
@@ -120,14 +127,12 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
     // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
-      print(moodItemID);
-      print(item.productID);
       if (moodItemID == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
     }
     Duration savedPosition = Duration(milliseconds: saveddouble);
-    print("position $savedPosition");
+
     return savedPosition;
   }
 
@@ -389,7 +394,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   introAudioPlayer.pause();
                 }
               }
-
               return AlbumDetailItem(
                 products: product[index],
                 isBought: false,

@@ -45,7 +45,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
           body: ListView.separated(
             itemCount: widget.articleModel.length,
             itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
               child: GestureDetector(
                   onTap: () => Navigator.push(
                       context,

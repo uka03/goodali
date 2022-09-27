@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
+
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/models/article_model.dart';
 
 class ArtcileItem extends StatelessWidget {
@@ -11,12 +14,13 @@ class ArtcileItem extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          height: 70,
-          width: 70,
-          decoration: BoxDecoration(
-              color: MyColors.secondary,
-              borderRadius: BorderRadius.circular(12)),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: ImageView(
+            imgPath: articleModel.banner ?? "",
+            width: 70,
+            height: 70,
+          ),
         ),
         Expanded(
           child: Padding(
@@ -32,12 +36,12 @@ class ArtcileItem extends StatelessWidget {
                     )),
                 const SizedBox(height: 10),
                 Text(
-                  articleModel.body ?? "",
+                  parseHtmlString(articleModel.body ?? ""),
                   style: const TextStyle(
                       fontSize: 12, color: MyColors.gray, height: 1.5),
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 3,
                 ),
               ],
             ),

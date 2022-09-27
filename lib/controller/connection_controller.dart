@@ -12,6 +12,7 @@ import 'package:goodali/models/course_lessons_model.dart';
 import 'package:goodali/models/course_lessons_tasks.dart';
 import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/models/my_all_lectures.dart';
+import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/models/mood_item.dart';
@@ -586,6 +587,26 @@ class Connection {
       print("error logged lectures $error");
 
       return {};
+    }
+  }
+
+  static Future<List<PodcastListModel>> getPodcastList(
+      BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypeNone).post(Urls.podcastList);
+      print("getPodcastList ${response.data}");
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => PodcastListModel.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (error) {
+      print("error podcast list $error");
+      return [];
     }
   }
 }
