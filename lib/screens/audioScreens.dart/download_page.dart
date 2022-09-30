@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
@@ -9,14 +10,16 @@ import 'package:provider/provider.dart';
 class DownloadPage extends StatelessWidget {
   final Stream<FileResponse>? fileStream;
   final VoidCallback downloadFile;
-  final Products products;
+  final Products? products;
+  final PodcastListModel? podcastItem;
 
-  const DownloadPage({
-    Key? key,
-    this.fileStream,
-    required this.downloadFile,
-    required this.products,
-  }) : super(key: key);
+  const DownloadPage(
+      {Key? key,
+      this.fileStream,
+      required this.downloadFile,
+      this.products,
+      this.podcastItem})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +33,16 @@ class DownloadPage extends StatelessWidget {
         if (snapshot.hasData) {
           if (loading) {
             bool finished = (snapshot.data as DownloadProgress).progress == 1;
-            String audioPath = (snapshot.data as DownloadProgress).originalUrl;
+
             if (finished == true) {
-              downloadAudio.addAudio(products, audioPath);
-              print("finiiiisheeeeeed");
+              if (products != null) {
+                downloadAudio.addAudio(products ?? Products());
+                print("downloaded audio");
+              } else {
+                downloadAudio.addPodcast(podcastItem ?? PodcastListModel());
+
+                print("downloaded podcast");
+              }
             }
             double? percent = (snapshot.data as DownloadProgress).progress;
 
@@ -62,8 +71,9 @@ class DownloadPage extends StatelessWidget {
                       color: MyColors.primaryColor),
                   splashRadius: 1,
                 ),
-                const Text("Татсан",
-                    style: TextStyle(fontSize: 12, color: MyColors.gray))
+                if (products != null)
+                  const Text("Татсан",
+                      style: TextStyle(fontSize: 12, color: MyColors.gray))
               ],
             );
           }
@@ -77,8 +87,9 @@ class DownloadPage extends StatelessWidget {
                 icon: const Icon(IconlyLight.arrow_down, color: MyColors.gray),
                 splashRadius: 1,
               ),
-              const Text("Татах",
-                  style: TextStyle(fontSize: 12, color: MyColors.gray))
+              if (products != null)
+                const Text("Татах",
+                    style: TextStyle(fontSize: 12, color: MyColors.gray))
             ],
           );
         }

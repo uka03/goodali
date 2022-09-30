@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_podcast.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/not_listened_podcast.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
 
 class Podcast extends StatefulWidget {
@@ -63,9 +66,9 @@ class _PodcastState extends State<Podcast> {
               },
               body: const TabBarView(children: [
                 PodcastAll(),
-                ReadTabbar(),
-                FeelTabbar(),
-                CourseTabbar()
+                NotListenedPodcast(),
+                DownloadedPodcast(),
+                ListenedPodcast()
               ]))),
     );
   }

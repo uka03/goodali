@@ -31,7 +31,7 @@ class MoodListItem extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(.0),
             child: Text(
-              getMoodList?.title?.capitalize() ?? "",
+              getMoodList?.title ?? "",
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,

@@ -38,7 +38,7 @@ class AlbumItem extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            albumData.title?.capitalize() ?? "",
+            albumData.title ?? "",
             style: const TextStyle(fontWeight: FontWeight.w200),
           ),
           const SizedBox(height: 5),

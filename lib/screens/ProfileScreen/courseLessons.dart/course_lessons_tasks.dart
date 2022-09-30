@@ -17,7 +17,7 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
-import 'package:goodali/models/course_lessons_tasks.dart';
+import 'package:goodali/models/course_lessons_tasks_model.dart';
 
 import 'package:goodali/models/task_answer.dart';
 import 'package:iconly/iconly.dart';
@@ -32,8 +32,7 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 class CourseTasks extends StatefulWidget {
   final String? title;
   final List<CourseLessonsTasksModel> courseTasks;
-  final int? initialPage;
-
+  final double? initialPage;
   const CourseTasks(
       {Key? key, this.title, required this.courseTasks, this.initialPage})
       : super(key: key);
@@ -49,7 +48,7 @@ class _CourseTasksState extends State<CourseTasks> {
   List<TaskAnswers> taskAnswerList = [];
 
   late final PageController _pageController =
-      PageController(initialPage: widget.initialPage ?? 0);
+      PageController(initialPage: widget.initialPage?.toInt() ?? 0);
 
   List<bool> _checkboxValue = [];
   final _kDuration = const Duration(milliseconds: 300);
@@ -149,7 +148,7 @@ class _CourseTasksState extends State<CourseTasks> {
 
   @override
   void dispose() {
-    // _controller?.dispose();
+    _pageController.dispose();
     _setOrientation([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -174,158 +173,156 @@ class _CourseTasksState extends State<CourseTasks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: SimpleAppBar(title: widget.title ?? ""),
-        body: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: widget.courseTasks.length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    switch (widget.courseTasks[index].type) {
-                      case 0:
-                      case 1:
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-                          child: type0(widget.courseTasks[index], index),
-                        );
-                      // case 1:
-                      //   return Padding(
-                      //     padding: const EdgeInsets.all(20),
-                      //     child: type1(widget.courseTasks[index], index),
-                      //   );
-                      case 2:
-                        initiliazeAudio(
-                            Urls.networkPath +
-                                widget.courseTasks[index].listenAudio!,
-                            widget.courseTasks[index].id ?? 0);
+        appBar: SimpleAppBar(
+            title: widget.title ?? "",
+            backFunction: () {
+              Navigator.pop(context, _current);
+            }),
+        body: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: widget.courseTasks.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      switch (widget.courseTasks[index].type) {
+                        case 0:
+                        case 1:
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                            child: type0(widget.courseTasks[index], index),
+                          );
+                        // case 1:
+                        //   return Padding(
+                        //     padding: const EdgeInsets.all(20),
+                        //     child: type1(widget.courseTasks[index], index),
+                        //   );
+                        case 2:
+                          initiliazeAudio(
+                              Urls.networkPath +
+                                  widget.courseTasks[index].listenAudio!,
+                              widget.courseTasks[index].id ?? 0);
 
-                        return Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: listen(widget.courseTasks[index]),
-                        );
+                          return Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: listen(widget.courseTasks[index]),
+                          );
 
-                      case 4:
-                        initiliazeVideo(Urls.networkPath +
-                            widget.courseTasks[index].videoUrl!);
+                        case 4:
+                          initiliazeVideo(Urls.networkPath +
+                              widget.courseTasks[index].videoUrl!);
 
-                        return video(widget.courseTasks[index], index);
+                          return video(widget.courseTasks[index], index);
 
-                      case 5:
-                      case 6:
-                        return Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: exercise(widget.courseTasks[index], index),
-                        );
+                        case 5:
+                        case 6:
+                          return Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: exercise(widget.courseTasks[index], index),
+                          );
 
-                      default:
-                        return Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: type0(widget.courseTasks[index], index),
-                        );
-                    }
-                  }),
-            ),
-            Positioned(
-                bottom: 30,
-                // right: 35,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        height: 50,
-                        width: 70,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            border:
-                                Border.all(color: MyColors.gray, width: 0.5),
-                            borderRadius: BorderRadius.circular(14)),
-                        child: Center(
-                          child: Wrap(children: [
-                            Text(
-                              ((_current + 1).toInt()).toString(),
-                              style: const TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const Text("/",
-                                style: TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 16,
-                                )),
-                            Text(widget.courseTasks.length.toString(),
+                        default:
+                          return Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: type0(widget.courseTasks[index], index),
+                          );
+                      }
+                    }),
+              ),
+              Positioned(
+                  bottom: 30,
+                  // right: 35,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          height: 50,
+                          width: 70,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              border:
+                                  Border.all(color: MyColors.gray, width: 0.5),
+                              borderRadius: BorderRadius.circular(14)),
+                          child: Center(
+                            child: Wrap(children: [
+                              Text(
+                                ((_current + 1).toInt()).toString(),
                                 style: const TextStyle(
                                     color: MyColors.black,
                                     fontSize: 16,
-                                    fontWeight: FontWeight.bold)),
-                          ]),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const Text("/",
+                                  style: TextStyle(
+                                    color: MyColors.black,
+                                    fontSize: 16,
+                                  )),
+                              Text(widget.courseTasks.length.toString(),
+                                  style: const TextStyle(
+                                      color: MyColors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                            ]),
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: CustomElevatedButton(
-                              onPress: () async {
-                                _pageController.nextPage(
-                                    curve: _kCurve, duration: _kDuration);
-                                saveAnswer(
-                                        widget.courseTasks[_current.toInt()].id
-                                            .toString(),
-                                        widget.courseTasks[_current.toInt()]
-                                                        .type ==
-                                                    4 ||
-                                                widget
-                                                        .courseTasks[
-                                                            _current.toInt()]
-                                                        .type ==
-                                                    2
-                                            ? _checkboxValue[_current.toInt()]
-                                                .toString()
-                                            : _controllers[_current.toInt()]
-                                                .text,
-                                        _controllers[_current.toInt()].text ==
-                                                    "" ||
-                                                _checkboxValue[
-                                                        _current.toInt()] ==
-                                                    false
-                                            ? 0
-                                            : 1)
-                                    .then((value) {
-                                  if (value == true) {
-                                    if (_current + 1 ==
-                                        widget.courseTasks.length) {
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20.0),
+                            child: CustomElevatedButton(
+                                onPress: () async {
+                                  _pageController.nextPage(
+                                      curve: _kCurve, duration: _kDuration);
+
+                                  if (_controllers[_current.toInt()].text !=
+                                          "" ||
+                                      _checkboxValue[_current.toInt()] ==
+                                          true) {
+                                    saveAnswer(
+                                            widget.courseTasks[_current.toInt()]
+                                                .id
+                                                .toString(),
+                                            _controllers[_current.toInt()].text,
+                                            1)
+                                        .then((value) {
                                       showTopSnackBar(
                                           context,
                                           const CustomTopSnackBar(
                                             type: 1,
                                             text: "Амжилттай хадгалагдлаа",
                                           ));
-                                      Navigator.pop(context, _current);
-                                    }
+                                    });
                                   }
-                                });
-                              },
-                              text: _current + 1 == widget.courseTasks.length
-                                  ? "Дуусгах"
-                                  : "Дараах"),
+                                  if (_current + 1 ==
+                                      widget.courseTasks.length) {
+                                    Navigator.pop(context, _current);
+                                  }
+                                },
+                                text: _current + 1 == widget.courseTasks.length
+                                    ? "Дуусгах"
+                                    : "Дараах"),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                )),
-          ],
+                      ],
+                    ),
+                  )),
+            ],
+          ),
         ));
   }
 
   Widget type0(CourseLessonsTasksModel courseTask, int index) {
+    _controllers[index].text = courseTask.answerData == ""
+        ? _controllers[index].text
+        : courseTask.answerData ?? "";
     return SingleChildScrollView(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,

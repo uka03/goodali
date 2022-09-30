@@ -47,7 +47,7 @@ class CartProductItem extends StatelessWidget {
                 child: Text(
                   products.title == ""
                       ? products.traingName ?? ""
-                      : products.title?.capitalize() ?? "",
+                      : products.title ?? "",
                   style: const TextStyle(color: MyColors.black),
                 ),
               ),

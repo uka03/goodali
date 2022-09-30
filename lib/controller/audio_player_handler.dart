@@ -17,75 +17,51 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final _player = AudioPlayer();
 
   AudioPlayerHandler() {
-    _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
+    // _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
 
     // mediaItem.add(item);
-
+    _transformEvent();
     // _listenForDurationChanges();
     // _listenForCurrentSongIndexChanges();
     // _listenForSequenceStateChanges();
   }
-  PlaybackState _transformEvent(PlaybackEvent event) {
-    return PlaybackState(
-      controls: [
-        // MediaControl.rewind,
-        MediaControl.skipToPrevious,
-        if (_player.playing) MediaControl.pause else MediaControl.play,
-        MediaControl.stop,
-        MediaControl.skipToNext,
-      ],
-      systemActions: const {
-        MediaAction.seek,
-      },
-      androidCompactActionIndices: const [0, 1, 3],
-      processingState: const {
-        ProcessingState.idle: AudioProcessingState.idle,
-        ProcessingState.loading: AudioProcessingState.loading,
-        ProcessingState.buffering: AudioProcessingState.buffering,
-        ProcessingState.ready: AudioProcessingState.ready,
-        ProcessingState.completed: AudioProcessingState.completed,
-      }[_player.processingState]!,
-      playing: _player.playing,
-      updatePosition: _player.position,
-      bufferedPosition: _player.bufferedPosition,
-      speed: _player.speed,
-      // queueIndex: event.currentIndex,
-    );
+  void _transformEvent() {
+    _player.playbackEventStream.listen((PlaybackEvent event) {
+      playbackState.add(playbackState.value.copyWith(
+        controls: [
+          // MediaControl.rewind,
+          MediaControl.skipToPrevious,
+          if (_player.playing) MediaControl.pause else MediaControl.play,
+          MediaControl.stop,
+          MediaControl.skipToNext,
+        ],
+        systemActions: const {
+          MediaAction.seek,
+        },
+        androidCompactActionIndices: const [0, 1, 3],
+        processingState: const {
+          ProcessingState.idle: AudioProcessingState.idle,
+          ProcessingState.loading: AudioProcessingState.loading,
+          ProcessingState.buffering: AudioProcessingState.buffering,
+          ProcessingState.ready: AudioProcessingState.ready,
+          ProcessingState.completed: AudioProcessingState.completed,
+        }[_player.processingState]!,
+        playing: _player.playing,
+        updatePosition: _player.position,
+        bufferedPosition: _player.bufferedPosition,
+        speed: _player.speed,
+        // queueIndex: event.currentIndex,
+      ));
+    });
   }
 
   void _listenForDurationChanges() {
-    _player.durationStream.listen((duration) {
-      var index = _player.currentIndex;
-      final newQueue = queue.value;
-      if (index == null || newQueue.isEmpty) return;
-      if (_player.shuffleModeEnabled) {
-        index = _player.shuffleIndices![index];
-      }
-      final oldMediaItem = newQueue[index];
-      final newMediaItem = oldMediaItem.copyWith(duration: duration);
-      newQueue[index] = newMediaItem;
-      queue.add(newQueue);
-      mediaItem.add(newMediaItem);
-    });
-  }
+    print("_listenForDurationChanges");
+    _player.positionStream.listen((duration) {});
+    _player.positionStream.listen((duration) {
+      // final newMediaItem = _player.currentIndex.copyWith(duration: duration);
 
-  void _listenForCurrentSongIndexChanges() {
-    _player.currentIndexStream.listen((index) {
-      final playlist = queue.value;
-      if (index == null || playlist.isEmpty) return;
-      if (_player.shuffleModeEnabled) {
-        index = _player.shuffleIndices![index];
-      }
-      mediaItem.add(playlist[index]);
-    });
-  }
-
-  void _listenForSequenceStateChanges() {
-    _player.sequenceStateStream.listen((SequenceState? sequenceState) {
-      final sequence = sequenceState?.effectiveSequence;
-      if (sequence == null || sequence.isEmpty) return;
-      final items = sequence.map((source) => source.tag as MediaItem);
-      queue.add(items.toList());
+      // mediaItem.add(newMediaItem);
     });
   }
 
@@ -101,19 +77,27 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   Future<void> playMediaItem(MediaItem item) async {
     mediaItem.add(item);
     print("player media item");
-    // updateMediaItem(item);
-    await _player.setAudioSource(AudioSource.uri(Uri.parse(item.id)));
+
+    await _player.setAudioSource(AudioSource.uri(Uri.parse(item.id)),
+        initialPosition: item.extras?['position'] != Duration.zero
+            ? Duration(microseconds: (item.extras?['position'] * 1000).toInt())
+            : Duration.zero);
   }
 
   @override
   Future<void> pause() async {
     print("audio handler pause");
+
     _player.pause();
     return super.pause();
   }
 
   @override
-  Future<void> seek(Duration position) => _player.seek(position);
+  Future<void> seek(Duration position) {
+    print("audio handler seeeeek");
+    _player.seek(position);
+    return super.pause();
+  }
 
   @override
   Future<void> skipToNext() => _player.seekToNext();

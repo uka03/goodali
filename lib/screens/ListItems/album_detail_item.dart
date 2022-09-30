@@ -36,7 +36,6 @@ class AlbumDetailItem extends StatefulWidget {
   final bool isBought;
   final AudioPlayer audioPlayer;
   final List<AudioPlayer> audioPlayerList;
-  final int currentIndex;
   // final Duration duration;
   // final Dura
 
@@ -48,7 +47,6 @@ class AlbumDetailItem extends StatefulWidget {
       required this.isBought,
       required this.audioPlayer,
       required this.audioPlayerList,
-      required this.currentIndex,
       required this.setIndex,
       this.albumProducts})
       : super(key: key);
@@ -58,19 +56,17 @@ class AlbumDetailItem extends StatefulWidget {
 }
 
 class _AlbumDetailItemState extends State<AlbumDetailItem> {
-  bool isPlaying = false;
-  bool isClicked = false;
-  Duration duration = Duration.zero;
-  Duration position = Duration.zero;
-
-  double sliderValue = 0.0;
-  Duration savedPosition = Duration.zero;
-  int saveddouble = 0;
   FileInfo? fileInfo;
   File? audioFile;
-  String url = "";
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
+  Duration savedPosition = Duration.zero;
 
+  int saveddouble = 0;
   int currentIndex = 0;
+  bool isClicked = false;
+  bool isPlaying = false;
+  String url = "";
 
   @override
   void initState() {
@@ -79,14 +75,11 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     String audioURL = Urls.networkPath + widget.products.audio!;
     String introURL = Urls.networkPath + widget.products.intro!;
 
-    print(widget.products.isBought);
     url = widget.isBought == true
         ? audioURL
         : widget.products.isBought == true
             ? audioURL
             : introURL;
-
-    print(url);
 
     getCachedFile(url);
 
@@ -95,6 +88,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   @override
   void dispose() {
+    widget.audioPlayer.dispose();
     super.dispose();
   }
 
@@ -155,8 +149,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     List<AudioPlayerModel> decodedProduct = decodedAudioString
         .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
         .toList();
-
-    // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
       if (moodItemID == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
@@ -331,6 +323,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   }
 
   showIntroAudioModal() {
+    widget.audioPlayer.pause();
     showModalBottomSheet(
         context: context,
         isDismissible: false,
@@ -341,11 +334,13 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
+              builder:
+                  (BuildContext _, void Function(void Function()) setState) {
+                // setState(() {});
                 return IntroAudio(
                     products: widget.products,
-                    productsList: widget.productsList);
+                    productsList: widget.productsList,
+                    audioPlayer: widget.audioPlayer);
               },
             ));
   }
@@ -364,7 +359,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
       ));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Product is already added in cart"),
+        content: Text("Сагсанд байна"),
         backgroundColor: MyColors.error,
         duration: Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,

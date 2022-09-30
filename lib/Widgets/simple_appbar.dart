@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 class SimpleAppBar extends StatelessWidget with PreferredSizeWidget {
   final String? title;
   final bool noCard;
-  const SimpleAppBar({Key? key, this.title, this.noCard = false})
+  final VoidCallback? backFunction;
+  const SimpleAppBar(
+      {Key? key, this.title, this.noCard = false, this.backFunction})
       : super(key: key);
 
   @override
@@ -19,9 +21,14 @@ class SimpleAppBar extends StatelessWidget with PreferredSizeWidget {
       elevation: 0,
       centerTitle: false,
       leading: IconButton(
-        icon: const Icon(IconlyLight.arrow_left),
-        onPressed: () => Navigator.pop(context),
-      ),
+          icon: const Icon(IconlyLight.arrow_left),
+          onPressed: () {
+            if (backFunction != null) {
+              backFunction!();
+            } else {
+              Navigator.pop(context);
+            }
+          }),
       actions: [
         noCard
             ? Container()

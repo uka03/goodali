@@ -105,7 +105,6 @@ class _MyCoursesState extends State<MyCourses> {
                   albumName: albumName,
                   productsList: allLectures,
                   audioPlayerList: audioPlayer,
-                  currentIndex: currentIndex,
                   setIndex: (int index) {
                     setState(() {
                       currentIndex = index;

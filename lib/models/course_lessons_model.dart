@@ -23,7 +23,7 @@ class Lesson {
   String? banner;
   String? expiry;
   int? id;
-  bool? isBought;
+  int? isBought;
   String? name;
 
   Lesson({this.banner, this.expiry, this.id, this.isBought, this.name});
@@ -32,7 +32,7 @@ class Lesson {
     banner = json['banner'] ?? "";
     expiry = json['expiry'] ?? "";
     id = json['id'] ?? 0;
-    isBought = json['is_bought'] ?? false;
+    isBought = json['is_bought'] ?? 0;
     name = json['name'] ?? "";
   }
 

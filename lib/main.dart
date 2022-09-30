@@ -6,6 +6,7 @@ import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/global_variables.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audio_player_handler.dart';
@@ -59,6 +60,8 @@ class _MyAppState extends State<MyApp> {
             create: (_) => AudioPlayerProvider()),
         ChangeNotifierProvider<AudioDownloadProvider>(
             create: (_) => AudioDownloadProvider()),
+        ChangeNotifierProvider<PodcastProvider>(
+            create: (_) => PodcastProvider()),
       ],
       child: Consumer<Auth>(
         builder: (context, value, child) {
@@ -87,6 +90,8 @@ class _MyAppState extends State<MyApp> {
                       (context, AsyncSnapshot<SharedPreferences> snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
+                        print("Connection none");
+                        return const Blank();
                       case ConnectionState.waiting:
                         return const Blank();
                       default:

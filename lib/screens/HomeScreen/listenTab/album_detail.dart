@@ -52,6 +52,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   bool isClicked = false;
   int currentIndex = 1;
   Duration savedPosition = Duration.zero;
+
   int saveddouble = 0;
 
   @override
@@ -91,7 +92,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   @override
   void dispose() {
     introAudioPlayer.dispose();
-    audioPlayer.map((e) => e.dispose());
+    // audioPlayer.map((e) => e.dispose());
     super.dispose();
   }
 
@@ -105,9 +106,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
           if (value != Duration.zero) {
             savedPosition = value;
             position = savedPosition;
-            // if (position != Duration.zero) {
-            //   introAudioPlayer.seek(position);
-            // }
+
             introAudioPlayer.setUrl(Urls.networkPath + widget.products.audio!,
                 initialPosition: position);
           } else {}
@@ -138,7 +137,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     final cart = Provider.of<CartProvider>(context);
     return WillPopScope(
       onWillPop: () async {
@@ -399,7 +397,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
                 isBought: false,
                 albumName: widget.products.title!,
                 audioPlayer: audioPlayer[index],
-                currentIndex: currentIndex,
                 audioPlayerList: audioPlayer,
                 productsList: product,
                 albumProducts: widget.products,
@@ -435,7 +432,10 @@ class _AlbumDetailState extends State<AlbumDetail> {
         builder: (_) => StatefulBuilder(
               builder: (BuildContext context,
                   void Function(void Function()) setState) {
-                return IntroAudio(products: widget.products, productsList: []);
+                return IntroAudio(
+                    products: widget.products,
+                    productsList: [],
+                    audioPlayer: introAudioPlayer);
               },
             ));
   }

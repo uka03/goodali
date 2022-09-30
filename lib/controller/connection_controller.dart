@@ -9,7 +9,7 @@ import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/article_model.dart';
 import 'package:goodali/models/course_lessons_model.dart';
-import 'package:goodali/models/course_lessons_tasks.dart';
+import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/models/my_all_lectures.dart';
 import 'package:goodali/models/podcast_list_model.dart';
@@ -512,24 +512,15 @@ class Connection {
     }
   }
 
-  static Future<List<CourseLesson>> getCoursesLessons(
+  static Future<List<Lesson>> getCoursesLessons(
       BuildContext context, String id) async {
-    print("getCoursesLessons");
     try {
       final response = await Http()
           .getDio(context, headerTypebearer)
           .get(Urls.getCoursesLessons + id);
-      print("response.data");
 
       if (response.statusCode == 200) {
-        List<CourseLesson> lessonData = [];
-
-        for (var item in (response.data as List)) {
-          lessonData
-              .add(CourseLesson.fromJson(Map<String, dynamic>.from(item)));
-        }
-
-        return lessonData;
+        return (response.data as List).map((e) => Lesson.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {

@@ -11,12 +11,12 @@ import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
-import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
+import 'package:goodali/models/podcast_list_model.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
@@ -30,16 +30,18 @@ import 'dart:developer' as developer;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PlayAudio extends StatefulWidget {
-  final Products products;
+  final Products? products;
+  final PodcastListModel? podcastItem;
   final String albumName;
   final bool? isDownloaded;
   final String? downloadedAudioPath;
   const PlayAudio(
       {Key? key,
-      required this.products,
+      this.products,
       required this.albumName,
       this.isDownloaded = false,
-      this.downloadedAudioPath})
+      this.downloadedAudioPath,
+      this.podcastItem})
       : super(key: key);
 
   @override
@@ -61,7 +63,6 @@ class _PlayAudioState extends State<PlayAudio> {
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
-  Duration savedPos = Duration.zero;
 
   File? audioFile;
 
@@ -75,32 +76,29 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   void initState() {
     super.initState();
-    // print(widget.products.);
 
-    url = Urls.networkPath + widget.products.audio!;
+    String audioUrl = widget.products?.audio ?? widget.podcastItem?.audio ?? "";
+    url = Urls.networkPath + audioUrl;
+
+    print("play_audio $url");
     getCachedFile(url);
   }
 
   @override
   void dispose() {
     audioPlayer.dispose();
-
+// audioHandler.customAction('dispose');
     super.dispose();
   }
 
   getCachedFile(String url) async {
-    fileInfo = await checkCacheFor(url);
-
-    developer.log(fileInfo?.file.path ?? "jfn");
-    _initAudioPlayer(url, fileInfo);
+    await checkCacheFor(url).then((value) => _initAudioPlayer(url, value));
   }
 
   void _downloadFile() {
     setState(() {
       fileStream =
           CustomCacheManager.instance.getFileStream(url, withProgress: true);
-
-      print("fileStream ");
     });
   }
 
@@ -117,46 +115,28 @@ class _PlayAudioState extends State<PlayAudio> {
   _initAudioPlayer(String url, FileInfo? fileInfo) async {
     try {
       if (fileInfo != null) {
-        developer.log(fileInfo.file.path);
-
+        print("fileInfo hoooson bish");
         audioFile = fileInfo.file;
-        audioPlayer.setFilePath(audioFile!.path);
+
         duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
               setState(() => isLoading = false);
               return value;
             }) ??
             Duration.zero;
       } else {
-        developer.log(url);
+        print("fileInfo hoooson");
         duration = await audioPlayer.setUrl(url).then((value) {
               setState(() => isLoading = false);
               return value;
             }) ??
             Duration.zero;
       }
-      audioPlayer.positionStream.listen((event) {
-        if (event.inMilliseconds != 0) {
-          AudioPlayerModel _audio = AudioPlayerModel(
-              productID: widget.products.productId,
-              audioPosition: event.inMilliseconds);
-          print(_audio);
-          Provider.of<AudioPlayerProvider>(context, listen: false)
-              .addAudioPosition(_audio);
-        }
-      });
 
-      MediaItem item = MediaItem(
-        id: url,
-        title: widget.products.title ?? "",
-        duration: duration,
-        artUri: Uri.parse(Urls.networkPath + widget.products.banner!),
-      );
+      String banner =
+          widget.products?.banner ?? widget.podcastItem?.banner ?? "";
 
-      developer.log("edit ${item.id}");
-      developer.log("edit ${item.duration}");
-
+      MediaItem item;
       getSavedPosition().then((value) {
-        developer.log(value.toString());
         setState(() {
           _durationState =
               Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
@@ -167,15 +147,29 @@ class _PlayAudioState extends State<PlayAudio> {
                       progress: position,
                       buffered: buffered,
                       total: mediaItem?.duration));
-          print("duration $duration");
-          if (value == Duration.zero) {
-            audioHandler.playMediaItem(item);
-          } else {
-            print(value);
-            audioHandler.seek(value);
-          }
+          position = value;
+          audioHandler.playbackState.listen((PlaybackState state) {
+            if (!state.playing) {
+              AudioPlayerModel _audio = AudioPlayerModel(
+                  productID:
+                      widget.products?.productId ?? widget.podcastItem?.id,
+                  audioPosition: position.inMilliseconds);
+              savePosition(_audio);
+            }
+          });
 
-          {}
+          item = MediaItem(
+              id: url,
+              title: widget.products?.title ?? widget.podcastItem?.title ?? "",
+              duration: duration,
+              artUri: Uri.parse(Urls.networkPath + banner),
+              extras: {"position": position.inMilliseconds});
+
+          developer.log("edit ${item.id}");
+          developer.log("duration ${item.duration}");
+          developer.log("duration ${item.extras?['position']}");
+
+          audioHandler.playMediaItem(item);
         });
       });
 
@@ -188,16 +182,29 @@ class _PlayAudioState extends State<PlayAudio> {
     }
   }
 
+  savePosition(AudioPlayerModel audio) async {
+    List<AudioPlayerModel> _audioItems = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(audio.audioPosition);
+    print(audio.productID);
+    _audioItems.add(audio);
+    List<String> encodedProducts =
+        _audioItems.map((res) => json.encode(res.toJson())).toList();
+    prefs.setStringList("save_audio", encodedProducts);
+  }
+
   Future getSavedPosition() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
+
     List<AudioPlayerModel> decodedProduct = decodedAudioString
         .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
         .toList();
 
-    // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
-      if (widget.products.productId == item.productID) {
+      if (widget.products == null && widget.podcastItem?.id == item.productID) {
+        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
+      } else if (widget.products?.productId == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
     }
@@ -229,7 +236,8 @@ class _PlayAudioState extends State<PlayAudio> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: ImageView(
-                imgPath: widget.products.banner ?? "",
+                imgPath:
+                    widget.products?.banner ?? widget.podcastItem?.banner ?? "",
                 width: 220,
                 height: 220,
               ),
@@ -241,7 +249,7 @@ class _PlayAudioState extends State<PlayAudio> {
             ),
             const SizedBox(height: 10),
             Text(
-              widget.products.title?.capitalize() ?? "",
+              widget.products?.title ?? widget.podcastItem?.title ?? "",
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 24,
@@ -269,7 +277,8 @@ class _PlayAudioState extends State<PlayAudio> {
                     : DownloadPage(
                         fileStream: fileStream,
                         downloadFile: _downloadFile,
-                        products: widget.products),
+                        products: widget.products,
+                        podcastItem: widget.podcastItem),
                 Column(
                   children: [
                     IconButton(
@@ -278,7 +287,9 @@ class _PlayAudioState extends State<PlayAudio> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => AudioDescription(
-                                    description: widget.products.body ?? "")));
+                                    description: widget.products?.body ??
+                                        widget.podcastItem?.body ??
+                                        "")));
                       },
                       icon: const Icon(
                         IconlyLight.info_square,
@@ -332,13 +343,9 @@ class _PlayAudioState extends State<PlayAudio> {
         stream: _durationState,
         builder: (context, snapshot) {
           final durationState = snapshot.data;
-          position = savedPos == Duration.zero
-              ? durationState?.progress ?? Duration.zero
-              : position;
+          position = durationState?.progress ?? Duration.zero;
           final buffered = durationState?.buffered ?? Duration.zero;
-          duration = savedPos == Duration.zero
-              ? durationState?.total ?? Duration.zero
-              : duration;
+          duration = durationState?.total ?? Duration.zero;
 
           return ProgressBar(
             progress: position,
@@ -350,9 +357,9 @@ class _PlayAudioState extends State<PlayAudio> {
             progressBarColor: MyColors.primaryColor,
             bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
             baseBarColor: MyColors.border1,
-            onSeek: (duration) async {
-              await audioHandler.seek(duration);
-              await audioHandler.play();
+            onSeek: (duration) {
+              audioHandler.seek(duration);
+              audioHandler.play();
             },
           );
         });
@@ -390,9 +397,9 @@ class _PlayAudioState extends State<PlayAudio> {
               size: 40.0,
             ),
             onPressed: () {
-              print("judujbds ${widget.products.id}");
               AudioPlayerModel _audio = AudioPlayerModel(
-                  productID: widget.products.productId,
+                  productID:
+                      widget.products?.productId ?? widget.podcastItem?.id,
                   audioPosition: position.inMilliseconds);
               audioPosition.addAudioPosition(_audio);
               audioHandler.pause();
@@ -405,8 +412,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
   buttonForward15Seconds() {
     position = position + const Duration(seconds: 15);
-    print(position);
-    print(duration);
+
     if (duration > position) {
       audioHandler.seek(position);
     } else if (duration < position) {

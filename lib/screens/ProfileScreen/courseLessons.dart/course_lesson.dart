@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
-import 'package:goodali/models/course_lessons_tasks.dart';
+import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/screens/ProfileScreen/courseLessons.dart/course_lessons_tasks.dart';
 
 class CourseLessonType extends StatefulWidget {
@@ -16,8 +16,9 @@ class CourseLessonType extends StatefulWidget {
 }
 
 class _CourseLessonTypeState extends State<CourseLessonType> {
-  late final future = getCoursesTasks(widget.id);
-  int initialPage = 0;
+  // late final future =
+  List<CourseLessonsTasksModel> taskList = [];
+  double initialPage = 0;
   List<CourseLessonsTasksModel> allTasks = [];
   List<String> tasksName = [];
   String taskType = "Унших материал";
@@ -25,7 +26,7 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    getCoursesTasks(widget.id);
     super.initState();
   }
 
@@ -33,85 +34,79 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: SimpleAppBar(title: widget.title, noCard: true),
-        body: FutureBuilder(
-          future: future,
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData &&
-                ConnectionState.done == snapshot.connectionState) {
-              List<CourseLessonsTasksModel> taskList = snapshot.data;
-              if (taskList.isEmpty) {
-                return const Center(
-                  child: Text("Хичээл хоосон байна",
-                      style: TextStyle(color: MyColors.gray)),
-                );
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: taskList.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => CourseTasks(
-                                        initialPage: index,
-                                        title: widget.title,
-                                        courseTasks: taskList))).then((value) {
-                              if (value != null) {
-                                initialPage = value;
-                              }
-                            });
-                          },
-                          focusColor: MyColors.input,
-                          splashColor: MyColors.input,
-                          hoverColor: MyColors.input,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 20, horizontal: 20),
-                            child: Row(
-                              children: [
-                                Text(
-                                    (index + 1).toString() +
-                                        ". " +
-                                        tasksName[index],
-                                    style: const TextStyle(
-                                        color: MyColors.black, fontSize: 16)),
-                                const Spacer(),
-
-                                Container(
-                                  height: 20,
-                                  width: 20,
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          width: 1.5, color: MyColors.border1)),
-                                )
-                                // : const CircleAvatar(
-                                //     radius: 11,
-                                //     backgroundColor: MyColors.success,
-                                //     child: Icon(
-                                //       Icons.done,
-                                //       color: Colors.white,
-                                //       size: 18,
-                                //     ),
-                                //   )
-                              ],
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: MyColors.primaryColor))
+            : taskList.isEmpty
+                ? const Center(
+                    child: Text("Хичээл хоосон байна",
+                        style: TextStyle(color: MyColors.gray)),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: taskList.length,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => CourseTasks(
+                                              initialPage: index.toDouble(),
+                                              title: widget.title,
+                                              courseTasks: taskList)))
+                                  .then((value) {
+                                if (value != null) {
+                                  initialPage = value;
+                                }
+                                setState(() {
+                                  print("pop hiisnii daraa");
+                                  getCoursesTasks(widget.id);
+                                });
+                              });
+                            },
+                            focusColor: MyColors.input,
+                            splashColor: MyColors.input,
+                            hoverColor: MyColors.input,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 20, horizontal: 20),
+                              child: Row(
+                                children: [
+                                  Text(
+                                      (index + 1).toString() +
+                                          ". " +
+                                          tasksName[index],
+                                      style: const TextStyle(
+                                          color: MyColors.black, fontSize: 16)),
+                                  const Spacer(),
+                                  taskList[index].isAnswered == 0
+                                      ? Container(
+                                          height: 20,
+                                          width: 20,
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  width: 1.5,
+                                                  color: MyColors.border1)),
+                                        )
+                                      : const CircleAvatar(
+                                          radius: 11,
+                                          backgroundColor: MyColors.success,
+                                          child: Icon(
+                                            Icons.done,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                        )
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      }),
-                );
-              }
-            } else {
-              return const Center(
-                  child:
-                      CircularProgressIndicator(color: MyColors.primaryColor));
-            }
-          },
-        ));
+                          );
+                        }),
+                  ));
   }
 
   Future<List<CourseLessonsTasksModel>> getCoursesTasks(String lessonID) async {
@@ -148,6 +143,9 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
 
       tasksName.add(taskType);
     }
+    setState(() {
+      taskList = allTasks;
+    });
 
     return allTasks;
   }

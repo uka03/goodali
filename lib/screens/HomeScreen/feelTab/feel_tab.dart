@@ -61,7 +61,7 @@ class _FeelTabbarState extends State<FeelTabbar> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  moodMain[0].title?.capitalize() ?? "",
+                                  moodMain[0].title ?? "",
                                   style: const TextStyle(
                                       color: MyColors.black,
                                       fontWeight: FontWeight.bold,

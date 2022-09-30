@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/course_lessons_model.dart';
-import 'package:goodali/models/course_lessons_tasks.dart';
+import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/screens/ProfileScreen/courseLessons.dart/course_lesson.dart';
 import 'package:iconly/iconly.dart';
@@ -31,7 +33,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
   String id = "";
 
   List<CourseLessonsTasksModel> allTasks = [];
-  List<int> lessonID = [];
+
   List<String> tasksName = [];
   bool isLoading = true;
 
@@ -53,17 +55,17 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
         child: Column(children: [
           const SizedBox(height: 20),
           ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child:
-                  //  ImageView(
-                  //     imgPath: widget.coursesItems.banner ?? "",
-                  //     width: 190,
-                  //     height: 190),
-                  Container(
-                color: Colors.blueGrey,
+            borderRadius: BorderRadius.circular(12),
+            child: ImageView(
+                imgPath: widget.coursesItems.banner ?? "",
                 width: 190,
-                height: 190,
-              )),
+                height: 190),
+            //     Container(
+            //   color: Colors.blueGrey,
+            //   width: 190,
+            //   height: 190,
+            // )
+          ),
           const SizedBox(height: 20),
           Text(
             widget.lessonName,
@@ -74,7 +76,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
           ),
           const SizedBox(height: 20),
           const Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
               child: CustomReadMoreText(
                 text:
                     "Чиний амьдралыг уг үндсээр нь хувиргах трансформац-хөтөлбөрийн эхний бүлгийг нээж байгаад баяр хүргэе! Удиртгал хэсгийг уншаагүй бол заавал уншихыг зөвлөж ",
@@ -107,7 +109,9 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                     MaterialPageRoute(
                                         builder: (_) => CourseLessonType(
                                             title: lessons[index]?.name ?? "",
-                                            id: lessonID[index].toString())));
+                                            id: lessons[index]!
+                                                .id
+                                                .toString())));
                               },
                               // subtitle: Row(children: [
                               //   const Text(""),
@@ -150,14 +154,9 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
 
   Future<List<Lesson?>> getCoursesLessons() async {
     List<Lesson?> courseLessons = [];
-    lessonIdData = await Connection.getCoursesLessons(
+    courseLessons = await Connection.getCoursesLessons(
         context, widget.coursesItems.id.toString());
-    if (lessonIdData != []) {
-      for (var item in lessonIdData) {
-        courseLessons.add(item.lesson);
-        lessonID.add(item.id ?? 0);
-      }
-    }
+
     return courseLessons;
   }
 }

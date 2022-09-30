@@ -7,6 +7,8 @@ class CourseLessonsTasksModel {
   int? type;
   String? videoUrl;
   int? isAnswer;
+  String? answerData;
+  int? isAnswered;
 
   CourseLessonsTasksModel(
       {this.body,
@@ -16,7 +18,9 @@ class CourseLessonsTasksModel {
       this.question,
       this.type,
       this.isAnswer,
-      this.videoUrl});
+      this.videoUrl,
+      this.isAnswered,
+      this.answerData});
 
   CourseLessonsTasksModel.fromJson(Map<String, dynamic> json) {
     body = json['body'];
@@ -27,6 +31,8 @@ class CourseLessonsTasksModel {
     type = json['type'];
     videoUrl = json['video_url'];
     isAnswer = json['is_answer'];
+    answerData = json['answer_data'];
+    isAnswered = json['is_answered'] ?? 0;
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +45,8 @@ class CourseLessonsTasksModel {
     data['type'] = type;
     data['video_url'] = videoUrl;
     data['is_answer'] = isAnswer;
+    data['answer_data'] = answerData;
+    data['is_answered'] = isAnswered;
     return data;
   }
 }

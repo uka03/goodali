@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/models/products_model.dart';
@@ -95,19 +96,19 @@ class _MyCourseMainState extends State<MyCourseMain> {
                                         "Image failed to upload")
                                     ? ClipRRect(
                                         borderRadius: BorderRadius.circular(4),
-                                        child:
-                                            // ImageView(
-                                            //   imgPath:
-                                            //       coursesItemList[index].banner ??
-                                            //           "",
-                                            //   height: 48,
-                                            //   width: 48,
-                                            // ),
-                                            Container(
-                                          color: Colors.blueGrey,
-                                          width: 48,
+                                        child: ImageView(
+                                          imgPath:
+                                              coursesItemList[index].banner ??
+                                                  "",
                                           height: 48,
-                                        ))
+                                          width: 48,
+                                        ),
+                                        //     Container(
+                                        //   color: Colors.blueGrey,
+                                        //   width: 48,
+                                        //   height: 48,
+                                        // )
+                                      )
                                     : Container(
                                         decoration: BoxDecoration(
                                             color: Colors.grey[300],
@@ -121,11 +122,7 @@ class _MyCourseMainState extends State<MyCourseMain> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                        coursesItemList[index]
-                                                .name
-                                                ?.capitalize() ??
-                                            "",
+                                    Text(coursesItemList[index].name ?? "",
                                         style: const TextStyle(
                                             color: MyColors.black,
                                             fontSize: 16,
