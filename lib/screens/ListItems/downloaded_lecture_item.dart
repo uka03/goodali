@@ -147,15 +147,6 @@ class _DownloadedLectureItemState extends State<DownloadedLectureItem> {
         //   await audioSession.configure(const AudioSessionConfiguration.speech());
         //   AudioSessionSettings.handleInterruption(audioSession);
         // });
-      } else {
-        print("iisheee orood bgn bhda");
-        if (widget.products == null) {
-          Provider.of<AudioDownloadProvider>(context, listen: false)
-              .removePodcast(widget.podcastItem ?? PodcastListModel());
-        } else {
-          Provider.of<AudioDownloadProvider>(context, listen: false)
-              .removeAudio(widget.products ?? Products());
-        }
       }
     } catch (e) {
       print(e);

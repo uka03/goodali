@@ -29,11 +29,12 @@ class MoodListItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(60)),
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(.0),
+            padding: EdgeInsets.zero,
             child: Text(
               getMoodList?.title ?? "",
               textAlign: TextAlign.center,
               style: const TextStyle(
+                // fontSize: 12,
                 color: Colors.white,
               ),
             ),

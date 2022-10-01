@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
-import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/models/get_mood_list.dart';

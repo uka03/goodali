@@ -46,7 +46,6 @@ class _MoodDetailState extends State<MoodDetail> {
   final _kDuration = const Duration(milliseconds: 300);
   final _kCurve = Curves.easeIn;
   Stream<DurationState>? _durationState;
-  Stream<DurationState>? _progressBarState;
   List<MoodItem> moodItem = [];
   AudioPlayer audioPlayer = AudioPlayer();
   PlayerState? playerState;
@@ -79,17 +78,11 @@ class _MoodDetailState extends State<MoodDetail> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      _audioPlayerProvider =
-          Provider.of<AudioPlayerProvider>(context, listen: false);
-    });
-
     getMoodList().then((value) {
       moodItem = value;
       if (value.length == 1) {
-        print("url $url");
         initForOthers(Urls.networkPath + moodItem.first.audio!,
-            moodItem[_current.toInt() + 1].id ?? 0);
+            moodItem[_current.toInt()].id ?? 0);
       }
     });
     _pageController.addListener(() {
@@ -113,12 +106,12 @@ class _MoodDetailState extends State<MoodDetail> {
     });
   }
 
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print(state);
-    if (state == AppLifecycleState.paused) {
-      audioPlayer.stop();
-    }
-  }
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   print(state);
+  //   if (state == AppLifecycleState.paused) {
+  //     audioPlayer.stop();
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -128,6 +121,8 @@ class _MoodDetailState extends State<MoodDetail> {
     // _audioPlayerProvider.addAudioPosition(_audio);
     // print("dispose");
     audioPlayer.dispose();
+
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -137,38 +132,18 @@ class _MoodDetailState extends State<MoodDetail> {
 
   initForOthers(String url, int id) async {
     try {
-      print(url);
-      await audioPlayer.dynamicSet(url: url);
+      print("initForOthers $url");
+      // await audioPlayer.dynamicSet(url: url);
       duration = await audioPlayer.setUrl(url).then((value) {
             setState(() => isLoading = false);
             return value;
           }) ??
           Duration.zero;
 
-      MediaItem item = MediaItem(
-        id: url,
-        title: moodItem[_current.toInt()].title ?? "",
-        duration: duration,
-        // artUri: Uri.parse(moodItem[_current.toInt()].banner!),
-      );
-
-      developer.log("edit ${item.id}");
-      developer.log("edit ${item.duration}");
-
-      _durationState =
-          Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
-              audioHandler.mediaItem,
-              AudioService.position,
-              _bufferedPositionStream,
-              (mediaItem, position, buffered) => DurationState(
-                    progress: position,
-                    buffered: buffered,
-                    total: mediaItem?.duration,
-                  ));
-
       getSavedPosition(id).then((value) {
         developer.log(value.toString());
         setState(() {
+          position = value;
           _durationState =
               Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
                   audioHandler.mediaItem,
@@ -179,14 +154,14 @@ class _MoodDetailState extends State<MoodDetail> {
                       buffered: buffered,
                       total: mediaItem?.duration));
           print("duration $duration");
-          if (value == Duration.zero) {
-            audioHandler.playMediaItem(item);
-          } else {
-            print(value);
-            audioHandler.seek(value);
-          }
-
-          {}
+          MediaItem item = MediaItem(
+              id: url,
+              title: moodItem[_current.toInt()].title ?? "",
+              duration: duration,
+              artUri: Uri.parse(
+                  Urls.networkPath + moodItem[_current.toInt()].banner!),
+              extras: {"position": position.inMilliseconds});
+          audioHandler.playMediaItem(item);
         });
       });
 
