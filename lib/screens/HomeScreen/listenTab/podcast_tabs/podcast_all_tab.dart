@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:goodali/Providers/audio_provider.dart';
-import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
+import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:provider/provider.dart';
+
+// typedef OnTap = void Function(PodcastListModel audioObject);
+typedef OnTap(final PodcastListModel audioObject);
 
 class PodcastAll extends StatefulWidget {
-  const PodcastAll({Key? key}) : super(key: key);
+  final OnTap onTap;
+
+  const PodcastAll({Key? key, required this.onTap}) : super(key: key);
 
   @override
   State<PodcastAll> createState() => _PodcastAllState();
@@ -48,38 +51,46 @@ class _PodcastAllState extends State<PodcastAll> {
               snapshot.connectionState == ConnectionState.done) {
             List<PodcastListModel> podcastList = snapshot.data;
 
-            return ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(top: 13, bottom: 15),
-              itemBuilder: (BuildContext context, int index) {
-                audioPlayer.add(AudioPlayer());
+            return Stack(children: [
+              RefreshIndicator(
+                color: MyColors.primaryColor,
+                onRefresh: _refresh,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.only(top: 13, bottom: 15),
+                  itemBuilder: (BuildContext context, int index) {
+                    audioPlayer.add(AudioPlayer());
 
-                for (var i = 0; i < audioPlayer.length; i++) {
-                  if (currentIndex != i) {
-                    audioPlayer[i].pause();
-                  }
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: PodcastItem(
-                      setIndex: (int index) {
-                        setState(() {
-                          currentIndex = index;
-                        });
-                      },
-                      podcastItem: podcastList[index],
-                      audioPlayer: audioPlayer[index],
-                      audioPlayerList: audioPlayer),
-                );
-              },
-              itemCount: podcastList.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  const Divider(
-                endIndent: 18,
-                indent: 18,
+                    for (var i = 0; i < audioPlayer.length; i++) {
+                      if (currentIndex != i) {
+                        audioPlayer[i].pause();
+                      }
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: PodcastItem(
+                          onTap: () => widget.onTap(podcastList[index]),
+                          setIndex: (int index) {
+                            setState(() {
+                              currentIndex = index;
+                            });
+                          },
+                          podcastList: podcastList,
+                          podcastItem: podcastList[index],
+                          audioPlayer: audioPlayer[index],
+                          audioPlayerList: audioPlayer),
+                    );
+                  },
+                  itemCount: podcastList.length,
+                  separatorBuilder: (BuildContext context, int index) =>
+                      const Divider(
+                    endIndent: 18,
+                    indent: 18,
+                  ),
+                ),
               ),
-            );
+            ]);
           } else {
             return const Center(
                 child: CircularProgressIndicator(color: MyColors.primaryColor));
@@ -89,5 +100,9 @@ class _PodcastAllState extends State<PodcastAll> {
 
   Future<List<PodcastListModel>> getPodcastList() {
     return Connection.getPodcastList(context);
+  }
+
+  Future<void> _refresh() async {
+    setState(() {});
   }
 }

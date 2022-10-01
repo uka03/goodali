@@ -330,6 +330,7 @@ class _DownloadedLectureItemState extends State<DownloadedLectureItem> {
                         widget.podcastItem?.title ??
                         "",
                     isDownloaded: true,
+                    notifyParent: () {},
                   ),
                 );
               },

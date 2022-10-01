@@ -12,6 +12,7 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_ta
 import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
+import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
@@ -99,7 +100,11 @@ class _ListenTabbarState extends State<ListenTabbar> {
                               icon: const Icon(IconlyLight.arrow_right))
                         ],
                       )),
-                  const PodcastAll(),
+                  PodcastAll(
+                    onTap: (PodcastListModel audioObject) {
+                      currentlyPlaying.value = audioObject;
+                    },
+                  ),
                   Padding(
                       padding: const EdgeInsets.all(20),
                       child: Row(

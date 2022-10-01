@@ -22,6 +22,15 @@ extension StringExtension on String {
   }
 }
 
+double valueFromPercentageInRange(
+    {required final double min, max, percentage}) {
+  return percentage * (max - min) + min;
+}
+
+double percentageFromValueInRange({required final double min, max, value}) {
+  return (value - min) / (max - min);
+}
+
 String dateTimeFormatter(String dateTime) {
   final dateFormatter = DateFormat("yyyy-MM-dd");
   DateTime formatdate = dateFormatter.parse(dateTime);

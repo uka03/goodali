@@ -106,12 +106,14 @@ class _MoodDetailState extends State<MoodDetail> {
     });
   }
 
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   print(state);
-  //   if (state == AppLifecycleState.paused) {
-  //     audioPlayer.stop();
-  //   }
-  // }
+  savePosition(AudioPlayerModel audio) async {
+    List<AudioPlayerModel> _audioItems = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _audioItems.add(audio);
+    List<String> encodedProducts =
+        _audioItems.map((res) => json.encode(res.toJson())).toList();
+    prefs.setStringList("save_audio", encodedProducts);
+  }
 
   @override
   void dispose() {
@@ -153,7 +155,16 @@ class _MoodDetailState extends State<MoodDetail> {
                       progress: position,
                       buffered: buffered,
                       total: mediaItem?.duration));
-          print("duration $duration");
+
+          audioHandler.playbackState.listen((PlaybackState state) {
+            if (!state.playing) {
+              AudioPlayerModel _audio = AudioPlayerModel(
+                  productID: moodItem[_current.toInt()].id ?? 0,
+                  audioPosition: position.inMilliseconds);
+              savePosition(_audio);
+            }
+          });
+
           MediaItem item = MediaItem(
               id: url,
               title: moodItem[_current.toInt()].title ?? "",

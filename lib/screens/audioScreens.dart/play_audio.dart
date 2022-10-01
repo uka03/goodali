@@ -8,15 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Providers/audio_provider.dart';
+import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/podcast_list_model.dart';
+import 'package:miniplayer/miniplayer.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
@@ -29,7 +32,16 @@ import 'dart:developer' as developer;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+void onTap() {}
+
+ValueNotifier<PodcastListModel?> currentlyPlaying = ValueNotifier(null);
+final ValueNotifier<double> playerExpandProgress =
+    ValueNotifier(playerMinHeight);
+
+final MiniplayerController controller = MiniplayerController();
+
 class PlayAudio extends StatefulWidget {
+  final Function() notifyParent;
   final Products? products;
   final PodcastListModel? podcastItem;
   final String albumName;
@@ -41,7 +53,8 @@ class PlayAudio extends StatefulWidget {
       required this.albumName,
       this.isDownloaded = false,
       this.downloadedAudioPath,
-      this.podcastItem})
+      this.podcastItem,
+      required this.notifyParent})
       : super(key: key);
 
   @override
@@ -80,14 +93,12 @@ class _PlayAudioState extends State<PlayAudio> {
     String audioUrl = widget.products?.audio ?? widget.podcastItem?.audio ?? "";
     url = Urls.networkPath + audioUrl;
 
-    print("play_audio $url");
     getCachedFile(url);
   }
 
   @override
   void dispose() {
     audioPlayer.dispose();
-// audioHandler.customAction('dispose');
     super.dispose();
   }
 
@@ -185,8 +196,6 @@ class _PlayAudioState extends State<PlayAudio> {
   savePosition(AudioPlayerModel audio) async {
     List<AudioPlayerModel> _audioItems = [];
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(audio.audioPosition);
-    print(audio.productID);
     _audioItems.add(audio);
     List<String> encodedProducts =
         _audioItems.map((res) => json.encode(res.toJson())).toList();
@@ -219,120 +228,266 @@ class _PlayAudioState extends State<PlayAudio> {
   }
 
   Widget playAudio() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            Container(
-              width: 38,
-              height: 6,
-              decoration: BoxDecoration(
-                  color: MyColors.gray,
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-            const SizedBox(height: 40),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: ImageView(
-                imgPath:
-                    widget.products?.banner ?? widget.podcastItem?.banner ?? "",
-                width: 220,
-                height: 220,
-              ),
-            ),
-            const SizedBox(height: 40),
-            Text(
-              widget.albumName,
-              style: const TextStyle(fontSize: 12, color: MyColors.gray),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              widget.products?.title ?? widget.podcastItem?.title ?? "",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
-            ),
-            const SizedBox(height: 46),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                fileInfo != null
-                    ? Column(
-                        children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(IconlyLight.arrow_down,
-                                color: MyColors.primaryColor),
-                            splashRadius: 1,
+    return Miniplayer(
+        valueNotifier: playerExpandProgress,
+        minHeight: playerMinHeight,
+        maxHeight: playerMaxHeight,
+        controller: controller,
+        elevation: 4,
+        onDismissed: () => currentlyPlaying.value = null,
+        curve: Curves.easeOut,
+        builder: (height, percentage) {
+          final bool miniplayer = percentage < miniplayerPercentageDeclaration;
+          final double width = MediaQuery.of(context).size.width;
+          const double maxImgSize = 220;
+
+          var percentageExpandedPlayer = percentageFromValueInRange(
+              min: playerMaxHeight * miniplayerPercentageDeclaration +
+                  playerMinHeight,
+              max: playerMaxHeight,
+              value: height);
+          if (percentageExpandedPlayer < 0) percentageExpandedPlayer = 0;
+          final paddingVertical = valueFromPercentageInRange(
+              min: 0, max: 10, percentage: percentageExpandedPlayer);
+          final double heightWithoutPadding = height - paddingVertical * 2 / 5;
+          final double imageSize = heightWithoutPadding > maxImgSize
+              ? maxImgSize
+              : heightWithoutPadding;
+          final paddingLeft = valueFromPercentageInRange(
+                min: 0,
+                max: width - imageSize,
+                percentage: percentageExpandedPlayer,
+              ) /
+              2;
+          const buttonPlay = IconButton(
+            icon: Icon(Icons.pause),
+            onPressed: onTap,
+          );
+          //Declare additional widgets (eg. SkipButton) and variables
+          if (!miniplayer) {
+            return Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12))),
+              height: MediaQuery.of(context).size.height - 80,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                child: Opacity(
+                  opacity: percentageExpandedPlayer,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Container(
+                        width: 38,
+                        height: 6,
+                        decoration: BoxDecoration(
+                            color: MyColors.gray,
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      const SizedBox(height: 40),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: paddingLeft,
+                            top: paddingVertical,
+                            bottom: paddingVertical),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: ImageView(
+                            imgPath: widget.products?.banner ??
+                                widget.podcastItem?.banner ??
+                                "",
+                            width: imageSize,
+                            height: imageSize,
                           ),
-                          const Text("Татсан",
-                              style:
-                                  TextStyle(fontSize: 12, color: MyColors.gray))
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      Text(
+                        widget.albumName,
+                        style:
+                            const TextStyle(fontSize: 12, color: MyColors.gray),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        widget.products?.title ??
+                            widget.podcastItem?.title ??
+                            "",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                      const SizedBox(height: 46),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          fileInfo != null
+                              ? Column(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(IconlyLight.arrow_down,
+                                          color: MyColors.primaryColor),
+                                      splashRadius: 1,
+                                    ),
+                                    const Text("Татсан",
+                                        style: TextStyle(
+                                            fontSize: 12, color: MyColors.gray))
+                                  ],
+                                )
+                              : DownloadPage(
+                                  fileStream: fileStream,
+                                  downloadFile: _downloadFile,
+                                  products: widget.products,
+                                  podcastItem: widget.podcastItem),
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              AudioDescription(
+                                                  description:
+                                                      widget.products?.body ??
+                                                          widget.podcastItem
+                                                              ?.body ??
+                                                          "")));
+                                },
+                                icon: const Icon(
+                                  IconlyLight.info_square,
+                                  color: MyColors.gray,
+                                ),
+                                splashRadius: 1,
+                              ),
+                              const Text("Тайлбар",
+                                  style: TextStyle(
+                                      fontSize: 12, color: MyColors.gray))
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: audioPlayerWidget()),
+                      const SizedBox(height: 30),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          InkWell(
+                            onTap: buttonBackWard5Seconds,
+                            child: SvgPicture.asset(
+                              "assets/images/replay_5.svg",
+                            ),
+                          ),
+                          CircleAvatar(
+                              radius: 36,
+                              backgroundColor: MyColors.primaryColor,
+                              child: playerButton()),
+                          InkWell(
+                            onTap: buttonForward15Seconds,
+                            child: SvgPicture.asset(
+                              "assets/images/forward_15.svg",
+                            ),
+                          ),
                         ],
                       )
-                    : DownloadPage(
-                        fileStream: fileStream,
-                        downloadFile: _downloadFile,
-                        products: widget.products,
-                        podcastItem: widget.podcastItem),
-                Column(
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          final percentageMiniplayer = percentageFromValueInRange(
+              min: playerMinHeight,
+              max: playerMaxHeight * miniplayerPercentageDeclaration +
+                  playerMinHeight,
+              value: height);
+
+          final elementOpacity = 1 - 1 * percentageMiniplayer;
+          final progressIndicatorHeight = 4 - 4 * percentageMiniplayer;
+
+          return Column(
+            children: [
+              Expanded(
+                child: Row(
                   children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AudioDescription(
-                                    description: widget.products?.body ??
-                                        widget.podcastItem?.body ??
-                                        "")));
-                      },
-                      icon: const Icon(
-                        IconlyLight.info_square,
-                        color: MyColors.gray,
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: maxImgSize),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: ImageView(
+                          imgPath: widget.products?.banner ??
+                              widget.podcastItem?.banner ??
+                              "",
+                          width: imageSize,
+                          height: imageSize,
+                        ),
                       ),
-                      splashRadius: 1,
                     ),
-                    const Text("Тайлбар",
-                        style: TextStyle(fontSize: 12, color: MyColors.gray))
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Opacity(
+                          opacity: elementOpacity,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(widget.podcastItem?.title ?? "",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(fontSize: 16)),
+                              Text(
+                                widget.albumName,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2!
+                                          .color!
+                                          .withOpacity(0.55),
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                        icon: const Icon(Icons.fullscreen),
+                        onPressed: () {
+                          controller.animateToHeight(state: PanelState.MAX);
+                        }),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 3),
+                      child: Opacity(
+                        opacity: elementOpacity,
+                        child: buttonPlay,
+                      ),
+                    ),
                   ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: audioPlayerWidget()),
-            const SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InkWell(
-                  onTap: buttonBackWard5Seconds,
-                  child: SvgPicture.asset(
-                    "assets/images/replay_5.svg",
-                  ),
+              ),
+              SizedBox(
+                height: progressIndicatorHeight,
+                child: Opacity(
+                  opacity: elementOpacity,
+                  child: LinearProgressIndicator(value: 0.3),
                 ),
-                CircleAvatar(
-                    radius: 36,
-                    backgroundColor: MyColors.primaryColor,
-                    child: playerButton()),
-                InkWell(
-                  onTap: buttonForward15Seconds,
-                  child: SvgPicture.asset(
-                    "assets/images/forward_15.svg",
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
+              ),
+            ],
+          );
+        });
   }
 
   Widget audioPlayerWidget() {

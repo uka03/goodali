@@ -23,19 +23,23 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'dart:developer' as developer;
 
 typedef SetIndex = void Function(int index);
+typedef OnTap(PodcastItem audioObject);
 
 class PodcastItem extends StatefulWidget {
   final AudioPlayer audioPlayer;
   final PodcastListModel podcastItem;
   final List<AudioPlayer> audioPlayerList;
   final Function setIndex;
-
+  final List<PodcastListModel> podcastList;
+  final Function onTap;
   const PodcastItem(
       {Key? key,
       required this.podcastItem,
       required this.audioPlayer,
       required this.audioPlayerList,
-      required this.setIndex})
+      required this.setIndex,
+      required this.podcastList,
+      required this.onTap})
       : super(key: key);
 
   @override
@@ -223,9 +227,10 @@ class _PodcastItemState extends State<PodcastItem> {
 
                   podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
                   if (!podcastProvider.sameItemCheck) {
-                    podcastProvider.addListenedPodcast(widget.podcastItem);
+                    podcastProvider.addListenedPodcast(
+                        widget.podcastItem, widget.podcastList);
                   }
-
+                  widget.onTap();
                   if (isPlaying) {
                     await widget.audioPlayer.pause();
                   } else {

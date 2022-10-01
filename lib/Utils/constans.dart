@@ -5,4 +5,6 @@ const int headerTypebearer = 1;
 
 final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-const bool isStaging = true;
+const double playerMinHeight = 70;
+const miniplayerPercentageDeclaration = 0.2;
+const double playerMaxHeight = 800;

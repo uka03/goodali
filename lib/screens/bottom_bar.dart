@@ -1,12 +1,16 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
+import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/HomeScreen/home_screen.dart';
 import 'package:goodali/screens/ForumScreen/forum_screen.dart';
 import 'package:goodali/screens/ProfileScreen/settings.dart';
 import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
+import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
@@ -34,53 +38,97 @@ class _BottomTabbarState extends State<BottomTabbar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
         title: title,
         actionButton2: actionButton2,
         actionButton1: actionButton1,
         isCartButton: isCartButton,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        elevation: 0,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              activeIcon: Padding(
-                padding: EdgeInsets.only(bottom: 6.0),
-                child: Icon(Icons.circle_outlined),
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: playerExpandProgress,
+        builder: (BuildContext context, double height, Widget? child) {
+          final value = percentageFromValueInRange(
+              min: playerMinHeight, max: playerMaxHeight, value: height);
+
+          var opacity = 1 - value;
+          if (opacity < 0) opacity = 0;
+          if (opacity > 1) opacity = 1;
+
+          return SizedBox(
+            height:
+                kBottomNavigationBarHeight - kBottomNavigationBarHeight * value,
+            child: Transform.translate(
+              offset: Offset(0.0, kBottomNavigationBarHeight * value * 0.5),
+              child: Opacity(
+                opacity: opacity,
+                child: OverflowBox(
+                  maxHeight: kBottomNavigationBarHeight,
+                  child: child,
+                ),
               ),
-              icon: Padding(
-                padding: EdgeInsets.only(bottom: 6.0),
-                child: Icon(Icons.circle_outlined),
-              ),
-              label: 'Сэтгэл'),
-          BottomNavigationBarItem(
-              activeIcon: Padding(
-                padding: EdgeInsets.only(bottom: 6.0),
-                child: Icon(Icons.forum),
-              ),
-              icon: Padding(
-                padding: EdgeInsets.only(bottom: 6.0),
-                child: Icon(Icons.home_outlined),
-              ),
-              label: "Түүдэг гал"),
-          BottomNavigationBarItem(
-              activeIcon: Padding(
-                padding: EdgeInsets.only(bottom: 6.0),
-                child: Icon(IconlyLight.profile),
-              ),
-              icon: Padding(
-                padding: EdgeInsets.only(bottom: 6.0),
-                child: Icon(IconlyLight.profile),
-              ),
-              label: "Би")
-        ],
-        currentIndex: selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (int? value) {
-          onTabTapped(value!);
+            ),
+          );
         },
+        child: BottomNavigationBar(
+          elevation: 0,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(Icons.circle_outlined),
+                ),
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(Icons.circle_outlined),
+                ),
+                label: 'Сэтгэл'),
+            BottomNavigationBarItem(
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(Icons.forum),
+                ),
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(Icons.home_outlined),
+                ),
+                label: "Түүдэг гал"),
+            BottomNavigationBarItem(
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(IconlyLight.profile),
+                ),
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(IconlyLight.profile),
+                ),
+                label: "Би")
+          ],
+          currentIndex: selectedIndex,
+          type: BottomNavigationBarType.fixed,
+          onTap: (int? value) {
+            onTabTapped(value!);
+          },
+        ),
       ),
-      body: _widgetOptions[selectedIndex],
+      body: Stack(
+        children: [
+          _widgetOptions[selectedIndex],
+          ValueListenableBuilder(
+              valueListenable: currentlyPlaying,
+              builder: (BuildContext context, PodcastListModel? audioObject,
+                  Widget? child) {
+                print(audioObject?.title);
+                return audioObject != null
+                    ? PlayAudio(
+                        podcastItem: audioObject,
+                        albumName: '',
+                        notifyParent: () {},
+                      )
+                    : Container();
+              }),
+        ],
+      ),
     );
   }
 

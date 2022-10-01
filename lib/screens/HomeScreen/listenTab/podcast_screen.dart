@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/not_listened_podcast.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/unlistened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
+import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 
 class Podcast extends StatefulWidget {
   const Podcast({Key? key}) : super(key: key);
@@ -64,11 +66,13 @@ class _PodcastState extends State<Podcast> {
                       )))
                 ];
               },
-              body: const TabBarView(children: [
-                PodcastAll(),
-                NotListenedPodcast(),
-                DownloadedPodcast(),
-                ListenedPodcast()
+              body: TabBarView(children: [
+                PodcastAll(
+                  onTap: (audioObject) => currentlyPlaying.value = audioObject,
+                ),
+                const NotListenedPodcast(),
+                const DownloadedPodcast(),
+                const ListenedPodcast()
               ]))),
     );
   }

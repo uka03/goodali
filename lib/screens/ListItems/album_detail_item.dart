@@ -387,6 +387,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   child: PlayAudio(
                     products: widget.products,
                     albumName: widget.albumName,
+                    notifyParent: () {},
                   ),
                 );
               },
