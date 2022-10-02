@@ -78,7 +78,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     mediaItem.add(item);
     print("player media item");
 
-    await _player.setAudioSource(AudioSource.uri(Uri.parse(item.id)),
+    _player.setAudioSource(AudioSource.uri(Uri.parse(item.id)),
         initialPosition: item.extras?['position'] != Duration.zero
             ? Duration(microseconds: (item.extras?['position'] * 1000).toInt())
             : Duration.zero);

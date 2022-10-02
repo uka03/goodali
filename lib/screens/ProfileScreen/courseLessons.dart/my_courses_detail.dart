@@ -89,7 +89,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
               if (snapshot.connectionState == ConnectionState.done &&
                   snapshot.hasData) {
                 List<Lesson?> lessons = snapshot.data;
-
+                print(lessons);
                 if (lessons.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,

@@ -16,6 +16,7 @@ import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/podcast_list_model.dart';
@@ -35,6 +36,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 void onTap() {}
 
 ValueNotifier<PodcastListModel?> currentlyPlaying = ValueNotifier(null);
+ValueNotifier<DurationState?> durationState = ValueNotifier(const DurationState(
+  progress: Duration.zero,
+  buffered: Duration.zero,
+  total: Duration.zero,
+));
+ValueNotifier<ButtonState?> buttonNotifier = ValueNotifier(ButtonState.paused);
+
 final ValueNotifier<double> playerExpandProgress =
     ValueNotifier(playerMinHeight);
 
@@ -92,13 +100,14 @@ class _PlayAudioState extends State<PlayAudio> {
 
     String audioUrl = widget.products?.audio ?? widget.podcastItem?.audio ?? "";
     url = Urls.networkPath + audioUrl;
-
+    print(controller.value);
     getCachedFile(url);
   }
 
   @override
   void dispose() {
     audioPlayer.dispose();
+
     super.dispose();
   }
 
@@ -234,7 +243,6 @@ class _PlayAudioState extends State<PlayAudio> {
         maxHeight: playerMaxHeight,
         controller: controller,
         elevation: 4,
-        onDismissed: () => currentlyPlaying.value = null,
         curve: Curves.easeOut,
         builder: (height, percentage) {
           final bool miniplayer = percentage < miniplayerPercentageDeclaration;
@@ -249,10 +257,9 @@ class _PlayAudioState extends State<PlayAudio> {
           if (percentageExpandedPlayer < 0) percentageExpandedPlayer = 0;
           final paddingVertical = valueFromPercentageInRange(
               min: 0, max: 10, percentage: percentageExpandedPlayer);
-          final double heightWithoutPadding = height - paddingVertical * 2 / 5;
-          final double imageSize = heightWithoutPadding > maxImgSize
-              ? maxImgSize
-              : heightWithoutPadding;
+          final double heightWithoutPadding = height - paddingVertical * 2 / 9;
+          final double imageSize =
+              heightWithoutPadding > maxImgSize ? maxImgSize : 48;
           final paddingLeft = valueFromPercentageInRange(
                 min: 0,
                 max: width - imageSize,
@@ -410,82 +417,82 @@ class _PlayAudioState extends State<PlayAudio> {
               value: height);
 
           final elementOpacity = 1 - 1 * percentageMiniplayer;
-          final progressIndicatorHeight = 4 - 4 * percentageMiniplayer;
+          final progressIndicatorHeight = 3 - 3 * percentageMiniplayer;
 
-          return Column(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: maxImgSize),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: ImageView(
-                          imgPath: widget.products?.banner ??
-                              widget.podcastItem?.banner ??
-                              "",
-                          width: imageSize,
-                          height: imageSize,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Opacity(
-                          opacity: elementOpacity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(widget.podcastItem?.title ?? "",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText2!
-                                      .copyWith(fontSize: 16)),
-                              Text(
-                                widget.albumName,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText2!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .color!
-                                          .withOpacity(0.55),
-                                    ),
-                              ),
-                            ],
+          return GestureDetector(
+            onTap: () => controller.animateToHeight(state: PanelState.MAX),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      ConstrainedBox(
+                        constraints:
+                            const BoxConstraints(maxHeight: maxImgSize),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: ImageView(
+                            imgPath: widget.products?.banner ??
+                                widget.podcastItem?.banner ??
+                                "",
+                            width: imageSize,
+                            height: imageSize,
                           ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                        icon: const Icon(Icons.fullscreen),
-                        onPressed: () {
-                          controller.animateToHeight(state: PanelState.MAX);
-                        }),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 3),
-                      child: Opacity(
-                        opacity: elementOpacity,
-                        child: buttonPlay,
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Opacity(
+                            opacity: elementOpacity,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(widget.podcastItem?.title ?? "",
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.bold,
+                                        color: MyColors.black)),
+                                Text(
+                                  widget.albumName,
+                                  style: const TextStyle(
+                                      fontSize: 12, color: MyColors.gray),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(right: 3),
+                        child: Opacity(
+                          opacity: elementOpacity,
+                          child: buttonPlay,
+                        ),
+                      ),
+                      IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            currentlyPlaying.value = null;
+                          }),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: progressIndicatorHeight,
-                child: Opacity(
-                  opacity: elementOpacity,
-                  child: LinearProgressIndicator(value: 0.3),
+                SizedBox(
+                  height: progressIndicatorHeight,
+                  child: Opacity(
+                    opacity: elementOpacity,
+                    child: LinearProgressIndicator(
+                        value: 0.3,
+                        backgroundColor: MyColors.border1,
+                        color: MyColors.primaryColor),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         });
   }

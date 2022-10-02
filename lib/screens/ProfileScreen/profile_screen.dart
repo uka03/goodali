@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/models/user_info.dart';
@@ -11,6 +12,7 @@ import 'package:goodali/screens/Auth/pincode_feild.dart';
 import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_bought_courses.dart';
 import 'package:goodali/screens/ProfileScreen/downloaded.dart';
 import 'package:goodali/screens/ProfileScreen/edit_profile.dart';
+import 'package:goodali/screens/ProfileScreen/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,6 +60,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        title: 'Би',
+        actionButton2: Consumer<Auth>(
+          builder: (context, value, child) => value.isAuth
+              ? IconButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const Settings()));
+                  },
+                  icon: const Icon(Icons.more_horiz,
+                      size: 28, color: MyColors.black))
+              : Container(),
+        ),
+        actionButton1: null,
+        isCartButton: false,
+      ),
       body: Consumer<Auth>(
         builder: (BuildContext context, value, Widget? child) {
           if (value.isAuth == true) {

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/file.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -11,10 +9,8 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
-import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class ListenTabbar extends StatefulWidget {
@@ -92,8 +88,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
                                   fontWeight: FontWeight.bold)),
                           IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                    context,
+                                Navigator.of(context, rootNavigator: true).push(
                                     MaterialPageRoute(
                                         builder: (_) => const Podcast()));
                               },

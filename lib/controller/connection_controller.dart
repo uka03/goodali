@@ -514,6 +514,7 @@ class Connection {
 
   static Future<List<Lesson>> getCoursesLessons(
       BuildContext context, String id) async {
+    print("getCoursesLessons $id");
     try {
       final response = await Http()
           .getDio(context, headerTypebearer)

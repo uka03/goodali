@@ -5,9 +5,20 @@ class PodcastListModel {
   int? status;
   String? title;
   String? audio;
+  int? duration;
+  int? position;
+  String? albumName;
 
   PodcastListModel(
-      {this.banner, this.body, this.id, this.status, this.title, this.audio});
+      {this.banner,
+      this.body,
+      this.id,
+      this.status,
+      this.title,
+      this.audio,
+      this.albumName,
+      this.duration,
+      this.position});
 
   PodcastListModel.fromJson(Map<String, dynamic> json) {
     banner = json['banner'];
@@ -16,6 +27,9 @@ class PodcastListModel {
     status = json['status'];
     title = json['title'];
     audio = json['audio'];
+    duration = json['duration'] ?? 0;
+    position = json['position'] ?? 0;
+    albumName = json['albumName'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -26,6 +40,9 @@ class PodcastListModel {
     data['status'] = status;
     data['title'] = title;
     data['audio'] = audio;
+    data['duration'] = duration;
+    data['position'] = position;
+    data['albumName'] = albumName;
     return data;
   }
 }

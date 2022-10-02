@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
@@ -29,6 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        title: 'Сэтгэл',
+        actionButton2: null,
+        // actionButton1: actionButton1,
+        isCartButton: true,
+      ),
       body: DefaultTabController(
         length: 4,
         child: NestedScrollView(

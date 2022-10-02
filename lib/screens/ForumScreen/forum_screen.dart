@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/Widgets/search_bar.dart';
 import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
@@ -19,65 +20,81 @@ class ForumScreen extends StatefulWidget {
 class _ForumScreenState extends State<ForumScreen> {
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: NestedScrollView(
-        physics: const NeverScrollableScrollPhysics(),
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              collapsedHeight: 80,
-              expandedHeight: 80,
-              backgroundColor: Colors.white,
-              flexibleSpace: Container(
-                margin: const EdgeInsets.all(18),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                  color: MyColors.input,
-                ),
-                child: Row(
-                  children: [
-                    const Icon(IconlyLight.edit),
-                    const SizedBox(width: 14),
-                    SizedBox(
-                      width: 200,
-                      child: TextField(
-                        onTap: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => CreatePost()));
-                        },
-                        cursorColor: MyColors.primaryColor,
-                        decoration: const InputDecoration(
-                            border: InputBorder.none, hintText: "Пост нэмэх"),
+    return Scaffold(
+      appBar: CustomAppBar(
+        title: 'Түүдэг гал',
+        actionButton2: IconButton(
+            onPressed: () {},
+            icon: const Icon(IconlyLight.bookmark,
+                size: 28, color: MyColors.black)),
+        actionButton1: IconButton(
+            onPressed: () {},
+            icon:
+                const Icon(IconlyLight.heart, size: 28, color: MyColors.black)),
+        isCartButton: false,
+      ),
+      body: DefaultTabController(
+        length: 3,
+        child: NestedScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              SliverAppBar(
+                collapsedHeight: 80,
+                expandedHeight: 80,
+                backgroundColor: Colors.white,
+                flexibleSpace: Container(
+                  margin: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    color: MyColors.input,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(IconlyLight.edit),
+                      const SizedBox(width: 14),
+                      SizedBox(
+                        width: 200,
+                        child: TextField(
+                          onTap: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => CreatePost()));
+                          },
+                          cursorColor: MyColors.primaryColor,
+                          decoration: const InputDecoration(
+                              border: InputBorder.none, hintText: "Пост нэмэх"),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SliverPersistentHeader(
-                floating: false,
-                pinned: true,
-                delegate: MyDelegate(
-                  const TabBar(
-                    isScrollable: true,
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    tabs: [
-                      SizedBox(width: 110, child: Tab(text: "Хүний байгаль")),
-                      SizedBox(width: 110, child: Tab(text: "Нууц бүлгэм")),
-                      SizedBox(width: 110, child: Tab(text: "Миний найз"))
-                    ],
-                    labelColor: MyColors.primaryColor,
-                    unselectedLabelColor: MyColors.black,
-                    indicatorColor: MyColors.primaryColor,
-                  ),
-                ))
-          ];
-        },
-        body: const TabBarView(
-            children: [NatureOfHuman(), NuutsBulgem(), NuutsBulgem()]),
+              SliverPersistentHeader(
+                  floating: false,
+                  pinned: true,
+                  delegate: MyDelegate(
+                    const TabBar(
+                      isScrollable: true,
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      tabs: [
+                        SizedBox(width: 110, child: Tab(text: "Хүний байгаль")),
+                        SizedBox(width: 110, child: Tab(text: "Нууц бүлгэм")),
+                        SizedBox(width: 110, child: Tab(text: "Миний найз"))
+                      ],
+                      labelColor: MyColors.primaryColor,
+                      unselectedLabelColor: MyColors.black,
+                      indicatorColor: MyColors.primaryColor,
+                    ),
+                  ))
+            ];
+          },
+          body: const TabBarView(
+              children: [NatureOfHuman(), NuutsBulgem(), NuutsBulgem()]),
+        ),
       ),
     );
   }

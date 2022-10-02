@@ -65,7 +65,7 @@ class _MyCourseMainState extends State<MyCourseMain> {
                       snapshot.connectionState == ConnectionState.done) {
                     List<CoursesItems> coursesItemList = snapshot.data;
                     return ListView.builder(
-                      itemCount: 6,
+                      itemCount: coursesItemList.length,
                       itemBuilder: (context, index) {
                         allTasks = coursesItemList[index].allTask ?? 0;
                         doneTasks = coursesItemList[index].done ?? 0;
@@ -96,19 +96,19 @@ class _MyCourseMainState extends State<MyCourseMain> {
                                         "Image failed to upload")
                                     ? ClipRRect(
                                         borderRadius: BorderRadius.circular(4),
-                                        child: ImageView(
-                                          imgPath:
-                                              coursesItemList[index].banner ??
-                                                  "",
-                                          height: 48,
+                                        child:
+                                            // ImageView(
+                                            //   imgPath:
+                                            //       coursesItemList[index].banner ??
+                                            //           "",
+                                            //   height: 48,
+                                            //   width: 48,
+                                            // ),
+                                            Container(
+                                          color: Colors.blueGrey,
                                           width: 48,
-                                        ),
-                                        //     Container(
-                                        //   color: Colors.blueGrey,
-                                        //   width: 48,
-                                        //   height: 48,
-                                        // )
-                                      )
+                                          height: 48,
+                                        ))
                                     : Container(
                                         decoration: BoxDecoration(
                                             color: Colors.grey[300],

@@ -126,8 +126,14 @@ class _PodcastItemState extends State<PodcastItem> {
           widget.audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(url)));
         }
       }
-    } catch (e) {
-      print(e);
+    } on PlayerInterruptedException catch (e) {
+      developer.log(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Алдаа гарлаа"),
+        backgroundColor: MyColors.error,
+        duration: Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ));
     }
   }
 

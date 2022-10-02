@@ -5,11 +5,9 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
-import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:just_audio/just_audio.dart';
 
-// typedef OnTap = void Function(PodcastListModel audioObject);
-typedef OnTap(final PodcastListModel audioObject);
+typedef OnTap = Function(PodcastListModel audioObject);
 
 class PodcastAll extends StatefulWidget {
   final OnTap onTap;
