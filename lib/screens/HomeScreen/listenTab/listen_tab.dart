@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/podcast_list_model.dart';
@@ -11,6 +12,7 @@ import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
 import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class ListenTabbar extends StatefulWidget {
@@ -96,8 +98,11 @@ class _ListenTabbarState extends State<ListenTabbar> {
                         ],
                       )),
                   PodcastAll(
-                    onTap: (PodcastListModel audioObject) {
+                    onTap: (PodcastListModel audioObject,
+                        List<PodcastListModel> podcastList) {
                       currentlyPlaying.value = audioObject;
+
+                      AudioPlayerController();
                     },
                   ),
                   Padding(
@@ -112,10 +117,10 @@ class _ListenTabbarState extends State<ListenTabbar> {
                                   fontWeight: FontWeight.bold)),
                           IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const VideoList()));
+                                // Navigator.push(
+                                //     context, sending message to a Handler on a dead thread
+                                //     MaterialPageRoute(
+                                //         builder: (_) => const VideoList()));
                               },
                               icon: const Icon(IconlyLight.arrow_right))
                         ],

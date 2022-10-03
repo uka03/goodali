@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/main.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:just_audio/just_audio.dart';
 
-typedef OnTap = Function(PodcastListModel audioObject);
+typedef OnTap = Function(
+    PodcastListModel audioObject, List<PodcastListModel> podcastList);
 
 class PodcastAll extends StatefulWidget {
   final OnTap onTap;
@@ -19,7 +22,7 @@ class PodcastAll extends StatefulWidget {
 }
 
 class _PodcastAllState extends State<PodcastAll> {
-  late final List<AudioPlayer> audioPlayer = [];
+  late final List<AudioPlayer> audioPlayers = [];
   late final future = getPodcastList();
   FileInfo? fileInfo;
   File? audioFile;
@@ -36,7 +39,7 @@ class _PodcastAllState extends State<PodcastAll> {
 
   @override
   void dispose() {
-    audioPlayer.map((e) => e.dispose());
+    audioPlayers.map((e) => e.dispose());
     super.dispose();
   }
 
@@ -58,17 +61,18 @@ class _PodcastAllState extends State<PodcastAll> {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.only(top: 13, bottom: 15),
                   itemBuilder: (BuildContext context, int index) {
-                    audioPlayer.add(AudioPlayer());
+                    audioPlayers.add(AudioPlayer());
 
-                    for (var i = 0; i < audioPlayer.length; i++) {
+                    for (var i = 0; i < audioPlayers.length; i++) {
                       if (currentIndex != i) {
-                        audioPlayer[i].pause();
+                        audioPlayers[i].pause();
                       }
                     }
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: PodcastItem(
-                          onTap: () => widget.onTap(podcastList[index]),
+                          onTap: () =>
+                              widget.onTap(podcastList[index], podcastList),
                           setIndex: (int index) {
                             setState(() {
                               currentIndex = index;
@@ -76,8 +80,8 @@ class _PodcastAllState extends State<PodcastAll> {
                           },
                           podcastList: podcastList,
                           podcastItem: podcastList[index],
-                          audioPlayer: audioPlayer[index],
-                          audioPlayerList: audioPlayer),
+                          audioPlayer: audioPlayers[index],
+                          audioPlayerList: audioPlayers),
                     );
                   },
                   itemCount: podcastList.length,

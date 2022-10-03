@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
@@ -49,8 +52,10 @@ class _ListenedPodcastState extends State<ListenedPodcast> {
                         currentIndex = index;
                       });
                     },
-                    onTap: () {
-                      value.unListenedPodcast[index];
+                    onTap: (PodcastListModel podcastItem,
+                        AudioPlayer audioPlayer) {
+                      print("listened podcast ${podcastItem.audio}");
+                      currentlyPlaying.value = podcastItem;
                     },
                   ),
                 );

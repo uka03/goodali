@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +14,7 @@ class NotListenedPodcast extends StatefulWidget {
 }
 
 class _NotListenedPodcastState extends State<NotListenedPodcast> {
-  final List<AudioPlayer> audioPlayer = [];
+  final List<AudioPlayer> audioPlayers = [];
 
   int currentIndex = 0;
 
@@ -30,10 +32,10 @@ class _NotListenedPodcastState extends State<NotListenedPodcast> {
             padding: EdgeInsets.zero,
             itemCount: value.unListenedPodcast.length,
             itemBuilder: (context, index) {
-              audioPlayer.add(AudioPlayer());
-              for (var i = 0; i < audioPlayer.length; i++) {
+              audioPlayers.add(AudioPlayer());
+              for (var i = 0; i < audioPlayers.length; i++) {
                 if (currentIndex != i) {
-                  audioPlayer[i].pause();
+                  audioPlayers[i].pause();
                 }
               }
               return Padding(
@@ -41,16 +43,20 @@ class _NotListenedPodcastState extends State<NotListenedPodcast> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: PodcastItem(
                   podcastItem: value.unListenedPodcast[index],
-                  audioPlayer: audioPlayer[index],
-                  audioPlayerList: audioPlayer,
+                  audioPlayer: audioPlayers[index],
+                  audioPlayerList: audioPlayers,
                   setIndex: (int index) {
                     setState(() {
                       currentIndex = index;
                     });
                   },
                   podcastList: [],
-                  onTap: () {
-                    value.unListenedPodcast[index];
+                  onTap:
+                      (PodcastListModel podcastItem, AudioPlayer audioPlayer) {
+                    value.unListenedPodcast[index] = podcastItem;
+                    audioPlayers[index] = audioPlayer;
+                    print("unListened podcast ${podcastItem.audio}");
+                    currentlyPlaying.value = podcastItem;
                   },
                 ),
               );

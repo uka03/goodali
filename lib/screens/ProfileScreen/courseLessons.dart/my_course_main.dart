@@ -124,7 +124,7 @@ class _MyCourseMainState extends State<MyCourseMain> {
                                     Text(coursesItemList[index].name ?? "",
                                         style: const TextStyle(
                                             color: MyColors.black,
-                                            fontSize: 16,
+                                            fontSize: 14,
                                             fontWeight: FontWeight.bold)),
                                     const SizedBox(height: 8),
                                     Text(

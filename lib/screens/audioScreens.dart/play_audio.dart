@@ -15,6 +15,7 @@ import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audio_session.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/main.dart';
@@ -34,17 +35,6 @@ import 'dart:developer' as developer;
 import 'package:shared_preferences/shared_preferences.dart';
 
 void onTap() {}
-
-ValueNotifier<PodcastListModel?> currentlyPlaying = ValueNotifier(null);
-ValueNotifier<DurationState?> durationState = ValueNotifier(const DurationState(
-  progress: Duration.zero,
-  buffered: Duration.zero,
-  total: Duration.zero,
-));
-ValueNotifier<ButtonState?> buttonNotifier = ValueNotifier(ButtonState.paused);
-
-final ValueNotifier<double> playerExpandProgress =
-    ValueNotifier(playerMinHeight);
 
 final MiniplayerController controller = MiniplayerController();
 
@@ -158,26 +148,6 @@ class _PlayAudioState extends State<PlayAudio> {
       MediaItem item;
       getSavedPosition().then((value) {
         setState(() {
-          _durationState =
-              Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
-                  audioHandler.mediaItem,
-                  AudioService.position,
-                  _bufferedPositionStream,
-                  (mediaItem, position, buffered) => DurationState(
-                      progress: position,
-                      buffered: buffered,
-                      total: mediaItem?.duration));
-          position = value;
-          audioHandler.playbackState.listen((PlaybackState state) {
-            if (!state.playing) {
-              AudioPlayerModel _audio = AudioPlayerModel(
-                  productID:
-                      widget.products?.productId ?? widget.podcastItem?.id,
-                  audioPosition: position.inMilliseconds);
-              savePosition(_audio);
-            }
-          });
-
           item = MediaItem(
               id: url,
               title: widget.products?.title ?? widget.podcastItem?.title ?? "",
@@ -266,10 +236,7 @@ class _PlayAudioState extends State<PlayAudio> {
                 percentage: percentageExpandedPlayer,
               ) /
               2;
-          const buttonPlay = IconButton(
-            icon: Icon(Icons.pause),
-            onPressed: onTap,
-          );
+
           //Declare additional widgets (eg. SkipButton) and variables
           if (!miniplayer) {
             return Container(
@@ -381,7 +348,7 @@ class _PlayAudioState extends State<PlayAudio> {
                       const SizedBox(height: 40),
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: audioPlayerWidget()),
+                          child: progressBar()),
                       const SizedBox(height: 30),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -470,7 +437,28 @@ class _PlayAudioState extends State<PlayAudio> {
                         padding: const EdgeInsets.only(right: 3),
                         child: Opacity(
                           opacity: elementOpacity,
-                          child: buttonPlay,
+                          child: ValueListenableBuilder(
+                            valueListenable: buttonNotifier,
+                            builder:
+                                (context, ButtonState? buttonValue, widget) {
+                              if (buttonValue?.index == 0) {
+                                return const IconButton(
+                                  icon: Icon(Icons.play_arrow_rounded),
+                                  onPressed: onTap,
+                                );
+                              } else if (buttonValue?.index == 1) {
+                                return const IconButton(
+                                    onPressed: onTap,
+                                    icon: Icon(Icons.pause_rounded));
+                              } else {
+                                return const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: CircularProgressIndicator(
+                                      color: Colors.grey),
+                                );
+                              }
+                            },
+                          ),
                         ),
                       ),
                       IconButton(
@@ -482,32 +470,36 @@ class _PlayAudioState extends State<PlayAudio> {
                   ),
                 ),
                 SizedBox(
-                  height: progressIndicatorHeight,
-                  child: Opacity(
-                    opacity: elementOpacity,
-                    child: LinearProgressIndicator(
-                        value: 0.3,
-                        backgroundColor: MyColors.border1,
-                        color: MyColors.primaryColor),
-                  ),
-                ),
+                    height: progressIndicatorHeight,
+                    child: Opacity(
+                      opacity: elementOpacity,
+                      child: ValueListenableBuilder<DurationState>(
+                        valueListenable: durationStateNotifier,
+                        builder: (context, durationValue, widget) {
+                          print("durationValue ${durationValue.progress}");
+                          return LinearProgressIndicator(
+                            value:
+                                durationValue.progress!.inMinutes.toDouble() /
+                                    100,
+                            backgroundColor: MyColors.border1,
+                            color: MyColors.primaryColor,
+                          );
+                        },
+                      ),
+                    )),
               ],
             ),
           );
         });
   }
 
-  Widget audioPlayerWidget() {
-    final audioPosition =
-        Provider.of<AudioPlayerProvider>(context, listen: false);
-
-    return StreamBuilder<DurationState>(
-        stream: _durationState,
-        builder: (context, snapshot) {
-          final durationState = snapshot.data;
-          position = durationState?.progress ?? Duration.zero;
-          final buffered = durationState?.buffered ?? Duration.zero;
-          duration = durationState?.total ?? Duration.zero;
+  Widget progressBar() {
+    return ValueListenableBuilder<DurationState>(
+        valueListenable: durationStateNotifier,
+        builder: (context, durationValue, widget) {
+          position = durationValue.progress ?? Duration.zero;
+          final buffered = durationValue.buffered ?? Duration.zero;
+          duration = durationValue.total ?? Duration.zero;
 
           return ProgressBar(
             progress: position,
@@ -530,43 +522,45 @@ class _PlayAudioState extends State<PlayAudio> {
   Widget playerButton() {
     final audioPosition =
         Provider.of<AudioPlayerProvider>(context, listen: false);
-    return StreamBuilder<bool>(
-      stream:
-          audioHandler.playbackState.map((state) => state.playing).distinct(),
-      builder: (context, snapshot) {
-        final playing = snapshot.data ?? false;
-
-        if (isLoading) {
-          return const CircularProgressIndicator(color: Colors.white);
-        } else if (playing != true) {
-          return IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.play_arrow_rounded,
-              color: Colors.white,
-              size: 40.0,
-            ),
-            onPressed: () {
-              audioHandler.play();
-            },
-          );
-        } else {
-          return IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.pause_rounded,
-              color: Colors.white,
-              size: 40.0,
-            ),
-            onPressed: () {
-              AudioPlayerModel _audio = AudioPlayerModel(
-                  productID:
-                      widget.products?.productId ?? widget.podcastItem?.id,
-                  audioPosition: position.inMilliseconds);
-              audioPosition.addAudioPosition(_audio);
-              audioHandler.pause();
-            },
-          );
+    return ValueListenableBuilder(
+      valueListenable: buttonNotifier,
+      builder:
+          (BuildContext context, ButtonState? buttonValue, Widget? widget) {
+        print("buttonValue $buttonValue");
+        switch (buttonValue) {
+          case ButtonState.loading:
+            return const CircularProgressIndicator(color: Colors.white);
+          case ButtonState.paused:
+            return IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(
+                Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 40.0,
+              ),
+              onPressed: () {
+                audioHandler.play();
+              },
+            );
+          case ButtonState.playing:
+            return IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(
+                Icons.pause_rounded,
+                color: Colors.white,
+                size: 40.0,
+              ),
+              onPressed: () {
+                // AudioPlayerModel _audio = AudioPlayerModel(
+                //     productID:
+                //         widget.products?.productId ?? widget.podcastItem?.id,
+                //     audioPosition: position.inMilliseconds);
+                // audioPosition.addAudioPosition(_audio);
+                audioHandler.pause();
+              },
+            );
+          default:
+            return Container();
         }
       },
     );

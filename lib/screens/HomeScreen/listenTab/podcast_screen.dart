@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/unlistened_podcast.dart';
@@ -64,7 +65,11 @@ class _PodcastState extends State<Podcast> {
               },
               body: TabBarView(children: [
                 PodcastAll(
-                  onTap: (audioObject) => currentlyPlaying.value = audioObject,
+                  onTap: (audioObject, podcastList) {
+                    print("podcastscreen podcastall");
+                    currentlyPlaying.value = audioObject;
+                    AudioPlayerController();
+                  },
                 ),
                 const NotListenedPodcast(),
                 const DownloadedPodcast(),

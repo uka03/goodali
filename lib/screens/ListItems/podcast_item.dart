@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -11,6 +13,12 @@ import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/audio_player_handler.dart';
+import 'package:goodali/controller/audio_session.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/audioScreens.dart/download_page.dart';
@@ -23,7 +31,7 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'dart:developer' as developer;
 
 typedef SetIndex = void Function(int index);
-typedef OnTap(PodcastItem audioObject);
+typedef OnTap(PodcastListModel audioObject, AudioPlayer audioPlayer);
 
 class PodcastItem extends StatefulWidget {
   final AudioPlayer audioPlayer;
@@ -61,6 +69,8 @@ class _PodcastItemState extends State<PodcastItem> {
   FileInfo? fileInfo;
   File? audioFile;
   Stream<FileResponse>? fileStream;
+  MediaItem item = MediaItem(id: "", title: "");
+  AudioPlayerController? audioPlayerController;
 
   @override
   void initState() {
@@ -79,51 +89,46 @@ class _PodcastItemState extends State<PodcastItem> {
 
   Future<void> setAudio(String url, FileInfo? fileInfo) async {
     try {
-      widget.audioPlayer.positionStream.listen((event) {
-        setState(() {
-          position = event;
-        });
-      });
-      widget.audioPlayer.durationStream.listen((event) {
-        duration = event ?? Duration.zero;
-      });
-
       widget.audioPlayer.playingStream.listen((event) {
         isPlaying = event;
       });
       if (fileInfo != null) {
-        print("fileInfo null ylgaatai");
         audioFile = fileInfo.file;
-
-        widget.audioPlayer.setFilePath(audioFile!.path).then((value) {
+        await widget.audioPlayer.setFilePath(audioFile!.path).then((value) {
           setState(() {
             duration = value ?? Duration.zero;
           });
         });
       } else {
-        print(url);
         if (url == "") {
           print("buruu url");
         } else {
-          widget.audioPlayer.setUrl(url).then((value) {
+          await widget.audioPlayer.setUrl(url).then((value) async {
+            if (!mounted) return;
             setState(() {
               duration = value ?? Duration.zero;
             });
-            print(duration);
+            String banner =
+                Urls.networkPath + (widget.podcastItem.banner ?? "");
+            print("duration$duration");
+
             getSavedPosition(widget.podcastItem.id!).then((value) {
-              developer.log(value.toString());
-              if (value != Duration.zero) {
-                savedPosition = value;
-                position = savedPosition;
-                // if (position != Duration.zero) {
-                //   widget.audioPlayer.seek(position);
-                // }
-                widget.audioPlayer.setUrl(url, initialPosition: position);
-              } else {}
+              savedPosition = value;
+              position = savedPosition;
+              item = MediaItem(
+                  id: audioUrl,
+                  title: widget.podcastItem.title ?? "",
+                  duration: duration,
+                  artUri: Uri.parse(banner),
+                  extras: {"position": position.inMilliseconds});
+            });
+
+            AudioSession.instance.then((audioSession) async {
+              await audioSession
+                  .configure(const AudioSessionConfiguration.speech());
+              AudioSessionSettings.handleInterruption(audioSession);
             });
           });
-
-          widget.audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(url)));
         }
       }
     } on PlayerInterruptedException catch (e) {
@@ -225,7 +230,6 @@ class _PodcastItemState extends State<PodcastItem> {
                 padding: EdgeInsets.zero,
                 onPressed: () async {
                   setState(() {
-                    isClicked = true;
                     currentIndex =
                         widget.audioPlayerList.indexOf(widget.audioPlayer);
                   });
@@ -239,7 +243,12 @@ class _PodcastItemState extends State<PodcastItem> {
                   widget.onTap();
                   if (isPlaying) {
                     await widget.audioPlayer.pause();
+                    audioHandler.pause();
                   } else {
+                    await audioHandler
+                        .playMediaItem(item)
+                        .then((value) => setState(() => isClicked = true));
+                    await audioHandler.play();
                     await widget.audioPlayer.play();
                   }
                   AudioPlayerModel _audio = AudioPlayerModel(
@@ -253,36 +262,102 @@ class _PodcastItemState extends State<PodcastItem> {
                   color: MyColors.black,
                 ),
               ),
+              // ValueListenableBuilder(
+              //   valueListenable: buttonNotifier,
+              //   builder:
+              //       (BuildContext context, ButtonState? value, Widget? child) {
+              //     switch (value) {
+              //       case ButtonState.paused:
+              //         return IconButton(
+              //           padding: EdgeInsets.zero,
+              //           icon: const Icon(
+              //             Icons.play_arrow_rounded,
+              //             color: Colors.black,
+              //             size: 30.0,
+              //           ),
+              //           onPressed: () {
+              //             setState(() {
+              //               isClicked = true;
+              //               currentIndex = widget.audioPlayerList
+              //                   .indexOf(widget.audioPlayer);
+              //             });
+              //             widget.setIndex(currentIndex);
+              //             podcastProvider
+              //                 .addPodcastID(widget.podcastItem.id ?? 0);
+              //             if (!podcastProvider.sameItemCheck) {
+              //               podcastProvider.addListenedPodcast(
+              //                   widget.podcastItem, widget.podcastList);
+              //             }
+              //             widget.onTap();
+              //             audioHandler.playMediaItem(item);
+
+              //             audioHandler.play();
+              //           },
+              //         );
+              //       case ButtonState.playing:
+              //         return IconButton(
+              //           padding: EdgeInsets.zero,
+              //           icon: const Icon(
+              //             Icons.pause_rounded,
+              //             color: Colors.black,
+              //             size: 30.0,
+              //           ),
+              //           onPressed: () {
+              //             widget.onTap();
+              //             AudioPlayerModel _audio = AudioPlayerModel(
+              //                 productID: widget.podcastItem.id,
+              //                 audioPosition: position.inMilliseconds);
+              //             _audioPlayerProvider.addAudioPosition(_audio);
+              //             audioHandler.pause();
+              //           },
+              //         );
+              //       default:
+              //         return Container();
+              //     }
+              //   },
+              // ),
             ),
-            if (isClicked || savedPosition != Duration.zero)
+            if (isClicked)
               Row(
                 children: [
                   const SizedBox(width: 14),
                   SizedBox(
                     width: 90,
-                    child: SfLinearGauge(
-                      minimum: 0,
-                      maximum: duration.inSeconds.toDouble() / 10,
-                      showLabels: false,
-                      showAxisTrack: false,
-                      showTicks: false,
-                      ranges: [
-                        LinearGaugeRange(
-                          position: LinearElementPosition.inside,
-                          edgeStyle: LinearEdgeStyle.bothCurve,
-                          startValue: 0,
-                          color: MyColors.border1,
-                          endValue: duration.inSeconds.toDouble() / 10,
-                        ),
-                      ],
-                      barPointers: [
-                        LinearBarPointer(
-                            position: LinearElementPosition.inside,
-                            edgeStyle: LinearEdgeStyle.bothCurve,
-                            color: MyColors.primaryColor,
-                            // color: MyColors.border1,
-                            value: position.inSeconds.toDouble() / 10)
-                      ],
+                    child: ValueListenableBuilder(
+                      valueListenable: durationStateNotifier,
+                      builder: (BuildContext context, DurationState value,
+                          Widget? child) {
+                        position = value.progress ?? Duration.zero;
+                        duration = value.total ?? Duration.zero;
+
+                        print("position $position");
+                        print("duration $duration");
+
+                        return SfLinearGauge(
+                          minimum: 0,
+                          maximum: value.total!.inSeconds.toDouble() / 10,
+                          showLabels: false,
+                          showAxisTrack: false,
+                          showTicks: false,
+                          ranges: [
+                            LinearGaugeRange(
+                              position: LinearElementPosition.inside,
+                              edgeStyle: LinearEdgeStyle.bothCurve,
+                              startValue: 0,
+                              color: MyColors.border1,
+                              endValue: value.total!.inSeconds.toDouble() / 10,
+                            ),
+                          ],
+                          barPointers: [
+                            LinearBarPointer(
+                                position: LinearElementPosition.inside,
+                                edgeStyle: LinearEdgeStyle.bothCurve,
+                                color: MyColors.primaryColor,
+                                value:
+                                    value.progress!.inSeconds.toDouble() / 10)
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ],

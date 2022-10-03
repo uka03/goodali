@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/HomeScreen/home_screen.dart';
 import 'package:goodali/screens/ForumScreen/forum_screen.dart';
