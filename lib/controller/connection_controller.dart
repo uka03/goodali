@@ -18,6 +18,7 @@ import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/models/mood_item.dart';
 import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/models/qpay.dart';
+import 'package:goodali/models/video_model.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:goodali/controller/http.dart';
@@ -598,6 +599,24 @@ class Connection {
       }
     } catch (error) {
       print("error podcast list $error");
+      return [];
+    }
+  }
+
+  static Future<List<VideoModel>> getVideoList(BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypeNone).post(Urls.videoList);
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => VideoModel.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (error) {
+      print("error video list $error");
       return [];
     }
   }

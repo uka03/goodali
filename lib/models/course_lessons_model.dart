@@ -25,6 +25,8 @@ class Lesson {
   int? id;
   int? isBought;
   String? name;
+  int? allTask;
+  int? done;
 
   Lesson({this.banner, this.expiry, this.id, this.isBought, this.name});
 
@@ -34,6 +36,8 @@ class Lesson {
     id = json['id'] ?? 0;
     isBought = json['is_bought'] ?? 0;
     name = json['name'] ?? "";
+    allTask = json['all_task'] ?? "";
+    done = json['done'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +47,8 @@ class Lesson {
     data['id'] = id;
     data['is_bought'] = isBought;
     data['name'] = name;
+    data['all_task'] = allTask;
+    data['done'] = done;
     return data;
   }
 }

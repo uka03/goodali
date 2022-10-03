@@ -89,14 +89,18 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
               if (snapshot.connectionState == ConnectionState.done &&
                   snapshot.hasData) {
                 List<Lesson?> lessons = snapshot.data;
-                print(lessons);
+
                 if (lessons.isNotEmpty) {
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: lessons.length,
                     itemBuilder: (context, index) {
-                      print(lessons[index]?.expiry);
+                      int allTasks = lessons[index]?.allTask ?? 0;
+                      int doneTasks = lessons[index]?.done ?? 0;
+
+                      String tasks =
+                          doneTasks.toString() + "/" + allTasks.toString();
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Card(
@@ -113,16 +117,19 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                                 .id
                                                 .toString())));
                               },
-                              // subtitle: Row(children: [
-                              //   const Text(""),
-                              //   const Spacer(),
-                              //   Text(lessons[index]?.expiry != null ||
-                              //           lessons[index]?.expiry != "" ||
-                              //           lessons[index]!.expiry!.isNotEmpty
-                              //       ? dateTimeFormatter(
-                              //           lessons[index]?.expiry ?? "")
-                              //       : ""),
-                              // ]),
+                              subtitle: Row(children: [
+                                Text(
+                                  tasks,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                // const Spacer(),
+                                // Text(lessons[index]?.expiry != null ||
+                                //         lessons[index]?.expiry != "" ||
+                                //         lessons[index]!.expiry!.isNotEmpty
+                                //     ? dateTimeFormatter(
+                                //         lessons[index]?.expiry ?? "")
+                                //     : ""),
+                              ]),
                               trailing: const Icon(IconlyLight.arrow_right_2,
                                   size: 18, color: MyColors.gray),
                               title: Text(

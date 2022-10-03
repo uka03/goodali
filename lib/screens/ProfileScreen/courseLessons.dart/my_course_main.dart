@@ -74,7 +74,6 @@ class _MyCourseMainState extends State<MyCourseMain> {
                             "/" +
                             allTasks.toString() +
                             " даалгавар";
-                        print("tasks $tasks");
                         return InkWell(
                           onTap: () {
                             Navigator.push(
@@ -96,19 +95,19 @@ class _MyCourseMainState extends State<MyCourseMain> {
                                         "Image failed to upload")
                                     ? ClipRRect(
                                         borderRadius: BorderRadius.circular(4),
-                                        child:
-                                            // ImageView(
-                                            //   imgPath:
-                                            //       coursesItemList[index].banner ??
-                                            //           "",
-                                            //   height: 48,
-                                            //   width: 48,
-                                            // ),
-                                            Container(
-                                          color: Colors.blueGrey,
-                                          width: 48,
+                                        child: ImageView(
+                                          imgPath:
+                                              coursesItemList[index].banner ??
+                                                  "",
                                           height: 48,
-                                        ))
+                                          width: 48,
+                                        ),
+                                        //     Container(
+                                        //   color: Colors.blueGrey,
+                                        //   width: 48,
+                                        //   height: 48,
+                                        // )
+                                      )
                                     : Container(
                                         decoration: BoxDecoration(
                                             color: Colors.grey[300],

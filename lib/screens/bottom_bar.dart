@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/models/podcast_list_model.dart';
@@ -24,8 +23,6 @@ class _BottomTabbarState extends State<BottomTabbar> {
 
   @override
   void initState() {
-    // firstValue();
-
     super.initState();
   }
 
@@ -53,14 +50,15 @@ class _BottomTabbarState extends State<BottomTabbar> {
             if (opacity > 1) opacity = 1;
 
             return SizedBox(
-              height: kBottomNavigationBarHeight -
-                  kBottomNavigationBarHeight * value,
+              height: (kBottomNavigationBarHeight + 30) -
+                  (kBottomNavigationBarHeight + 30) * value,
               child: Transform.translate(
-                offset: Offset(0.0, kBottomNavigationBarHeight * value * 0.5),
+                offset: Offset(
+                    0.0, (kBottomNavigationBarHeight + 30) * value * 0.5),
                 child: Opacity(
                   opacity: opacity,
                   child: OverflowBox(
-                    maxHeight: kBottomNavigationBarHeight,
+                    maxHeight: kBottomNavigationBarHeight + 30,
                     child: child,
                   ),
                 ),
@@ -122,7 +120,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
                 valueListenable: currentlyPlaying,
                 builder: (BuildContext context, PodcastListModel? podcastItem,
                     Widget? child) {
-                  print(podcastItem?.title);
+                  print("aaaaa ${podcastItem?.title}");
                   return podcastItem != null
                       ? PlayAudio(
                           podcastItem: podcastItem,

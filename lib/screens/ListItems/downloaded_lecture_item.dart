@@ -175,7 +175,7 @@ class _DownloadedLectureItemState extends State<DownloadedLectureItem> {
     final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return GestureDetector(
       onTap: () {
-        showAudioModal();
+        // showAudioModal();
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
