@@ -1,9 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
-import 'package:goodali/models/podcast_list_model.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart';
 
 Future<AudioHandler> initAudioService() async {
   return await AudioService.init(
@@ -23,10 +21,22 @@ class AudioPlayerHandler extends BaseAudioHandler
   final _playlist = ConcatenatingAudioSource(children: []);
 
   AudioPlayerHandler() {
-    _notifyAudioHandlerAboutPlaybackEvents();
     AudioSession.instance.then((session) {
       session.configure(const AudioSessionConfiguration.speech());
     });
+    _loadEmptyPlaylist();
+    _notifyAudioHandlerAboutPlaybackEvents();
+    // _listenForDurationChanges();
+    // _listenForCurrentSongIndexChanges();
+    // _listenForSequenceStateChanges();
+  }
+
+  Future<void> _loadEmptyPlaylist() async {
+    try {
+      await _player.setAudioSource(_playlist);
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
   void _notifyAudioHandlerAboutPlaybackEvents() {
@@ -67,6 +77,39 @@ class AudioPlayerHandler extends BaseAudioHandler
     });
   }
 
+  void _listenForDurationChanges() {
+    _player.durationStream.listen((duration) {
+      var index = _player.currentIndex;
+      final newQueue = queue.value;
+      if (index == null || newQueue.isEmpty) return;
+      final oldMediaItem = newQueue[index];
+      final newMediaItem = oldMediaItem.copyWith(duration: duration);
+      newQueue[index] = newMediaItem;
+      queue.add(newQueue);
+      mediaItem.add(newMediaItem);
+    });
+  }
+
+  void _listenForCurrentSongIndexChanges() {
+    _player.currentIndexStream.listen((index) {
+      final playlist = queue.value;
+      if (index == null || playlist.isEmpty) return;
+      if (_player.shuffleModeEnabled) {
+        index = _player.shuffleIndices![index];
+      }
+      mediaItem.add(playlist[index]);
+    });
+  }
+
+  void _listenForSequenceStateChanges() {
+    _player.sequenceStateStream.listen((SequenceState? sequenceState) {
+      final sequence = sequenceState?.effectiveSequence;
+      if (sequence == null || sequence.isEmpty) return;
+      final items = sequence.map((source) => source.tag as MediaItem);
+      queue.add(items.toList());
+    });
+  }
+
   @override
   Future<void> play() async {
     print("audio handler play");
@@ -79,24 +122,24 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> playMediaItem(MediaItem item) async {
     mediaItem.add(item);
     print("player media item");
-    await _player
-        .setUrl(item.id,
-            initialPosition: item.extras?['position'] != Duration.zero
-                ? Duration(
-                    microseconds: (item.extras?['position'] * 1000).toInt())
-                : Duration.zero,
-            preload: false)
-        .then((value) => AudioPlayerController());
+    await _player.setUrl(item.id,
+        initialPosition: item.extras?['position'] != Duration.zero
+            ? Duration(microseconds: (item.extras?['position'] * 1000).toInt())
+            : Duration.zero,
+        preload: false);
   }
 
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
-    print("fddbfhbdf");
     final audioSource = mediaItems.map(_createAudioSource);
     _playlist.addAll(audioSource.toList());
+  }
 
-    final newQueue = queue.value..addAll(mediaItems);
-    queue.add(newQueue);
+  @override
+  Future<void> skipToQueueItem(int index) async {
+    if (index < 0 || index >= queue.value.length) return;
+
+    _player.seek(Duration.zero, index: index);
   }
 
   UriAudioSource _createAudioSource(MediaItem mediaItem) {

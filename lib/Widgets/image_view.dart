@@ -32,13 +32,17 @@ class ImageView extends StatelessWidget {
       height: height,
       width: width,
       fit: BoxFit.cover,
-      errorWidget: (context, url, error) => SizedBox(
-          width: width,
-          height: height,
-          child: const Text(
-            "No Image",
-            style: TextStyle(fontSize: 12),
-          )),
+      errorWidget: (context, url, error) {
+        print("error $error");
+        print("url$url");
+        return SizedBox(
+            width: width,
+            height: height,
+            child: const Text(
+              "No Image",
+              style: TextStyle(fontSize: 12),
+            ));
+      },
     );
   }
 }

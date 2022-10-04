@@ -11,7 +11,8 @@ import 'package:just_audio/just_audio.dart';
 final currentlyPlaying = ValueNotifier<PodcastListModel?>(null);
 
 final playerExpandProgress = ValueNotifier<double>(playerMinHeight);
-final buttonNotifierList = ValueNotifier<List<ButtonState>>([]);
+final currentPlayingItem =
+    ValueNotifier<MediaItem>(MediaItem(id: "", title: ''));
 
 final durationStateNotifier = ValueNotifier<DurationState>(const DurationState(
   progress: Duration.zero,
@@ -20,7 +21,7 @@ final durationStateNotifier = ValueNotifier<DurationState>(const DurationState(
 ));
 final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
 
-class AudioPlayerController {
+class AudioPlayerController with ChangeNotifier {
   AudioPlayerController() {
     initiliaze();
     // _loadPlaylist(podcastList);
@@ -56,6 +57,7 @@ class AudioPlayerController {
     });
 
     audioHandler.playbackState.listen((event) {
+      print(event.position);
       final oldState = durationStateNotifier.value;
       durationStateNotifier.value = DurationState(
         progress: event.position,
@@ -75,6 +77,10 @@ class AudioPlayerController {
         total: event?.duration ?? Duration.zero,
       );
       durationStateNotifier.notifyListeners();
+    });
+
+    audioHandler.mediaItem.listen((event) {
+      currentPlayingItem.value = event ?? MediaItem(id: "", title: "");
     });
 
     //   audioPlayer.bufferedPositionStream.listen((bufferedPosition) {

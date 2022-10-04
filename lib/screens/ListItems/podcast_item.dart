@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -35,25 +34,21 @@ class PodcastItem extends StatefulWidget {
   final AudioPlayer audioPlayer;
   final PodcastListModel podcastItem;
   final List<AudioPlayer> audioPlayerList;
-  final AudioHandler? audioHandler;
   final Function setIndex;
   final List<PodcastListModel> podcastList;
   final Function onTap;
   final int index;
-  final List<AudioHandler>? audioHandlerList;
 
-  const PodcastItem(
-      {Key? key,
-      required this.podcastItem,
-      required this.audioPlayer,
-      required this.audioPlayerList,
-      required this.setIndex,
-      required this.podcastList,
-      required this.index,
-      required this.onTap,
-      this.audioHandler,
-      this.audioHandlerList})
-      : super(key: key);
+  const PodcastItem({
+    Key? key,
+    required this.podcastItem,
+    required this.audioPlayer,
+    required this.audioPlayerList,
+    required this.setIndex,
+    required this.podcastList,
+    required this.index,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   State<PodcastItem> createState() => _PodcastItemState();
@@ -70,12 +65,14 @@ class _PodcastItemState extends State<PodcastItem> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   Duration savedPosition = Duration.zero;
+  Duration leftedPosition = Duration.zero;
 
   FileInfo? fileInfo;
   File? audioFile;
   Stream<FileResponse>? fileStream;
+  List<MediaItem> mediaItems = [];
+  List<ButtonState> buttonsStateList = [];
   MediaItem item = MediaItem(id: "", title: "");
-  AudioPlayerController? audioPlayerController;
 
   @override
   void initState() {
@@ -96,35 +93,40 @@ class _PodcastItemState extends State<PodcastItem> {
     try {
       if (fileInfo != null) {
         audioFile = fileInfo.file;
+
         await widget.audioPlayer.setFilePath(audioFile!.path).then((value) {
+          if (!mounted) return;
           setState(() {
             duration = value ?? Duration.zero;
           });
         });
       } else {
         if (url == "") {
-          print("buruu url");
+          debugPrint("buruu url");
         } else {
-          await widget.audioPlayer.setUrl(url).then((value) async {
+          widget.audioPlayer.setUrl(url).then((value) async {
             if (!mounted) return;
             setState(() {
               duration = value ?? Duration.zero;
             });
             String banner =
                 Urls.networkPath + (widget.podcastItem.banner ?? "");
-            print("duration$duration");
 
-            getSavedPosition(widget.podcastItem.id!).then((value) {
+            getSavedPosition(widget.podcastItem.id!).then((value) async {
               savedPosition = value;
               position = savedPosition;
-
-              item = MediaItem(
-                  id: audioUrl,
-                  title: widget.podcastItem.title ?? "",
-                  duration: duration,
-                  artUri: Uri.parse(banner),
-                  extras: {"position": position.inMilliseconds});
-              widget.audioHandler?.playMediaItem(item);
+              leftedPosition = duration - position;
+              for (var e in widget.podcastList) {
+                item = MediaItem(
+                    id: audioUrl,
+                    title: e.title ?? "",
+                    duration: duration,
+                    artUri: Uri.parse(banner),
+                    extras: {"position": position.inMilliseconds});
+                mediaItems.add(item);
+              }
+              await audioHandler.addQueueItems(mediaItems);
+              AudioPlayerController();
             });
           });
         }
@@ -152,7 +154,7 @@ class _PodcastItemState extends State<PodcastItem> {
       }
     }
     savedPosition = Duration(milliseconds: saveddouble);
-    print("savedPosition $savedPosition");
+    debugPrint("savedPosition $savedPosition");
     return savedPosition;
   }
 
@@ -171,8 +173,6 @@ class _PodcastItemState extends State<PodcastItem> {
     setState(() {
       fileStream = CustomCacheManager.instance
           .getFileStream(audioUrl, withProgress: true);
-
-      print("fileStream ");
     });
   }
 
@@ -222,119 +222,145 @@ class _PodcastItemState extends State<PodcastItem> {
         Row(
           children: [
             ValueListenableBuilder(
-              valueListenable: buttonNotifier,
-              builder: (BuildContext context, value, Widget? child) {
-                switch (value) {
-                  case ButtonState.loading:
-                    return const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(
-                        color: MyColors.gray,
-                      ),
-                    );
-                  case ButtonState.playing:
-                    return CircleAvatar(
+              valueListenable: currentlyPlaying,
+              builder: (BuildContext context, PodcastListModel? value,
+                  Widget? child) {
+                var buttonState = buttonNotifier.value;
+                print(buttonState);
+                if (value?.title == "" ||
+                    buttonState == ButtonState.paused ||
+                    value?.title != widget.podcastItem.title) {
+                  print("paused $buttonState");
+                  return CircleAvatar(
                       backgroundColor: MyColors.input,
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         icon: const Icon(
-                          Icons.pause_rounded,
+                          Icons.play_arrow_rounded,
                           color: Colors.black,
                           size: 30.0,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
+                          setState(() {
+                            isClicked = true;
+                            currentIndex = widget.audioPlayerList
+                                .indexOf(widget.audioPlayer);
+                          });
+                          currentlyPlaying.value = widget.podcastItem;
+                          buttonNotifier.value = ButtonState.playing;
+                          widget.setIndex(currentIndex);
+                          podcastProvider
+                              .addPodcastID(widget.podcastItem.id ?? 0);
+                          if (!podcastProvider.sameItemCheck) {
+                            podcastProvider.addListenedPodcast(
+                                widget.podcastItem, widget.podcastList);
+                          }
                           widget.onTap();
-                          buttonNotifier.value = ButtonState.paused;
-                          AudioPlayerModel _audio = AudioPlayerModel(
-                              productID: widget.podcastItem.id,
-                              audioPosition: position.inMilliseconds);
-                          _audioPlayerProvider.addAudioPosition(_audio);
-                          widget.audioHandler?.pause();
+                          audioHandler.playMediaItem(mediaItems[widget.index]);
+                          audioHandler.play();
                         },
+                      ));
+                } else if (buttonState == ButtonState.playing &&
+                    value?.title == widget.podcastItem.title) {
+                  print("playing$buttonState");
+                  return CircleAvatar(
+                    backgroundColor: MyColors.input,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(
+                        Icons.pause_rounded,
+                        color: Colors.black,
+                        size: 30.0,
                       ),
-                    );
-                  case ButtonState.paused:
-                    return CircleAvatar(
-                        backgroundColor: MyColors.input,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(
-                            Icons.play_arrow_rounded,
-                            color: Colors.black,
-                            size: 30.0,
-                          ),
-                          onPressed: () async {
-                            setState(() {
-                              isClicked = true;
-                              currentIndex = widget.audioPlayerList
-                                  .indexOf(widget.audioPlayer);
-                            });
-                            print("currentIndex $currentIndex");
-                            buttonNotifier.value = ButtonState.playing;
-                            widget.setIndex(currentIndex);
-                            podcastProvider
-                                .addPodcastID(widget.podcastItem.id ?? 0);
-                            if (!podcastProvider.sameItemCheck) {
-                              podcastProvider.addListenedPodcast(
-                                  widget.podcastItem, widget.podcastList);
-                            }
-                            widget.onTap();
-                            await widget.audioHandler?.play();
-                          },
-                        ));
-                  default:
-                    return Container();
+                      onPressed: () {
+                        widget.onTap();
+
+                        buttonNotifier.value = ButtonState.paused;
+                        AudioPlayerModel _audio = AudioPlayerModel(
+                            productID: widget.podcastItem.id,
+                            audioPosition: position.inMilliseconds);
+                        _audioPlayerProvider.addAudioPosition(_audio);
+                        audioHandler.pause();
+                      },
+                    ),
+                  );
+                } else {
+                  developer.log("ddfhdhfkfh");
+                  return const CircleAvatar(
+                      backgroundColor: MyColors.input,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(
+                          color: Colors.black,
+                          strokeWidth: 2,
+                        ),
+                      ));
                 }
               },
             ),
-            if (isClicked)
-              Row(
-                children: [
-                  const SizedBox(width: 14),
-                  SizedBox(
-                    width: 90,
-                    child: ValueListenableBuilder(
-                      valueListenable: durationStateNotifier,
-                      builder: (BuildContext context, DurationState value,
-                          Widget? child) {
-                        position = value.progress ?? Duration.zero;
-                        duration = value.total ?? Duration.zero;
+            // if (isClicked)
+            //   Row(
+            //     children: [
+            //       const SizedBox(width: 14),
+            //       SizedBox(
+            //         width: 90,
+            //         child: ValueListenableBuilder(
+            //           valueListenable: durationStateNotifier,
+            //           builder: (BuildContext context, DurationState value,
+            //               Widget? child) {
+            //             position = value.progress ?? Duration.zero;
+            //             duration = value.total ?? Duration.zero;
 
-                        print("position $position");
-                        print("duration $duration");
+            //             print("position $position");
+            //             print("duration $duration");
 
-                        return SfLinearGauge(
-                          minimum: 0,
-                          maximum: value.total!.inSeconds.toDouble() / 10,
-                          showLabels: false,
-                          showAxisTrack: false,
-                          showTicks: false,
-                          ranges: [
-                            LinearGaugeRange(
-                              position: LinearElementPosition.inside,
-                              edgeStyle: LinearEdgeStyle.bothCurve,
-                              startValue: 0,
-                              color: MyColors.border1,
-                              endValue: value.total!.inSeconds.toDouble() / 10,
-                            ),
-                          ],
-                          barPointers: [
-                            LinearBarPointer(
-                                position: LinearElementPosition.inside,
-                                edgeStyle: LinearEdgeStyle.bothCurve,
-                                color: MyColors.primaryColor,
-                                value:
-                                    value.progress!.inSeconds.toDouble() / 10)
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+            //             return SfLinearGauge(
+            //               minimum: 0,
+            //               maximum: value.total!.inSeconds.toDouble() / 10,
+            //               showLabels: false,
+            //               showAxisTrack: false,
+            //               showTicks: false,
+            //               ranges: [
+            //                 LinearGaugeRange(
+            //                   position: LinearElementPosition.inside,
+            //                   edgeStyle: LinearEdgeStyle.bothCurve,
+            //                   startValue: 0,
+            //                   color: MyColors.border1,
+            //                   endValue: value.total!.inSeconds.toDouble() / 10,
+            //                 ),
+            //               ],
+            //               barPointers: [
+            //                 LinearBarPointer(
+            //                     position: LinearElementPosition.inside,
+            //                     edgeStyle: LinearEdgeStyle.bothCurve,
+            //                     color: MyColors.primaryColor,
+            //                     value:
+            //                         value.progress!.inSeconds.toDouble() / 10)
+            //               ],
+            //             );
+            //           },
+            //         ),
+            //       ),
+            //     ],
+            //   ),
             const SizedBox(width: 10),
-            Text(formatTime(duration - position) + "мин",
-                style: const TextStyle(fontSize: 12, color: MyColors.black)),
+            ValueListenableBuilder(
+              valueListenable: durationStateNotifier,
+              builder: (context, DurationState value, child) {
+                var currentlyPlayingPodcast = currentlyPlaying.value;
+                position = value.progress ?? Duration.zero;
+                if (currentlyPlayingPodcast?.title ==
+                    widget.podcastItem.title) {
+                  return Text(formatTime(duration - position) + "мин",
+                      style:
+                          const TextStyle(fontSize: 12, color: MyColors.black));
+                } else {
+                  return Text(formatTime(leftedPosition) + "мин",
+                      style:
+                          const TextStyle(fontSize: 12, color: MyColors.black));
+                }
+              },
+            ),
             const Spacer(),
             fileInfo != null
                 ? IconButton(

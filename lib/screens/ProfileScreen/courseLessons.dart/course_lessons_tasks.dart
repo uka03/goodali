@@ -292,14 +292,12 @@ class _CourseTasksState extends State<CourseTasks> {
                                                 .toString(),
                                             _controllers[_current.toInt()].text,
                                             1)
-                                        .then((value) {
-                                      showTopSnackBar(
-                                          context,
-                                          const CustomTopSnackBar(
-                                            type: 1,
-                                            text: "Амжилттай хадгалагдлаа",
-                                          ));
-                                    });
+                                        .whenComplete(() => showTopSnackBar(
+                                            context,
+                                            const CustomTopSnackBar(
+                                              type: 1,
+                                              text: "Амжилттай хадгалагдлаа",
+                                            )));
                                   }
                                   if (_current + 1 ==
                                       widget.courseTasks.length) {
