@@ -1,9 +1,11 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
@@ -23,6 +25,7 @@ class PodcastAll extends StatefulWidget {
 
 class _PodcastAllState extends State<PodcastAll> {
   late final List<AudioPlayer> audioPlayers = [];
+  late final List<AudioHandler> audioHandlers = [];
   late final future = getPodcastList();
   FileInfo? fileInfo;
   File? audioFile;
@@ -62,27 +65,31 @@ class _PodcastAllState extends State<PodcastAll> {
                   padding: const EdgeInsets.only(top: 13, bottom: 15),
                   itemBuilder: (BuildContext context, int index) {
                     audioPlayers.add(AudioPlayer());
+                    audioHandlers.add(audioHandler);
 
-                    for (var i = 0; i < audioPlayers.length; i++) {
+                    for (var i = 0; i < audioHandlers.length; i++) {
                       if (currentIndex != i) {
-                        audioPlayers[i].pause();
+                        audioHandlers[i].pause();
                       }
                     }
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: PodcastItem(
-                          onTap: () =>
-                              widget.onTap(podcastList[index], podcastList),
-                          setIndex: (int index) {
-                            setState(() {
-                              currentIndex = index;
-                            });
-                          },
-                          podcastList: podcastList,
-                          podcastItem: podcastList[index],
-                          audioPlayer: audioPlayers[index],
-                          audioPlayerList: audioPlayers),
-                    );
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: PodcastItem(
+                            onTap: () =>
+                                widget.onTap(podcastList[index], podcastList),
+                            setIndex: (int index) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                              print("current $currentIndex");
+                            },
+                            audioHandler: audioHandlers[index],
+                            audioHandlerList: audioHandlers,
+                            index: index,
+                            podcastList: podcastList,
+                            podcastItem: podcastList[index],
+                            audioPlayer: audioPlayers[index],
+                            audioPlayerList: audioPlayers));
                   },
                   itemCount: podcastList.length,
                   separatorBuilder: (BuildContext context, int index) =>

@@ -13,8 +13,6 @@ import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/controller/audio_player_handler.dart';
-import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
@@ -37,9 +35,13 @@ class PodcastItem extends StatefulWidget {
   final AudioPlayer audioPlayer;
   final PodcastListModel podcastItem;
   final List<AudioPlayer> audioPlayerList;
+  final AudioHandler? audioHandler;
   final Function setIndex;
   final List<PodcastListModel> podcastList;
   final Function onTap;
+  final int index;
+  final List<AudioHandler>? audioHandlerList;
+
   const PodcastItem(
       {Key? key,
       required this.podcastItem,
@@ -47,7 +49,10 @@ class PodcastItem extends StatefulWidget {
       required this.audioPlayerList,
       required this.setIndex,
       required this.podcastList,
-      required this.onTap})
+      required this.index,
+      required this.onTap,
+      this.audioHandler,
+      this.audioHandlerList})
       : super(key: key);
 
   @override
@@ -89,9 +94,6 @@ class _PodcastItemState extends State<PodcastItem> {
 
   Future<void> setAudio(String url, FileInfo? fileInfo) async {
     try {
-      widget.audioPlayer.playingStream.listen((event) {
-        isPlaying = event;
-      });
       if (fileInfo != null) {
         audioFile = fileInfo.file;
         await widget.audioPlayer.setFilePath(audioFile!.path).then((value) {
@@ -115,18 +117,14 @@ class _PodcastItemState extends State<PodcastItem> {
             getSavedPosition(widget.podcastItem.id!).then((value) {
               savedPosition = value;
               position = savedPosition;
+
               item = MediaItem(
                   id: audioUrl,
                   title: widget.podcastItem.title ?? "",
                   duration: duration,
                   artUri: Uri.parse(banner),
                   extras: {"position": position.inMilliseconds});
-            });
-
-            AudioSession.instance.then((audioSession) async {
-              await audioSession
-                  .configure(const AudioSessionConfiguration.speech());
-              AudioSessionSettings.handleInterruption(audioSession);
+              widget.audioHandler?.playMediaItem(item);
             });
           });
         }
@@ -223,99 +221,71 @@ class _PodcastItemState extends State<PodcastItem> {
         const SizedBox(height: 14),
         Row(
           children: [
-            CircleAvatar(
-              backgroundColor: MyColors.input,
-              child: IconButton(
-                splashRadius: 20,
-                padding: EdgeInsets.zero,
-                onPressed: () async {
-                  setState(() {
-                    currentIndex =
-                        widget.audioPlayerList.indexOf(widget.audioPlayer);
-                  });
-                  widget.setIndex(currentIndex);
-
-                  podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
-                  if (!podcastProvider.sameItemCheck) {
-                    podcastProvider.addListenedPodcast(
-                        widget.podcastItem, widget.podcastList);
-                  }
-                  widget.onTap();
-                  if (isPlaying) {
-                    await widget.audioPlayer.pause();
-                    audioHandler.pause();
-                  } else {
-                    await audioHandler
-                        .playMediaItem(item)
-                        .then((value) => setState(() => isClicked = true));
-                    await audioHandler.play();
-                    await widget.audioPlayer.play();
-                  }
-                  AudioPlayerModel _audio = AudioPlayerModel(
-                      productID: widget.podcastItem.id,
-                      audioPosition: position.inMilliseconds);
-                  _audioPlayerProvider.addAudioPosition(_audio);
-                },
-                icon: Icon(
-                  isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                  size: 30,
-                  color: MyColors.black,
-                ),
-              ),
-              // ValueListenableBuilder(
-              //   valueListenable: buttonNotifier,
-              //   builder:
-              //       (BuildContext context, ButtonState? value, Widget? child) {
-              //     switch (value) {
-              //       case ButtonState.paused:
-              //         return IconButton(
-              //           padding: EdgeInsets.zero,
-              //           icon: const Icon(
-              //             Icons.play_arrow_rounded,
-              //             color: Colors.black,
-              //             size: 30.0,
-              //           ),
-              //           onPressed: () {
-              //             setState(() {
-              //               isClicked = true;
-              //               currentIndex = widget.audioPlayerList
-              //                   .indexOf(widget.audioPlayer);
-              //             });
-              //             widget.setIndex(currentIndex);
-              //             podcastProvider
-              //                 .addPodcastID(widget.podcastItem.id ?? 0);
-              //             if (!podcastProvider.sameItemCheck) {
-              //               podcastProvider.addListenedPodcast(
-              //                   widget.podcastItem, widget.podcastList);
-              //             }
-              //             widget.onTap();
-              //             audioHandler.playMediaItem(item);
-
-              //             audioHandler.play();
-              //           },
-              //         );
-              //       case ButtonState.playing:
-              //         return IconButton(
-              //           padding: EdgeInsets.zero,
-              //           icon: const Icon(
-              //             Icons.pause_rounded,
-              //             color: Colors.black,
-              //             size: 30.0,
-              //           ),
-              //           onPressed: () {
-              //             widget.onTap();
-              //             AudioPlayerModel _audio = AudioPlayerModel(
-              //                 productID: widget.podcastItem.id,
-              //                 audioPosition: position.inMilliseconds);
-              //             _audioPlayerProvider.addAudioPosition(_audio);
-              //             audioHandler.pause();
-              //           },
-              //         );
-              //       default:
-              //         return Container();
-              //     }
-              //   },
-              // ),
+            ValueListenableBuilder(
+              valueListenable: buttonNotifier,
+              builder: (BuildContext context, value, Widget? child) {
+                switch (value) {
+                  case ButtonState.loading:
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(
+                        color: MyColors.gray,
+                      ),
+                    );
+                  case ButtonState.playing:
+                    return CircleAvatar(
+                      backgroundColor: MyColors.input,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(
+                          Icons.pause_rounded,
+                          color: Colors.black,
+                          size: 30.0,
+                        ),
+                        onPressed: () {
+                          widget.onTap();
+                          buttonNotifier.value = ButtonState.paused;
+                          AudioPlayerModel _audio = AudioPlayerModel(
+                              productID: widget.podcastItem.id,
+                              audioPosition: position.inMilliseconds);
+                          _audioPlayerProvider.addAudioPosition(_audio);
+                          widget.audioHandler?.pause();
+                        },
+                      ),
+                    );
+                  case ButtonState.paused:
+                    return CircleAvatar(
+                        backgroundColor: MyColors.input,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(
+                            Icons.play_arrow_rounded,
+                            color: Colors.black,
+                            size: 30.0,
+                          ),
+                          onPressed: () async {
+                            setState(() {
+                              isClicked = true;
+                              currentIndex = widget.audioPlayerList
+                                  .indexOf(widget.audioPlayer);
+                            });
+                            print("currentIndex $currentIndex");
+                            buttonNotifier.value = ButtonState.playing;
+                            widget.setIndex(currentIndex);
+                            podcastProvider
+                                .addPodcastID(widget.podcastItem.id ?? 0);
+                            if (!podcastProvider.sameItemCheck) {
+                              podcastProvider.addListenedPodcast(
+                                  widget.podcastItem, widget.podcastList);
+                            }
+                            widget.onTap();
+                            await widget.audioHandler?.play();
+                          },
+                        ));
+                  default:
+                    return Container();
+                }
+              },
             ),
             if (isClicked)
               Row(

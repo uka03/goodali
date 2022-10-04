@@ -43,6 +43,7 @@ class _ListenedPodcastState extends State<ListenedPodcast> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 10),
                   child: PodcastItem(
+                    index: index,
                     podcastList: [],
                     podcastItem: value.listenedPodcast[index],
                     audioPlayer: audioPlayer[index],

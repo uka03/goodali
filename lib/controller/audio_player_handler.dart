@@ -1,7 +1,9 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 
 Future<AudioHandler> initAudioService() async {
   return await AudioService.init(
@@ -15,22 +17,16 @@ Future<AudioHandler> initAudioService() async {
   );
 }
 
-class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
+class AudioPlayerHandler extends BaseAudioHandler
+    with SeekHandler, QueueHandler {
   final _player = AudioPlayer();
   final _playlist = ConcatenatingAudioSource(children: []);
 
   AudioPlayerHandler() {
-    // _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
-    // _loadEmptyPlaylist();
     _notifyAudioHandlerAboutPlaybackEvents();
-  }
-
-  Future<void> _loadEmptyPlaylist() async {
-    try {
-      await _player.setAudioSource(_playlist);
-    } catch (e) {
-      print("Error: $e");
-    }
+    AudioSession.instance.then((session) {
+      session.configure(const AudioSessionConfiguration.speech());
+    });
   }
 
   void _notifyAudioHandlerAboutPlaybackEvents() {
@@ -71,28 +67,6 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     });
   }
 
-  void _listenForDurationChanges() {
-    _player.durationStream.listen((duration) {
-      var index = _player.currentIndex;
-      final newQueue = queue.value;
-      if (index == null || newQueue.isEmpty) return;
-      final oldMediaItem = newQueue[index];
-      final newMediaItem = oldMediaItem.copyWith(duration: duration);
-      newQueue[index] = newMediaItem;
-      queue.add(newQueue);
-      mediaItem.add(newMediaItem);
-    });
-  }
-
-  void _listenForCurrentSongIndexChanges() {
-    _player.currentIndexStream.listen((index) {
-      final playlist = queue.value;
-      if (index == null || playlist.isEmpty) return;
-
-      mediaItem.add(playlist[index]);
-    });
-  }
-
   @override
   Future<void> play() async {
     print("audio handler play");
@@ -117,6 +91,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
+    print("fddbfhbdf");
     final audioSource = mediaItems.map(_createAudioSource);
     _playlist.addAll(audioSource.toList());
 
