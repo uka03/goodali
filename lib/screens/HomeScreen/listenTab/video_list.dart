@@ -105,11 +105,10 @@ class _VideoListState extends State<VideoList> {
   }
 
   initiliazeVideo(videoUrl) {
-    print(videoUrl);
     _ytbPlayerController = YoutubePlayerController(
       initialVideoId: videoUrl,
       params: const YoutubePlayerParams(
-        showControls: false,
+        showControls: true,
         origin: "https://www.youtube.com/embed/",
         startAt: Duration(seconds: 30),
         autoPlay: true,
@@ -126,8 +125,10 @@ class _VideoListState extends State<VideoList> {
         itemBuilder: (context, index) {
           initiliazeVideo(videoList[index].videoUrl);
           return GestureDetector(
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const VideoDetail())),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => VideoDetail(videoModel: videoList[index]))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -3,66 +3,83 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/video_model.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class VideoDetail extends StatefulWidget {
-  const VideoDetail({Key? key}) : super(key: key);
+  final VideoModel videoModel;
+  const VideoDetail({Key? key, required this.videoModel}) : super(key: key);
 
   @override
   State<VideoDetail> createState() => _VideoDetailState();
 }
 
 class _VideoDetailState extends State<VideoDetail> {
+  YoutubePlayerController? _ytbPlayerController;
+
+  @override
+  void initState() {
+    initiliazeVideo(widget.videoModel.videoUrl);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _ytbPlayerController?.close();
+    super.dispose();
+  }
+
+  initiliazeVideo(videoUrl) {
+    _ytbPlayerController = YoutubePlayerController(
+      initialVideoId: videoUrl,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        origin: "https://www.youtube.com/embed/",
+        startAt: Duration(seconds: 30),
+        autoPlay: true,
+      ),
+    );
+    // _controller?.addListener(listener);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(),
-      body: SingleChildScrollView(
-          child: FutureBuilder(
-        future: getVideoList(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData &&
-              ConnectionState.done == snapshot.connectionState) {
-            List<VideoModel> videoList = [];
-            if (videoList.isNotEmpty) {
-              return Column(
-                children: [
-                  Container(
-                    height: 190,
-                    width: double.infinity,
-                    color: Colors.blueGrey,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Text(
-                      "Chi ymar tsaraitai we",
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: MyColors.black),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Text(
-                      "Алив зүйлийг эхлэхдээ будилах, ялимгүй аргалчих гэсэн эрмэлзлээсээ болоод төлөх гэсэн биш даялаад явчихвал хүссэн үр дүнгээ хүссэн хугацаандаа авахгүй байх, их үнээр авах болчихдог учраас би аль болох үнэн байхыг хичээдэг. ",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(height: 1.7, color: MyColors.black),
-                    ),
-                  )
-                ],
-              );
-            } else {
-              return Container();
-            }
-          } else {
-            return const Center(
-                child: CircularProgressIndicator(
-              color: MyColors.primaryColor,
-            ));
-          }
-        },
-      )),
-    );
+        appBar: const SimpleAppBar(),
+        body: SingleChildScrollView(
+            child: Column(
+          children: [
+            SizedBox(
+              height: 200,
+              width: double.infinity,
+              child: YoutubePlayerControllerProvider(
+                controller: _ytbPlayerController ??
+                    YoutubePlayerController(
+                        initialVideoId: widget.videoModel.videoUrl ?? ""),
+                child: const YoutubePlayerIFrame(
+                  aspectRatio: 16 / 9,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Text(
+                widget.videoModel.title ?? "",
+                style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: MyColors.black),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                widget.videoModel.body ?? "",
+                textAlign: TextAlign.center,
+                style: const TextStyle(height: 1.7, color: MyColors.black),
+              ),
+            )
+          ],
+        )));
   }
 
   Future<List<VideoModel>> getVideoList() {

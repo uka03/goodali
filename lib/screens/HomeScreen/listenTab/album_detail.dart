@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
@@ -172,12 +173,50 @@ class _AlbumDetailState extends State<AlbumDetail> {
                               Opacity(
                                 opacity: imageOpacity.clamp(0, 1),
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(14),
-                                  child: ImageView(
-                                      imgPath: widget.products.banner ?? "",
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: Image.network(
+                                      Urls.networkPath +
+                                          (widget.products.banner ?? ""),
                                       width: imageSize,
-                                      height: imageSize),
-                                ),
+                                      height: imageSize,
+                                      loadingBuilder: (BuildContext context,
+                                          Widget child,
+                                          ImageChunkEvent? loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            color: MyColors.primaryColor,
+                                            strokeWidth: 2,
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        );
+                                      },
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stack) {
+                                        if (error
+                                                is NetworkImageLoadException &&
+                                            error.statusCode == 404) {
+                                          return const Text("404");
+                                        }
+
+                                        return SizedBox(
+                                            width: imageSize,
+                                            height: imageSize,
+                                            child: const Text(
+                                              "No Image",
+                                              style: TextStyle(fontSize: 12),
+                                            ));
+                                      },
+                                    )),
                               ),
                               const SizedBox(height: 80)
                             ],

@@ -1,6 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:ui';
+
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -16,32 +17,75 @@ class ImageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      imageUrl: isQpay == true
+    return ExtendedImage.network(
+      isQpay == true
           ? imgPath
           : imgPath == ""
               ? ""
               : Urls.networkPath + imgPath,
-      progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-        child: CircularProgressIndicator(
-            color: MyColors.primaryColor,
-            strokeWidth: 2,
-            value: downloadProgress.progress),
-      ),
-      cacheManager: CustomCacheManager.instance,
+      cacheHeight: (height?.toInt() ?? 100) * window.devicePixelRatio.ceil(),
       height: height,
       width: width,
       fit: BoxFit.cover,
-      errorWidget: (context, url, error) {
-        return SizedBox(
-            width: width,
-            height: height,
-            child: const Text(
-              "No Image",
-              style: TextStyle(fontSize: 12),
-            ));
+      cache: true, // store in cache
+      enableMemoryCache: false, // do not store in memory
+      enableLoadState: false, // hide spinner
+      loadStateChanged: (ExtendedImageState state) {
+        switch (state.extendedImageLoadState) {
+          case LoadState.loading:
+            return Container(
+              padding: const EdgeInsets.all(8),
+              height: width,
+              width: width,
+              child: Center(
+                child: CircularProgressIndicator(
+                    color: MyColors.primaryColor,
+                    strokeWidth: 2,
+                    value:
+                        state.loadingProgress?.expectedTotalBytes?.toDouble()),
+              ),
+            );
+
+          case LoadState.completed:
+            return null;
+          case LoadState.failed:
+            return SizedBox(
+                width: width,
+                height: height,
+                child: const Text(
+                  "No Image",
+                  style: TextStyle(fontSize: 12),
+                ));
+        }
       },
     );
+
+    // CachedNetworkImage(
+    //   imageUrl: isQpay == true
+    //       ? imgPath
+    //       : imgPath == ""
+    //           ? ""
+    //           : Urls.networkPath + imgPath,
+    //   progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+    //     child: CircularProgressIndicator(
+    //         color: MyColors.primaryColor,
+    //         strokeWidth: 2,
+    //         value: downloadProgress.progress),
+    //   ),
+    //   cacheManager: CustomCacheManager.instance,
+    //   height: height,
+    //   width: width,
+    //   fit: BoxFit.cover,
+    //   errorWidget: (context, url, error) {
+    //     return SizedBox(
+    //         width: width,
+    //         height: height,
+    //         child: const Text(
+    //           "No Image",
+    //           style: TextStyle(fontSize: 12),
+    //         ));
+    //   },
+    // );
   }
 }
 

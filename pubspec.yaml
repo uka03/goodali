@@ -45,7 +45,6 @@ dependencies:
   rxdart: ^0.27.5
   audio_video_progress_bar: ^0.10.0
   just_audio_cache: ^0.1.1
-  streaming_shared_preferences: ^2.0.0
   webview_flutter: ^3.0.4
   local_auth: ^2.1.2
   get_it: ^7.2.0
@@ -53,7 +52,6 @@ dependencies:
   audio_service: ^0.18.7
   audio_session: ^0.1.10
   device_info_plus: ^4.0.0
-  cached_network_image: ^3.2.0
   pin_code_fields: ^7.4.0
   permission_handler: 9.2.0
   path_provider: ^2.0.11
@@ -63,7 +61,8 @@ dependencies:
   http: ^0.13.5
   intl: ^0.17.0
   miniplayer: ^1.0.1
-  flutter_riverpod: ^1.0.3+1
+  extended_image: ^6.1.0
+  youtube_player_flutter: ^8.0.0
 
 dev_dependencies:
   flutter_test:
