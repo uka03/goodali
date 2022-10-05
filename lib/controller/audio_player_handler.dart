@@ -1,6 +1,8 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:just_audio/just_audio.dart';
 
 Future<AudioHandler> initAudioService() async {
@@ -35,7 +37,9 @@ class AudioPlayerHandler extends BaseAudioHandler
     try {
       await _player.setAudioSource(_playlist);
     } catch (e) {
-      print("Error: $e");
+      if (kDebugMode) {
+        print("Error: $e");
+      }
     }
   }
 
@@ -112,7 +116,7 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> play() async {
-    print("audio handler play");
+    debugPrint("audio handler play");
 
     _player.play();
     return super.play();
@@ -121,7 +125,7 @@ class AudioPlayerHandler extends BaseAudioHandler
   @override
   Future<void> playMediaItem(MediaItem item) async {
     mediaItem.add(item);
-    print("player media item");
+    debugPrint("player media item");
     await _player.setUrl(item.id,
         initialPosition: item.extras?['position'] != Duration.zero
             ? Duration(microseconds: (item.extras?['position'] * 1000).toInt())
@@ -151,15 +155,19 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> pause() async {
-    print("audio handler pause");
-
+    if (kDebugMode) {
+      print("audio handler pause");
+    }
+    buttonNotifier.value = ButtonState.paused;
     _player.pause();
     return super.pause();
   }
 
   @override
   Future<void> seek(Duration position) {
-    print("audio handler seeeeek");
+    if (kDebugMode) {
+      print("audio handler seeeeek");
+    }
     _player.seek(position);
     return super.pause();
   }

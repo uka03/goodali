@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/utils.dart';
@@ -50,9 +52,12 @@ class _BottomTabbarState extends State<BottomTabbar> {
             if (opacity < 0) opacity = 0;
             if (opacity > 1) opacity = 1;
 
+            double bottomBarHeight = kBottomNavigationBarHeight;
+            if (Platform.isIOS) {
+              bottomBarHeight = kBottomNavigationBarHeight + 30;
+            }
             return SizedBox(
-              height: (kBottomNavigationBarHeight + 30) -
-                  (kBottomNavigationBarHeight + 30) * value,
+              height: bottomBarHeight - bottomBarHeight * value,
               child: Transform.translate(
                 offset: Offset(
                     0.0, (kBottomNavigationBarHeight + 30) * value * 0.5),
@@ -121,7 +126,6 @@ class _BottomTabbarState extends State<BottomTabbar> {
                 valueListenable: currentlyPlaying,
                 builder: (BuildContext context, PodcastListModel? podcastItem,
                     Widget? child) {
-                  print("aaaaa ${podcastItem?.title}");
                   return podcastItem != null
                       ? PlayAudio(
                           podcastItem: podcastItem,

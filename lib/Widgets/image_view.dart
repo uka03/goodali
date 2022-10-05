@@ -33,8 +33,6 @@ class ImageView extends StatelessWidget {
       width: width,
       fit: BoxFit.cover,
       errorWidget: (context, url, error) {
-        print("error $error");
-        print("url$url");
         return SizedBox(
             width: width,
             height: height,

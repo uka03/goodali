@@ -6,7 +6,6 @@ import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/podcast_list_model.dart';
-import 'package:just_audio/just_audio.dart';
 
 final currentlyPlaying = ValueNotifier<PodcastListModel?>(null);
 
@@ -57,26 +56,23 @@ class AudioPlayerController with ChangeNotifier {
     });
 
     audioHandler.playbackState.listen((event) {
-      print(event.position);
       final oldState = durationStateNotifier.value;
       durationStateNotifier.value = DurationState(
         progress: event.position,
         buffered: event.bufferedPosition,
         total: oldState.total,
       );
-      durationStateNotifier.notifyListeners();
+      // durationStateNotifier.notifyListeners();
     });
 
     audioHandler.mediaItem.listen((event) {
-      print("bufferedPosition ${event?.duration}");
-      print("title ${event?.duration}");
       final oldState = durationStateNotifier.value;
       durationStateNotifier.value = DurationState(
         progress: oldState.progress,
         buffered: oldState.buffered,
         total: event?.duration ?? Duration.zero,
       );
-      durationStateNotifier.notifyListeners();
+      // durationStateNotifier.notifyListeners();
     });
 
     audioHandler.mediaItem.listen((event) {

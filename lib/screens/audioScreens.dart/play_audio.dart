@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
@@ -90,7 +91,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
     String audioUrl = widget.products?.audio ?? widget.podcastItem?.audio ?? "";
     url = Urls.networkPath + audioUrl;
-    print(controller.value);
+
     getCachedFile(url);
   }
 
@@ -125,7 +126,9 @@ class _PlayAudioState extends State<PlayAudio> {
   _initAudioPlayer(String url, FileInfo? fileInfo) async {
     try {
       if (fileInfo != null) {
-        print("fileInfo hoooson bish");
+        if (kDebugMode) {
+          print("fileInfo hoooson bish");
+        }
         audioFile = fileInfo.file;
 
         duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
@@ -134,7 +137,9 @@ class _PlayAudioState extends State<PlayAudio> {
             }) ??
             Duration.zero;
       } else {
-        print("fileInfo hoooson");
+        if (kDebugMode) {
+          print("fileInfo hoooson");
+        }
         duration = await audioPlayer.setUrl(url).then((value) {
               setState(() => isLoading = false);
               return value;
@@ -168,7 +173,9 @@ class _PlayAudioState extends State<PlayAudio> {
         AudioSessionSettings.handleInterruption(audioSession);
       });
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -207,6 +214,8 @@ class _PlayAudioState extends State<PlayAudio> {
   }
 
   Widget playAudio() {
+    final audioPosition =
+        Provider.of<AudioPlayerProvider>(context, listen: false);
     return Miniplayer(
         valueNotifier: playerExpandProgress,
         minHeight: playerMinHeight,
@@ -226,18 +235,11 @@ class _PlayAudioState extends State<PlayAudio> {
               value: height);
           if (percentageExpandedPlayer < 0) percentageExpandedPlayer = 0;
           final paddingVertical = valueFromPercentageInRange(
-              min: 0, max: 10, percentage: percentageExpandedPlayer);
+              min: 0, max: 0, percentage: percentageExpandedPlayer);
           final double heightWithoutPadding = height - paddingVertical * 2 / 9;
           final double imageSize =
               heightWithoutPadding > maxImgSize ? maxImgSize : 48;
-          final paddingLeft = valueFromPercentageInRange(
-                min: 0,
-                max: width - imageSize,
-                percentage: percentageExpandedPlayer,
-              ) /
-              2;
 
-          //Declare additional widgets (eg. SkipButton) and variables
           if (!miniplayer) {
             return Container(
               decoration: const BoxDecoration(
@@ -245,7 +247,6 @@ class _PlayAudioState extends State<PlayAudio> {
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(12),
                       topRight: Radius.circular(12))),
-              height: MediaQuery.of(context).size.height - 80,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SingleChildScrollView(
                 child: Opacity(
@@ -260,10 +261,10 @@ class _PlayAudioState extends State<PlayAudio> {
                             color: MyColors.gray,
                             borderRadius: BorderRadius.circular(10)),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 30),
                       Padding(
                         padding: EdgeInsets.only(
-                            left: paddingLeft,
+                            left: paddingVertical,
                             top: paddingVertical,
                             bottom: paddingVertical),
                         child: ClipRRect(
@@ -345,7 +346,7 @@ class _PlayAudioState extends State<PlayAudio> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 30),
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: progressBar()),
@@ -441,15 +442,26 @@ class _PlayAudioState extends State<PlayAudio> {
                             valueListenable: buttonNotifier,
                             builder:
                                 (context, ButtonState? buttonValue, widget) {
+                              PodcastListModel? currentlyPlay =
+                                  currentlyPlaying.value;
+
                               if (buttonValue?.index == 0) {
-                                return const IconButton(
-                                  icon: Icon(Icons.play_arrow_rounded),
-                                  onPressed: onTap,
+                                return IconButton(
+                                  icon: const Icon(Icons.play_arrow_rounded),
+                                  onPressed: () {
+                                    audioHandler.play();
+                                    AudioPlayerModel _audio = AudioPlayerModel(
+                                        productID: currentlyPlay?.id ?? 0,
+                                        audioPosition: position.inMilliseconds);
+                                    audioPosition.addAudioPosition(_audio);
+                                  },
                                 );
                               } else if (buttonValue?.index == 1) {
-                                return const IconButton(
-                                    onPressed: onTap,
-                                    icon: Icon(Icons.pause_rounded));
+                                return IconButton(
+                                    onPressed: () {
+                                      audioHandler.pause();
+                                    },
+                                    icon: const Icon(Icons.pause_rounded));
                               } else {
                                 return const Padding(
                                   padding: EdgeInsets.all(8.0),
@@ -476,7 +488,6 @@ class _PlayAudioState extends State<PlayAudio> {
                       child: ValueListenableBuilder<DurationState>(
                         valueListenable: durationStateNotifier,
                         builder: (context, durationValue, widget) {
-                          print("durationValue ${durationValue.progress}");
                           return LinearProgressIndicator(
                             value:
                                 durationValue.progress!.inMinutes.toDouble() /
@@ -526,7 +537,7 @@ class _PlayAudioState extends State<PlayAudio> {
       valueListenable: buttonNotifier,
       builder:
           (BuildContext context, ButtonState? buttonValue, Widget? widget) {
-        print("buttonValue $buttonValue");
+        PodcastListModel? currentlyPlay = currentlyPlaying.value;
         switch (buttonValue) {
           case ButtonState.loading:
             return const CircularProgressIndicator(color: Colors.white);
@@ -551,11 +562,10 @@ class _PlayAudioState extends State<PlayAudio> {
                 size: 40.0,
               ),
               onPressed: () {
-                // AudioPlayerModel _audio = AudioPlayerModel(
-                //     productID:
-                //         widget.products?.productId ?? widget.podcastItem?.id,
-                //     audioPosition: position.inMilliseconds);
-                // audioPosition.addAudioPosition(_audio);
+                AudioPlayerModel _audio = AudioPlayerModel(
+                    productID: currentlyPlay?.id ?? 0,
+                    audioPosition: position.inMilliseconds);
+                audioPosition.addAudioPosition(_audio);
                 audioHandler.pause();
               },
             );

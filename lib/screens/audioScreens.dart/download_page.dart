@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/audio_download_provider.dart';
@@ -37,11 +39,11 @@ class DownloadPage extends StatelessWidget {
             if (finished == true) {
               if (products != null) {
                 downloadAudio.addAudio(products ?? Products());
-                print("downloaded audio");
+                log("downloaded audio");
               } else {
                 downloadAudio.addPodcast(podcastItem ?? PodcastListModel());
 
-                print("downloaded podcast");
+                log("downloaded podcast");
               }
             }
             double? percent = (snapshot.data as DownloadProgress).progress;
@@ -71,9 +73,9 @@ class DownloadPage extends StatelessWidget {
                       color: MyColors.primaryColor),
                   splashRadius: 1,
                 ),
-                if (products != null)
-                  const Text("Татсан",
-                      style: TextStyle(fontSize: 12, color: MyColors.gray))
+                // if (products != null)
+                const Text("Татсан",
+                    style: TextStyle(fontSize: 12, color: MyColors.gray))
               ],
             );
           }

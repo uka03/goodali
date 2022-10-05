@@ -226,11 +226,10 @@ class _PodcastItemState extends State<PodcastItem> {
               builder: (BuildContext context, PodcastListModel? value,
                   Widget? child) {
                 var buttonState = buttonNotifier.value;
-                print(buttonState);
+
                 if (value?.title == "" ||
                     buttonState == ButtonState.paused ||
                     value?.title != widget.podcastItem.title) {
-                  print("paused $buttonState");
                   return CircleAvatar(
                       backgroundColor: MyColors.input,
                       child: IconButton(
@@ -262,7 +261,6 @@ class _PodcastItemState extends State<PodcastItem> {
                       ));
                 } else if (buttonState == ButtonState.playing &&
                     value?.title == widget.podcastItem.title) {
-                  print("playing$buttonState");
                   return CircleAvatar(
                     backgroundColor: MyColors.input,
                     child: IconButton(

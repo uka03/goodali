@@ -105,7 +105,6 @@ class _CourseTasksState extends State<CourseTasks> {
 
     getSavedPosition(id).then((value) {
       setState(() {
-        print("duration $duration");
         if (value == Duration.zero) {
         } else {
           print(value);
@@ -124,14 +123,12 @@ class _CourseTasksState extends State<CourseTasks> {
 
     // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
-      print(moodItemID);
-      print(item.productID);
       if (moodItemID == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
     }
     position = Duration(milliseconds: saveddouble);
-    print("position $position");
+
     return position;
   }
 

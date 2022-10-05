@@ -62,7 +62,6 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
                                   initialPage = value;
                                 }
                                 setState(() {
-                                  print("pop hiisnii daraa");
                                   getCoursesTasks(widget.id);
                                 });
                               });
