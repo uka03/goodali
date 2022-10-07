@@ -2,14 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:goodali/models/podcast_list_model.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PodcastProvider with ChangeNotifier {
-  List<PodcastListModel> _listenedPodcastList = [];
-  List<PodcastListModel> get listenedPodcastList => _listenedPodcastList;
+  List<Products> _listenedPodcastList = [];
+  List<Products> get listenedPodcastList => _listenedPodcastList;
 
-  List<PodcastListModel> _unListenedPodcastList = [];
-  List<PodcastListModel> get unListenedPodcastList => _unListenedPodcastList;
+  List<Products> _unListenedPodcastList = [];
+  List<Products> get unListenedPodcastList => _unListenedPodcastList;
 
   List<int> _podcastID = [];
   List<int> get podcastID => _podcastID;
@@ -39,8 +40,8 @@ class PodcastProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> decodedProductsString =
         prefs.getStringList("listened_podcast") ?? [];
-    List<PodcastListModel> decodedProduct = decodedProductsString
-        .map((res) => PodcastListModel.fromJson(json.decode(res)))
+    List<Products> decodedProduct = decodedProductsString
+        .map((res) => Products.fromJson(json.decode(res)))
         .toList();
     _listenedPodcastList = decodedProduct;
 
@@ -49,8 +50,8 @@ class PodcastProvider with ChangeNotifier {
 
     List<String> unListenedPodcast =
         prefs.getStringList("unlistened_podcast") ?? [];
-    List<PodcastListModel> unListened = unListenedPodcast
-        .map((res) => PodcastListModel.fromJson(json.decode(res)))
+    List<Products> unListened = unListenedPodcast
+        .map((res) => Products.fromJson(json.decode(res)))
         .toList();
     _unListenedPodcastList = unListened;
 
@@ -71,8 +72,7 @@ class PodcastProvider with ChangeNotifier {
     }
   }
 
-  void addListenedPodcast(
-      PodcastListModel item, List<PodcastListModel> podcastList) {
+  void addListenedPodcast(Products item, List<Products> podcastList) {
     _listenedPodcastList.add(item);
     for (var podcast in podcastList) {
       if (podcast.id == item.id) {
@@ -85,12 +85,12 @@ class PodcastProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  List<PodcastListModel> get listenedPodcast {
+  List<Products> get listenedPodcast {
     _getPrefItems();
     return _listenedPodcastList;
   }
 
-  List<PodcastListModel> get unListenedPodcast {
+  List<Products> get unListenedPodcast {
     _getPrefItems();
     return _unListenedPodcastList;
   }

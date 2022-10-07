@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
-import 'package:goodali/controller/audioplayer_controller.dart';
-import 'package:goodali/models/podcast_list_model.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
+typedef OnTap = Function(Products audioObject, List<Products> podcastList);
+
 class NotListenedPodcast extends StatefulWidget {
-  const NotListenedPodcast({Key? key}) : super(key: key);
+  final OnTap onTap;
+  const NotListenedPodcast({Key? key, required this.onTap}) : super(key: key);
 
   @override
   State<NotListenedPodcast> createState() => _NotListenedPodcastState();
@@ -51,14 +53,9 @@ class _NotListenedPodcastState extends State<NotListenedPodcast> {
                       currentIndex = index;
                     });
                   },
-                  podcastList: [],
-                  onTap:
-                      (PodcastListModel podcastItem, AudioPlayer audioPlayer) {
-                    value.unListenedPodcast[index] = podcastItem;
-                    audioPlayers[index] = audioPlayer;
-                    print("unListened podcast ${podcastItem.audio}");
-                    currentlyPlaying.value = podcastItem;
-                  },
+                  podcastList: value.unListenedPodcast,
+                  onTap: () => widget.onTap(
+                      value.unListenedPodcast[index], value.unListenedPodcast),
                 ),
               );
             },

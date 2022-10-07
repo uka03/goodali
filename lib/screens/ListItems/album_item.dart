@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 
@@ -14,11 +13,14 @@ class AlbumItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
+      onTap: () =>
+          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
               builder: (context) => AlbumDetail(
-                    products: albumData,
+                    onTap: (audioObject, podcastList) {
+                      currentlyPlaying.value = audioObject;
+                      AudioPlayerController();
+                    },
+                    albumProduct: albumData,
                   ))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

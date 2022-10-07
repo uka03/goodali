@@ -9,8 +9,8 @@ class AudioDownloadProvider with ChangeNotifier {
   List<Products> _items = [];
   List<Products> get items => _items;
 
-  List<PodcastListModel> _podcastItem = [];
-  List<PodcastListModel> get podcastItem => _podcastItem;
+  List<Products> _podcastItem = [];
+  List<Products> get podcastItem => _podcastItem;
 
   void _setPrefItems() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -68,28 +68,30 @@ class AudioDownloadProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> decodedProductsString =
         prefs.getStringList("podcast_item") ?? [];
-    List<PodcastListModel> decodedProduct = decodedProductsString
-        .map((res) => PodcastListModel.fromJson(json.decode(res)))
+    List<Products> decodedProduct = decodedProductsString
+        .map((res) => Products.fromJson(json.decode(res)))
         .toList();
     _podcastItem = decodedProduct;
 
     notifyListeners();
   }
 
-  Future<void> addPodcast(PodcastListModel cartItem) async {
+  Future<void> addPodcast(Products cartItem) async {
     _podcastItem.add(cartItem);
-    _setPrefPodcastItems();
-    // notifyListeners();
-  }
-
-  void removePodcast(PodcastListModel item) {
-    _podcastItem.remove(item);
-    _podcastItem.removeWhere((element) => element.id == item.id);
     _setPrefPodcastItems();
     notifyListeners();
   }
 
-  List<PodcastListModel> get downloadedPodcast {
+  void removePodcast(Products item) {
+    _podcastItem.remove(item);
+    _podcastItem.removeWhere((element) => element.id == item.id);
+    _setPrefPodcastItems();
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      notifyListeners();
+    });
+  }
+
+  List<Products> get downloadedPodcast {
     _getPrefPodcastItems();
     return _podcastItem;
   }

@@ -66,14 +66,28 @@ class _PodcastState extends State<Podcast> {
               body: TabBarView(children: [
                 PodcastAll(
                   onTap: (audioObject, podcastList) {
-                    print("podcastscreen podcastall");
                     currentlyPlaying.value = audioObject;
                     AudioPlayerController();
                   },
                 ),
-                const NotListenedPodcast(),
-                const DownloadedPodcast(),
-                const ListenedPodcast()
+                NotListenedPodcast(
+                  onTap: (audioObject, podcastList) {
+                    currentlyPlaying.value = audioObject;
+                    AudioPlayerController();
+                  },
+                ),
+                DownloadedPodcast(
+                  onTap: (audioObject, podcastList) {
+                    currentlyPlaying.value = audioObject;
+                    AudioPlayerController();
+                  },
+                ),
+                ListenedPodcast(
+                  onTap: (audioObject, podcastList) {
+                    currentlyPlaying.value = audioObject;
+                    AudioPlayerController();
+                  },
+                )
               ]))),
     );
   }

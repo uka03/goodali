@@ -8,6 +8,7 @@ import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
+import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/global_variables.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audio_player_handler.dart';
@@ -67,7 +68,7 @@ class _MyAppState extends State<MyApp> {
       child: Consumer<Auth>(
         builder: (context, value, child) {
           return MaterialApp(
-              // navigatorKey: NavigationService.navigatorKey,
+              // navigatorKey: navigatorKey,
               title: 'Goodali',
               debugShowCheckedModeBanner: false,
               theme: ThemeData(

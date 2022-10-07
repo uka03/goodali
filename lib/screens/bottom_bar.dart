@@ -4,15 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
-import 'package:goodali/models/podcast_list_model.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/home_screen.dart';
 import 'package:goodali/screens/ForumScreen/forum_screen.dart';
 import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
 import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:miniplayer/miniplayer.dart';
-
-final _navigatorKey = GlobalKey();
 
 class BottomTabbar extends StatefulWidget {
   const BottomTabbar({Key? key}) : super(key: key);
@@ -33,8 +31,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
   Widget build(BuildContext context) {
     return MiniplayerWillPopScope(
       onWillPop: () async {
-        final NavigatorState? navigator =
-            _navigatorKey.currentState as NavigatorState?;
+        final NavigatorState? navigator = navigatorKey.currentState;
         if (!navigator!.canPop()) return true;
         navigator.pop();
 
@@ -115,22 +112,21 @@ class _BottomTabbarState extends State<BottomTabbar> {
         body: Stack(
           children: [
             Navigator(
-              key: _navigatorKey,
+              key: navigatorKey,
               onGenerateRoute: (RouteSettings settings) => MaterialPageRoute(
                 settings: settings,
-                builder: (BuildContext context) => const HomeScreen(),
+                builder: (BuildContext context) =>
+                    _widgetOptions[selectedIndex],
               ),
             ),
-            _widgetOptions[selectedIndex],
             ValueListenableBuilder(
                 valueListenable: currentlyPlaying,
-                builder: (BuildContext context, PodcastListModel? podcastItem,
+                builder: (BuildContext context, Products? podcastItem,
                     Widget? child) {
                   return podcastItem != null
                       ? PlayAudio(
-                          podcastItem: podcastItem,
-                          albumName: podcastItem.albumName ?? "",
-                          notifyParent: () {},
+                          products: podcastItem,
+                          albumName: podcastItem.albumTitle ?? "",
                         )
                       : Container();
                 }),

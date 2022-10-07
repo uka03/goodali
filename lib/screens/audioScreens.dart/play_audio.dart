@@ -40,21 +40,17 @@ void onTap() {}
 final MiniplayerController controller = MiniplayerController();
 
 class PlayAudio extends StatefulWidget {
-  final Function() notifyParent;
   final Products? products;
-  final PodcastListModel? podcastItem;
   final String albumName;
   final bool? isDownloaded;
   final String? downloadedAudioPath;
-  const PlayAudio(
-      {Key? key,
-      this.products,
-      required this.albumName,
-      this.isDownloaded = false,
-      this.downloadedAudioPath,
-      this.podcastItem,
-      required this.notifyParent})
-      : super(key: key);
+  const PlayAudio({
+    Key? key,
+    this.products,
+    required this.albumName,
+    this.isDownloaded = false,
+    this.downloadedAudioPath,
+  }) : super(key: key);
 
   @override
   State<PlayAudio> createState() => _PlayAudioState();
@@ -89,7 +85,7 @@ class _PlayAudioState extends State<PlayAudio> {
   void initState() {
     super.initState();
 
-    String audioUrl = widget.products?.audio ?? widget.podcastItem?.audio ?? "";
+    String audioUrl = widget.products?.audio ?? "";
     url = Urls.networkPath + audioUrl;
 
     getCachedFile(url);
@@ -119,10 +115,6 @@ class _PlayAudioState extends State<PlayAudio> {
     return value;
   }
 
-  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
-      .map((state) => state.bufferedPosition)
-      .distinct();
-
   _initAudioPlayer(String url, FileInfo? fileInfo) async {
     try {
       if (fileInfo != null) {
@@ -147,15 +139,14 @@ class _PlayAudioState extends State<PlayAudio> {
             Duration.zero;
       }
 
-      String banner =
-          widget.products?.banner ?? widget.podcastItem?.banner ?? "";
+      String banner = widget.products?.banner ?? "";
 
       MediaItem item;
       getSavedPosition().then((value) {
         setState(() {
           item = MediaItem(
               id: url,
-              title: widget.products?.title ?? widget.podcastItem?.title ?? "",
+              title: widget.products?.title ?? "",
               duration: duration,
               artUri: Uri.parse(Urls.networkPath + banner),
               extras: {"position": position.inMilliseconds});
@@ -197,7 +188,7 @@ class _PlayAudioState extends State<PlayAudio> {
         .toList();
 
     for (var item in decodedProduct) {
-      if (widget.products == null && widget.podcastItem?.id == item.productID) {
+      if (widget.products?.id == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       } else if (widget.products?.productId == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
@@ -225,7 +216,6 @@ class _PlayAudioState extends State<PlayAudio> {
         curve: Curves.easeOut,
         builder: (height, percentage) {
           final bool miniplayer = percentage < miniplayerPercentageDeclaration;
-          final double width = MediaQuery.of(context).size.width;
           const double maxImgSize = 220;
 
           var percentageExpandedPlayer = percentageFromValueInRange(
@@ -271,7 +261,7 @@ class _PlayAudioState extends State<PlayAudio> {
                           borderRadius: BorderRadius.circular(12),
                           child: ImageView(
                             imgPath: widget.products?.banner ??
-                                widget.podcastItem?.banner ??
+                                widget.products?.banner ??
                                 "",
                             width: imageSize,
                             height: imageSize,
@@ -286,9 +276,7 @@ class _PlayAudioState extends State<PlayAudio> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        widget.products?.title ??
-                            widget.podcastItem?.title ??
-                            "",
+                        widget.products?.title ?? "",
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             fontSize: 24,
@@ -316,8 +304,7 @@ class _PlayAudioState extends State<PlayAudio> {
                               : DownloadPage(
                                   fileStream: fileStream,
                                   downloadFile: _downloadFile,
-                                  products: widget.products,
-                                  podcastItem: widget.podcastItem),
+                                  products: widget.products),
                           Column(
                             children: [
                               IconButton(
@@ -327,11 +314,10 @@ class _PlayAudioState extends State<PlayAudio> {
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               AudioDescription(
-                                                  description:
+                                                  description: widget
+                                                          .products?.body ??
                                                       widget.products?.body ??
-                                                          widget.podcastItem
-                                                              ?.body ??
-                                                          "")));
+                                                      "")));
                                 },
                                 icon: const Icon(
                                   IconlyLight.info_square,
@@ -401,7 +387,7 @@ class _PlayAudioState extends State<PlayAudio> {
                           borderRadius: BorderRadius.circular(4),
                           child: ImageView(
                             imgPath: widget.products?.banner ??
-                                widget.podcastItem?.banner ??
+                                widget.products?.banner ??
                                 "",
                             width: imageSize,
                             height: imageSize,
@@ -418,7 +404,7 @@ class _PlayAudioState extends State<PlayAudio> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(widget.podcastItem?.title ?? "",
+                                Text(widget.products?.title ?? "",
                                     maxLines: 1,
                                     style: const TextStyle(
                                         overflow: TextOverflow.ellipsis,
@@ -442,8 +428,7 @@ class _PlayAudioState extends State<PlayAudio> {
                             valueListenable: buttonNotifier,
                             builder:
                                 (context, ButtonState? buttonValue, widget) {
-                              PodcastListModel? currentlyPlay =
-                                  currentlyPlaying.value;
+                              Products? currentlyPlay = currentlyPlaying.value;
 
                               if (buttonValue?.index == 0) {
                                 return IconButton(
@@ -477,6 +462,7 @@ class _PlayAudioState extends State<PlayAudio> {
                           icon: const Icon(Icons.close),
                           onPressed: () {
                             currentlyPlaying.value = null;
+                            audioHandler.stop();
                           }),
                     ],
                   ),
@@ -537,7 +523,7 @@ class _PlayAudioState extends State<PlayAudio> {
       valueListenable: buttonNotifier,
       builder:
           (BuildContext context, ButtonState? buttonValue, Widget? widget) {
-        PodcastListModel? currentlyPlay = currentlyPlaying.value;
+        Products? currentlyPlay = currentlyPlaying.value;
         switch (buttonValue) {
           case ButtonState.loading:
             return const CircularProgressIndicator(color: Colors.white);

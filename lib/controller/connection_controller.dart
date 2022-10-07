@@ -583,8 +583,7 @@ class Connection {
     }
   }
 
-  static Future<List<PodcastListModel>> getPodcastList(
-      BuildContext context) async {
+  static Future<List<Products>> getPodcastList(BuildContext context) async {
     try {
       final response =
           await Http().getDio(context, headerTypeNone).post(Urls.podcastList);
@@ -592,7 +591,7 @@ class Connection {
 
       if (response.statusCode == 200) {
         return (response.data as List)
-            .map((e) => PodcastListModel.fromJson(e))
+            .map((e) => Products.fromJson(e))
             .toList();
       } else {
         return [];

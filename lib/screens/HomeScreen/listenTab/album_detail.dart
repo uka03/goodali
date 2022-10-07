@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
-import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
@@ -23,21 +24,27 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-class AlbumDetail extends StatefulWidget {
-  final Products products;
+typedef OnTap = Function(Products products, List<Products> productsList);
 
-  const AlbumDetail({Key? key, required this.products}) : super(key: key);
+class AlbumDetail extends StatefulWidget {
+  final Products albumProduct;
+  final OnTap onTap;
+
+  const AlbumDetail({Key? key, required this.albumProduct, required this.onTap})
+      : super(key: key);
 
   @override
   State<AlbumDetail> createState() => _AlbumDetailState();
 }
 
 class _AlbumDetailState extends State<AlbumDetail> {
+  AudioPlayerController audioPlayerController = AudioPlayerController();
   late final List<AudioPlayer> audioPlayer = [];
   late final Future future = getAlbumLectures();
   late final Future futureLogged = getLectureListLogged();
   late final AudioPlayer introAudioPlayer = AudioPlayer();
   List<int> albumProductsList = [];
+  List<Products> lectureList = [];
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
@@ -48,7 +55,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
   double containerHeight = 270;
   double containerInitialHeight = 270;
   double imageOpacity = 1;
-  bool isLoading = true;
   bool isPlaying = false;
   bool isClicked = false;
   int currentIndex = 1;
@@ -100,40 +106,25 @@ class _AlbumDetailState extends State<AlbumDetail> {
   setAlbumIntroAudio() {
     try {
       introAudioPlayer
-          .setUrl(Urls.networkPath + widget.products.audio!)
+          .setUrl(Urls.networkPath + widget.albumProduct.audio!)
           .then((value) {
         duration = value ?? Duration.zero;
-        getSavedPosition(widget.products.productId!).then((value) {
+        audioPlayerController
+            .getSavedPosition(widget.albumProduct.productId!)
+            .then((value) {
           if (value != Duration.zero) {
             savedPosition = value;
             position = savedPosition;
-
-            introAudioPlayer.setUrl(Urls.networkPath + widget.products.audio!,
+            duration = duration - position;
+            introAudioPlayer.setUrl(
+                Urls.networkPath + widget.albumProduct.audio!,
                 initialPosition: position);
           } else {}
         });
       });
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
-  }
-
-  Future getSavedPosition(int moodItemID) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
-    List<AudioPlayerModel> decodedProduct = decodedAudioString
-        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
-        .toList();
-
-    // developer.log(decodedProduct.first.audioPosition.toString());
-    for (var item in decodedProduct) {
-      if (moodItemID == item.productID) {
-        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
-      }
-    }
-    Duration savedPosition = Duration(milliseconds: saveddouble);
-
-    return savedPosition;
   }
 
   @override
@@ -149,145 +140,142 @@ class _AlbumDetailState extends State<AlbumDetail> {
         return true;
       },
       child: Scaffold(
-          appBar: const SimpleAppBar(),
-          body: Consumer<Auth>(
-            builder: (context, value, child) {
-              return FutureBuilder(
-                future: value.isAuth ? futureLogged : future,
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    List<Products> lectureList = snapshot.data;
-                    return Stack(children: [
-                      Container(
-                          height: containerHeight,
-                          width: MediaQuery.of(context).size.width,
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Container(
-                              //     height: imageSize,
-                              //     width: imageSize,
-                              //     color: Colors.indigo[200]),
-                              Opacity(
-                                opacity: imageOpacity.clamp(0, 1),
-                                child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(14),
-                                    child: Image.network(
-                                      Urls.networkPath +
-                                          (widget.products.banner ?? ""),
-                                      width: imageSize,
-                                      height: imageSize,
-                                      loadingBuilder: (BuildContext context,
-                                          Widget child,
-                                          ImageChunkEvent? loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            color: MyColors.primaryColor,
-                                            strokeWidth: 2,
-                                            value: loadingProgress
-                                                        .expectedTotalBytes !=
-                                                    null
-                                                ? loadingProgress
-                                                        .cumulativeBytesLoaded /
-                                                    loadingProgress
-                                                        .expectedTotalBytes!
-                                                : null,
-                                          ),
-                                        );
-                                      },
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stack) {
-                                        if (error
-                                                is NetworkImageLoadException &&
-                                            error.statusCode == 404) {
-                                          return const Text("404");
-                                        }
+        appBar: const SimpleAppBar(),
+        body: Consumer<Auth>(
+          builder: (context, value, child) {
+            return FutureBuilder(
+              future: value.isAuth ? futureLogged : future,
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  lectureList = snapshot.data;
+                  return Stack(children: [
+                    Container(
+                        height: containerHeight,
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Container(
+                            //     height: imageSize,
+                            //     width: imageSize,
+                            //     color: Colors.indigo[200]),
+                            Opacity(
+                              opacity: imageOpacity.clamp(0, 1),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Image.network(
+                                    Urls.networkPath +
+                                        (widget.albumProduct.banner ?? ""),
+                                    width: imageSize,
+                                    height: imageSize,
+                                    loadingBuilder: (BuildContext context,
+                                        Widget child,
+                                        ImageChunkEvent? loadingProgress) {
+                                      if (loadingProgress == null) {
+                                        return child;
+                                      }
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          color: MyColors.primaryColor,
+                                          strokeWidth: 2,
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stack) {
+                                      if (error is NetworkImageLoadException &&
+                                          error.statusCode == 404) {
+                                        return const Text("404");
+                                      }
 
-                                        return SizedBox(
-                                            width: imageSize,
-                                            height: imageSize,
-                                            child: const Text(
-                                              "No Image",
-                                              style: TextStyle(fontSize: 12),
-                                            ));
-                                      },
-                                    )),
-                              ),
-                              const SizedBox(height: 80)
-                            ],
-                          )),
-                      SingleChildScrollView(
-                        controller: _controller,
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(children: [
-                          SizedBox(height: initialSize + 32),
-                          Text(
-                            widget.products.title ?? "",
-                            style: const TextStyle(
-                                fontSize: 20,
-                                color: MyColors.black,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 20),
-                          Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20.0),
-                              child: CustomReadMoreText(
-                                text: widget.products.body ?? "",
-                                textAlign: TextAlign.center,
-                              )),
-                          const SizedBox(height: 20),
-                          const Divider(endIndent: 20, indent: 20),
-                          lecture(context, lectureList),
-                          const SizedBox(height: 20),
-                          Padding(
+                                      return SizedBox(
+                                          width: imageSize,
+                                          height: imageSize,
+                                          child: const Text(
+                                            "No Image",
+                                            style: TextStyle(fontSize: 12),
+                                          ));
+                                    },
+                                  )),
+                            ),
+                            const SizedBox(height: 80)
+                          ],
+                        )),
+                    SingleChildScrollView(
+                      controller: _controller,
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(children: [
+                        SizedBox(height: initialSize + 32),
+                        Text(
+                          widget.albumProduct.title ?? "",
+                          style: const TextStyle(
+                              fontSize: 20,
+                              color: MyColors.black,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 20.0),
-                            child: CustomElevatedButton(
-                                text: "Худалдаж авах",
-                                onPress: () {
-                                  for (var item in lectureList) {
-                                    albumProductsList.add(item.productId!);
-                                  }
-                                  cart.addItemsIndex(widget.products.productId!,
-                                      albumProductIDs: albumProductsList);
-                                  if (!cart.sameItemCheck) {
-                                    cart.addProducts(widget.products);
-                                    cart.addTotalPrice(
-                                        widget.products.price?.toDouble() ??
-                                            0.0);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const CartScreen()));
-                                  } else {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const CartScreen()));
-                                  }
-                                }),
-                          ),
-                          const SizedBox(height: 50),
-                        ]),
-                      ),
-                    ]);
-                  } else {
-                    return const Center(
-                        child: CircularProgressIndicator(
-                            color: MyColors.primaryColor));
+                            child: CustomReadMoreText(
+                              text: widget.albumProduct.body ?? "",
+                              textAlign: TextAlign.center,
+                            )),
+                        const SizedBox(height: 20),
+                        const Divider(endIndent: 20, indent: 20),
+                        lecture(context, lectureList),
+                        const SizedBox(height: 20),
+                      ]),
+                    ),
+                  ]);
+                } else {
+                  return const Center(
+                      child: CircularProgressIndicator(
+                          color: MyColors.primaryColor));
+                }
+              },
+            );
+          },
+        ),
+        persistentFooterButtons: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: CustomElevatedButton(
+                text: "Худалдаж авах",
+                onPress: () {
+                  for (var item in lectureList) {
+                    albumProductsList.add(item.productId!);
                   }
-                },
-              );
-            },
-          )),
+                  cart.addItemsIndex(widget.albumProduct.productId!,
+                      albumProductIDs: albumProductsList);
+                  if (!cart.sameItemCheck) {
+                    cart.addProducts(widget.albumProduct);
+                    cart.addTotalPrice(
+                        widget.albumProduct.price?.toDouble() ?? 0.0);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartScreen()));
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartScreen()));
+                  }
+                }),
+          ),
+        ],
+      ),
     );
   }
 
@@ -311,7 +299,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     ClipRRect(
                         borderRadius: BorderRadius.circular(4),
                         child: ImageView(
-                            imgPath: widget.products.banner ?? "",
+                            imgPath: widget.albumProduct.banner ?? "",
                             width: 40,
                             height: 40)),
                     const SizedBox(width: 15),
@@ -350,7 +338,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                             currentIndex = audioPlayer.length + 1;
                           });
                           AudioPlayerModel _audio = AudioPlayerModel(
-                              productID: widget.products.productId,
+                              productID: widget.albumProduct.productId,
                               audioPosition: position.inMilliseconds);
                           _audioPlayerProvider.addAudioPosition(_audio);
                           if (isPlaying) {
@@ -368,40 +356,44 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         ),
                       ),
                     ),
-                    if (isClicked || savedPosition != Duration.zero)
-                      Row(
-                        children: [
-                          const SizedBox(width: 14),
-                          SizedBox(
-                            width: 90,
-                            child: SfLinearGauge(
-                              minimum: 0,
-                              maximum: duration.inSeconds.toDouble() / 10,
-                              showLabels: false,
-                              showAxisTrack: false,
-                              showTicks: false,
-                              ranges: [
-                                LinearGaugeRange(
-                                  position: LinearElementPosition.inside,
-                                  edgeStyle: LinearEdgeStyle.bothCurve,
-                                  startValue: 0,
-                                  color: MyColors.border1,
-                                  endValue: duration.inSeconds.toDouble() / 10,
-                                ),
-                              ],
-                              barPointers: [
-                                LinearBarPointer(
-                                    position: LinearElementPosition.inside,
-                                    edgeStyle: LinearEdgeStyle.bothCurve,
-                                    color: MyColors.primaryColor,
-                                    // color: MyColors.border1,
-                                    value: position.inSeconds.toDouble() / 10)
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    // if (isClicked || savedPosition != Duration.zero)
+                    //   Row(
+                    //     children: [
+                    //       const SizedBox(width: 14),
+                    //       SizedBox(
+                    //         width: 90,
+                    //         child: SfLinearGauge(
+                    //           minimum: 0,
+                    //           maximum: duration.inSeconds.toDouble() / 10,
+                    //           showLabels: false,
+                    //           showAxisTrack: false,
+                    //           showTicks: false,
+                    //           ranges: [
+                    //             LinearGaugeRange(
+                    //               position: LinearElementPosition.inside,
+                    //               edgeStyle: LinearEdgeStyle.bothCurve,
+                    //               startValue: 0,
+                    //               color: MyColors.border1,
+                    //               endValue: duration.inSeconds.toDouble() / 10,
+                    //             ),
+                    //           ],
+                    //           barPointers: [
+                    //             LinearBarPointer(
+                    //                 position: LinearElementPosition.inside,
+                    //                 edgeStyle: LinearEdgeStyle.bothCurve,
+                    //                 color: MyColors.primaryColor,
+                    //                 // color: MyColors.border1,
+                    //                 value: position.inSeconds.toDouble() / 10)
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
                     const SizedBox(width: 10),
+                    // AudioplayerTimer(
+                    //     savedPosition: savedPosition,
+                    //     leftPosition: duration,
+                    //     title: "Танилцуулга"),
                     Text(formatTime(duration - position) + "мин",
                         style: const TextStyle(
                             fontSize: 12, color: MyColors.black)),
@@ -434,16 +426,17 @@ class _AlbumDetailState extends State<AlbumDetail> {
               return AlbumDetailItem(
                 products: product[index],
                 isBought: false,
-                albumName: widget.products.title!,
+                albumName: widget.albumProduct.title!,
                 audioPlayer: audioPlayer[index],
                 audioPlayerList: audioPlayer,
                 productsList: product,
-                albumProducts: widget.products,
+                albumProducts: widget.albumProduct,
                 setIndex: (int index) {
                   setState(() {
                     currentIndex = index;
                   });
                 },
+                onTap: () => widget.onTap(product[index], product),
               );
             },
             itemCount: product.length,
@@ -472,7 +465,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
               builder: (BuildContext context,
                   void Function(void Function()) setState) {
                 return IntroAudio(
-                    products: widget.products,
+                    products: widget.albumProduct,
                     productsList: [],
                     audioPlayer: introAudioPlayer);
               },
@@ -481,11 +474,11 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
   Future<List<Products>> getAlbumLectures() async {
     return await Connection.getAlbumLectures(
-        context, widget.products.id.toString());
+        context, widget.albumProduct.id.toString());
   }
 
   Future<List<Products>> getLectureListLogged() async {
     return await Connection.getLectureListLogged(
-        context, widget.products.id.toString());
+        context, widget.albumProduct.id.toString());
   }
 }

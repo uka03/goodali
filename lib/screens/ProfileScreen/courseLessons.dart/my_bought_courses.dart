@@ -7,8 +7,11 @@ import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/course_products_item.dart';
 import 'package:just_audio/just_audio.dart';
 
+typedef OnTap = Function(Products products, List<Products> productsList);
+
 class MyCourses extends StatefulWidget {
-  const MyCourses({Key? key}) : super(key: key);
+  final OnTap onTap;
+  const MyCourses({Key? key, required this.onTap}) : super(key: key);
 
   @override
   State<MyCourses> createState() => _MyCoursesState();
@@ -110,6 +113,7 @@ class _MyCoursesState extends State<MyCourses> {
                       currentIndex = index;
                     });
                   },
+                  onTap: () => widget.onTap(allLectures[index], allLectures),
                 ),
               ],
             );

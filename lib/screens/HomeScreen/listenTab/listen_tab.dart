@@ -3,16 +3,13 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
-import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class ListenTabbar extends StatefulWidget {
@@ -23,12 +20,6 @@ class ListenTabbar extends StatefulWidget {
 }
 
 class _ListenTabbarState extends State<ListenTabbar> {
-  // late final List<AudioPlayer> audioPlayer = [];
-  // late final future = getPodcastList();
-  // FileInfo? fileInfo;
-  // File? audioFile;
-  // int currentIndex = 0;
-
   List<Products>? albumList;
   List<Products> audioLength = [];
 
@@ -65,8 +56,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
                                 fontWeight: FontWeight.bold)),
                         IconButton(
                             onPressed: () {
-                              Navigator.push(
-                                  context,
+                              Navigator.of(context, rootNavigator: true).push(
                                   MaterialPageRoute(
                                       builder: (_) => const AlbumLecture()));
                             },
@@ -98,11 +88,8 @@ class _ListenTabbarState extends State<ListenTabbar> {
                         ],
                       )),
                   PodcastAll(
-                    onTap: (PodcastListModel audioObject,
-                        List<PodcastListModel> podcastList) {
+                    onTap: (Products audioObject, List<Products> podcastList) {
                       currentlyPlaying.value = audioObject;
-
-                      AudioPlayerController();
                     },
                   ),
                   Padding(
@@ -117,8 +104,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
                                   fontWeight: FontWeight.bold)),
                           IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                    context,
+                                Navigator.of(context, rootNavigator: true).push(
                                     MaterialPageRoute(
                                         builder: (_) => const VideoList()));
                               },
@@ -151,36 +137,6 @@ class _ListenTabbarState extends State<ListenTabbar> {
     );
   }
 
-  // Widget podcast(BuildContext context, List<PodcastListModel> podcastList) {
-  //   return ListView.separated(
-  //     physics: const NeverScrollableScrollPhysics(),
-  //     shrinkWrap: true,
-  //     padding: const EdgeInsets.only(bottom: 15),
-  //     itemBuilder: (BuildContext context, int index) {
-  //       audioPlayer.add(AudioPlayer());
-  //       for (var i = 0; i < audioPlayer.length; i++) {
-  //         if (currentIndex != i) {
-  //           audioPlayer[i].pause();
-  //         }
-  //       }
-  //       return PodcastItem(
-  //           podcastItem: podcastList[index],
-  //           audioPlayer: audioPlayer[index],
-  //           audioPlayerList: audioPlayer,
-  //           setIndex: (int index) {
-  //             setState(() {
-  //               currentIndex = index;
-  //             });
-  //           });
-  //     },
-  //     itemCount: podcastList.length,
-  //     separatorBuilder: (BuildContext context, int index) => const Divider(
-  //       endIndent: 18,
-  //       indent: 18,
-  //     ),
-  //   );
-  // }
-
   Future<List<Products>> getProducts() {
     return Connection.getProducts(context, "0");
   }
@@ -189,7 +145,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
     return Connection.getalbumListLogged(context);
   }
 
-  Future<List<PodcastListModel>> getPodcastList() {
+  Future<List<Products>> getPodcastList() {
     return Connection.getPodcastList(context);
   }
 }

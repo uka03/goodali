@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
@@ -28,9 +30,6 @@ class AudioPlayerHandler extends BaseAudioHandler
     });
     _loadEmptyPlaylist();
     _notifyAudioHandlerAboutPlaybackEvents();
-    // _listenForDurationChanges();
-    // _listenForCurrentSongIndexChanges();
-    // _listenForSequenceStateChanges();
   }
 
   Future<void> _loadEmptyPlaylist() async {
@@ -126,16 +125,27 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> playMediaItem(MediaItem item) async {
     mediaItem.add(item);
     debugPrint("player media item");
-    await _player.setUrl(item.id,
-        initialPosition: item.extras?['position'] != Duration.zero
-            ? Duration(microseconds: (item.extras?['position'] * 1000).toInt())
-            : Duration.zero,
-        preload: false);
+    if (item.extras?['isDownloaded'] == true) {
+      _player.setFilePath(item.id,
+          initialPosition: item.extras?['position'] != Duration.zero
+              ? Duration(
+                  microseconds: (item.extras?['position'] * 1000).toInt())
+              : Duration.zero,
+          preload: false);
+    } else {
+      _player.setUrl(item.id,
+          initialPosition: item.extras?['position'] != Duration.zero
+              ? Duration(
+                  microseconds: (item.extras?['position'] * 1000).toInt())
+              : Duration.zero,
+          preload: false);
+    }
   }
 
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
     final audioSource = mediaItems.map(_createAudioSource);
+
     _playlist.addAll(audioSource.toList());
   }
 
@@ -147,10 +157,17 @@ class AudioPlayerHandler extends BaseAudioHandler
   }
 
   UriAudioSource _createAudioSource(MediaItem mediaItem) {
-    return AudioSource.uri(
-      Uri.parse(mediaItem.id),
-      tag: mediaItem,
-    );
+    if (mediaItem.extras?['isDownloaded'] == true) {
+      return AudioSource.uri(
+        Uri.file(mediaItem.id),
+        tag: mediaItem,
+      );
+    } else {
+      return AudioSource.uri(
+        Uri.parse(mediaItem.id),
+        tag: mediaItem,
+      );
+    }
   }
 
   @override

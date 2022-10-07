@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/models/products_model.dart';
+import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/downloaded_lecture_item.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
+typedef OnTap(Products audioObject, AudioPlayer audioPlayer);
+
 class Downloaded extends StatefulWidget {
-  const Downloaded({Key? key}) : super(key: key);
+  final Function onTap;
+  const Downloaded({Key? key, required this.onTap}) : super(key: key);
 
   @override
   State<Downloaded> createState() => _DownloadedState();
 }
 
 class _DownloadedState extends State<Downloaded> {
-  List<AudioPlayer> audioPlayer = [];
   @override
   void initState() {
     super.initState();
@@ -29,12 +33,16 @@ class _DownloadedState extends State<Downloaded> {
             return ListView.builder(
                 itemCount: value.items.length,
                 itemBuilder: (context, index) {
-                  audioPlayer.add(AudioPlayer());
-                  return DownloadedLectureItem(
-                      products: value.downloadedItem[index],
-                      audioPlayerList: audioPlayer,
-                      setIndex: (int index) {},
-                      audioPlayer: audioPlayer[index]);
+                  return AlbumDetailItem(
+                    products: value.downloadedItem[index],
+                    audioPlayerList: [],
+                    setIndex: (int index) {},
+                    audioPlayer: AudioPlayer(),
+                    albumName: value.downloadedItem[index].albumTitle ?? "",
+                    isBought: value.downloadedItem[index].isBought ?? true,
+                    onTap: widget.onTap,
+                    productsList: value.downloadedItem,
+                  );
                 });
           } else {
             return const Center(

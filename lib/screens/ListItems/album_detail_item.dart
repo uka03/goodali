@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -8,24 +7,25 @@ import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
-import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Widgets/audio_progressbar.dart';
+import 'package:goodali/Widgets/audioplayer_button.dart';
+import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
-import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
-import 'package:syncfusion_flutter_gauges/gauges.dart';
-
 typedef SetIndex = void Function(int index);
+typedef OnTap(Products audioObject, AudioPlayer audioPlayer);
 
 class AlbumDetailItem extends StatefulWidget {
   final SetIndex setIndex;
@@ -36,8 +36,7 @@ class AlbumDetailItem extends StatefulWidget {
   final bool isBought;
   final AudioPlayer audioPlayer;
   final List<AudioPlayer> audioPlayerList;
-  // final Duration duration;
-  // final Dura
+  final Function onTap;
 
   const AlbumDetailItem(
       {Key? key,
@@ -48,7 +47,8 @@ class AlbumDetailItem extends StatefulWidget {
       required this.audioPlayer,
       required this.audioPlayerList,
       required this.setIndex,
-      this.albumProducts})
+      this.albumProducts,
+      required this.onTap})
       : super(key: key);
 
   @override
@@ -56,31 +56,42 @@ class AlbumDetailItem extends StatefulWidget {
 }
 
 class _AlbumDetailItemState extends State<AlbumDetailItem> {
+  AudioPlayerController audioPlayerController = AudioPlayerController();
+  List<MediaItem> mediaItems = [];
+  MediaItem mediaItem = const MediaItem(id: "", title: "");
   FileInfo? fileInfo;
   File? audioFile;
+  Stream<FileResponse>? fileStream;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   Duration savedPosition = Duration.zero;
+  Duration leftDuration = Duration.zero;
 
   int saveddouble = 0;
   int currentIndex = 0;
   bool isClicked = false;
   bool isPlaying = false;
   String url = "";
+  String audioURL = "";
+  String introURL = "";
+  String banner = "";
+  bool isbgPlaying = false;
 
   @override
   void initState() {
-    widget.audioPlayer.setLoopMode(LoopMode.off);
+    if (widget.products.audio != "Audio failed to upload") {
+      audioURL = Urls.networkPath + widget.products.audio!;
+    }
+    if (widget.products.intro != "Audio failed to upload") {
+      introURL = Urls.networkPath + widget.products.intro!;
+    }
+    banner = Urls.networkPath + (widget.products.banner ?? "");
 
-    String audioURL = Urls.networkPath + widget.products.audio!;
-    String introURL = Urls.networkPath + widget.products.intro!;
-
-    url = widget.isBought == true
-        ? audioURL
-        : widget.products.isBought == true
-            ? audioURL
-            : introURL;
-
+    if (widget.isBought == true || widget.products.isBought == true) {
+      url = audioURL;
+    } else {
+      url = introURL;
+    }
     getCachedFile(url);
 
     super.initState();
@@ -92,82 +103,70 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     super.dispose();
   }
 
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    developer.log(state.toString());
-    if (state == AppLifecycleState.paused) {
-      widget.audioPlayer.stop();
-    }
-  }
-
   Future<void> setAudio(String url, FileInfo? fileInfo) async {
     try {
-      widget.audioPlayer.positionStream.listen((event) {
-        position = event;
-      });
-      widget.audioPlayer.durationStream.listen((event) {
-        duration = event ?? Duration.zero;
-      });
+      isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
 
-      widget.audioPlayer.playingStream.listen((event) {
-        isPlaying = event;
-      });
-      if (fileInfo != null) {
-        audioFile = fileInfo.file;
-        duration =
-            await widget.audioPlayer.setFilePath(audioFile!.path).then((value) {
-                  return value;
-                }) ??
-                Duration.zero;
-      } else {
-        print(url);
-        widget.audioPlayer.setUrl(url).then((value) {
-          duration = value ?? Duration.zero;
-          getSavedPosition(widget.products.productId!).then((value) {
-            developer.log(value.toString());
-            if (value != Duration.zero) {
-              savedPosition = value;
-              position = savedPosition;
-              // if (position != Duration.zero) {
-              //   widget.audioPlayer.seek(position);
-              // }
-              widget.audioPlayer.setUrl(url, initialPosition: position);
-            } else {}
-          });
+      if (audioURL != "" || introURL != "") {
+        if (fileInfo != null) {
+          audioFile = fileInfo.file;
+          url = audioFile!.path;
+          duration = await widget.audioPlayer.setFilePath(audioFile!.path) ??
+              Duration.zero;
+        } else {
+          duration = await widget.audioPlayer.setUrl(url) ?? Duration.zero;
+        }
+
+        audioPlayerController
+            .getSavedPosition(widget.products.productId!)
+            .then((value) async {
+          developer.log(value.toString());
+          savedPosition = value;
+          leftDuration = duration - savedPosition;
+          position = savedPosition;
+
+          for (var item in widget.productsList) {
+            mediaItem = MediaItem(
+                id: url,
+                title: item.title ?? "",
+                duration: duration,
+                artUri: Uri.parse(banner),
+                extras: {
+                  "position": position.inMilliseconds,
+                  "isDownloaded": fileInfo != null ? true : false
+                });
+
+            mediaItems.add(mediaItem);
+          }
+
+          if (!isbgPlaying) {
+            developer.log(isbgPlaying.toString());
+            await audioHandler.addQueueItems(mediaItems);
+          }
+          audioPlayerController;
         });
-
-        await widget.audioPlayer
-            .setAudioSource(AudioSource.uri(Uri.parse(url)));
       }
-    } catch (e) {
-      print(e);
+    } on PlayerInterruptedException catch (e) {
+      developer.log(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Алдаа гарлаа"),
+        backgroundColor: MyColors.error,
+        duration: Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ));
     }
-  }
-
-  Future getSavedPosition(int moodItemID) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
-    List<AudioPlayerModel> decodedProduct = decodedAudioString
-        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
-        .toList();
-    for (var item in decodedProduct) {
-      if (moodItemID == item.productID) {
-        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
-      }
-    }
-    savedPosition = Duration(milliseconds: saveddouble);
-    print("position $savedPosition");
-    return savedPosition;
   }
 
   getCachedFile(String url) async {
-    fileInfo = await checkCachefor(url);
+    fileInfo = await audioPlayerController.checkCachefor(url);
     setAudio(url, fileInfo);
   }
 
-  Future<FileInfo?> checkCachefor(String url) async {
-    final FileInfo? value =
-        await CustomCacheManager.instance.getFileFromCache(url);
-    return value;
+  void _downloadFile() {
+    setState(() {
+      fileStream =
+          CustomCacheManager.instance.getFileStream(url, withProgress: true);
+    });
   }
 
   @override
@@ -176,10 +175,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return GestureDetector(
       onTap: () {
-        widget.isBought || widget.products.isBought == true
-            ? showAudioModal()
-            : showIntroAudioModal();
-        widget.audioPlayer.dispose();
+        if (widget.isBought || widget.products.isBought == true) {
+          showIntroAudioModal();
+          widget.audioPlayer.dispose();
+        }
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -227,71 +226,41 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           const SizedBox(height: 14),
           Row(
             children: [
-              CircleAvatar(
-                backgroundColor: MyColors.input,
-                child: IconButton(
-                  splashRadius: 20,
-                  padding: EdgeInsets.zero,
-                  onPressed: () async {
-                    setState(() {
-                      isClicked = true;
-                      currentIndex =
-                          widget.audioPlayerList.indexOf(widget.audioPlayer);
-                    });
-                    widget.setIndex(currentIndex);
-                    AudioPlayerModel _audio = AudioPlayerModel(
-                        productID: widget.products.productId,
-                        audioPosition: position.inMilliseconds);
-                    _audioPlayerProvider.addAudioPosition(_audio);
-                    if (isPlaying) {
-                      widget.audioPlayer.pause();
-                    } else {
-                      widget.audioPlayer.play();
-                    }
-                  },
-                  icon: Icon(
-                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                    size: 30,
-                    color: MyColors.black,
-                  ),
-                ),
+              AudioPlayerButton(
+                onPlay: () {
+                  setState(() {
+                    isPlaying = true;
+                    currentIndex =
+                        widget.audioPlayerList.indexOf(widget.audioPlayer);
+                  });
+                  currentlyPlaying.value = widget.products;
+                  buttonNotifier.value = ButtonState.playing;
+                  widget.setIndex(currentIndex);
+                  developer.log("play");
+                  widget.onTap();
+                  audioHandler.playMediaItem(mediaItems[currentIndex]);
+                  audioHandler.play();
+                },
+                onPause: () {
+                  widget.onTap();
+                  developer.log("paused");
+                  buttonNotifier.value = ButtonState.paused;
+                  AudioPlayerModel _audio = AudioPlayerModel(
+                      productID: widget.products.id,
+                      audioPosition: position.inMilliseconds);
+                  _audioPlayerProvider.addAudioPosition(_audio);
+                  audioHandler.pause();
+                },
+                title: widget.products.title ?? "",
               ),
-              if (isClicked || savedPosition != Duration.zero)
-                Row(
-                  children: [
-                    const SizedBox(width: 14),
-                    SizedBox(
-                      width: 90,
-                      child: SfLinearGauge(
-                        minimum: 0,
-                        maximum: duration.inSeconds.toDouble() / 10,
-                        showLabels: false,
-                        showAxisTrack: false,
-                        showTicks: false,
-                        ranges: [
-                          LinearGaugeRange(
-                            position: LinearElementPosition.inside,
-                            edgeStyle: LinearEdgeStyle.bothCurve,
-                            startValue: 0,
-                            color: MyColors.border1,
-                            endValue: duration.inSeconds.toDouble() / 10,
-                          ),
-                        ],
-                        barPointers: [
-                          LinearBarPointer(
-                              position: LinearElementPosition.inside,
-                              edgeStyle: LinearEdgeStyle.bothCurve,
-                              color: MyColors.primaryColor,
-                              // color: MyColors.border1,
-                              value: position.inSeconds.toDouble() / 10)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              // if (isClicked || savedPosition != Duration.zero || isPlaying)
+              //   AudioProgressBar(
+              //       savedPosition: savedPosition, totalPosition: leftDuration),
               const SizedBox(width: 10),
-              Text(formatTime(duration - position) + "мин",
-                  style: const TextStyle(fontSize: 12, color: MyColors.black)),
+              AudioplayerTimer(
+                  title: widget.products.title ?? "",
+                  leftPosition: leftDuration,
+                  savedPosition: savedPosition),
               const Spacer(),
               widget.products.isBought == false
                   ? IconButton(
@@ -299,7 +268,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                       onPressed: () {
                         widget.products.isBought == true ||
                                 widget.isBought == true
-                            ? downloadAudio()
+                            ? _downloadFile()
                             : addToCard(cart);
                       },
                       icon: Icon(
@@ -365,32 +334,5 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         behavior: SnackBarBehavior.floating,
       ));
     }
-  }
-
-  downloadAudio() {}
-
-  showAudioModal() {
-    showModalBottomSheet(
-        context: context,
-        isDismissible: false,
-        enableDrag: true,
-        backgroundColor: Colors.white,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height - 80,
-                  child: PlayAudio(
-                    products: widget.products,
-                    albumName: widget.albumName,
-                    notifyParent: () {},
-                  ),
-                );
-              },
-            ));
   }
 }

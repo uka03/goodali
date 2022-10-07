@@ -13,15 +13,13 @@ class DownloadPage extends StatelessWidget {
   final Stream<FileResponse>? fileStream;
   final VoidCallback downloadFile;
   final Products? products;
-  final PodcastListModel? podcastItem;
 
-  const DownloadPage(
-      {Key? key,
-      this.fileStream,
-      required this.downloadFile,
-      this.products,
-      this.podcastItem})
-      : super(key: key);
+  const DownloadPage({
+    Key? key,
+    this.fileStream,
+    required this.downloadFile,
+    this.products,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +39,7 @@ class DownloadPage extends StatelessWidget {
                 downloadAudio.addAudio(products ?? Products());
                 log("downloaded audio");
               } else {
-                downloadAudio.addPodcast(podcastItem ?? PodcastListModel());
+                downloadAudio.addPodcast(products ?? Products());
 
                 log("downloaded podcast");
               }

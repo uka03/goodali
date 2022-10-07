@@ -6,6 +6,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/Auth/pincode_feild.dart';
@@ -176,9 +177,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         ),
-                        const Expanded(
+                        Expanded(
                           child: TabBarView(
-                            children: [MyCourses(), Downloaded()],
+                            children: [
+                              MyCourses(
+                                onTap: (audioObject, podcastList) {
+                                  currentlyPlaying.value = audioObject;
+                                  AudioPlayerController();
+                                },
+                              ),
+                              Downloaded(
+                                onTap: (audioObject, podcastList) {
+                                  currentlyPlaying.value = audioObject;
+                                  AudioPlayerController();
+                                },
+                              )
+                            ],
                           ),
                         )
                       ],
