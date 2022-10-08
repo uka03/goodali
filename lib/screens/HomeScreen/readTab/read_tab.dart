@@ -32,15 +32,15 @@ class _ReadTabbarState extends State<ReadTabbar> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 30.0, bottom: 20),
-                    child: Text("Онлайн ном",
-                        style: TextStyle(
-                            color: MyColors.black,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                  onlineBook(context),
+                  // const Padding(
+                  //   padding: EdgeInsets.only(top: 30.0, bottom: 20),
+                  //   child: Text("Онлайн ном",
+                  //       style: TextStyle(
+                  //           color: MyColors.black,
+                  //           fontSize: 24,
+                  //           fontWeight: FontWeight.bold)),
+                  // ),
+                  // onlineBook(context),
                   Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20.0),
                       child: Row(
@@ -53,8 +53,7 @@ class _ReadTabbarState extends State<ReadTabbar> {
                                   fontWeight: FontWeight.bold)),
                           IconButton(
                               onPressed: () {
-                                Navigator.push(
-                                    context,
+                                Navigator.of(context, rootNavigator: true).push(
                                     MaterialPageRoute(
                                         builder: (_) => ArticleScreen(
                                             articleModel: articleList)));
@@ -119,8 +118,7 @@ class _ReadTabbarState extends State<ReadTabbar> {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: articleList.length,
         itemBuilder: (context, index) => GestureDetector(
-            onTap: () => Navigator.push(
-                context,
+            onTap: () => Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
                     builder: (context) =>
                         ArticleDetail(articleItem: articleList[index]))),

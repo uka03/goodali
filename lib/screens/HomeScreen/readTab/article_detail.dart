@@ -118,8 +118,8 @@ class _ArticleDetailState extends State<ArticleDetail> {
       itemBuilder: (context, index) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: GestureDetector(
-          onTap: () => Navigator.push(
-              context, MaterialPageRoute(builder: (context) => const Blank())),
+          onTap: () => Navigator.of(context, rootNavigator: true).push(
+       MaterialPageRoute(builder: (context) => const Blank())),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

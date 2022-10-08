@@ -1,10 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:audio_service/audio_service.dart';
-import 'package:audio_session/audio_session.dart';
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,13 +11,13 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
-import 'package:goodali/models/podcast_list_model.dart';
+import 'package:goodali/screens/audioScreens.dart/player_buttons.dart';
+import 'package:goodali/screens/audioScreens.dart/progress_bar.dart';
 import 'package:miniplayer/miniplayer.dart';
 
 import 'package:goodali/models/products_model.dart';
@@ -30,10 +26,6 @@ import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
-import 'dart:developer' as developer;
-
-import 'package:shared_preferences/shared_preferences.dart';
 
 void onTap() {}
 
@@ -57,49 +49,43 @@ class PlayAudio extends StatefulWidget {
 }
 
 class _PlayAudioState extends State<PlayAudio> {
+  AudioPlayerController audioPlayerController = AudioPlayerController();
   AudioPlayer audioPlayer = AudioPlayer();
-  Stream<DurationState>? _durationState;
   Future<FileInfo>? fileFuture;
   Stream<FileResponse>? fileStream;
-
   FileInfo? fileInfo;
-
-  int currentview = 0;
-  int saveddouble = 0;
-
-  PlayerState? playerState;
+  File? audioFile;
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
 
-  File? audioFile;
-
   String url = "";
-  String manuFacturer = "";
-  String taskId = "";
-
-  bool isExited = false;
-  bool isLoading = true;
+  String audioURL = "";
+  String introURL = "";
 
   @override
   void initState() {
     super.initState();
+    if (widget.products?.audio != "Audio failed to upload" ||
+        widget.products?.audio != "") {
+      audioURL = Urls.networkPath + (widget.products?.audio ?? "");
+    }
+    if (widget.products?.intro != "Audio failed to upload" ||
+        widget.products?.intro != "") {
+      introURL = Urls.networkPath + (widget.products?.intro ?? "");
+    }
 
-    String audioUrl = widget.products?.audio ?? "";
-    url = Urls.networkPath + audioUrl;
+    if (widget.products?.isBought == true) {
+      url = audioURL;
+    } else {
+      url = introURL;
+    }
 
     getCachedFile(url);
   }
 
-  @override
-  void dispose() {
-    audioPlayer.dispose();
-
-    super.dispose();
-  }
-
   getCachedFile(String url) async {
-    await checkCacheFor(url).then((value) => _initAudioPlayer(url, value));
+    fileInfo = await audioPlayerController.checkCachefor(url);
   }
 
   void _downloadFile() {
@@ -107,96 +93,6 @@ class _PlayAudioState extends State<PlayAudio> {
       fileStream =
           CustomCacheManager.instance.getFileStream(url, withProgress: true);
     });
-  }
-
-  Future<FileInfo?> checkCacheFor(String url) async {
-    final FileInfo? value =
-        await CustomCacheManager.instance.getFileFromCache(url);
-    return value;
-  }
-
-  _initAudioPlayer(String url, FileInfo? fileInfo) async {
-    try {
-      if (fileInfo != null) {
-        if (kDebugMode) {
-          print("fileInfo hoooson bish");
-        }
-        audioFile = fileInfo.file;
-
-        duration = await audioPlayer.setFilePath(audioFile!.path).then((value) {
-              setState(() => isLoading = false);
-              return value;
-            }) ??
-            Duration.zero;
-      } else {
-        if (kDebugMode) {
-          print("fileInfo hoooson");
-        }
-        duration = await audioPlayer.setUrl(url).then((value) {
-              setState(() => isLoading = false);
-              return value;
-            }) ??
-            Duration.zero;
-      }
-
-      String banner = widget.products?.banner ?? "";
-
-      MediaItem item;
-      getSavedPosition().then((value) {
-        setState(() {
-          item = MediaItem(
-              id: url,
-              title: widget.products?.title ?? "",
-              duration: duration,
-              artUri: Uri.parse(Urls.networkPath + banner),
-              extras: {"position": position.inMilliseconds});
-
-          developer.log("edit ${item.id}");
-          developer.log("duration ${item.duration}");
-          developer.log("duration ${item.extras?['position']}");
-
-          audioHandler.playMediaItem(item);
-        });
-      });
-
-      AudioSession.instance.then((audioSession) async {
-        await audioSession.configure(const AudioSessionConfiguration.speech());
-        AudioSessionSettings.handleInterruption(audioSession);
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
-  }
-
-  savePosition(AudioPlayerModel audio) async {
-    List<AudioPlayerModel> _audioItems = [];
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _audioItems.add(audio);
-    List<String> encodedProducts =
-        _audioItems.map((res) => json.encode(res.toJson())).toList();
-    prefs.setStringList("save_audio", encodedProducts);
-  }
-
-  Future getSavedPosition() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
-
-    List<AudioPlayerModel> decodedProduct = decodedAudioString
-        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
-        .toList();
-
-    for (var item in decodedProduct) {
-      if (widget.products?.id == item.productID) {
-        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
-      } else if (widget.products?.productId == item.productID) {
-        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
-      }
-    }
-    position = Duration(milliseconds: saveddouble);
-    print("position $position");
-    return position;
   }
 
   @override
@@ -229,6 +125,9 @@ class _PlayAudioState extends State<PlayAudio> {
           final double heightWithoutPadding = height - paddingVertical * 2 / 9;
           final double imageSize =
               heightWithoutPadding > maxImgSize ? maxImgSize : 48;
+
+          position = durationStateNotifier.value.progress ?? Duration.zero;
+          duration = durationStateNotifier.value.total ?? Duration.zero;
 
           if (!miniplayer) {
             return Container(
@@ -333,9 +232,9 @@ class _PlayAudioState extends State<PlayAudio> {
                         ],
                       ),
                       const SizedBox(height: 30),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: progressBar()),
+                      const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: PlayerProgressBar()),
                       const SizedBox(height: 30),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -346,10 +245,10 @@ class _PlayAudioState extends State<PlayAudio> {
                               "assets/images/replay_5.svg",
                             ),
                           ),
-                          CircleAvatar(
+                          const CircleAvatar(
                               radius: 36,
                               backgroundColor: MyColors.primaryColor,
-                              child: playerButton()),
+                              child: PlayerButtons()),
                           InkWell(
                             onTap: buttonForward15Seconds,
                             child: SvgPicture.asset(
@@ -490,77 +389,36 @@ class _PlayAudioState extends State<PlayAudio> {
         });
   }
 
-  Widget progressBar() {
-    return ValueListenableBuilder<DurationState>(
-        valueListenable: durationStateNotifier,
-        builder: (context, durationValue, widget) {
-          position = durationValue.progress ?? Duration.zero;
-          final buffered = durationValue.buffered ?? Duration.zero;
-          duration = durationValue.total ?? Duration.zero;
+  // Widget progressBar() {
+  //   return ValueListenableBuilder<DurationState>(
+  //       valueListenable: durationStateNotifier,
+  //       builder: (context, durationValue, widget) {
+  //         position = durationValue.progress ?? Duration.zero;
+  //         final buffered = durationValue.buffered ?? Duration.zero;
+  //         duration = durationValue.total ?? Duration.zero;
 
-          return ProgressBar(
-            progress: position,
-            buffered: buffered,
-            total: duration,
-            thumbColor: MyColors.primaryColor,
-            thumbGlowColor: MyColors.primaryColor,
-            timeLabelTextStyle: const TextStyle(color: MyColors.gray),
-            progressBarColor: MyColors.primaryColor,
-            bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
-            baseBarColor: MyColors.border1,
-            onSeek: (duration) {
-              audioHandler.seek(duration);
-              audioHandler.play();
-            },
-          );
-        });
-  }
+  //         return ProgressBar(
+  //           progress: position,
+  //           buffered: buffered,
+  //           total: duration,
+  //           thumbColor: MyColors.primaryColor,
+  //           thumbGlowColor: MyColors.primaryColor,
+  //           timeLabelTextStyle: const TextStyle(color: MyColors.gray),
+  //           progressBarColor: MyColors.primaryColor,
+  //           bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
+  //           baseBarColor: MyColors.border1,
+  //           onSeek: (duration) {
+  //             audioHandler.seek(duration);
+  //             audioHandler.play();
+  //           },
+  //         );
+  //       });
+  // }
 
-  Widget playerButton() {
-    final audioPosition =
-        Provider.of<AudioPlayerProvider>(context, listen: false);
-    return ValueListenableBuilder(
-      valueListenable: buttonNotifier,
-      builder:
-          (BuildContext context, ButtonState? buttonValue, Widget? widget) {
-        Products? currentlyPlay = currentlyPlaying.value;
-        switch (buttonValue) {
-          case ButtonState.loading:
-            return const CircularProgressIndicator(color: Colors.white);
-          case ButtonState.paused:
-            return IconButton(
-              padding: EdgeInsets.zero,
-              icon: const Icon(
-                Icons.play_arrow_rounded,
-                color: Colors.white,
-                size: 40.0,
-              ),
-              onPressed: () {
-                audioHandler.play();
-              },
-            );
-          case ButtonState.playing:
-            return IconButton(
-              padding: EdgeInsets.zero,
-              icon: const Icon(
-                Icons.pause_rounded,
-                color: Colors.white,
-                size: 40.0,
-              ),
-              onPressed: () {
-                AudioPlayerModel _audio = AudioPlayerModel(
-                    productID: currentlyPlay?.id ?? 0,
-                    audioPosition: position.inMilliseconds);
-                audioPosition.addAudioPosition(_audio);
-                audioHandler.pause();
-              },
-            );
-          default:
-            return Container();
-        }
-      },
-    );
-  }
+  // Widget playerButton() {
+
+  //   return
+  // }
 
   buttonForward15Seconds() {
     position = position + const Duration(seconds: 15);

@@ -4,6 +4,7 @@ import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -19,16 +20,15 @@ import 'package:goodali/models/audio_player_model.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
+import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as developer;
 
-typedef SetIndex = void Function(int index);
 typedef OnTap(Products audioObject, AudioPlayer audioPlayer);
 
 class AlbumDetailItem extends StatefulWidget {
-  final SetIndex setIndex;
   final Products products;
   final Products? albumProducts;
   final List<Products> productsList;
@@ -46,7 +46,6 @@ class AlbumDetailItem extends StatefulWidget {
       required this.isBought,
       required this.audioPlayer,
       required this.audioPlayerList,
-      required this.setIndex,
       this.albumProducts,
       required this.onTap})
       : super(key: key);
@@ -65,33 +64,34 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   Duration savedPosition = Duration.zero;
-  Duration leftDuration = Duration.zero;
 
   int saveddouble = 0;
   int currentIndex = 0;
   bool isClicked = false;
   bool isPlaying = false;
+  bool isLoading = true;
+  bool isbgPlaying = false;
   String url = "";
   String audioURL = "";
   String introURL = "";
   String banner = "";
-  bool isbgPlaying = false;
 
   @override
   void initState() {
     if (widget.products.audio != "Audio failed to upload") {
-      audioURL = Urls.networkPath + widget.products.audio!;
+      audioURL = Urls.networkPath + (widget.products.audio ?? "");
     }
     if (widget.products.intro != "Audio failed to upload") {
       introURL = Urls.networkPath + widget.products.intro!;
     }
     banner = Urls.networkPath + (widget.products.banner ?? "");
 
-    if (widget.isBought == true || widget.products.isBought == true) {
-      url = audioURL;
-    } else {
+    if (widget.isBought == false || widget.products.isBought == false) {
       url = introURL;
+    } else {
+      url = audioURL;
     }
+
     getCachedFile(url);
 
     super.initState();
@@ -107,22 +107,14 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     try {
       isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
 
-      if (audioURL != "" || introURL != "") {
-        if (fileInfo != null) {
-          audioFile = fileInfo.file;
-          url = audioFile!.path;
-          duration = await widget.audioPlayer.setFilePath(audioFile!.path) ??
-              Duration.zero;
-        } else {
-          duration = await widget.audioPlayer.setUrl(url) ?? Duration.zero;
-        }
-
+      getTotalDuration(url, fileInfo).then((value) {
+        duration = value;
+        setState(() => isLoading = false);
         audioPlayerController
             .getSavedPosition(widget.products.productId!)
             .then((value) async {
           developer.log(value.toString());
           savedPosition = value;
-          leftDuration = duration - savedPosition;
           position = savedPosition;
 
           for (var item in widget.productsList) {
@@ -145,7 +137,14 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           }
           audioPlayerController;
         });
-      }
+      }).onError((error, stackTrace) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Алдаа гарлаа, Дахин оролдоно уу"),
+          backgroundColor: MyColors.error,
+          duration: Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+        ));
+      });
     } on PlayerInterruptedException catch (e) {
       developer.log(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -155,6 +154,25 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         behavior: SnackBarBehavior.floating,
       ));
     }
+  }
+
+  Future getTotalDuration(String audioURL, FileInfo? fileInfo) async {
+    Duration totalDuration = Duration.zero;
+    if (audioURL != "") {
+      if (fileInfo != null) {
+        audioFile = fileInfo.file;
+        audioURL = audioFile!.path;
+        totalDuration = await widget.audioPlayer.setFilePath(audioFile!.path) ??
+            Duration.zero;
+      } else {
+        totalDuration =
+            await widget.audioPlayer.setUrl(audioURL) ?? Duration.zero;
+      }
+    } else {
+      debugPrint("hooson url");
+    }
+
+    return totalDuration;
   }
 
   getCachedFile(String url) async {
@@ -175,9 +193,12 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return GestureDetector(
       onTap: () {
-        if (widget.isBought || widget.products.isBought == true) {
+        if (!widget.isBought || widget.products.isBought == false) {
           showIntroAudioModal();
           widget.audioPlayer.dispose();
+          audioHandler.stop();
+        } else {
+          showAudioModal();
         }
       },
       child: Column(
@@ -189,16 +210,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
             children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child:
-                      // Container(
-                      //   width: 40,
-                      //   height: 40,
-                      //   color: Colors.pink,
-                      // )
-                      ImageView(
-                          imgPath: widget.products.banner ?? "",
-                          width: 40,
-                          height: 40)),
+                  child: ImageView(
+                      imgPath: widget.products.banner ?? "",
+                      width: 40,
+                      height: 40)),
               const SizedBox(width: 15),
               Expanded(
                 child: Column(
@@ -226,40 +241,47 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           const SizedBox(height: 14),
           Row(
             children: [
-              AudioPlayerButton(
-                onPlay: () {
-                  setState(() {
-                    isPlaying = true;
-                    currentIndex =
-                        widget.audioPlayerList.indexOf(widget.audioPlayer);
-                  });
-                  currentlyPlaying.value = widget.products;
-                  buttonNotifier.value = ButtonState.playing;
-                  widget.setIndex(currentIndex);
-                  developer.log("play");
-                  widget.onTap();
-                  audioHandler.playMediaItem(mediaItems[currentIndex]);
-                  audioHandler.play();
-                },
-                onPause: () {
-                  widget.onTap();
-                  developer.log("paused");
-                  buttonNotifier.value = ButtonState.paused;
-                  AudioPlayerModel _audio = AudioPlayerModel(
-                      productID: widget.products.id,
-                      audioPosition: position.inMilliseconds);
-                  _audioPlayerProvider.addAudioPosition(_audio);
-                  audioHandler.pause();
-                },
-                title: widget.products.title ?? "",
-              ),
-              // if (isClicked || savedPosition != Duration.zero || isPlaying)
-              //   AudioProgressBar(
-              //       savedPosition: savedPosition, totalPosition: leftDuration),
+              isLoading
+                  ? const CircleAvatar(
+                      backgroundColor: MyColors.input,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(
+                          color: Colors.black,
+                          strokeWidth: 2,
+                        ),
+                      ))
+                  : AudioPlayerButton(
+                      onPlay: () {
+                        setState(() {
+                          isPlaying = true;
+                        });
+                        currentlyPlaying.value = widget.products;
+                        buttonNotifier.value = ButtonState.playing;
+                        developer.log("play");
+                        widget.onTap();
+                        audioHandler.playMediaItem(mediaItems[currentIndex]);
+                        audioHandler.play();
+                      },
+                      onPause: () {
+                        widget.onTap();
+                        developer.log("paused");
+                        buttonNotifier.value = ButtonState.paused;
+                        AudioPlayerModel _audio = AudioPlayerModel(
+                            productID: widget.products.id,
+                            audioPosition: position.inMilliseconds);
+                        _audioPlayerProvider.addAudioPosition(_audio);
+                        audioHandler.pause();
+                      },
+                      title: widget.products.title ?? "",
+                    ),
+              if (isClicked || savedPosition != Duration.zero || isPlaying)
+                AudioProgressBar(
+                    savedPosition: savedPosition, totalPosition: duration),
               const SizedBox(width: 10),
               AudioplayerTimer(
                   title: widget.products.title ?? "",
-                  leftPosition: leftDuration,
+                  leftPosition: duration,
                   savedPosition: savedPosition),
               const Spacer(),
               widget.products.isBought == false
@@ -334,5 +356,23 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         behavior: SnackBarBehavior.floating,
       ));
     }
+  }
+
+  showAudioModal() {
+    showModalBottomSheet(
+        context: context,
+        isDismissible: false,
+        enableDrag: true,
+        isScrollControlled: true,
+        builder: (_) => StatefulBuilder(
+              builder: (BuildContext context,
+                  void Function(void Function()) setState) {
+                return PlayAudio(
+                  products: widget.products,
+                  albumName: widget.products.albumTitle ?? "",
+                  isDownloaded: true,
+                );
+              },
+            ));
   }
 }

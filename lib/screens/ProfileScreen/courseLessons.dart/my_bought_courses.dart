@@ -87,11 +87,7 @@ class _MyCoursesState extends State<MyCourses> {
               albumName = allLectures[index].albumTitle ?? "";
               empty = albumName;
             }
-            for (var i = 0; i < audioPlayer.length; i++) {
-              if (currentIndex != i) {
-                audioPlayer[i].pause();
-              }
-            }
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -108,11 +104,6 @@ class _MyCoursesState extends State<MyCourses> {
                   albumName: albumName,
                   productsList: allLectures,
                   audioPlayerList: audioPlayer,
-                  setIndex: (int index) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
                   onTap: () => widget.onTap(allLectures[index], allLectures),
                 ),
               ],

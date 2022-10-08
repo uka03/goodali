@@ -10,8 +10,7 @@ class MoodListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(
-          context,
+      onTap: () => Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
               builder: (context) =>
                   MoodDetail(moodListId: getMoodList!.id.toString()))),

@@ -47,8 +47,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
             itemBuilder: (context, index) => Padding(
               padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
               child: GestureDetector(
-                  onTap: () => Navigator.push(
-                      context,
+                  onTap: () => Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute(
                           builder: (context) => ArticleDetail(
                               articleItem: widget.articleModel[index]))),

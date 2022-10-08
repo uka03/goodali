@@ -68,8 +68,7 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
           bottom: 20,
           left: 20,
           child: GestureDetector(
-            onTap: () => Navigator.push(
-                context,
+            onTap: () => Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
                     builder: (_) => widget.isBought
                         ? MyCourseMain(

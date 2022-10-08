@@ -6,7 +6,6 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
-import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
@@ -21,7 +20,6 @@ import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 typedef OnTap = Function(Products products, List<Products> productsList);
@@ -234,7 +232,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         const SizedBox(height: 20),
                         const Divider(endIndent: 20, indent: 20),
                         lecture(context, lectureList),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 70),
                       ]),
                     ),
                   ]);
@@ -247,34 +245,33 @@ class _AlbumDetailState extends State<AlbumDetail> {
             );
           },
         ),
-        persistentFooterButtons: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: CustomElevatedButton(
-                text: "Худалдаж авах",
-                onPress: () {
-                  for (var item in lectureList) {
-                    albumProductsList.add(item.productId!);
-                  }
-                  cart.addItemsIndex(widget.albumProduct.productId!,
-                      albumProductIDs: albumProductsList);
-                  if (!cart.sameItemCheck) {
-                    cart.addProducts(widget.albumProduct);
-                    cart.addTotalPrice(
-                        widget.albumProduct.price?.toDouble() ?? 0.0);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CartScreen()));
-                  } else {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CartScreen()));
-                  }
-                }),
-          ),
-        ],
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: CustomElevatedButton(
+              text: "Худалдаж авах",
+              onPress: () {
+                for (var item in lectureList) {
+                  albumProductsList.add(item.productId!);
+                }
+                cart.addItemsIndex(widget.albumProduct.productId!,
+                    albumProductIDs: albumProductsList);
+                if (!cart.sameItemCheck) {
+                  cart.addProducts(widget.albumProduct);
+                  cart.addTotalPrice(
+                      widget.albumProduct.price?.toDouble() ?? 0.0);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CartScreen()));
+                } else {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CartScreen()));
+                }
+              }),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
@@ -356,44 +353,40 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         ),
                       ),
                     ),
-                    // if (isClicked || savedPosition != Duration.zero)
-                    //   Row(
-                    //     children: [
-                    //       const SizedBox(width: 14),
-                    //       SizedBox(
-                    //         width: 90,
-                    //         child: SfLinearGauge(
-                    //           minimum: 0,
-                    //           maximum: duration.inSeconds.toDouble() / 10,
-                    //           showLabels: false,
-                    //           showAxisTrack: false,
-                    //           showTicks: false,
-                    //           ranges: [
-                    //             LinearGaugeRange(
-                    //               position: LinearElementPosition.inside,
-                    //               edgeStyle: LinearEdgeStyle.bothCurve,
-                    //               startValue: 0,
-                    //               color: MyColors.border1,
-                    //               endValue: duration.inSeconds.toDouble() / 10,
-                    //             ),
-                    //           ],
-                    //           barPointers: [
-                    //             LinearBarPointer(
-                    //                 position: LinearElementPosition.inside,
-                    //                 edgeStyle: LinearEdgeStyle.bothCurve,
-                    //                 color: MyColors.primaryColor,
-                    //                 // color: MyColors.border1,
-                    //                 value: position.inSeconds.toDouble() / 10)
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
+                    if (isClicked || savedPosition != Duration.zero)
+                      Row(
+                        children: [
+                          const SizedBox(width: 14),
+                          SizedBox(
+                            width: 90,
+                            child: SfLinearGauge(
+                              minimum: 0,
+                              maximum: duration.inSeconds.toDouble() / 10,
+                              showLabels: false,
+                              showAxisTrack: false,
+                              showTicks: false,
+                              ranges: [
+                                LinearGaugeRange(
+                                  position: LinearElementPosition.inside,
+                                  edgeStyle: LinearEdgeStyle.bothCurve,
+                                  startValue: 0,
+                                  color: MyColors.border1,
+                                  endValue: duration.inSeconds.toDouble() / 10,
+                                ),
+                              ],
+                              barPointers: [
+                                LinearBarPointer(
+                                    position: LinearElementPosition.inside,
+                                    edgeStyle: LinearEdgeStyle.bothCurve,
+                                    color: MyColors.primaryColor,
+                                    // color: MyColors.border1,
+                                    value: position.inSeconds.toDouble() / 10)
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     const SizedBox(width: 10),
-                    // AudioplayerTimer(
-                    //     savedPosition: savedPosition,
-                    //     leftPosition: duration,
-                    //     title: "Танилцуулга"),
                     Text(formatTime(duration - position) + "мин",
                         style: const TextStyle(
                             fontSize: 12, color: MyColors.black)),
@@ -415,14 +408,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
             padding: const EdgeInsets.only(bottom: 15),
             itemBuilder: (BuildContext context, int index) {
               audioPlayer.add(AudioPlayer());
-              for (var i = 0; i < audioPlayer.length; i++) {
-                if (currentIndex != i) {
-                  audioPlayer[i].pause();
-                }
-                if (audioPlayer[i].playing) {
-                  introAudioPlayer.pause();
-                }
-              }
+
               return AlbumDetailItem(
                 products: product[index],
                 isBought: false,
@@ -431,11 +417,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
                 audioPlayerList: audioPlayer,
                 productsList: product,
                 albumProducts: widget.albumProduct,
-                setIndex: (int index) {
-                  setState(() {
-                    currentIndex = index;
-                  });
-                },
                 onTap: () => widget.onTap(product[index], product),
               );
             },

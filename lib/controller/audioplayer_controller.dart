@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
+import 'package:goodali/controller/audio_session.dart';
 
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
@@ -29,6 +32,10 @@ final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
 
 class AudioPlayerController with ChangeNotifier {
   AudioPlayerController() {
+    AudioSession.instance.then((audioSession) async {
+      await audioSession.configure(const AudioSessionConfiguration.speech());
+      AudioSessionSettings.handleInterruption(audioSession);
+    });
     initiliaze();
   }
 
@@ -51,6 +58,7 @@ class AudioPlayerController with ChangeNotifier {
     });
 
     audioHandler.mediaItem.listen((event) {
+      log(event?.duration.toString() ?? "", name: "mediaItem");
       final oldState = durationStateNotifier.value;
       durationStateNotifier.value = DurationState(
         progress: oldState.progress,
