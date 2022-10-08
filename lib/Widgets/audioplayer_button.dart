@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
-import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 
 class AudioPlayerButton extends StatelessWidget {

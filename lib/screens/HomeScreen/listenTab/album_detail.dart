@@ -16,6 +16,7 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
+import 'package:goodali/screens/ListItems/album_intro_item.dart';
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:just_audio/just_audio.dart';
@@ -97,7 +98,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   @override
   void dispose() {
     introAudioPlayer.dispose();
-    // audioPlayer.map((e) => e.dispose());
+    audioPlayer.map((e) => e.dispose());
     super.dispose();
   }
 
@@ -245,33 +246,36 @@ class _AlbumDetailState extends State<AlbumDetail> {
             );
           },
         ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: CustomElevatedButton(
-              text: "Худалдаж авах",
-              onPress: () {
-                for (var item in lectureList) {
-                  albumProductsList.add(item.productId!);
-                }
-                cart.addItemsIndex(widget.albumProduct.productId!,
-                    albumProductIDs: albumProductsList);
-                if (!cart.sameItemCheck) {
-                  cart.addProducts(widget.albumProduct);
-                  cart.addTotalPrice(
-                      widget.albumProduct.price?.toDouble() ?? 0.0);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CartScreen()));
-                } else {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const CartScreen()));
-                }
-              }),
+        floatingActionButton: Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+            child: CustomElevatedButton(
+                text: "Худалдаж авах",
+                onPress: () {
+                  for (var item in lectureList) {
+                    albumProductsList.add(item.productId!);
+                  }
+                  cart.addItemsIndex(widget.albumProduct.productId!,
+                      albumProductIDs: albumProductsList);
+                  if (!cart.sameItemCheck) {
+                    cart.addProducts(widget.albumProduct);
+                    cart.addTotalPrice(
+                        widget.albumProduct.price?.toDouble() ?? 0.0);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartScreen()));
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartScreen()));
+                  }
+                }),
+          ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
@@ -341,7 +345,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                           if (isPlaying) {
                             introAudioPlayer.pause();
                           } else {
-                            await introAudioPlayer.play();
+                            introAudioPlayer.play();
                           }
                         },
                         icon: Icon(
@@ -409,16 +413,39 @@ class _AlbumDetailState extends State<AlbumDetail> {
             itemBuilder: (BuildContext context, int index) {
               audioPlayer.add(AudioPlayer());
 
-              return AlbumDetailItem(
-                products: product[index],
-                isBought: false,
-                albumName: widget.albumProduct.title!,
-                audioPlayer: audioPlayer[index],
-                audioPlayerList: audioPlayer,
-                productsList: product,
-                albumProducts: widget.albumProduct,
-                onTap: () => widget.onTap(product[index], product),
-              );
+              if (product[index].isBought == false) {
+                for (var i = 0; i < audioPlayer.length; i++) {
+                  if (currentIndex != i) {
+                    audioPlayer[i].pause();
+                  }
+                  if (audioPlayer[i].playing) {
+                    introAudioPlayer.pause();
+                  }
+                }
+
+                return AlbumIntroItem(
+                  albumName: '',
+                  audioPlayer: audioPlayer[index],
+                  audioPlayerList: audioPlayer,
+                  products: product[index],
+                  productsList: product,
+                  setIndex: (int index) {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                  },
+                );
+              } else {
+                return AlbumDetailItem(
+                  products: product[index],
+                  isBought: false,
+                  albumName: widget.albumProduct.title!,
+                  audioPlayer: audioPlayer[index],
+                  productsList: product,
+                  albumProducts: widget.albumProduct,
+                  onTap: () => widget.onTap(product[index], product),
+                );
+              }
             },
             itemCount: product.length,
             separatorBuilder: (BuildContext context, int index) =>

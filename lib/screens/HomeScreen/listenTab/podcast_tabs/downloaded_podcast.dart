@@ -6,7 +6,7 @@ import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
-typedef OnTap = Function(Products audioObject, List<Products> podcastList);
+typedef OnTap = Function(Products audioObject);
 
 class DownloadedPodcast extends StatefulWidget {
   final OnTap onTap;
@@ -24,13 +24,12 @@ class _DownloadedPodcastState extends State<DownloadedPodcast> {
   @override
   Widget build(BuildContext context) {
     return Consumer<AudioDownloadProvider>(builder: ((context, value, child) {
-      // print(value.downloadedPodcast.length);
       if (value.downloadedPodcast.isNotEmpty) {
         return ListView.builder(
             padding: EdgeInsets.zero,
             itemCount: value.downloadedPodcast.length,
             itemBuilder: (context, index) {
-              audioPlayer.add(AudioPlayer());
+              print(value.downloadedPodcast[index].title);
               return Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 10),
@@ -38,24 +37,8 @@ class _DownloadedPodcastState extends State<DownloadedPodcast> {
                     index: index,
                     podcastList: value.downloadedPodcast,
                     podcastItem: value.downloadedPodcast[index],
-                    audioPlayer: audioPlayer[index],
-                    audioPlayerList: audioPlayer,
-                    setIndex: (int index) {
-                      setState(() {
-                        currentIndex = index;
-                      });
-                    },
-                    onTap: () => widget.onTap(value.downloadedPodcast[index],
-                        value.downloadedPodcast),
-                  )
-
-                  // DownloadedLectureItem(
-                  //   audioPlayer: audioPlayer[index],
-                  //   podcastItem: value.downloadedPodcast[index],
-                  //   audioPlayerList: audioPlayer,
-                  //   setIndex: (int index) {},
-                  // ),
-                  );
+                    onTap: (product) => widget.onTap(product),
+                  ));
             });
       } else {
         return Container();

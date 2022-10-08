@@ -24,24 +24,17 @@ import 'package:provider/provider.dart';
 
 import 'dart:developer' as developer;
 
-typedef SetIndex = void Function(int index);
-typedef OnTap(Products audioObject, AudioPlayer audioPlayer);
+typedef OnTap = Function(Products audioObject);
 
 class PodcastItem extends StatefulWidget {
-  final AudioPlayer audioPlayer;
   final Products podcastItem;
-  final List<AudioPlayer> audioPlayerList;
-  final Function setIndex;
   final List<Products> podcastList;
-  final Function onTap;
+  final OnTap onTap;
   final int index;
 
   const PodcastItem({
     Key? key,
     required this.podcastItem,
-    required this.audioPlayer,
-    required this.audioPlayerList,
-    required this.setIndex,
     required this.podcastList,
     required this.index,
     required this.onTap,
@@ -52,6 +45,7 @@ class PodcastItem extends StatefulWidget {
 }
 
 class _PodcastItemState extends State<PodcastItem> {
+  AudioPlayer audioPlayer = AudioPlayer();
   AudioPlayerController audioPlayerController = AudioPlayerController();
   String audioUrl = "";
   bool isPlaying = false;
@@ -71,11 +65,12 @@ class _PodcastItemState extends State<PodcastItem> {
   MediaItem item = const MediaItem(id: "", title: "");
   String banner = "";
   bool isbgPlaying = false;
+  bool isLoading = true;
 
   @override
   void initState() {
     if (widget.podcastItem.audio != "Audio failed to upload") {
-      audioUrl = Urls.networkPath + widget.podcastItem.audio!;
+      audioUrl = Urls.networkPath + (widget.podcastItem.audio ?? "");
     }
     banner = Urls.networkPath + (widget.podcastItem.banner ?? "");
     getCachedFile(audioUrl);
@@ -90,11 +85,11 @@ class _PodcastItemState extends State<PodcastItem> {
         if (fileInfo != null) {
           audioFile = fileInfo.file;
           audioUrl = audioFile!.path;
-          duration = await widget.audioPlayer.setFilePath(audioFile!.path) ??
-              Duration.zero;
+          duration =
+              await audioPlayer.setFilePath(audioFile!.path) ?? Duration.zero;
         } else {
           audioUrl = url;
-          duration = await widget.audioPlayer.setUrl(url) ?? Duration.zero;
+          duration = await audioPlayer.setUrl(url) ?? Duration.zero;
         }
 
         audioPlayerController
@@ -104,10 +99,11 @@ class _PodcastItemState extends State<PodcastItem> {
           if (!mounted) return;
           setState(() {
             leftDuration = duration - savedPosition;
+            isLoading = false;
           });
 
           position = savedPosition;
-          developer.log(leftDuration.toString(), name: "leftDuration");
+          developer.log(duration.toString(), name: "leftDuration");
 
           for (var e in widget.podcastList) {
             item = MediaItem(
@@ -200,10 +196,10 @@ class _PodcastItemState extends State<PodcastItem> {
               onPlay: () {
                 setState(() {
                   isPlaying = true;
-
-                  currentIndex =
-                      widget.audioPlayerList.indexOf(widget.audioPlayer);
                 });
+                audioHandler.playMediaItem(mediaItems[widget.index]);
+
+                audioHandler.play();
                 currentlyPlaying.value = widget.podcastItem;
                 buttonNotifier.value = ButtonState.playing;
                 podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
@@ -212,12 +208,10 @@ class _PodcastItemState extends State<PodcastItem> {
                       widget.podcastItem, widget.podcastList);
                 }
                 developer.log("play");
-                widget.onTap();
-                audioHandler.playMediaItem(mediaItems[widget.index]);
-                audioHandler.play();
+                widget.onTap(widget.podcastItem);
               },
               onPause: () {
-                widget.onTap();
+                widget.onTap(widget.podcastItem);
                 developer.log("paused");
                 buttonNotifier.value = ButtonState.paused;
                 AudioPlayerModel _audio = AudioPlayerModel(
@@ -229,9 +223,11 @@ class _PodcastItemState extends State<PodcastItem> {
               title: widget.podcastItem.title ?? "",
             ),
             const SizedBox(width: 14),
-            // if (savedPosition != Duration.zero || isPlaying)
-            //   AudioProgressBar(
-            //       savedPosition: savedPosition, totalPosition: leftDuration),
+            if (savedPosition != Duration.zero || isPlaying)
+              isLoading
+                  ? Container()
+                  : AudioProgressBar(
+                      savedPosition: savedPosition, totalDuration: duration),
             const SizedBox(width: 14),
             AudioplayerTimer(
                 title: widget.podcastItem.title ?? "",
@@ -246,7 +242,10 @@ class _PodcastItemState extends State<PodcastItem> {
                     splashRadius: 1,
                   )
                 : DownloadPage(
-                    fileStream: fileStream, downloadFile: _downloadFile),
+                    fileStream: fileStream,
+                    downloadFile: _downloadFile,
+                    products: widget.podcastItem,
+                  ),
             IconButton(
                 splashRadius: 20,
                 onPressed: () {},

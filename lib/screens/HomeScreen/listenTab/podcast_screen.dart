@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/unlistened_podcast.dart';
@@ -16,6 +18,7 @@ class Podcast extends StatefulWidget {
 }
 
 class _PodcastState extends State<Podcast> {
+  late final future = getPodcastList();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,32 +66,52 @@ class _PodcastState extends State<Podcast> {
                       )))
                 ];
               },
-              body: TabBarView(children: [
-                PodcastAll(
-                  onTap: (audioObject, podcastList) {
-                    currentlyPlaying.value = audioObject;
-                    AudioPlayerController();
-                  },
-                ),
-                NotListenedPodcast(
-                  onTap: (audioObject, podcastList) {
-                    currentlyPlaying.value = audioObject;
-                    AudioPlayerController();
-                  },
-                ),
-                DownloadedPodcast(
-                  onTap: (audioObject, podcastList) {
-                    currentlyPlaying.value = audioObject;
-                    AudioPlayerController();
-                  },
-                ),
-                ListenedPodcast(
-                  onTap: (audioObject, podcastList) {
-                    currentlyPlaying.value = audioObject;
-                    AudioPlayerController();
-                  },
-                )
-              ]))),
+              body: FutureBuilder(
+                future: future,
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData &&
+                      ConnectionState.done == snapshot.connectionState) {
+                    List<Products> podcastList = snapshot.data;
+                    return TabBarView(children: [
+                      PodcastAll(
+                        onTap: (audioObject) {
+                          currentlyPlaying.value = audioObject;
+                          AudioPlayerController();
+                        },
+                        podcastList: podcastList,
+                      ),
+                      NotListenedPodcast(
+                        onTap: (audioObject) {
+                          currentlyPlaying.value = audioObject;
+                          AudioPlayerController();
+                        },
+                        podcastList: podcastList,
+                      ),
+                      DownloadedPodcast(
+                        onTap: (audioObject) {
+                          currentlyPlaying.value = audioObject;
+                          AudioPlayerController();
+                        },
+                      ),
+                      ListenedPodcast(
+                        onTap: (audioObject) {
+                          currentlyPlaying.value = audioObject;
+                          AudioPlayerController();
+                        },
+                      )
+                    ]);
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                          color: MyColors.primaryColor),
+                    );
+                  }
+                },
+              ))),
     );
+  }
+
+  Future<List<Products>> getPodcastList() {
+    return Connection.getPodcastList(context);
   }
 }

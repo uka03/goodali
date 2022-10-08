@@ -103,7 +103,6 @@ class _MyCoursesState extends State<MyCourses> {
                   products: allLectures[index],
                   albumName: albumName,
                   productsList: allLectures,
-                  audioPlayerList: audioPlayer,
                   onTap: () => widget.onTap(allLectures[index], allLectures),
                 ),
               ],

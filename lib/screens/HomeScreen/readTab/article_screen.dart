@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/models/article_model.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_detail.dart';
 import 'package:goodali/screens/ListItems/article_item.dart';
@@ -23,7 +24,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
               SliverAppBar(
                 pinned: true,
                 floating: true,
-                // snap: true,
                 elevation: 0,
                 iconTheme: const IconThemeData(color: MyColors.black),
                 backgroundColor: Colors.white,
@@ -59,6 +59,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 const Divider(
                     color: MyColors.border1, endIndent: 20, indent: 20),
           )),
+      floatingActionButton: FilterButton(onPress: () {}),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

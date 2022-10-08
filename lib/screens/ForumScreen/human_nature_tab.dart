@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:iconly/iconly.dart';
 
@@ -181,11 +182,12 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                                   TextStyle(color: MyColors.gray, fontSize: 16))
                         ],
                       ),
-                      Spacer(),
+                      const Spacer(),
                       IconButton(
                           splashRadius: 20,
                           onPressed: () {},
-                          icon: Icon(Icons.more_horiz, color: MyColors.gray)),
+                          icon: const Icon(Icons.more_horiz,
+                              color: MyColors.gray)),
                     ],
                   )
                 ],
@@ -194,28 +196,8 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
           ],
         ),
       ),
-      floatingActionButton: floatActionButtons(),
+      floatingActionButton: FilterButton(onPress: () {}),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  Widget floatActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: MyColors.primaryColor,
-            child: IconButton(
-              splashRadius: 10,
-              onPressed: () {},
-              icon: const Icon(IconlyLight.filter, color: Colors.white),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

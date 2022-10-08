@@ -74,13 +74,9 @@ class PodcastProvider with ChangeNotifier {
 
   void addListenedPodcast(Products item, List<Products> podcastList) {
     _listenedPodcastList.add(item);
-    for (var podcast in podcastList) {
-      if (podcast.id == item.id) {
-        print("what the heekkk");
-      } else {
-        _unListenedPodcastList.add(podcast);
-      }
-    }
+    _unListenedPodcastList = podcastList;
+    _unListenedPodcastList.remove(item);
+
     _setPrefItems();
     notifyListeners();
   }
@@ -92,6 +88,6 @@ class PodcastProvider with ChangeNotifier {
 
   List<Products> get unListenedPodcast {
     _getPrefItems();
-    return _unListenedPodcastList;
+    return _unListenedPodcastList.toSet().toList();
   }
 }

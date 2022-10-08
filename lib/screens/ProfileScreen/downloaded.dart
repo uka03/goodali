@@ -35,7 +35,6 @@ class _DownloadedState extends State<Downloaded> {
                 itemBuilder: (context, index) {
                   return AlbumDetailItem(
                     products: value.downloadedItem[index],
-                    audioPlayerList: [],
                     audioPlayer: AudioPlayer(),
                     albumName: value.downloadedItem[index].albumTitle ?? "",
                     isBought: value.downloadedItem[index].isBought ?? true,

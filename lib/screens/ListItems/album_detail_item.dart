@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/audio_provider.dart';
-import 'package:goodali/Providers/cart_provider.dart';
-import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -19,7 +17,6 @@ import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
@@ -35,7 +32,6 @@ class AlbumDetailItem extends StatefulWidget {
   final String albumName;
   final bool isBought;
   final AudioPlayer audioPlayer;
-  final List<AudioPlayer> audioPlayerList;
   final Function onTap;
 
   const AlbumDetailItem(
@@ -45,7 +41,6 @@ class AlbumDetailItem extends StatefulWidget {
       required this.productsList,
       required this.isBought,
       required this.audioPlayer,
-      required this.audioPlayerList,
       this.albumProducts,
       required this.onTap})
       : super(key: key);
@@ -81,26 +76,13 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     if (widget.products.audio != "Audio failed to upload") {
       audioURL = Urls.networkPath + (widget.products.audio ?? "");
     }
-    if (widget.products.intro != "Audio failed to upload") {
-      introURL = Urls.networkPath + widget.products.intro!;
-    }
     banner = Urls.networkPath + (widget.products.banner ?? "");
 
-    if (widget.isBought == false || widget.products.isBought == false) {
-      url = introURL;
-    } else {
-      url = audioURL;
-    }
+    url = audioURL;
 
     getCachedFile(url);
 
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    widget.audioPlayer.dispose();
-    super.dispose();
   }
 
   Future<void> setAudio(String url, FileInfo? fileInfo) async {
@@ -189,17 +171,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<CartProvider>(context);
     final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return GestureDetector(
       onTap: () {
-        if (!widget.isBought || widget.products.isBought == false) {
-          showIntroAudioModal();
-          widget.audioPlayer.dispose();
-          audioHandler.stop();
-        } else {
-          showAudioModal();
-        }
+        showAudioModal();
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -275,9 +250,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                       },
                       title: widget.products.title ?? "",
                     ),
-              if (isClicked || savedPosition != Duration.zero || isPlaying)
+              if (isClicked)
                 AudioProgressBar(
-                    savedPosition: savedPosition, totalPosition: duration),
+                    savedPosition: savedPosition, totalDuration: duration),
               const SizedBox(width: 10),
               AudioplayerTimer(
                   title: widget.products.title ?? "",
@@ -288,15 +263,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   ? IconButton(
                       splashRadius: 20,
                       onPressed: () {
-                        widget.products.isBought == true ||
-                                widget.isBought == true
-                            ? _downloadFile()
-                            : addToCard(cart);
+                        _downloadFile();
                       },
-                      icon: Icon(
-                          widget.isBought
-                              ? IconlyLight.arrow_down
-                              : IconlyLight.buy,
+                      icon: Icon(IconlyLight.arrow_down,
                           color: fileInfo != null
                               ? MyColors.primaryColor
                               : MyColors.gray))
@@ -311,29 +280,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         ],
       ),
     );
-  }
-
-  showIntroAudioModal() {
-    widget.audioPlayer.pause();
-    showModalBottomSheet(
-        context: context,
-        isDismissible: false,
-        enableDrag: true,
-        backgroundColor: Colors.white,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => StatefulBuilder(
-              builder:
-                  (BuildContext _, void Function(void Function()) setState) {
-                // setState(() {});
-                return IntroAudio(
-                    products: widget.products,
-                    productsList: widget.productsList,
-                    audioPlayer: widget.audioPlayer);
-              },
-            ));
   }
 
   addToCard(cart) {

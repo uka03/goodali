@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/video_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_detail.dart';
@@ -99,7 +100,7 @@ class _VideoListState extends State<VideoList> {
           ),
         ),
       ),
-      floatingActionButton: floatActionButtons(),
+      floatingActionButton: FilterButton(onPress: () {}),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
@@ -162,21 +163,6 @@ class _VideoListState extends State<VideoList> {
             ),
           );
         });
-  }
-
-  Widget floatActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: CircleAvatar(
-        radius: 26,
-        backgroundColor: MyColors.primaryColor,
-        child: IconButton(
-          splashRadius: 10,
-          onPressed: () {},
-          icon: const Icon(IconlyLight.filter, color: Colors.white),
-        ),
-      ),
-    );
   }
 
   Future<List<VideoModel>> getVideoList() {

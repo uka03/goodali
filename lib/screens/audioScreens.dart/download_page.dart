@@ -12,13 +12,13 @@ import 'package:provider/provider.dart';
 class DownloadPage extends StatelessWidget {
   final Stream<FileResponse>? fileStream;
   final VoidCallback downloadFile;
-  final Products? products;
+  final Products products;
 
   const DownloadPage({
     Key? key,
     this.fileStream,
     required this.downloadFile,
-    this.products,
+    required this.products,
   }) : super(key: key);
 
   @override
@@ -33,16 +33,14 @@ class DownloadPage extends StatelessWidget {
         if (snapshot.hasData) {
           if (loading) {
             bool finished = (snapshot.data as DownloadProgress).progress == 1;
-
+            print((snapshot.data as DownloadProgress).progress);
+            print("finished $finished");
             if (finished == true) {
-              if (products != null) {
-                downloadAudio.addAudio(products ?? Products());
-                log("downloaded audio");
-              } else {
-                downloadAudio.addPodcast(products ?? Products());
+              downloadAudio.addAudio(products);
+              log("downloaded audio");
 
-                log("downloaded podcast");
-              }
+              downloadAudio.addPodcast(products);
+              log("downloaded podcast");
             }
             double? percent = (snapshot.data as DownloadProgress).progress;
 
@@ -87,9 +85,9 @@ class DownloadPage extends StatelessWidget {
                 icon: const Icon(IconlyLight.arrow_down, color: MyColors.gray),
                 splashRadius: 1,
               ),
-              if (products != null)
-                const Text("Татах",
-                    style: TextStyle(fontSize: 12, color: MyColors.gray))
+
+              // const Text("Татах",
+              //     style: TextStyle(fontSize: 12, color: MyColors.gray))
             ],
           );
         }

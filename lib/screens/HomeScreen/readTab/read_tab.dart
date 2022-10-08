@@ -116,7 +116,7 @@ class _ReadTabbarState extends State<ReadTabbar> {
     return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: articleList.length,
+        itemCount: articleList.length > 6 ? 6 : articleList.length,
         itemBuilder: (context, index) => GestureDetector(
             onTap: () => Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(

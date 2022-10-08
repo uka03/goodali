@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
-import 'package:goodali/models/podcast_list_model.dart';
+
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
-typedef OnTap = Function(Products audioObject, List<Products> podcastList);
+typedef OnTap = Function(Products audioObject);
 
 class ListenedPodcast extends StatefulWidget {
   final OnTap onTap;
@@ -48,15 +48,7 @@ class _ListenedPodcastState extends State<ListenedPodcast> {
                     index: index,
                     podcastList: value.listenedPodcast,
                     podcastItem: value.listenedPodcast[index],
-                    audioPlayer: audioPlayer[index],
-                    audioPlayerList: audioPlayer,
-                    setIndex: (int index) {
-                      setState(() {
-                        currentIndex = index;
-                      });
-                    },
-                    onTap: () => widget.onTap(
-                        value.listenedPodcast[index], value.listenedPodcast),
+                    onTap: (product) => widget.onTap(product),
                   ),
                 );
               });

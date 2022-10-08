@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -32,13 +33,13 @@ void onTap() {}
 final MiniplayerController controller = MiniplayerController();
 
 class PlayAudio extends StatefulWidget {
-  final Products? products;
+  final Products products;
   final String albumName;
   final bool? isDownloaded;
   final String? downloadedAudioPath;
   const PlayAudio({
     Key? key,
-    this.products,
+    required this.products,
     required this.albumName,
     this.isDownloaded = false,
     this.downloadedAudioPath,
@@ -66,16 +67,16 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   void initState() {
     super.initState();
-    if (widget.products?.audio != "Audio failed to upload" ||
-        widget.products?.audio != "") {
-      audioURL = Urls.networkPath + (widget.products?.audio ?? "");
+    if (widget.products.audio != "Audio failed to upload" ||
+        widget.products.audio != "") {
+      audioURL = Urls.networkPath + (widget.products.audio ?? "");
     }
-    if (widget.products?.intro != "Audio failed to upload" ||
-        widget.products?.intro != "") {
-      introURL = Urls.networkPath + (widget.products?.intro ?? "");
+    if (widget.products.intro != "Audio failed to upload" ||
+        widget.products.intro != "") {
+      introURL = Urls.networkPath + (widget.products.intro ?? "");
     }
 
-    if (widget.products?.isBought == true) {
+    if (widget.products.isBought == true) {
       url = audioURL;
     } else {
       url = introURL;
@@ -159,8 +160,8 @@ class _PlayAudioState extends State<PlayAudio> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: ImageView(
-                            imgPath: widget.products?.banner ??
-                                widget.products?.banner ??
+                            imgPath: widget.products.banner ??
+                                widget.products.banner ??
                                 "",
                             width: imageSize,
                             height: imageSize,
@@ -175,7 +176,7 @@ class _PlayAudioState extends State<PlayAudio> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        widget.products?.title ?? "",
+                        widget.products.title ?? "",
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             fontSize: 24,
@@ -214,8 +215,8 @@ class _PlayAudioState extends State<PlayAudio> {
                                           builder: (context) =>
                                               AudioDescription(
                                                   description: widget
-                                                          .products?.body ??
-                                                      widget.products?.body ??
+                                                          .products.body ??
+                                                      widget.products.body ??
                                                       "")));
                                 },
                                 icon: const Icon(
@@ -285,8 +286,8 @@ class _PlayAudioState extends State<PlayAudio> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: ImageView(
-                            imgPath: widget.products?.banner ??
-                                widget.products?.banner ??
+                            imgPath: widget.products.banner ??
+                                widget.products.banner ??
                                 "",
                             width: imageSize,
                             height: imageSize,
@@ -303,7 +304,7 @@ class _PlayAudioState extends State<PlayAudio> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(widget.products?.title ?? "",
+                                Text(widget.products.title ?? "",
                                     maxLines: 1,
                                     style: const TextStyle(
                                         overflow: TextOverflow.ellipsis,
@@ -344,6 +345,7 @@ class _PlayAudioState extends State<PlayAudio> {
                                 return IconButton(
                                     onPressed: () {
                                       audioHandler.pause();
+                                      buttonNotifier.value = ButtonState.paused;
                                     },
                                     icon: const Icon(Icons.pause_rounded));
                               } else {
@@ -388,37 +390,6 @@ class _PlayAudioState extends State<PlayAudio> {
           );
         });
   }
-
-  // Widget progressBar() {
-  //   return ValueListenableBuilder<DurationState>(
-  //       valueListenable: durationStateNotifier,
-  //       builder: (context, durationValue, widget) {
-  //         position = durationValue.progress ?? Duration.zero;
-  //         final buffered = durationValue.buffered ?? Duration.zero;
-  //         duration = durationValue.total ?? Duration.zero;
-
-  //         return ProgressBar(
-  //           progress: position,
-  //           buffered: buffered,
-  //           total: duration,
-  //           thumbColor: MyColors.primaryColor,
-  //           thumbGlowColor: MyColors.primaryColor,
-  //           timeLabelTextStyle: const TextStyle(color: MyColors.gray),
-  //           progressBarColor: MyColors.primaryColor,
-  //           bufferedBarColor: MyColors.primaryColor.withOpacity(0.3),
-  //           baseBarColor: MyColors.border1,
-  //           onSeek: (duration) {
-  //             audioHandler.seek(duration);
-  //             audioHandler.play();
-  //           },
-  //         );
-  //       });
-  // }
-
-  // Widget playerButton() {
-
-  //   return
-  // }
 
   buttonForward15Seconds() {
     position = position + const Duration(seconds: 15);

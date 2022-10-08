@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -20,9 +22,6 @@ class ListenTabbar extends StatefulWidget {
 }
 
 class _ListenTabbarState extends State<ListenTabbar> {
-  List<Products>? albumList;
-  List<Products> audioLength = [];
-
   @override
   void initState() {
     super.initState();
@@ -31,109 +30,107 @@ class _ListenTabbarState extends State<ListenTabbar> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Consumer<Auth>(
-        builder: (context, value, child) => FutureBuilder(
-          future: value.isAuth ? getalbumListLogged() : getProducts(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.hasData) {
-              albumList = snapshot.data;
-
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        top: 30.0, bottom: 20, left: 20, right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Цомог лекц",
-                            style: TextStyle(
-                                color: MyColors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold)),
-                        IconButton(
-                            onPressed: () {
-                              Navigator.of(context, rootNavigator: true).push(
-                                  MaterialPageRoute(
-                                      builder: (_) => const AlbumLecture()));
-                            },
-                            icon: const Icon(IconlyLight.arrow_right))
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: albumLecture(context, albumList!),
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text("Подкаст",
-                              style: TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold)),
-                          IconButton(
-                              onPressed: () {
-                                Navigator.of(context, rootNavigator: true).push(
-                                    MaterialPageRoute(
-                                        builder: (_) => const Podcast()));
-                              },
-                              icon: const Icon(IconlyLight.arrow_right))
-                        ],
-                      )),
-                  PodcastAll(
-                    onTap: (Products audioObject, List<Products> podcastList) {
-                      currentlyPlaying.value = audioObject;
-                    },
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text("Видео",
-                              style: TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold)),
-                          IconButton(
-                              onPressed: () {
-                                Navigator.of(context, rootNavigator: true).push(
-                                    MaterialPageRoute(
-                                        builder: (_) => const VideoList()));
-                              },
-                              icon: const Icon(IconlyLight.arrow_right))
-                        ],
-                      )),
-                ],
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(color: MyColors.primaryColor),
-              );
-            }
-          },
+        child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding:
+              const EdgeInsets.only(top: 30.0, bottom: 20, left: 20, right: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Цомог лекц",
+                  style: TextStyle(
+                      color: MyColors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold)),
+              IconButton(
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                            builder: (_) => const AlbumLecture()));
+                  },
+                  icon: const Icon(IconlyLight.arrow_right))
+            ],
+          ),
         ),
-      ),
-    );
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: albumLecture(),
+        ),
+        Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Подкаст",
+                    style: TextStyle(
+                        color: MyColors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold)),
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(builder: (_) => const Podcast()));
+                    },
+                    icon: const Icon(IconlyLight.arrow_right))
+              ],
+            )),
+        PodcastAll(
+          onTap: (Products audioObject) {
+            log(audioObject.title ?? "", name: "jdfndjnf");
+            currentlyPlaying.value = audioObject;
+          },
+          podcastList: [],
+        ),
+        Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Видео",
+                    style: TextStyle(
+                        color: MyColors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold)),
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(builder: (_) => const VideoList()));
+                    },
+                    icon: const Icon(IconlyLight.arrow_right))
+              ],
+            )),
+      ],
+    ));
   }
 
-  Widget albumLecture(BuildContext context, List<Products> albumList) {
-    return SizedBox(
-      height: 220,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: albumList.length,
-          itemBuilder: (BuildContext context, int index) => Padding(
-                padding: const EdgeInsets.only(right: 20.0),
-                child: AlbumItem(albumData: albumList[index]),
-              )),
+  Widget albumLecture() {
+    return Consumer<Auth>(
+      builder: (context, value, child) => FutureBuilder(
+        future: value.isAuth ? getalbumListLogged() : getProducts(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            List<Products> albumList = snapshot.data;
+            return SizedBox(
+              height: 220,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: albumList.length,
+                  itemBuilder: (BuildContext context, int index) => Padding(
+                        padding: const EdgeInsets.only(right: 20.0),
+                        child: AlbumItem(albumData: albumList[index]),
+                      )),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(color: MyColors.primaryColor),
+            );
+          }
+        },
+      ),
     );
   }
 

@@ -6,9 +6,9 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class AudioProgressBar extends StatelessWidget {
   final Duration savedPosition;
-  final Duration totalPosition;
+  final Duration totalDuration;
   const AudioProgressBar(
-      {Key? key, required this.savedPosition, required this.totalPosition})
+      {Key? key, required this.savedPosition, required this.totalDuration})
       : super(key: key);
 
   @override
@@ -21,10 +21,7 @@ class AudioProgressBar extends StatelessWidget {
           Duration position = savedPosition != Duration.zero
               ? savedPosition
               : value.progress ?? Duration.zero;
-          Duration duration = value.total ?? totalPosition;
-
-          print("position $position");
-          print("duration $duration");
+          Duration duration = value.total ?? totalDuration;
 
           return SfLinearGauge(
             minimum: 0,

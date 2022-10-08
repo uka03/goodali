@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:goodali/models/podcast_list_model.dart';
+
 import 'package:goodali/models/products_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,14 +72,14 @@ class AudioDownloadProvider with ChangeNotifier {
         .map((res) => Products.fromJson(json.decode(res)))
         .toList();
     _podcastItem = decodedProduct;
-
+    // print(downloadedPodcast.length);
     notifyListeners();
   }
 
-  Future<void> addPodcast(Products cartItem) async {
-    _podcastItem.add(cartItem);
+  Future<void> addPodcast(Products podcastItem) async {
+    _podcastItem.add(podcastItem);
     _setPrefPodcastItems();
-    notifyListeners();
+    // notifyListeners();
   }
 
   void removePodcast(Products item) {
