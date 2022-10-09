@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 class DownloadPage extends StatelessWidget {
   final Stream<FileResponse>? fileStream;
   final VoidCallback downloadFile;
+  final bool isPodcast;
   final Products products;
 
   const DownloadPage({
@@ -19,6 +20,7 @@ class DownloadPage extends StatelessWidget {
     this.fileStream,
     required this.downloadFile,
     required this.products,
+    required this.isPodcast,
   }) : super(key: key);
 
   @override
@@ -36,11 +38,13 @@ class DownloadPage extends StatelessWidget {
             print((snapshot.data as DownloadProgress).progress);
             print("finished $finished");
             if (finished == true) {
-              downloadAudio.addAudio(products);
-              log("downloaded audio");
-
-              downloadAudio.addPodcast(products);
-              log("downloaded podcast");
+              if (isPodcast == true) {
+                downloadAudio.addAudio(products);
+                log("downloaded audio");
+              } else {
+                downloadAudio.addPodcast(products);
+                log("downloaded podcast");
+              }
             }
             double? percent = (snapshot.data as DownloadProgress).progress;
 

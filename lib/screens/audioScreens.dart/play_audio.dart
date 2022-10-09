@@ -202,6 +202,7 @@ class _PlayAudioState extends State<PlayAudio> {
                                   ],
                                 )
                               : DownloadPage(
+                                  isPodcast: false,
                                   fileStream: fileStream,
                                   downloadFile: _downloadFile,
                                   products: widget.products),

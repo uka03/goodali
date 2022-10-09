@@ -77,12 +77,25 @@ class _ListenTabbarState extends State<ListenTabbar> {
                     icon: const Icon(IconlyLight.arrow_right))
               ],
             )),
-        PodcastAll(
-          onTap: (Products audioObject) {
-            log(audioObject.title ?? "", name: "jdfndjnf");
-            currentlyPlaying.value = audioObject;
+        FutureBuilder(
+          future: getPodcastList(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData &&
+                ConnectionState.done == snapshot.connectionState) {
+              List<Products> podcastList = snapshot.data;
+              return PodcastAll(
+                onTap: (Products audioObject) {
+                  log(audioObject.title ?? "", name: "jdfndjnf");
+                  currentlyPlaying.value = audioObject;
+                },
+                podcastList: podcastList,
+              );
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(color: MyColors.primaryColor),
+              );
+            }
           },
-          podcastList: [],
         ),
         Padding(
             padding: const EdgeInsets.all(20),

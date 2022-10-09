@@ -213,12 +213,15 @@ class _PodcastItemState extends State<PodcastItem> {
               onPause: () {
                 widget.onTap(widget.podcastItem);
                 developer.log("paused");
+
                 buttonNotifier.value = ButtonState.paused;
                 AudioPlayerModel _audio = AudioPlayerModel(
                     productID: widget.podcastItem.id,
                     audioPosition: position.inMilliseconds);
                 _audioPlayerProvider.addAudioPosition(_audio);
-                audioHandler.pause();
+                audioHandler.pause().then((value) =>
+                    podcastProvider.unListenedPodcastFun(
+                        widget.podcastItem, widget.podcastList));
               },
               title: widget.podcastItem.title ?? "",
             ),
@@ -245,6 +248,7 @@ class _PodcastItemState extends State<PodcastItem> {
                     fileStream: fileStream,
                     downloadFile: _downloadFile,
                     products: widget.podcastItem,
+                    isPodcast: true,
                   ),
             IconButton(
                 splashRadius: 20,

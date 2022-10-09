@@ -74,11 +74,14 @@ class PodcastProvider with ChangeNotifier {
 
   void addListenedPodcast(Products item, List<Products> podcastList) {
     _listenedPodcastList.add(item);
-    _unListenedPodcastList = podcastList;
-    _unListenedPodcastList.remove(item);
 
     _setPrefItems();
     notifyListeners();
+  }
+
+  void unListenedPodcastFun(Products item, List<Products> podcastList) {
+    _unListenedPodcastList = podcastList;
+    _unListenedPodcastList.remove(item);
   }
 
   List<Products> get listenedPodcast {
