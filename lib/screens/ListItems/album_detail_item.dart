@@ -89,7 +89,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     try {
       isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
 
-      getTotalDuration(url, fileInfo).then((value) {
+      audioPlayerController.getTotalDuration(url, fileInfo).then((value) {
         duration = value;
         setState(() => isLoading = false);
         audioPlayerController
@@ -136,25 +136,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         behavior: SnackBarBehavior.floating,
       ));
     }
-  }
-
-  Future getTotalDuration(String audioURL, FileInfo? fileInfo) async {
-    Duration totalDuration = Duration.zero;
-    if (audioURL != "") {
-      if (fileInfo != null) {
-        audioFile = fileInfo.file;
-        audioURL = audioFile!.path;
-        totalDuration = await widget.audioPlayer.setFilePath(audioFile!.path) ??
-            Duration.zero;
-      } else {
-        totalDuration =
-            await widget.audioPlayer.setUrl(audioURL) ?? Duration.zero;
-      }
-    } else {
-      debugPrint("hooson url");
-    }
-
-    return totalDuration;
   }
 
   getCachedFile(String url) async {

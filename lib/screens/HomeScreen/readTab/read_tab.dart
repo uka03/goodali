@@ -16,9 +16,11 @@ class ReadTabbar extends StatefulWidget {
   State<ReadTabbar> createState() => _ReadTabbarState();
 }
 
-class _ReadTabbarState extends State<ReadTabbar> {
+class _ReadTabbarState extends State<ReadTabbar>
+    with AutomaticKeepAliveClientMixin<ReadTabbar> {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -131,4 +133,7 @@ class _ReadTabbarState extends State<ReadTabbar> {
   Future<List<ArticleModel>> getArticle() {
     return Connection.getArticle(context);
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

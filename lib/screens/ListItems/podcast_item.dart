@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
@@ -46,6 +47,7 @@ class PodcastItem extends StatefulWidget {
 
 class _PodcastItemState extends State<PodcastItem> {
   AudioPlayer audioPlayer = AudioPlayer();
+
   AudioPlayerController audioPlayerController = AudioPlayerController();
   String audioUrl = "";
   bool isPlaying = false;
@@ -77,50 +79,32 @@ class _PodcastItemState extends State<PodcastItem> {
     super.initState();
   }
 
-  Future<void> setAudio(String url, FileInfo? fileInfo) async {
+  Future<void> setAudio(
+      String url, FileInfo? fileInfo, Duration totalDuration) async {
     try {
       isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
 
       if (url != "") {
-        if (fileInfo != null) {
-          audioFile = fileInfo.file;
-          audioUrl = audioFile!.path;
-          duration =
-              await audioPlayer.setFilePath(audioFile!.path) ?? Duration.zero;
-        } else {
-          audioUrl = url;
-          duration = await audioPlayer.setUrl(url) ?? Duration.zero;
-        }
-
         audioPlayerController
             .getSavedPosition(widget.podcastItem.id!)
             .then((value) async {
           savedPosition = value;
-          if (!mounted) return;
-          setState(() {
-            leftDuration = duration - savedPosition;
-            isLoading = false;
-          });
 
           position = savedPosition;
           developer.log(duration.toString(), name: "leftDuration");
 
-          for (var e in widget.podcastList) {
-            item = MediaItem(
-                id: audioUrl,
-                title: e.title ?? "",
-                duration: duration,
-                artUri: Uri.parse(banner),
-                extras: {
-                  "position": position.inMilliseconds,
-                  "isDownloaded": fileInfo != null ? true : false
-                });
-            mediaItems.add(item);
-          }
-          if (!isbgPlaying) {
-            developer.log(isbgPlaying.toString());
-            await audioHandler.addQueueItems(mediaItems);
-          }
+          item = MediaItem(
+              id: audioUrl,
+              title: widget.podcastItem.title ?? "",
+              duration: totalDuration,
+              artUri: Uri.parse(banner),
+              extras: {
+                "position": position.inMilliseconds,
+                "isDownloaded": fileInfo != null ? true : false
+              });
+
+          developer.log(isbgPlaying.toString());
+          audioHandler.addQueueItem(item);
           audioPlayerController;
         });
       }
@@ -137,7 +121,6 @@ class _PodcastItemState extends State<PodcastItem> {
 
   getCachedFile(String url) async {
     fileInfo = await audioPlayerController.checkCachefor(url);
-    setAudio(url, fileInfo);
   }
 
   void _downloadFile() {
@@ -197,8 +180,8 @@ class _PodcastItemState extends State<PodcastItem> {
                 setState(() {
                   isPlaying = true;
                 });
-                audioHandler.playMediaItem(mediaItems[widget.index]);
 
+                audioHandler.playMediaItem(item);
                 audioHandler.play();
                 currentlyPlaying.value = widget.podcastItem;
                 buttonNotifier.value = ButtonState.playing;
@@ -226,16 +209,38 @@ class _PodcastItemState extends State<PodcastItem> {
               title: widget.podcastItem.title ?? "",
             ),
             const SizedBox(width: 14),
-            if (savedPosition != Duration.zero || isPlaying)
-              isLoading
-                  ? Container()
-                  : AudioProgressBar(
-                      savedPosition: savedPosition, totalDuration: duration),
             const SizedBox(width: 14),
-            AudioplayerTimer(
-                title: widget.podcastItem.title ?? "",
-                leftPosition: leftDuration,
-                savedPosition: savedPosition),
+            FutureBuilder(
+              future:
+                  audioPlayerController.getTotalDuration(audioUrl, fileInfo),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.hasData &&
+                    ConnectionState.done == snapshot.connectionState) {
+                  Duration totalDuration = snapshot.data;
+                  print("totalDuration $totalDuration");
+                  setAudio(audioUrl, fileInfo, totalDuration);
+                  return Column(
+                    children: [
+                      if (savedPosition != Duration.zero || isPlaying)
+                        AudioProgressBar(
+                            savedPosition: savedPosition,
+                            totalDuration: totalDuration),
+                      AudioplayerTimer(
+                          title: widget.podcastItem.title ?? "",
+                          leftPosition: totalDuration - savedPosition,
+                          savedPosition: savedPosition)
+                    ],
+                  );
+                } else {
+                  return const SizedBox(
+                      width: 30,
+                      child: LinearProgressIndicator(
+                          backgroundColor: Colors.transparent,
+                          minHeight: 2,
+                          color: MyColors.black));
+                }
+              },
+            ),
             const Spacer(),
             fileInfo != null
                 ? IconButton(

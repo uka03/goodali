@@ -21,7 +21,10 @@ class ListenTabbar extends StatefulWidget {
   State<ListenTabbar> createState() => _ListenTabbarState();
 }
 
-class _ListenTabbarState extends State<ListenTabbar> {
+class _ListenTabbarState extends State<ListenTabbar>
+    with AutomaticKeepAliveClientMixin<ListenTabbar> {
+  @override
+  bool get wantKeepAlive => true;
   @override
   void initState() {
     super.initState();
@@ -29,6 +32,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SingleChildScrollView(
         child: Column(
       mainAxisSize: MainAxisSize.min,
@@ -84,6 +88,7 @@ class _ListenTabbarState extends State<ListenTabbar> {
                 ConnectionState.done == snapshot.connectionState) {
               List<Products> podcastList = snapshot.data;
               return PodcastAll(
+                isHomeScreen: true,
                 onTap: (Products audioObject) {
                   log(audioObject.title ?? "", name: "jdfndjnf");
                   currentlyPlaying.value = audioObject;

@@ -63,7 +63,7 @@ dependencies:
   miniplayer: ^1.0.1
   extended_image: ^6.1.0
   youtube_player_flutter: ^8.0.0
-  persistent_bottom_nav_bar: 4.0.2
+  async: ^2.8.2
 
 dev_dependencies:
   flutter_test:

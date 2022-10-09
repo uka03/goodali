@@ -18,9 +18,11 @@ class NotListenedPodcast extends StatefulWidget {
   State<NotListenedPodcast> createState() => _NotListenedPodcastState();
 }
 
-class _NotListenedPodcastState extends State<NotListenedPodcast> {
+class _NotListenedPodcastState extends State<NotListenedPodcast>
+    with AutomaticKeepAliveClientMixin<NotListenedPodcast> {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Consumer<PodcastProvider>(
       builder: (context, value, child) {
         if (value.unListenedPodcast.isNotEmpty) {
@@ -61,4 +63,7 @@ class _NotListenedPodcastState extends State<NotListenedPodcast> {
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

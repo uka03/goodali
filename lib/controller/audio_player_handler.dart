@@ -125,6 +125,7 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> playMediaItem(MediaItem item) async {
     mediaItem.add(item);
     debugPrint("player media item");
+    debugPrint(item.title);
     if (item.extras?['isDownloaded'] == true) {
       _player.setFilePath(item.id,
           initialPosition: item.extras?['position'] != Duration.zero
@@ -144,9 +145,21 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
-    final audioSource = mediaItems.map(_createAudioSource);
+    final audioSource = mediaItems.map(_createAudioSource).toList();
 
-    _playlist.addAll(audioSource.toList());
+    for (int i = 0; i < mediaItems.length; i++) {
+      _playlist.add(audioSource[i]);
+    }
+  }
+
+  @override
+  Future<void> updateQueue(List<MediaItem> mediaItems) async {
+    queue.add(mediaItems);
+    await _player.setAudioSource(ConcatenatingAudioSource(
+      children: mediaItems
+          .map((item) => AudioSource.uri(Uri.parse(item.id)))
+          .toList(),
+    ));
   }
 
   @override

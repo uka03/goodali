@@ -14,7 +14,8 @@ class FeelTabbar extends StatefulWidget {
   State<FeelTabbar> createState() => _FeelTabbarState();
 }
 
-class _FeelTabbarState extends State<FeelTabbar> {
+class _FeelTabbarState extends State<FeelTabbar>
+    with AutomaticKeepAliveClientMixin<FeelTabbar> {
   @override
   void initState() {
     super.initState();
@@ -22,6 +23,7 @@ class _FeelTabbarState extends State<FeelTabbar> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SingleChildScrollView(
       child: FutureBuilder(
           future: Future.wait([getMoodList(), getMoodMain()]),
@@ -108,4 +110,7 @@ class _FeelTabbarState extends State<FeelTabbar> {
   Future<List<MoodMain>> getMoodMain() {
     return Connection.getMoodMain(context);
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

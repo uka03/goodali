@@ -6,7 +6,7 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class AudioProgressBar extends StatelessWidget {
   final Duration savedPosition;
-  final Duration totalDuration;
+  final Duration? totalDuration;
   const AudioProgressBar(
       {Key? key, required this.savedPosition, required this.totalDuration})
       : super(key: key);
@@ -21,11 +21,12 @@ class AudioProgressBar extends StatelessWidget {
           Duration position = savedPosition != Duration.zero
               ? savedPosition
               : value.progress ?? Duration.zero;
-          Duration duration = value.total ?? totalDuration;
+          Duration duration =
+              value.total ?? totalDuration ?? const Duration(minutes: 60);
 
           return SfLinearGauge(
             minimum: 0,
-            maximum: duration.inSeconds.toDouble() / 10,
+            maximum: (duration.inSeconds.toDouble() / 10),
             showLabels: false,
             showAxisTrack: false,
             showTicks: false,
@@ -35,7 +36,7 @@ class AudioProgressBar extends StatelessWidget {
                 edgeStyle: LinearEdgeStyle.bothCurve,
                 startValue: 0,
                 color: MyColors.border1,
-                endValue: duration.inSeconds.toDouble() / 10,
+                endValue: (duration.inSeconds.toDouble() / 10),
               ),
             ],
             barPointers: [
@@ -43,7 +44,7 @@ class AudioProgressBar extends StatelessWidget {
                   position: LinearElementPosition.inside,
                   edgeStyle: LinearEdgeStyle.bothCurve,
                   color: MyColors.primaryColor,
-                  value: position.inSeconds.toDouble() / 10)
+                  value: (position.inSeconds.toDouble() / 10))
             ],
           );
         },

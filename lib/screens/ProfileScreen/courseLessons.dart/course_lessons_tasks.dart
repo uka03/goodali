@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
@@ -136,10 +137,12 @@ class _CourseTasksState extends State<CourseTasks> {
     _ytbPlayerController = YoutubePlayerController(
       initialVideoId: videoUrl,
       params: const YoutubePlayerParams(
-        startAt: Duration(seconds: 30),
+        showControls: true,
+        origin: "https://www.youtube.com/embed/",
         autoPlay: true,
       ),
     );
+
     // _controller?.addListener(listener);
   }
 
@@ -393,6 +396,7 @@ class _CourseTasksState extends State<CourseTasks> {
   }
 
   Widget video(CourseLessonsTasksModel courseTask, int index) {
+    log(courseTask.videoUrl ?? "", name: "videoUrl");
     return Column(
       children: [
         _ytbPlayerController?.value.isReady != null

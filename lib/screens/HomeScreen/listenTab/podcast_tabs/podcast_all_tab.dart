@@ -7,19 +7,26 @@ import 'package:goodali/screens/ListItems/podcast_item.dart';
 typedef OnTap = Function(Products audioObject);
 
 class PodcastAll extends StatefulWidget {
+  final bool? isHomeScreen;
   final List<Products> podcastList;
   final OnTap onTap;
 
-  const PodcastAll({Key? key, required this.onTap, required this.podcastList})
+  const PodcastAll(
+      {Key? key,
+      required this.onTap,
+      required this.podcastList,
+      this.isHomeScreen = false})
       : super(key: key);
 
   @override
   State<PodcastAll> createState() => _PodcastAllState();
 }
 
-class _PodcastAllState extends State<PodcastAll> {
+class _PodcastAllState extends State<PodcastAll>
+    with AutomaticKeepAliveClientMixin<PodcastAll> {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Stack(children: [
       RefreshIndicator(
         color: MyColors.primaryColor,
@@ -38,7 +45,11 @@ class _PodcastAllState extends State<PodcastAll> {
                   podcastItem: widget.podcastList[index],
                 ));
           },
-          itemCount: widget.podcastList.length,
+          itemCount: widget.isHomeScreen == true
+              ? widget.podcastList.length > 5
+                  ? 5
+                  : widget.podcastList.length
+              : widget.podcastList.length,
           separatorBuilder: (BuildContext context, int index) => const Divider(
             endIndent: 18,
             indent: 18,
@@ -55,4 +66,7 @@ class _PodcastAllState extends State<PodcastAll> {
   Future<void> _refresh() async {
     setState(() {});
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

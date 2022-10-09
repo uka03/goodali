@@ -88,12 +88,12 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
 
       widget.audioPlayer.setUrl(url).then((value) {
         duration = value ?? Duration.zero;
-        getSavedPosition(widget.products.productId!).then((value) {
+        getSavedPosition(widget.products.productId!).then((value) async {
           if (value != Duration.zero) {
             savedPosition = value;
             position = savedPosition;
 
-            widget.audioPlayer.setUrl(url, initialPosition: position);
+            await widget.audioPlayer.setUrl(url, initialPosition: position);
           } else {}
         });
       });

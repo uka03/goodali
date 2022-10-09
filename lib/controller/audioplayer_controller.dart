@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final currentlyPlaying = ValueNotifier<Products?>(null);
@@ -31,6 +33,7 @@ final durationStateNotifier = ValueNotifier<DurationState>(const DurationState(
 final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
 
 class AudioPlayerController with ChangeNotifier {
+  AudioPlayer audioPlayer = AudioPlayer();
   AudioPlayerController() {
     AudioSession.instance.then((audioSession) async {
       await audioSession.configure(const AudioSessionConfiguration.speech());
@@ -104,5 +107,30 @@ class AudioPlayerController with ChangeNotifier {
     final FileInfo? value =
         await CustomCacheManager.instance.getFileFromCache(url);
     return value;
+  }
+
+  Future getTotalDuration(String audioURL, FileInfo? fileInfo) async {
+    final _memoizer = AsyncMemoizer();
+    final _usersCache = AsyncCache(const Duration(hours: 1));
+    Duration totalDuration = Duration.zero;
+
+    return _usersCache.fetch(() => _memoizer.runOnce(() async {
+          if (audioURL != "") {
+            if (fileInfo != null) {
+              audioURL = fileInfo.file.path;
+              totalDuration =
+                  await audioPlayer.setFilePath(audioURL) ?? Duration.zero;
+            } else {
+              totalDuration = await audioPlayer.setAudioSource(
+                      AudioSource.uri(Uri.parse(audioURL)),
+                      preload: true) ??
+                  Duration.zero;
+            }
+          } else {
+            debugPrint("hooson url");
+          }
+
+          return totalDuration;
+        }));
   }
 }
