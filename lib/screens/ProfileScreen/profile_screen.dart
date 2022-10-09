@@ -33,7 +33,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    print("jfnjdnfndkjnf");
     checkLoginWithBio();
     super.initState();
   }
@@ -41,7 +40,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   checkLoginWithBio() async {
     final prefs = await SharedPreferences.getInstance();
     loginWithBio = prefs.getBool("login_biometric") ?? false;
-    print("getCheckBiometric $loginWithBio");
   }
 
   Future<UserInfo?> userData() async {
@@ -53,7 +51,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       return userInfo;
     } else {
-      print("hooson");
       return null;
     }
   }

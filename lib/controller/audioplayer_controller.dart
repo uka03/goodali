@@ -121,10 +121,9 @@ class AudioPlayerController with ChangeNotifier {
               totalDuration =
                   await audioPlayer.setFilePath(audioURL) ?? Duration.zero;
             } else {
-              totalDuration = await audioPlayer.setAudioSource(
-                      AudioSource.uri(Uri.parse(audioURL)),
-                      preload: true) ??
-                  Duration.zero;
+              totalDuration =
+                  await audioPlayer.setUrl(audioURL, preload: true) ??
+                      Duration.zero;
             }
           } else {
             debugPrint("hooson url");

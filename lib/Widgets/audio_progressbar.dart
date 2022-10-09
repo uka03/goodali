@@ -7,8 +7,12 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 class AudioProgressBar extends StatelessWidget {
   final Duration savedPosition;
   final Duration? totalDuration;
+  final bool? isPlayed;
   const AudioProgressBar(
-      {Key? key, required this.savedPosition, required this.totalDuration})
+      {Key? key,
+      required this.savedPosition,
+      required this.totalDuration,
+      this.isPlayed = false})
       : super(key: key);
 
   @override
@@ -18,9 +22,7 @@ class AudioProgressBar extends StatelessWidget {
       child: ValueListenableBuilder(
         valueListenable: durationStateNotifier,
         builder: (BuildContext context, DurationState value, Widget? child) {
-          Duration position = savedPosition != Duration.zero
-              ? savedPosition
-              : value.progress ?? Duration.zero;
+          Duration position = value.progress ?? Duration.zero;
           Duration duration =
               value.total ?? totalDuration ?? const Duration(minutes: 60);
 

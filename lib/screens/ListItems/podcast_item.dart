@@ -47,7 +47,6 @@ class PodcastItem extends StatefulWidget {
 
 class _PodcastItemState extends State<PodcastItem> {
   AudioPlayer audioPlayer = AudioPlayer();
-
   AudioPlayerController audioPlayerController = AudioPlayerController();
   String audioUrl = "";
   bool isPlaying = false;
@@ -58,7 +57,6 @@ class _PodcastItemState extends State<PodcastItem> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
   Duration savedPosition = Duration.zero;
-  Duration leftDuration = Duration.zero;
 
   FileInfo? fileInfo;
   File? audioFile;
@@ -75,39 +73,45 @@ class _PodcastItemState extends State<PodcastItem> {
       audioUrl = Urls.networkPath + (widget.podcastItem.audio ?? "");
     }
     banner = Urls.networkPath + (widget.podcastItem.banner ?? "");
-    getCachedFile(audioUrl);
+
+    if (audioUrl != '') {
+      getCachedFile(audioUrl);
+    }
+
     super.initState();
   }
 
-  Future<void> setAudio(
-      String url, FileInfo? fileInfo, Duration totalDuration) async {
+  Future<Duration> _getSavedPosition(String url, FileInfo? fileInfo) async {
+    savedPosition =
+        await audioPlayerController.getSavedPosition(widget.podcastItem.id!);
+    developer.log(savedPosition.toString());
+    setState(() => isLoading = false);
+    setAudio(fileInfo, savedPosition);
+    return savedPosition;
+  }
+
+  Future<void> setAudio(FileInfo? fileInfo, Duration savedPosition) async {
     try {
       isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
-
-      if (url != "") {
-        audioPlayerController
-            .getSavedPosition(widget.podcastItem.id!)
-            .then((value) async {
-          savedPosition = value;
-
-          position = savedPosition;
-          developer.log(duration.toString(), name: "leftDuration");
-
-          item = MediaItem(
-              id: audioUrl,
-              title: widget.podcastItem.title ?? "",
-              duration: totalDuration,
-              artUri: Uri.parse(banner),
-              extras: {
-                "position": position.inMilliseconds,
-                "isDownloaded": fileInfo != null ? true : false
-              });
-
-          developer.log(isbgPlaying.toString());
-          audioHandler.addQueueItem(item);
-          audioPlayerController;
+      position = savedPosition;
+      duration = await audioPlayer.setUrl(audioUrl) ?? Duration.zero;
+      if (mounted) {
+        setState(() {
+          duration = duration;
         });
       }
+
+      item = MediaItem(
+          id: audioUrl,
+          title: widget.podcastItem.title ?? "",
+          duration: duration,
+          artUri: Uri.parse(banner),
+          extras: {
+            "position": position.inMilliseconds,
+            "isDownloaded": fileInfo != null ? true : false
+          });
+
+      audioPlayerController;
     } on PlayerInterruptedException catch (e) {
       developer.log(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -121,6 +125,7 @@ class _PodcastItemState extends State<PodcastItem> {
 
   getCachedFile(String url) async {
     fileInfo = await audioPlayerController.checkCachefor(url);
+    _getSavedPosition(url, fileInfo);
   }
 
   void _downloadFile() {
@@ -180,10 +185,9 @@ class _PodcastItemState extends State<PodcastItem> {
                 setState(() {
                   isPlaying = true;
                 });
-
                 audioHandler.playMediaItem(item);
+
                 audioHandler.play();
-                currentlyPlaying.value = widget.podcastItem;
                 buttonNotifier.value = ButtonState.playing;
                 podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
                 if (!podcastProvider.sameItemCheck) {
@@ -209,38 +213,22 @@ class _PodcastItemState extends State<PodcastItem> {
               title: widget.podcastItem.title ?? "",
             ),
             const SizedBox(width: 14),
-            const SizedBox(width: 14),
-            FutureBuilder(
-              future:
-                  audioPlayerController.getTotalDuration(audioUrl, fileInfo),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.hasData &&
-                    ConnectionState.done == snapshot.connectionState) {
-                  Duration totalDuration = snapshot.data;
-                  print("totalDuration $totalDuration");
-                  setAudio(audioUrl, fileInfo, totalDuration);
-                  return Column(
-                    children: [
-                      if (savedPosition != Duration.zero || isPlaying)
-                        AudioProgressBar(
-                            savedPosition: savedPosition,
-                            totalDuration: totalDuration),
-                      AudioplayerTimer(
-                          title: widget.podcastItem.title ?? "",
-                          leftPosition: totalDuration - savedPosition,
-                          savedPosition: savedPosition)
-                    ],
-                  );
-                } else {
-                  return const SizedBox(
-                      width: 30,
-                      child: LinearProgressIndicator(
-                          backgroundColor: Colors.transparent,
-                          minHeight: 2,
-                          color: MyColors.black));
-                }
-              },
-            ),
+            // if (savedPosition != Duration.zero || isPlaying)
+            //   buttonNotifier.value == ButtonState.loading
+            //       ? Container()
+            //       : AudioProgressBar(
+            //           savedPosition: savedPosition,
+            //           totalDuration: totalDuration),
+            isLoading
+                ? const SizedBox(
+                    width: 30,
+                    child: LinearProgressIndicator(
+                        backgroundColor: Colors.transparent,
+                        minHeight: 2,
+                        color: MyColors.black))
+                : AudioplayerTimer(
+                    title: widget.podcastItem.title ?? "",
+                    leftPosition: duration - savedPosition),
             const Spacer(),
             fileInfo != null
                 ? IconButton(

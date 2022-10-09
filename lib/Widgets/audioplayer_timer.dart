@@ -6,15 +6,11 @@ import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 
 class AudioplayerTimer extends StatelessWidget {
-  final Duration savedPosition;
   final Duration leftPosition;
   final String title;
 
   const AudioplayerTimer(
-      {Key? key,
-      required this.savedPosition,
-      required this.leftPosition,
-      required this.title})
+      {Key? key, required this.leftPosition, required this.title})
       : super(key: key);
 
   @override
@@ -37,7 +33,7 @@ class AudioplayerTimer extends StatelessWidget {
           return Text(formatTime(duration - position) + "мин",
               style: const TextStyle(fontSize: 12, color: MyColors.black));
         } else {
-          return Text(formatTime(leftPosition) + "мин",
+          return Text(formatTime(duration) + "мин",
               style: const TextStyle(fontSize: 12, color: MyColors.black));
         }
       },

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart' as ja;
 
 class AudioSessionSettings {
@@ -12,7 +13,7 @@ class AudioSessionSettings {
     );
     bool playInterrupted = false;
     audioSession.becomingNoisyEventStream.listen((_) {
-      print('PAUSE');
+      debugPrint('PAUSE');
       _player.pause();
     });
     _player.playingStream.listen((playing) {
@@ -22,8 +23,8 @@ class AudioSessionSettings {
       }
     });
     audioSession.interruptionEventStream.listen((event) {
-      print('interruption begin: ${event.begin}');
-      print('interruption type: ${event.type}');
+      debugPrint('interruption begin: ${event.begin}');
+      debugPrint('interruption type: ${event.type}');
       if (event.begin) {
         switch (event.type) {
           case AudioInterruptionType.duck:
@@ -58,8 +59,8 @@ class AudioSessionSettings {
       }
     });
     audioSession.devicesChangedEventStream.listen((event) {
-      print('Devices added: ${event.devicesAdded}');
-      print('Devices removed: ${event.devicesRemoved}');
+      debugPrint('Devices added: ${event.devicesAdded}');
+      debugPrint('Devices removed: ${event.devicesRemoved}');
     });
   }
 }

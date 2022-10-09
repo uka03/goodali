@@ -236,9 +236,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                     savedPosition: savedPosition, totalDuration: duration),
               const SizedBox(width: 10),
               AudioplayerTimer(
-                  title: widget.products.title ?? "",
-                  leftPosition: duration,
-                  savedPosition: savedPosition),
+                  title: widget.products.title ?? "", leftPosition: duration),
               const Spacer(),
               widget.products.isBought == false
                   ? IconButton(
