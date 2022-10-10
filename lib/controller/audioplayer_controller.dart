@@ -25,27 +25,29 @@ final playerExpandProgress = ValueNotifier<double>(playerMinHeight);
 final currentPlayingItem =
     ValueNotifier<MediaItem>(const MediaItem(id: "", title: ''));
 
-final durationStateNotifier = ValueNotifier<DurationState>(const DurationState(
-  progress: Duration.zero,
-  buffered: Duration.zero,
-  total: Duration.zero,
-));
+final durationStateNotifier = ValueNotifier<DurationState>(
+    const DurationState(Duration.zero, Duration.zero, Duration.zero));
 final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
 
 class AudioPlayerController with ChangeNotifier {
   AudioPlayer audioPlayer = AudioPlayer();
+
   AudioPlayerController() {
     AudioSession.instance.then((audioSession) async {
       await audioSession.configure(const AudioSessionConfiguration.speech());
       AudioSessionSettings.handleInterruption(audioSession);
     });
-    initiliaze();
   }
 
-  initiliaze() {
+  void initiliaze() {
+    _listenToPosition();
+    _listenToTotalDuration();
+    _listenToPlaybackState();
+  }
+
+  _listenToPlaybackState() {
     audioHandler.playbackState.listen((event) {
       final isPlaying = event.playing;
-
       final processingState = event.processingState;
       if (processingState == AudioProcessingState.loading ||
           processingState == AudioProcessingState.buffering) {
@@ -59,48 +61,68 @@ class AudioPlayerController with ChangeNotifier {
         audioHandler.pause();
       }
     });
+  }
 
-    audioHandler.mediaItem.listen((event) {
-      log(event?.duration.toString() ?? "", name: "mediaItem");
-      final oldState = durationStateNotifier.value;
-      durationStateNotifier.value = DurationState(
-        progress: oldState.progress,
-        buffered: oldState.buffered,
-        total: event?.duration ?? Duration.zero,
-      );
-      // durationStateNotifier.notifyListeners();
-    });
+  void _listenToPosition() {
     audioHandler.playbackState.listen((event) {
       final oldState = durationStateNotifier.value;
       durationStateNotifier.value = DurationState(
-        progress: event.position,
-        buffered: event.bufferedPosition,
-        total: oldState.total,
+        event.position,
+        event.bufferedPosition,
+        oldState.total,
       );
-      // durationStateNotifier.notifyListeners();
-    });
-
-    audioHandler.mediaItem.listen((event) {
-      currentPlayingItem.value = event ?? MediaItem(id: "", title: "");
     });
   }
 
-  Future<Duration> getSavedPosition(int moodItemID) async {
+  void _listenToTotalDuration() {
+    audioHandler.mediaItem.listen((mediaItem) {
+      final oldState = durationStateNotifier.value;
+      log(mediaItem?.duration.toString() ?? "", name: "totalDuration");
+      durationStateNotifier.value = DurationState(
+        oldState.progress,
+        oldState.buffered,
+        mediaItem?.duration ?? Duration.zero,
+      );
+
+      if (buttonNotifier.value == ButtonState.paused) {
+        AudioPlayerModel _audio = AudioPlayerModel(
+            productID: int.parse(mediaItem?.id ?? "0"),
+            audioPosition: oldState.progress?.inMilliseconds,
+            audioUrl: mediaItem?.extras?['audioUrl'],
+            banner: mediaItem?.artUri?.path,
+            title: mediaItem?.title);
+        AudioPlayerController().savePosition(_audio);
+      }
+    });
+  }
+
+  Future<int> getSavedPosition(MediaItem mediaItem) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
     List<AudioPlayerModel> decodedProduct = decodedAudioString
         .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
         .toList();
-    int? saveddouble;
-    Duration savedPosition;
+    int savedPosition = 0;
+
+    AudioPlayerModel audioFile = toAudioModel(mediaItem);
+
     for (var item in decodedProduct) {
-      if (moodItemID == item.productID) {
-        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
+      if (audioFile.title == item.title) {
+        savedPosition = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
     }
-    savedPosition = Duration(milliseconds: saveddouble ?? 0);
-    debugPrint("savedPosition $savedPosition");
+
+    log("savedPosition $savedPosition");
     return savedPosition;
+  }
+
+  savePosition(AudioPlayerModel audio) async {
+    List<AudioPlayerModel> _audioItems = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _audioItems.add(audio);
+    List<String> encodedProducts =
+        _audioItems.map((res) => json.encode(res.toJson())).toList();
+    prefs.setStringList("save_audio", encodedProducts);
   }
 
   Future<FileInfo?> checkCachefor(String url) async {
@@ -109,27 +131,10 @@ class AudioPlayerController with ChangeNotifier {
     return value;
   }
 
-  Future getTotalDuration(String audioURL, FileInfo? fileInfo) async {
-    final _memoizer = AsyncMemoizer();
-    final _usersCache = AsyncCache(const Duration(hours: 1));
-    Duration totalDuration = Duration.zero;
-
-    return _usersCache.fetch(() => _memoizer.runOnce(() async {
-          if (audioURL != "") {
-            if (fileInfo != null) {
-              audioURL = fileInfo.file.path;
-              totalDuration =
-                  await audioPlayer.setFilePath(audioURL) ?? Duration.zero;
-            } else {
-              totalDuration =
-                  await audioPlayer.setUrl(audioURL, preload: true) ??
-                      Duration.zero;
-            }
-          } else {
-            debugPrint("hooson url");
-          }
-
-          return totalDuration;
-        }));
-  }
+  toAudioModel(MediaItem item) => AudioPlayerModel(
+      productID: int.parse(item.id),
+      audioPosition: item.duration?.inMilliseconds ?? 0,
+      audioUrl: item.extras?['audioUrl'],
+      banner: item.artUri?.origin,
+      title: item.title);
 }

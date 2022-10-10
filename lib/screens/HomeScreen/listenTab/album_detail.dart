@@ -57,7 +57,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   bool isPlaying = false;
   bool isClicked = false;
   int currentIndex = 1;
-  Duration savedPosition = Duration.zero;
+  int savedPosition = 0;
 
   int saveddouble = 0;
 
@@ -108,18 +108,18 @@ class _AlbumDetailState extends State<AlbumDetail> {
           .setUrl(Urls.networkPath + widget.albumProduct.audio!)
           .then((value) {
         duration = value ?? Duration.zero;
-        audioPlayerController
-            .getSavedPosition(widget.albumProduct.productId!)
-            .then((value) {
-          if (value != Duration.zero) {
-            savedPosition = value;
-            position = savedPosition;
-            duration = duration - position;
-            introAudioPlayer.setUrl(
-                Urls.networkPath + widget.albumProduct.audio!,
-                initialPosition: position);
-          } else {}
-        });
+        // audioPlayerController
+        //     .getSavedPosition(widget.albumProduct.productId!)
+        //     .then((value) {
+        //   if (value != 0) {
+        //     savedPosition = value;
+        //     position = Duration(milliseconds: savedPosition);
+        //     duration = duration - position;
+        //     introAudioPlayer.setUrl(
+        //         Urls.networkPath + widget.albumProduct.audio!,
+        //         initialPosition: position);
+        //   } else {}
+        // });
       });
     } catch (e) {
       debugPrint(e.toString());

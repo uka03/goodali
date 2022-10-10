@@ -30,4 +30,9 @@ class Urls {
   static final saveAnswerData = "$host/set_answer_api";
   static final podcastList = "$host/podcast_list";
   static final videoList = "$host/video_list";
+  static final insertPost = "$host/insert_post";
+  static final getTagList = "$host/tag_list";
+  static final getPostList = "$host/user_post_list";
+  static final insertPostLike = "$host/insert_post_like";
+  static final insertPostReply = "$host/insert_post_reply";
 }

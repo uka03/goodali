@@ -58,7 +58,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   Stream<FileResponse>? fileStream;
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
-  Duration savedPosition = Duration.zero;
+  int savedPosition = 0;
 
   int saveddouble = 0;
   int currentIndex = 0;
@@ -80,53 +80,34 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
     url = audioURL;
 
-    getCachedFile(url);
+    if (url != '') {
+      setAudio();
+      // getTotalDuration();
+    }
 
     super.initState();
   }
 
-  Future<void> setAudio(String url, FileInfo? fileInfo) async {
+  Future<void> setAudio() async {
     try {
       isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
+      developer.log(isbgPlaying.toString(), name: "isbgPlaying");
 
-      audioPlayerController.getTotalDuration(url, fileInfo).then((value) {
-        duration = value;
+      for (var podcast in widget.productsList) {
+        MediaItem item = MediaItem(
+            id: podcast.id.toString(),
+            title: podcast.title ?? "",
+            duration: duration,
+            artUri: Uri.parse(banner),
+            extras: {"audioUrl": Urls.networkPath + (podcast.audio ?? "")});
+        mediaItems.add(item);
+      }
+
+      if (!isbgPlaying) {
+        await audioHandler.updateQueue(mediaItems);
         setState(() => isLoading = false);
-        audioPlayerController
-            .getSavedPosition(widget.products.productId!)
-            .then((value) async {
-          developer.log(value.toString());
-          savedPosition = value;
-          position = savedPosition;
-
-          for (var item in widget.productsList) {
-            mediaItem = MediaItem(
-                id: url,
-                title: item.title ?? "",
-                duration: duration,
-                artUri: Uri.parse(banner),
-                extras: {
-                  "position": position.inMilliseconds,
-                  "isDownloaded": fileInfo != null ? true : false
-                });
-
-            mediaItems.add(mediaItem);
-          }
-
-          if (!isbgPlaying) {
-            developer.log(isbgPlaying.toString());
-            await audioHandler.addQueueItems(mediaItems);
-          }
-          audioPlayerController;
-        });
-      }).onError((error, stackTrace) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Алдаа гарлаа, Дахин оролдоно уу"),
-          backgroundColor: MyColors.error,
-          duration: Duration(seconds: 1),
-          behavior: SnackBarBehavior.floating,
-        ));
-      });
+      }
+      audioPlayerController.initiliaze();
     } on PlayerInterruptedException catch (e) {
       developer.log(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -140,7 +121,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   getCachedFile(String url) async {
     fileInfo = await audioPlayerController.checkCachefor(url);
-    setAudio(url, fileInfo);
   }
 
   void _downloadFile() {
@@ -231,12 +211,20 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                       },
                       title: widget.products.title ?? "",
                     ),
-              if (isClicked)
-                AudioProgressBar(
-                    savedPosition: savedPosition, totalDuration: duration),
+              // if (isClicked)
+              //   AudioProgressBar(
+              //       savedPosition: savedPosition, totalDuration: duration),
               const SizedBox(width: 10),
-              AudioplayerTimer(
-                  title: widget.products.title ?? "", leftPosition: duration),
+              isLoading
+                  ? const SizedBox(
+                      width: 30,
+                      child: LinearProgressIndicator(
+                          backgroundColor: Colors.transparent,
+                          minHeight: 2,
+                          color: MyColors.black))
+                  : AudioplayerTimer(
+                      title: widget.products.title ?? "",
+                      totalDuration: duration),
               const Spacer(),
               widget.products.isBought == false
                   ? IconButton(

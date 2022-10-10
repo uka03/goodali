@@ -14,6 +14,7 @@ import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
@@ -24,6 +25,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 import 'dart:developer' as developer;
+
+import 'package:rxdart/rxdart.dart';
 
 typedef OnTap = Function(Products audioObject);
 
@@ -56,7 +59,7 @@ class _PodcastItemState extends State<PodcastItem> {
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
-  Duration savedPosition = Duration.zero;
+  int savedPosition = 0;
 
   FileInfo? fileInfo;
   File? audioFile;
@@ -75,46 +78,32 @@ class _PodcastItemState extends State<PodcastItem> {
     banner = Urls.networkPath + (widget.podcastItem.banner ?? "");
 
     if (audioUrl != '') {
-      getCachedFile(audioUrl);
+      getTotalDuration();
     }
-
     super.initState();
   }
 
-  Future<Duration> _getSavedPosition(String url, FileInfo? fileInfo) async {
-    savedPosition =
-        await audioPlayerController.getSavedPosition(widget.podcastItem.id!);
-    developer.log(savedPosition.toString());
-    setState(() => isLoading = false);
-    setAudio(fileInfo, savedPosition);
-    return savedPosition;
-  }
-
-  Future<void> setAudio(FileInfo? fileInfo, Duration savedPosition) async {
+  Future<void> setAudio(Duration duration) async {
     try {
       isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
-      position = savedPosition;
-      duration = await audioPlayer.setUrl(audioUrl) ?? Duration.zero;
-      if (mounted) {
-        setState(() {
-          duration = duration;
-        });
+      developer.log(isbgPlaying.toString(), name: "isbgPlaying");
+
+      for (var podcast in widget.podcastList) {
+        item = MediaItem(
+            id: podcast.id.toString(),
+            title: podcast.title ?? "",
+            duration: duration,
+            artUri: Uri.parse(banner),
+            extras: {"audioUrl": audioUrl});
+        mediaItems.add(item);
       }
+      await audioHandler.updateQueue(mediaItems);
 
-      item = MediaItem(
-          id: audioUrl,
-          title: widget.podcastItem.title ?? "",
-          duration: duration,
-          artUri: Uri.parse(banner),
-          extras: {
-            "position": position.inMilliseconds,
-            "isDownloaded": fileInfo != null ? true : false
-          });
-
-      audioPlayerController;
+      audioPlayerController.initiliaze();
     } on PlayerInterruptedException catch (e) {
       developer.log(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        elevation: 0,
         content: Text("Алдаа гарлаа"),
         backgroundColor: MyColors.error,
         duration: Duration(seconds: 1),
@@ -123,9 +112,21 @@ class _PodcastItemState extends State<PodcastItem> {
     }
   }
 
+  Future<Duration> getTotalDuration() async {
+    var _totalduration = await audioPlayer.setUrl(audioUrl) ?? Duration.zero;
+    if (mounted) {
+      setState(() {
+        duration = _totalduration;
+        isLoading = false;
+      });
+    }
+    developer.log(duration.toString());
+    // setAudio(duration);
+    return duration;
+  }
+
   getCachedFile(String url) async {
     fileInfo = await audioPlayerController.checkCachefor(url);
-    _getSavedPosition(url, fileInfo);
   }
 
   void _downloadFile() {
@@ -137,7 +138,6 @@ class _PodcastItemState extends State<PodcastItem> {
 
   @override
   Widget build(BuildContext context) {
-    final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     final podcastProvider = Provider.of<PodcastProvider>(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -181,31 +181,24 @@ class _PodcastItemState extends State<PodcastItem> {
         Row(
           children: [
             AudioPlayerButton(
-              onPlay: () {
+              onPlay: () async {
                 setState(() {
                   isPlaying = true;
                 });
-                audioHandler.playMediaItem(item);
+                audioHandler.skipToQueueItem(widget.index);
 
                 audioHandler.play();
-                buttonNotifier.value = ButtonState.playing;
+
                 podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
                 if (!podcastProvider.sameItemCheck) {
                   podcastProvider.addListenedPodcast(
                       widget.podcastItem, widget.podcastList);
                 }
-                developer.log("play");
                 widget.onTap(widget.podcastItem);
               },
               onPause: () {
                 widget.onTap(widget.podcastItem);
-                developer.log("paused");
 
-                buttonNotifier.value = ButtonState.paused;
-                AudioPlayerModel _audio = AudioPlayerModel(
-                    productID: widget.podcastItem.id,
-                    audioPosition: position.inMilliseconds);
-                _audioPlayerProvider.addAudioPosition(_audio);
                 audioHandler.pause().then((value) =>
                     podcastProvider.unListenedPodcastFun(
                         widget.podcastItem, widget.podcastList));
@@ -213,12 +206,7 @@ class _PodcastItemState extends State<PodcastItem> {
               title: widget.podcastItem.title ?? "",
             ),
             const SizedBox(width: 14),
-            // if (savedPosition != Duration.zero || isPlaying)
-            //   buttonNotifier.value == ButtonState.loading
-            //       ? Container()
-            //       : AudioProgressBar(
-            //           savedPosition: savedPosition,
-            //           totalDuration: totalDuration),
+            // if (savedPosition != 0 || isPlaying) AudioProgressBar(),
             isLoading
                 ? const SizedBox(
                     width: 30,
@@ -228,7 +216,7 @@ class _PodcastItemState extends State<PodcastItem> {
                         color: MyColors.black))
                 : AudioplayerTimer(
                     title: widget.podcastItem.title ?? "",
-                    leftPosition: duration - savedPosition),
+                    totalDuration: duration),
             const Spacer(),
             fileInfo != null
                 ? IconButton(

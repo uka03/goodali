@@ -99,16 +99,15 @@ class _CourseTasksState extends State<CourseTasks> {
         audioPlayer.playbackEventStream,
         AudioService.position,
         (playbackEvent, position) => DurationState(
-              progress: position,
-              buffered: playbackEvent.bufferedPosition,
-              total: playbackEvent.duration,
+              position,
+              playbackEvent.bufferedPosition,
+              playbackEvent.duration,
             ));
 
     getSavedPosition(id).then((value) {
       setState(() {
         if (value == Duration.zero) {
         } else {
-          print(value);
           audioPlayer.seek(value);
         }
       });

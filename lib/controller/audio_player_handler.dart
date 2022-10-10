@@ -5,39 +5,33 @@ import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
-Future<AudioHandler> initAudioService() async {
-  return await AudioService.init(
-    builder: () => AudioPlayerHandler(),
-    config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.goodali.goodali.audio',
-      androidNotificationChannelName: 'Audio Service',
-      androidNotificationOngoing: true,
-      androidStopForegroundOnPause: true,
-    ),
-  );
-}
-
 class AudioPlayerHandler extends BaseAudioHandler
     with SeekHandler, QueueHandler {
   final _player = AudioPlayer();
+  var _queue = <MediaItem>[];
   final _playlist = ConcatenatingAudioSource(children: []);
   final currentSong = BehaviorSubject<Products>();
+  List<MediaItem> get queuea => _queue;
 
   AudioPlayerHandler() {
     AudioSession.instance.then((session) {
       session.configure(const AudioSessionConfiguration.speech());
     });
+
     _loadEmptyPlaylist();
     _notifyAudioHandlerAboutPlaybackEvents();
+    // _listenForSequenceStateChanges();
   }
 
   Future<void> _loadEmptyPlaylist() async {
     try {
-      await _player.setAudioSource(_playlist);
+      // print("dfjnodfnodnfndonfodnfn");
+      // await _player.setAudioSource(_playlist);
     } catch (e) {
       if (kDebugMode) {
         print("Error: $e");
@@ -80,11 +74,14 @@ class AudioPlayerHandler extends BaseAudioHandler
     });
   }
 
-  MediaItem toMediaItem(Products audioItem) => MediaItem(
-        id: audioItem.audio ?? "",
-        title: audioItem.title ?? audioItem.name ?? "",
-        artUri: Uri.parse(audioItem.banner ?? ""),
-      );
+  void _listenForSequenceStateChanges() {
+    _player.sequenceStateStream.listen((SequenceState? sequenceState) {
+      final sequence = sequenceState?.effectiveSequence;
+      if (sequence == null || sequence.isEmpty) return;
+      final items = sequence.map((source) => source.tag as MediaItem);
+      queue.add(items.toList());
+    });
+  }
 
   @override
   Future<void> play() async {
@@ -95,49 +92,64 @@ class AudioPlayerHandler extends BaseAudioHandler
   }
 
   @override
-  Future<void> playMediaItem(MediaItem item) async {
-    mediaItem.add(item);
-    _player.setUrl(
-      item.id,
-      initialPosition: item.extras?['position'] != Duration.zero
-          ? Duration(microseconds: (item.extras?['position'] * 1000).toInt())
-          : Duration.zero,
-    );
-    // await _player.setAudioSource(
-    //   AudioSource.uri(Uri.parse(item.id)),
-    //   initialPosition: item.extras?['position'] != Duration.zero
-    //       ? Duration(milliseconds: item.extras?['position'])
-    //       : Duration.zero,
-    // );
-    // if (item.extras?['isDownloaded'] == true) {
-    //   _player.setFilePath(item.id,
-    //       initialPosition: item.extras?['position'] != Duration.zero
-    //           ? Duration(
-    //               microseconds: (item.extras?['position'] * 1000).toInt())
-    //           : Duration.zero,
-    //       preload: false);
-    // } else {
+  Future<void> skipToQueueItem(int index) async {
+    if (index < 0 || index >= queue.value.length) return;
 
-    // }
+    log(index.toString(), name: "index");
+    log(_queue[index].extras!['audioUrl'].toString(), name: "audioUrl");
+
+    AudioPlayerController().getSavedPosition(_queue[index]).then((value) {
+      log(value.toString(), name: "savedposition");
+      _player.seek(Duration.zero, index: index);
+    });
+  }
+
+  @override
+  Future<void> updateQueue(List<MediaItem> newQueue) async {
+    queue.add(_queue = newQueue);
+
+    log(queuea.length.toString());
+    await _player.setAudioSource(ConcatenatingAudioSource(
+      children: queuea
+          .map((item) => AudioSource.uri(Uri.parse(item.extras!['audioUrl'])))
+          .toList(),
+    ));
+    return super.updateQueue(newQueue);
+  }
+
+  @override
+  Future<void> addQueueItem(MediaItem mediaItem) async {
+    final audioSource = _createAudioSource(mediaItem);
+    _playlist.add(audioSource);
+
+    final newQueue = queue.value..add(mediaItem);
+    queue.add(newQueue);
+
+    await _player.setAudioSource(_playlist);
+
+    log(newQueue.length.toString());
   }
 
   UriAudioSource _createAudioSource(MediaItem mediaItem) {
-    if (mediaItem.extras?['isDownloaded'] == true) {
-      return AudioSource.uri(
-        Uri.file(mediaItem.id),
-        tag: mediaItem,
-      );
-    } else {
-      return AudioSource.uri(
-        Uri.parse(mediaItem.id),
-        tag: mediaItem,
-      );
-    }
+    return AudioSource.uri(
+      Uri.parse(mediaItem.extras!['audioUrl']),
+      tag: mediaItem,
+    );
+  }
+
+  @override
+  Future<void> addQueueItems(List<MediaItem> mediaItems) async {
+    final audioSource = mediaItems.map(_createAudioSource);
+    _playlist.addAll(audioSource.toList());
+    log(_playlist.length.toString(), name: "playlist lenght");
+
+    final newQueue = queue.value..addAll(mediaItems);
+    queue.add(_queue = newQueue);
+    log(queuea.length.toString(), name: "queue lenght");
   }
 
   @override
   Future<void> pause() async {
-    buttonNotifier.value = ButtonState.paused;
     _player.pause();
     return super.pause();
   }

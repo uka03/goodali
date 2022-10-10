@@ -5,15 +5,7 @@ import 'package:goodali/controller/duration_state.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class AudioProgressBar extends StatelessWidget {
-  final Duration savedPosition;
-  final Duration? totalDuration;
-  final bool? isPlayed;
-  const AudioProgressBar(
-      {Key? key,
-      required this.savedPosition,
-      required this.totalDuration,
-      this.isPlayed = false})
-      : super(key: key);
+  const AudioProgressBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +15,7 @@ class AudioProgressBar extends StatelessWidget {
         valueListenable: durationStateNotifier,
         builder: (BuildContext context, DurationState value, Widget? child) {
           Duration position = value.progress ?? Duration.zero;
-          Duration duration =
-              value.total ?? totalDuration ?? const Duration(minutes: 60);
+          Duration duration = value.total ?? const Duration(minutes: 60);
 
           return SfLinearGauge(
             minimum: 0,

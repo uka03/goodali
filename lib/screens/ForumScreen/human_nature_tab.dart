@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/filter_button.dart';
-import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
+import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/models/post_list_model.dart';
+import 'package:goodali/screens/ForumScreen/post_detail.dart';
+import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:iconly/iconly.dart';
 
 class NatureOfHuman extends StatefulWidget {
@@ -12,7 +15,8 @@ class NatureOfHuman extends StatefulWidget {
 }
 
 class _NatureOfHumanState extends State<NatureOfHuman> {
-  bool isHearted = false;
+  List<bool> isHearted = [];
+
   @override
   void initState() {
     super.initState();
@@ -20,184 +24,61 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
 
   @override
   Widget build(BuildContext context) {
-    // return Container(
-    //     child: ListView.separated(
-    //       itemCount: itemCount,
-    //         itemBuilder: ,
-    //         separatorBuilder: separatorBuilder,
-    //         ));
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: MyColors.border1))),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "Nickname",
-                        style: TextStyle(color: MyColors.gray),
-                      ),
-                      SizedBox(width: 8),
-                      Icon(Icons.circle, color: MyColors.gray, size: 5),
-                      SizedBox(width: 8),
-                      Text(
-                        "2022.06.22",
-                        style: TextStyle(color: MyColors.gray),
-                      ),
-                      Spacer(),
-                      Container(
-                        width: 58,
-                        height: 26,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: Colors.lightGreen[300]),
-                        child: Center(
-                          child: Text(
-                            "Tag name",
-                            style: TextStyle(color: Colors.white, fontSize: 11),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 23),
-                  Text(
-                    "Sain l huntei suu, ter boltol gantsaaraa hichneen udaan yawsan ch hamaaq. Muu amidray gewel gantsaaraa hen ch chadna.",
-                    style: TextStyle(
-                        height: 1.35, fontSize: 20, color: MyColors.black),
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Wrap(
-                        spacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isHearted = !isHearted;
-                              });
-                            },
-                            child: isHearted
-                                ? Icon(IconlyBold.heart,
-                                    color: MyColors.primaryColor)
-                                : Icon(IconlyLight.heart, color: MyColors.gray),
-                          ),
-                          Text("24",
-                              style:
-                                  TextStyle(color: MyColors.gray, fontSize: 16))
-                        ],
-                      ),
-                      SizedBox(width: 20),
-                      Wrap(
-                        spacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Icon(IconlyLight.chat, color: MyColors.gray),
-                          Text("3",
-                              style:
-                                  TextStyle(color: MyColors.gray, fontSize: 16))
-                        ],
-                      ),
-                      Spacer(),
-                      IconButton(
-                          splashRadius: 20,
-                          onPressed: () {},
-                          icon: Icon(Icons.more_horiz, color: MyColors.gray)),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: MyColors.border1))),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 26),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "Nickname",
-                        style: TextStyle(color: MyColors.gray),
-                      ),
-                      SizedBox(width: 8),
-                      Icon(Icons.circle, color: MyColors.gray, size: 5),
-                      SizedBox(width: 8),
-                      Text(
-                        "2022.06.22",
-                        style: TextStyle(color: MyColors.gray),
-                      ),
-                      Spacer(),
-                      Container(
-                        width: 58,
-                        height: 26,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: MyColors.primaryColor),
-                        child: Center(
-                          child: Text(
-                            "Tag name",
-                            style: TextStyle(color: Colors.white, fontSize: 11),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                    style: TextStyle(
-                        height: 1.35, fontSize: 20, color: MyColors.black),
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Wrap(
-                        spacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Icon(IconlyLight.heart, color: MyColors.gray),
-                          Text("24",
-                              style:
-                                  TextStyle(color: MyColors.gray, fontSize: 16))
-                        ],
-                      ),
-                      SizedBox(width: 20),
-                      Wrap(
-                        spacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Icon(IconlyLight.chat, color: MyColors.gray),
-                          Text("3",
-                              style:
-                                  TextStyle(color: MyColors.gray, fontSize: 16))
-                        ],
-                      ),
-                      const Spacer(),
-                      IconButton(
-                          splashRadius: 20,
-                          onPressed: () {},
-                          icon: const Icon(Icons.more_horiz,
-                              color: MyColors.gray)),
-                    ],
-                  )
-                ],
-              ),
-            )
-          ],
+      body: RefreshIndicator(
+        color: MyColors.primaryColor,
+        onRefresh: _refresh,
+        child: FutureBuilder(
+          future: getPostList(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData &&
+                ConnectionState.done == snapshot.connectionState) {
+              List<PostListModel> postList = snapshot.data;
+              if (postList.isNotEmpty) {
+                return ListView.separated(
+                    itemCount: postList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      isHearted.add(false);
+                      return GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => PostDetail(
+                                    postItem: postList[index],
+                                    isHearted: isHearted[index]))),
+                        child: PostItem(
+                            postItem: postList[index],
+                            isHearted: isHearted[index]),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const Divider(
+                          endIndent: 18,
+                          indent: 18,
+                        ));
+              } else {
+                return Container();
+              }
+            } else {
+              return const Center(
+                  child:
+                      CircularProgressIndicator(color: MyColors.primaryColor));
+            }
+          },
         ),
       ),
       floatingActionButton: FilterButton(onPress: () {}),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      getPostList();
+    });
+  }
+
+  Future getPostList() {
+    return Connection.getPostList(context, {"post_type": 0});
   }
 }

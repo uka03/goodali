@@ -180,13 +180,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               MyCourses(
                                 onTap: (audioObject, podcastList) {
                                   currentlyPlaying.value = audioObject;
-                                  AudioPlayerController();
                                 },
                               ),
                               Downloaded(
                                 onTap: (audioObject, podcastList) {
                                   currentlyPlaying.value = audioObject;
-                                  AudioPlayerController();
                                 },
                               )
                             ],

@@ -13,6 +13,7 @@ import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audio_session.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:just_audio/just_audio.dart' as ja;
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -106,15 +107,6 @@ class _MoodDetailState extends State<MoodDetail> {
     });
   }
 
-  savePosition(AudioPlayerModel audio) async {
-    List<AudioPlayerModel> _audioItems = [];
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _audioItems.add(audio);
-    List<String> encodedProducts =
-        _audioItems.map((res) => json.encode(res.toJson())).toList();
-    prefs.setStringList("save_audio", encodedProducts);
-  }
-
   @override
   void dispose() {
     // AudioPlayerModel _audio = AudioPlayerModel(
@@ -151,18 +143,11 @@ class _MoodDetailState extends State<MoodDetail> {
                   audioHandler.mediaItem,
                   AudioService.position,
                   _bufferedPositionStream,
-                  (mediaItem, position, buffered) => DurationState(
-                      progress: position,
-                      buffered: buffered,
-                      total: mediaItem?.duration));
+                  (mediaItem, position, buffered) =>
+                      DurationState(position, buffered, mediaItem?.duration));
 
           audioHandler.playbackState.listen((PlaybackState state) {
-            if (!state.playing) {
-              AudioPlayerModel _audio = AudioPlayerModel(
-                  productID: moodItem[_current.toInt()].id ?? 0,
-                  audioPosition: position.inMilliseconds);
-              savePosition(_audio);
-            }
+            if (!state.playing) {}
           });
 
           MediaItem item = MediaItem(

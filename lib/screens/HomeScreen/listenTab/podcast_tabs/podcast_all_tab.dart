@@ -1,8 +1,16 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/main.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
+import 'dart:developer' as developer;
+
+import 'package:just_audio/just_audio.dart';
 
 typedef OnTap = Function(Products audioObject);
 
@@ -24,6 +32,24 @@ class PodcastAll extends StatefulWidget {
 
 class _PodcastAllState extends State<PodcastAll>
     with AutomaticKeepAliveClientMixin<PodcastAll> {
+  AudioPlayer audioPlayer = AudioPlayer();
+  AudioPlayerController audioPlayerController = AudioPlayerController();
+  String audioUrl = "";
+  bool isPlaying = false;
+
+  int saveddouble = 0;
+  int currentIndex = 0;
+
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
+  int savedPosition = 0;
+
+  List<MediaItem> mediaItems = [];
+  MediaItem item = const MediaItem(id: "", title: "");
+  String banner = "";
+  bool isbgPlaying = false;
+  bool isLoading = true;
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -59,8 +85,12 @@ class _PodcastAllState extends State<PodcastAll>
     ]);
   }
 
-  Future<List<Products>> getPodcastList() {
-    return Connection.getPodcastList(context);
+  Future<List<Products>> getPodcastList() async {
+    List<Products> podcastList = [];
+
+    podcastList = await Connection.getPodcastList(context);
+    // setAudio(podcastList);
+    return podcastList;
   }
 
   Future<void> _refresh() async {

@@ -62,7 +62,7 @@ class _ForumScreenState extends State<ForumScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => CreatePost()));
+                                    builder: (_) => const CreatePost()));
                           },
                           cursorColor: MyColors.primaryColor,
                           decoration: const InputDecoration(

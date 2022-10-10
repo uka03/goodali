@@ -76,27 +76,23 @@ class _PodcastState extends State<Podcast> {
                       PodcastAll(
                         onTap: (audioObject) {
                           currentlyPlaying.value = audioObject;
-                          AudioPlayerController();
                         },
                         podcastList: podcastList,
                       ),
                       NotListenedPodcast(
                         onTap: (audioObject) {
                           currentlyPlaying.value = audioObject;
-                          AudioPlayerController();
                         },
                         podcastList: podcastList,
                       ),
                       DownloadedPodcast(
                         onTap: (audioObject) {
                           currentlyPlaying.value = audioObject;
-                          AudioPlayerController();
                         },
                       ),
                       ListenedPodcast(
                         onTap: (audioObject) {
                           currentlyPlaying.value = audioObject;
-                          AudioPlayerController();
                         },
                       )
                     ]);

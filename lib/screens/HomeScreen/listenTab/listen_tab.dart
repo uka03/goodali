@@ -90,7 +90,6 @@ class _ListenTabbarState extends State<ListenTabbar>
               return PodcastAll(
                 isHomeScreen: true,
                 onTap: (Products audioObject) {
-                  log(audioObject.title ?? "", name: "jdfndjnf");
                   currentlyPlaying.value = audioObject;
                 },
                 podcastList: podcastList,

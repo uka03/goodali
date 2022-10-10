@@ -6,11 +6,10 @@ import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 
 class AudioplayerTimer extends StatelessWidget {
-  final Duration leftPosition;
   final String title;
-
+  final Duration totalDuration;
   const AudioplayerTimer(
-      {Key? key, required this.leftPosition, required this.title})
+      {Key? key, required this.title, required this.totalDuration})
       : super(key: key);
 
   @override
@@ -21,7 +20,7 @@ class AudioplayerTimer extends StatelessWidget {
         var buttonState = buttonNotifier.value;
         var currently = currentlyPlaying.value;
 
-        Duration duration = value.total ?? leftPosition;
+        Duration duration = totalDuration;
         Duration position = value.progress ?? Duration.zero;
 
         bool isPlaying =

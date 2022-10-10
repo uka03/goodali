@@ -13,11 +13,13 @@ import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/courses_item.dart';
 import 'package:goodali/models/my_all_lectures.dart';
 import 'package:goodali/models/podcast_list_model.dart';
+import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/models/mood_item.dart';
 import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/models/qpay.dart';
+import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/models/video_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -587,7 +589,6 @@ class Connection {
     try {
       final response =
           await Http().getDio(context, headerTypeNone).post(Urls.podcastList);
-      print("getPodcastList ${response.data}");
 
       if (response.statusCode == 200) {
         return (response.data as List)
@@ -597,7 +598,7 @@ class Connection {
         return [];
       }
     } catch (error) {
-      print("error podcast list $error");
+      debugPrint("error podcast list $error");
       return [];
     }
   }
@@ -615,8 +616,133 @@ class Connection {
         return [];
       }
     } catch (error) {
-      print("error video list $error");
+      developer.log("error video list $error");
       return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>> insertPost(
+      BuildContext context, dynamic data) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.insertPost, data: data);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] == 1) {
+          return {"success": true};
+        } else {
+          return {"success": false};
+        }
+      } else if (response.statusCode == 401) {
+        return {"success": false};
+      } else {
+        developer.log("error");
+        return {};
+      }
+    } catch (error) {
+      developer.log("error logged lectures $error");
+
+      return {};
+    }
+  }
+
+  static Future<List<TagModel>> getTagList(BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypebearer).post(Urls.getTagList);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] == 1) {
+          return (response.data['data'] as List)
+              .map((e) => TagModel.fromJson(e))
+              .toList();
+        }
+        return [];
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        developer.log("error");
+        return [];
+      }
+    } catch (error) {
+      developer.log("error logged lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<List<PostListModel>> getPostList(
+      BuildContext context, dynamic data) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.getPostList, data: data);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] == 1) {
+          return (response.data['data'] as List)
+              .map((e) => PostListModel.fromJson(e))
+              .toList();
+        } else {
+          return [];
+        }
+      } else {
+        developer.log("error");
+        return [];
+      }
+    } catch (error) {
+      developer.log("error logged lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<bool> insertPostLiske(
+      BuildContext context, dynamic data) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.insertPostLike, data: data);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] == 1) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        developer.log("error");
+        return false;
+      }
+    } catch (error) {
+      developer.log("error logged lectures $error");
+
+      return false;
+    }
+  }
+
+  static Future<bool> insertPostReply(
+      BuildContext context, dynamic data) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.insertPostReply, data: data);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] == 1) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        developer.log("error");
+        return false;
+      }
+    } catch (error) {
+      developer.log("error logged lectures $error");
+
+      return false;
     }
   }
 }
