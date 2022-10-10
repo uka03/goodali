@@ -34,7 +34,20 @@ class _VideoDetailState extends State<VideoDetail> {
       params: const YoutubePlayerParams(
         showControls: true,
         origin: "https://www.youtube.com/embed/",
-        startAt: Duration(seconds: 30),
+        startAt: Duration(seconds: 0),
+        autoPlay: true,
+      ),
+    );
+    // _controller?.addListener(listener);
+  }
+
+  initiliazeSimilarVideo(videoUrl) {
+    _ytbPlayerController = YoutubePlayerController(
+      initialVideoId: videoUrl,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        origin: "https://www.youtube.com/embed/",
+        startAt: Duration(seconds: 0),
         autoPlay: true,
       ),
     );
@@ -77,12 +90,89 @@ class _VideoDetailState extends State<VideoDetail> {
                 textAlign: TextAlign.center,
                 style: const TextStyle(height: 1.7, color: MyColors.black),
               ),
-            )
+            ),
+            const SizedBox(height: 40),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text("Төстэй видео",
+                    style: TextStyle(
+                        color: MyColors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        height: 1.7)),
+              ),
+            ),
+            const SizedBox(height: 30),
+            _similarVideo()
           ],
         )));
   }
 
-  Future<List<VideoModel>> getVideoList() {
-    return Connection.getVideoList(context);
+  Widget _similarVideo() {
+    return FutureBuilder(
+      future: getSimilarVideo(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          List<VideoModel> similarVideo = snapshot.data;
+          return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: similarVideo.length,
+              itemBuilder: (context, index) {
+                initiliazeVideo(similarVideo[index].videoUrl);
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              VideoDetail(videoModel: similarVideo[index]))),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ytbPlayerController?.value.isReady != null
+                          ? YoutubePlayerControllerProvider(
+                              controller: _ytbPlayerController ??
+                                  YoutubePlayerController(
+                                      initialVideoId:
+                                          similarVideo[index].videoUrl ?? ""),
+                              child: const YoutubePlayerIFrame(
+                                aspectRatio: 16 / 9,
+                              ),
+                            )
+                          : const CircularProgressIndicator(
+                              color: MyColors.primaryColor),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              similarVideo[index].title ?? "",
+                              style: const TextStyle(
+                                  color: MyColors.black, fontSize: 16),
+                            ),
+                            const SizedBox(height: 15),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              });
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: MyColors.secondary,
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Future<List<VideoModel>> getSimilarVideo() {
+    return Connection.getSimilarVideo(context);
   }
 }

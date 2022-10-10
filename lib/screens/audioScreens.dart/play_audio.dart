@@ -37,12 +37,14 @@ class PlayAudio extends StatefulWidget {
   final String albumName;
   final bool? isDownloaded;
   final String? downloadedAudioPath;
+  final bool? mini;
   const PlayAudio({
     Key? key,
     required this.products,
     required this.albumName,
     this.isDownloaded = false,
     this.downloadedAudioPath,
+    this.mini = true,
   }) : super(key: key);
 
   @override
@@ -67,20 +69,6 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   void initState() {
     super.initState();
-    if (widget.products.audio != "Audio failed to upload" ||
-        widget.products.audio != "") {
-      audioURL = Urls.networkPath + (widget.products.audio ?? "");
-    }
-    if (widget.products.intro != "Audio failed to upload" ||
-        widget.products.intro != "") {
-      introURL = Urls.networkPath + (widget.products.intro ?? "");
-    }
-
-    if (widget.products.isBought == true) {
-      url = audioURL;
-    } else {
-      url = introURL;
-    }
 
     getCachedFile(url);
   }
@@ -112,7 +100,7 @@ class _PlayAudioState extends State<PlayAudio> {
         elevation: 4,
         curve: Curves.easeOut,
         builder: (height, percentage) {
-          final bool miniplayer = percentage < miniplayerPercentageDeclaration;
+          bool miniplayer = percentage < miniplayerPercentageDeclaration;
           const double maxImgSize = 220;
 
           var percentageExpandedPlayer = percentageFromValueInRange(
@@ -160,9 +148,7 @@ class _PlayAudioState extends State<PlayAudio> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: ImageView(
-                            imgPath: widget.products.banner ??
-                                widget.products.banner ??
-                                "",
+                            imgPath: widget.products.banner ?? "",
                             width: imageSize,
                             height: imageSize,
                           ),
@@ -176,7 +162,9 @@ class _PlayAudioState extends State<PlayAudio> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        widget.products.title ?? "",
+                        widget.products.title == ""
+                            ? widget.products.lectureTitle ?? ""
+                            : widget.products.title ?? "",
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             fontSize: 24,

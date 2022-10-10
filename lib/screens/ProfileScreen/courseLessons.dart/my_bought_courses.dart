@@ -7,7 +7,7 @@ import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/course_products_item.dart';
 import 'package:just_audio/just_audio.dart';
 
-typedef OnTap = Function(Products products, List<Products> productsList);
+typedef OnTap = Function(Products products);
 
 class MyCourses extends StatefulWidget {
   final OnTap onTap;
@@ -103,7 +103,7 @@ class _MyCoursesState extends State<MyCourses> {
                   products: allLectures[index],
                   albumName: albumName,
                   productsList: allLectures,
-                  onTap: () => widget.onTap(allLectures[index], allLectures),
+                  onTap: (lecture) => widget.onTap(lecture),
                 ),
               ],
             );

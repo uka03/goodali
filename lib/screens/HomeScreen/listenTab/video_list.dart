@@ -111,7 +111,7 @@ class _VideoListState extends State<VideoList> {
       params: const YoutubePlayerParams(
         showControls: true,
         origin: "https://www.youtube.com/embed/",
-        startAt: Duration(seconds: 30),
+        startAt: Duration(seconds: 0),
         autoPlay: true,
       ),
     );

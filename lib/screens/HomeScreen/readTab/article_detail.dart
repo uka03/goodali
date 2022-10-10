@@ -3,7 +3,9 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/article_model.dart';
+import 'package:goodali/screens/ListItems/article_item.dart';
 import 'package:goodali/screens/blank.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
@@ -19,6 +21,7 @@ class _ArticleDetailState extends State<ArticleDetail> {
   final ScrollController _scrollController = ScrollController();
   double scrollPercent = 0;
   double maxScrollExtent = 1;
+  List<ArticleModel> similarArticle = [];
 
   @override
   void initState() {
@@ -28,6 +31,7 @@ class _ArticleDetailState extends State<ArticleDetail> {
         maxScrollExtent = _scrollController.position.maxScrollExtent;
       });
     });
+    getSimilarPost();
     super.initState();
   }
 
@@ -85,7 +89,7 @@ class _ArticleDetailState extends State<ArticleDetail> {
                         height: 1.7)),
               ),
               const SizedBox(height: 30),
-              // similarArticle()
+              _similarArticle()
             ],
           ),
         ),
@@ -110,77 +114,39 @@ class _ArticleDetailState extends State<ArticleDetail> {
     );
   }
 
-  similarArticle() {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 3,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: GestureDetector(
-          onTap: () => Navigator.of(context, rootNavigator: true).push(
-       MaterialPageRoute(builder: (context) => const Blank())),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: 70,
-                width: 70,
-                decoration: BoxDecoration(
-                    color: MyColors.secondary,
-                    borderRadius: BorderRadius.circular(12)),
+  Widget _similarArticle() {
+    return FutureBuilder(
+      future: getSimilarPost(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          similarArticle = snapshot.data;
+          return ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: similarArticle.length,
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ArtcileItem(
+                articleModel: similarArticle[index],
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Ineegerei, busgui min",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: MyColors.black,
-                          )),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("4 min unshih",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: MyColors.primaryColor,
-                              )),
-                          SizedBox(width: 5),
-                          Icon(Icons.circle,
-                              color: MyColors.primaryColor, size: 4),
-                          SizedBox(width: 5),
-                          Text("2022.03.18",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: MyColors.primaryColor,
-                              ))
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Jaalkhuu bytshan ohind hairtai baijee. Jaalkhuu bytshan ohind hairtai baijee.  Ter ohinii tsangisan ineed huugiin buh",
-                        style: TextStyle(
-                            fontSize: 12, color: MyColors.gray, height: 1.5),
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-      separatorBuilder: (BuildContext context, int index) =>
-          const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
+            ),
+            separatorBuilder: (BuildContext context, int index) =>
+                const Divider(
+                    color: MyColors.border1, endIndent: 20, indent: 20),
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: MyColors.secondary,
+            ),
+          );
+        }
+      },
     );
+  }
+
+  Future<List<ArticleModel>> getSimilarPost() {
+    Map sendData = {"post_id": widget.articleItem.id};
+    return Connection.getSimilarPost(context, sendData);
   }
 }

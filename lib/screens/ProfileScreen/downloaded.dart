@@ -7,10 +7,10 @@ import 'package:goodali/screens/ListItems/downloaded_lecture_item.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
-typedef OnTap(Products audioObject, AudioPlayer audioPlayer);
+typedef OnTap = Function(Products audioObject);
 
 class Downloaded extends StatefulWidget {
-  final Function onTap;
+  final OnTap onTap;
   const Downloaded({Key? key, required this.onTap}) : super(key: key);
 
   @override
@@ -38,7 +38,7 @@ class _DownloadedState extends State<Downloaded> {
                     audioPlayer: AudioPlayer(),
                     albumName: value.downloadedItem[index].albumTitle ?? "",
                     isBought: value.downloadedItem[index].isBought ?? true,
-                    onTap: widget.onTap,
+                    onTap: widget.onTap(value.downloadedItem[index]),
                     productsList: value.downloadedItem,
                   );
                 });

@@ -745,4 +745,48 @@ class Connection {
       return false;
     }
   }
+
+  static Future<List<ArticleModel>> getSimilarPost(
+      BuildContext context, dynamic data) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.getSimilarPost, data: data);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] == 1) {
+          return (response.data['data'] as List)
+              .map((e) => ArticleModel.fromJson(e))
+              .toList();
+        } else {
+          return [];
+        }
+      } else {
+        developer.log("error");
+        return [];
+      }
+    } catch (error) {
+      developer.log("error logged lectures $error");
+
+      return [];
+    }
+  }
+
+  static Future<List<VideoModel>> getSimilarVideo(BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypebearer).post(Urls.videoList);
+
+      if (response.statusCode == 200) {
+        return (response.data as List)
+            .map((e) => VideoModel.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (error) {
+      developer.log("error video list $error");
+      return [];
+    }
+  }
 }

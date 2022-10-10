@@ -23,7 +23,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-typedef OnTap = Function(Products products, List<Products> productsList);
+typedef OnTap = Function(Products products);
 
 class AlbumDetail extends StatefulWidget {
   final Products albumProduct;
@@ -443,7 +443,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   audioPlayer: audioPlayer[index],
                   productsList: product,
                   albumProducts: widget.albumProduct,
-                  onTap: () => widget.onTap(product[index], product),
+                  onTap: (lecture) => widget.onTap(lecture),
                 );
               }
             },

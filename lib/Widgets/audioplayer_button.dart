@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -21,9 +23,10 @@ class AudioPlayerButton extends StatelessWidget {
       valueListenable: currentlyPlaying,
       builder: (BuildContext context, Products? value, Widget? child) {
         var buttonState = buttonNotifier.value;
-
+        var currentTitle = value?.title ?? value?.lectureTitle ?? "";
+        log(currentTitle);
         bool isPlaying =
-            value?.title == title && buttonState == ButtonState.playing
+            currentTitle == title && buttonState == ButtonState.playing
                 ? true
                 : false;
 

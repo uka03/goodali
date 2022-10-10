@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/audio_provider.dart';
+import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -23,7 +24,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as developer;
 
-typedef OnTap(Products audioObject, AudioPlayer audioPlayer);
+typedef OnTap = Function(Products audioObject);
 
 class AlbumDetailItem extends StatefulWidget {
   final Products products;
@@ -32,7 +33,7 @@ class AlbumDetailItem extends StatefulWidget {
   final String albumName;
   final bool isBought;
   final AudioPlayer audioPlayer;
-  final Function onTap;
+  final OnTap onTap;
 
   const AlbumDetailItem(
       {Key? key,
@@ -52,6 +53,7 @@ class AlbumDetailItem extends StatefulWidget {
 class _AlbumDetailItemState extends State<AlbumDetailItem> {
   AudioPlayerController audioPlayerController = AudioPlayerController();
   List<MediaItem> mediaItems = [];
+  AudioPlayer audioPlayer = AudioPlayer();
   MediaItem mediaItem = const MediaItem(id: "", title: "");
   FileInfo? fileInfo;
   File? audioFile;
@@ -70,7 +72,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   String audioURL = "";
   String introURL = "";
   String banner = "";
-
+  MediaItem item = MediaItem(id: '', title: "");
   @override
   void initState() {
     if (widget.products.audio != "Audio failed to upload") {
@@ -81,42 +83,49 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     url = audioURL;
 
     if (url != '') {
-      setAudio();
-      // getTotalDuration();
+      getTotalDuration();
     }
 
     super.initState();
   }
 
-  Future<void> setAudio() async {
+  Future<void> setAudio(Duration duration) async {
     try {
       isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
       developer.log(isbgPlaying.toString(), name: "isbgPlaying");
 
-      for (var podcast in widget.productsList) {
-        MediaItem item = MediaItem(
-            id: podcast.id.toString(),
-            title: podcast.title ?? "",
-            duration: duration,
-            artUri: Uri.parse(banner),
-            extras: {"audioUrl": Urls.networkPath + (podcast.audio ?? "")});
-        mediaItems.add(item);
-      }
+      item = MediaItem(
+          id: widget.products.id.toString(),
+          title: widget.products.title ?? "",
+          album: widget.albumName,
+          duration: duration,
+          artUri: Uri.parse(banner),
+          extras: {
+            "audioUrl": Urls.networkPath + (widget.products.audio ?? "")
+          });
+      mediaItems.add(item);
 
-      if (!isbgPlaying) {
-        await audioHandler.updateQueue(mediaItems);
-        setState(() => isLoading = false);
-      }
+      // await audioHandler.updateQueue(mediaItems);
+
       audioPlayerController.initiliaze();
     } on PlayerInterruptedException catch (e) {
       developer.log(e.toString());
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Алдаа гарлаа"),
-        backgroundColor: MyColors.error,
-        duration: Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ));
     }
+  }
+
+  Future<Duration> getTotalDuration() async {
+    try {
+      var _totalduration = await audioPlayer.setUrl(url) ?? Duration.zero;
+      if (mounted) {
+        setState(() {
+          duration = _totalduration;
+          isLoading = false;
+        });
+      }
+      developer.log(duration.toString());
+      setAudio(duration);
+    } catch (e) {}
+    return duration;
   }
 
   getCachedFile(String url) async {
@@ -135,7 +144,8 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return GestureDetector(
       onTap: () {
-        showAudioModal();
+        playerExpandProgress.value = playerMaxHeight;
+        currentlyPlaying.value = widget.products;
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -177,40 +187,31 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           const SizedBox(height: 14),
           Row(
             children: [
-              isLoading
-                  ? const CircleAvatar(
-                      backgroundColor: MyColors.input,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(
-                          color: Colors.black,
-                          strokeWidth: 2,
-                        ),
-                      ))
-                  : AudioPlayerButton(
-                      onPlay: () {
-                        setState(() {
-                          isPlaying = true;
-                        });
-                        currentlyPlaying.value = widget.products;
-                        buttonNotifier.value = ButtonState.playing;
-                        developer.log("play");
-                        widget.onTap();
-                        audioHandler.playMediaItem(mediaItems[currentIndex]);
-                        audioHandler.play();
-                      },
-                      onPause: () {
-                        widget.onTap();
-                        developer.log("paused");
-                        buttonNotifier.value = ButtonState.paused;
-                        AudioPlayerModel _audio = AudioPlayerModel(
-                            productID: widget.products.id,
-                            audioPosition: position.inMilliseconds);
-                        _audioPlayerProvider.addAudioPosition(_audio);
-                        audioHandler.pause();
-                      },
-                      title: widget.products.title ?? "",
-                    ),
+              AudioPlayerButton(
+                onPlay: () {
+                  setState(() {
+                    isPlaying = true;
+                  });
+
+                  audioHandler.playMediaItem(item);
+                  audioHandler.play();
+
+                  widget.onTap(widget.products);
+                },
+                onPause: () {
+                  widget.onTap(widget.products);
+                  developer.log("paused");
+
+                  AudioPlayerModel _audio = AudioPlayerModel(
+                      productID: widget.products.id,
+                      audioPosition: position.inMilliseconds);
+                  _audioPlayerProvider.addAudioPosition(_audio);
+                  audioHandler.pause();
+                },
+                title: widget.products.lectureTitle == ""
+                    ? widget.products.title ?? ""
+                    : widget.products.lectureTitle ?? '',
+              ),
               // if (isClicked)
               //   AudioProgressBar(
               //       savedPosition: savedPosition, totalDuration: duration),
@@ -247,45 +248,5 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         ],
       ),
     );
-  }
-
-  addToCard(cart) {
-    cart.addItemsIndex(widget.products.productId!,
-        albumID: widget.albumProducts?.productId!);
-    if (!cart.sameItemCheck) {
-      cart.addProducts(widget.products);
-      cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Сагсанд амжилттай нэмэгдлээ"),
-        backgroundColor: MyColors.success,
-        duration: Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Сагсанд байна"),
-        backgroundColor: MyColors.error,
-        duration: Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ));
-    }
-  }
-
-  showAudioModal() {
-    showModalBottomSheet(
-        context: context,
-        isDismissible: false,
-        enableDrag: true,
-        isScrollControlled: true,
-        builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return PlayAudio(
-                  products: widget.products,
-                  albumName: widget.products.albumTitle ?? "",
-                  isDownloaded: true,
-                );
-              },
-            ));
   }
 }

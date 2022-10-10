@@ -16,9 +16,8 @@ class AlbumItem extends StatelessWidget {
       onTap: () =>
           Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
               builder: (context) => AlbumDetail(
-                    onTap: (audioObject, podcastList) {
+                    onTap: (audioObject) {
                       currentlyPlaying.value = audioObject;
-                      AudioPlayerController();
                     },
                     albumProduct: albumData,
                   ))),

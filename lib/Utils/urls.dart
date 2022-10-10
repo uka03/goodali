@@ -35,4 +35,6 @@ class Urls {
   static final getPostList = "$host/user_post_list";
   static final insertPostLike = "$host/insert_post_like";
   static final insertPostReply = "$host/insert_post_reply";
+  static final getSimilarPost = "$host/similar_post";
+  static final getSimilarVideo = "$host/similar_video";
 }

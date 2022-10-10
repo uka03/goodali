@@ -178,12 +178,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: TabBarView(
                             children: [
                               MyCourses(
-                                onTap: (audioObject, podcastList) {
+                                onTap: (audioObject) {
                                   currentlyPlaying.value = audioObject;
                                 },
                               ),
                               Downloaded(
-                                onTap: (audioObject, podcastList) {
+                                onTap: (audioObject) {
                                   currentlyPlaying.value = audioObject;
                                 },
                               )

@@ -118,6 +118,18 @@ class AudioPlayerHandler extends BaseAudioHandler
   }
 
   @override
+  Future<void> playMediaItem(MediaItem item) {
+    mediaItem.add(item);
+
+    AudioPlayerController().getSavedPosition(item).then((value) {
+      log(value.toString(), name: "savedposition");
+      _player.setUrl(item.extras!['audioUrl'],
+          initialPosition: Duration(milliseconds: value));
+    });
+    return super.playMediaItem(item);
+  }
+
+  @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
     final audioSource = _createAudioSource(mediaItem);
     _playlist.add(audioSource);

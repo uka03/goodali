@@ -88,27 +88,19 @@ class _PodcastItemState extends State<PodcastItem> {
       isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
       developer.log(isbgPlaying.toString(), name: "isbgPlaying");
 
-      for (var podcast in widget.podcastList) {
-        item = MediaItem(
-            id: podcast.id.toString(),
-            title: podcast.title ?? "",
-            duration: duration,
-            artUri: Uri.parse(banner),
-            extras: {"audioUrl": audioUrl});
-        mediaItems.add(item);
-      }
-      await audioHandler.updateQueue(mediaItems);
+      item = MediaItem(
+          id: widget.podcastItem.id.toString(),
+          title: widget.podcastItem.title ?? "",
+          duration: duration,
+          artUri: Uri.parse(banner),
+          extras: {"audioUrl": audioUrl});
+      mediaItems.add(item);
+
+      // await audioHandler.addQueueItem(item);
 
       audioPlayerController.initiliaze();
     } on PlayerInterruptedException catch (e) {
       developer.log(e.toString());
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        elevation: 0,
-        content: Text("Алдаа гарлаа"),
-        backgroundColor: MyColors.error,
-        duration: Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ));
     }
   }
 
@@ -121,7 +113,7 @@ class _PodcastItemState extends State<PodcastItem> {
       });
     }
     developer.log(duration.toString());
-    // setAudio(duration);
+    setAudio(duration);
     return duration;
   }
 
@@ -185,8 +177,7 @@ class _PodcastItemState extends State<PodcastItem> {
                 setState(() {
                   isPlaying = true;
                 });
-                audioHandler.skipToQueueItem(widget.index);
-
+                audioHandler.playMediaItem(item);
                 audioHandler.play();
 
                 podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);

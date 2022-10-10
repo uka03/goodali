@@ -133,6 +133,7 @@ class _PostDetailState extends State<PostDetail> {
                             ));
                       } else {
                         writeComment();
+                        Navigator.pop(context);
                       }
                     },
                   )
@@ -149,7 +150,7 @@ class _PostDetailState extends State<PostDetail> {
       "post_id": widget.postItem.id
     };
     bool isCommented = await Connection.insertPostReply(context, commentData);
-    Navigator.pop(context);
+
     if (isCommented) {
       showTopSnackBar(context,
           const CustomTopSnackBar(type: 1, text: "Сэтгэгдэл илгээгдлээ"));
