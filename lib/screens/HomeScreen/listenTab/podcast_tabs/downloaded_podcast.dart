@@ -29,7 +29,6 @@ class _DownloadedPodcastState extends State<DownloadedPodcast> {
             padding: EdgeInsets.zero,
             itemCount: value.downloadedPodcast.length,
             itemBuilder: (context, index) {
-              print(value.downloadedPodcast[index].title);
               return Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 10),

@@ -1,5 +1,4 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
@@ -8,8 +7,6 @@ import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
-import 'package:goodali/Utils/constans.dart';
-import 'package:goodali/Utils/global_variables.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audio_player_handler.dart';
 import 'package:goodali/screens/Auth/enable_biometric.dart';

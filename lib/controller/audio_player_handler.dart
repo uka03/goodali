@@ -4,8 +4,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
-import 'package:goodali/controller/pray_button_notifier.dart';
-import 'package:goodali/models/audio_player_model.dart';
+
 import 'package:goodali/models/products_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
@@ -17,6 +16,7 @@ class AudioPlayerHandler extends BaseAudioHandler
   final _playlist = ConcatenatingAudioSource(children: []);
   final currentSong = BehaviorSubject<Products>();
   List<MediaItem> get queuea => _queue;
+  final _mediaItemExpando = Expando<MediaItem>();
 
   AudioPlayerHandler() {
     AudioSession.instance.then((session) {
@@ -25,18 +25,40 @@ class AudioPlayerHandler extends BaseAudioHandler
 
     _loadEmptyPlaylist();
     _notifyAudioHandlerAboutPlaybackEvents();
-    // _listenForSequenceStateChanges();
+    _listenForDurationChanges();
+    // _listenForCurrentSongIndexChanges();
   }
 
   Future<void> _loadEmptyPlaylist() async {
     try {
-      // print("dfjnodfnodnfndonfodnfn");
-      // await _player.setAudioSource(_playlist);
+      await _player.setAudioSource(_playlist);
     } catch (e) {
       if (kDebugMode) {
         print("Error: $e");
       }
     }
+  }
+
+  void _listenForDurationChanges() {
+    _player.durationStream.listen((duration) {
+      var index = _player.currentIndex;
+
+      log(index.toString(), name: "currently playing index");
+      if (index == null || _queue.isEmpty) return;
+      _queue[index].copyWith(duration: duration);
+      mediaItem.add(_queue[index]);
+      log(_queue[index].title);
+    });
+  }
+
+  void _listenForCurrentSongIndexChanges() {
+    _player.currentIndexStream.listen((index) {
+      final playlist = queue.value;
+      log(playlist.length.toString(), name: "hduf");
+      log(index.toString(), name: "currentlyindex");
+      if (index == null || _queue.isEmpty) return;
+      mediaItem.add(playlist[index]);
+    });
   }
 
   void _notifyAudioHandlerAboutPlaybackEvents() {
@@ -74,15 +96,6 @@ class AudioPlayerHandler extends BaseAudioHandler
     });
   }
 
-  void _listenForSequenceStateChanges() {
-    _player.sequenceStateStream.listen((SequenceState? sequenceState) {
-      final sequence = sequenceState?.effectiveSequence;
-      if (sequence == null || sequence.isEmpty) return;
-      final items = sequence.map((source) => source.tag as MediaItem);
-      queue.add(items.toList());
-    });
-  }
-
   @override
   Future<void> play() async {
     debugPrint("audio handler play");
@@ -93,53 +106,39 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> skipToQueueItem(int index) async {
-    if (index < 0 || index >= queue.value.length) return;
+    // log(queue.value.length.toString(), name: "queue.value");
+    // if (index < 0 || index >= queue.value.length) return;
 
-    log(index.toString(), name: "index");
-    log(_queue[index].extras!['audioUrl'].toString(), name: "audioUrl");
+    // log(index.toString(), name: "index");
+    // log(_queue[index].extras!['url'].toString(), name: "url");
 
-    AudioPlayerController().getSavedPosition(_queue[index]).then((value) {
-      log(value.toString(), name: "savedposition");
-      _player.seek(Duration.zero, index: index);
-    });
+    // _player.seek(Duration(seconds: savedPosition), index: index);
+    // return super.skipToQueueItem(index);
+  }
+
+  @override
+  Future<void> playFromMediaId(String mediaId, [Map<String, dynamic>? extras]) {
+    if (extras!['saved_position'] > 0) {
+      _player.seek(extras['saved_position']);
+    }
+    return super.playFromMediaId(mediaId, extras);
   }
 
   @override
   Future<void> updateQueue(List<MediaItem> newQueue) async {
+    log(newQueue.length.toString(), name: "newQueue");
     queue.add(_queue = newQueue);
-
-    log(queuea.length.toString());
-    await _player.setAudioSource(ConcatenatingAudioSource(
-      children: queuea
-          .map((item) => AudioSource.uri(Uri.parse(item.extras!['audioUrl'])))
-          .toList(),
-    ));
-    return super.updateQueue(newQueue);
+    await _playlist.clear();
+    await _playlist.addAll(_itemsToSources(newQueue));
   }
 
-  @override
-  Future<void> playMediaItem(MediaItem item) {
-    mediaItem.add(item);
+  List<AudioSource> _itemsToSources(List<MediaItem> mediaItems) =>
+      mediaItems.map(_itemToSource).toList();
 
-    AudioPlayerController().getSavedPosition(item).then((value) {
-      log(value.toString(), name: "savedposition");
-      _player.setUrl(item.extras!['audioUrl'],
-          initialPosition: Duration(milliseconds: value));
-    });
-    return super.playMediaItem(item);
-  }
-
-  @override
-  Future<void> addQueueItem(MediaItem mediaItem) async {
-    final audioSource = _createAudioSource(mediaItem);
-    _playlist.add(audioSource);
-
-    final newQueue = queue.value..add(mediaItem);
-    queue.add(newQueue);
-
-    await _player.setAudioSource(_playlist);
-
-    log(newQueue.length.toString());
+  AudioSource _itemToSource(MediaItem mediaItem) {
+    final audioSource = AudioSource.uri(Uri.parse(mediaItem.extras!['url']));
+    _mediaItemExpando[audioSource] = mediaItem;
+    return audioSource;
   }
 
   UriAudioSource _createAudioSource(MediaItem mediaItem) {
@@ -150,14 +149,21 @@ class AudioPlayerHandler extends BaseAudioHandler
   }
 
   @override
+  Future<void> playMediaItem(MediaItem item) {
+    mediaItem.add(item);
+    if (item.extras!['saved_position'] > 0) {
+      _player.seek(Duration(seconds: item.extras!['saved_position']));
+    }
+    return super.playMediaItem(item);
+  }
+
+  @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
     final audioSource = mediaItems.map(_createAudioSource);
     _playlist.addAll(audioSource.toList());
-    log(_playlist.length.toString(), name: "playlist lenght");
 
     final newQueue = queue.value..addAll(mediaItems);
     queue.add(_queue = newQueue);
-    log(queuea.length.toString(), name: "queue lenght");
   }
 
   @override

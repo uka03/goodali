@@ -37,7 +37,7 @@ class Products {
       this.trainingBanner});
 
   Products.fromJson(Map<String, dynamic> json) {
-    audio = json['audio'];
+    audio = json['audio'] ?? "";
     albumTitle = json['album_title'] ?? "";
     lectureTitle = json['lecture_title'] ?? "";
     banner = json['banner'] ?? "";

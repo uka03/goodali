@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
@@ -94,6 +95,8 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
             position = savedPosition;
 
             await widget.audioPlayer.setUrl(url, initialPosition: position);
+            log(position.toString(), name: "intro");
+            log(duration.toString(), name: "Introduration");
           } else {}
         });
       });
@@ -204,39 +207,39 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
                   ),
                 ),
               ),
-              if (isClicked || savedPosition != Duration.zero)
-                Row(
-                  children: [
-                    const SizedBox(width: 14),
-                    SizedBox(
-                      width: 90,
-                      child: SfLinearGauge(
-                        minimum: 0,
-                        maximum: duration.inSeconds.toDouble() / 10,
-                        showLabels: false,
-                        showAxisTrack: false,
-                        showTicks: false,
-                        ranges: [
-                          LinearGaugeRange(
-                            position: LinearElementPosition.inside,
-                            edgeStyle: LinearEdgeStyle.bothCurve,
-                            startValue: 0,
-                            color: MyColors.border1,
-                            endValue: duration.inSeconds.toDouble() / 10,
-                          ),
-                        ],
-                        barPointers: [
-                          LinearBarPointer(
-                              position: LinearElementPosition.inside,
-                              edgeStyle: LinearEdgeStyle.bothCurve,
-                              color: MyColors.primaryColor,
-                              // color: MyColors.border1,
-                              value: position.inSeconds.toDouble() / 10)
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              // if (isClicked || savedPosition != Duration.zero)
+              //   Row(
+              //     children: [
+              //       const SizedBox(width: 14),
+              //       SizedBox(
+              //         width: 90,
+              //         child: SfLinearGauge(
+              //           minimum: 0,
+              //           maximum: duration.inSeconds.toDouble() / 10,
+              //           showLabels: false,
+              //           showAxisTrack: false,
+              //           showTicks: false,
+              //           ranges: [
+              //             LinearGaugeRange(
+              //               position: LinearElementPosition.inside,
+              //               edgeStyle: LinearEdgeStyle.bothCurve,
+              //               startValue: 0,
+              //               color: MyColors.border1,
+              //               endValue: duration.inSeconds.toDouble() / 10,
+              //             ),
+              //           ],
+              //           barPointers: [
+              //             LinearBarPointer(
+              //                 position: LinearElementPosition.inside,
+              //                 edgeStyle: LinearEdgeStyle.bothCurve,
+              //                 color: MyColors.primaryColor,
+              //                 // color: MyColors.border1,
+              //                 value: position.inSeconds.toDouble() / 10)
+              //           ],
+              //         ),
+              //       ),
+              //     ],
+              //   ),
               const SizedBox(width: 10),
               Text(formatTime(duration - position) + "мин",
                   style: const TextStyle(fontSize: 12, color: MyColors.black)),

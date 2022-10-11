@@ -1,7 +1,13 @@
+import 'dart:developer';
+
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/main.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/course_products_item.dart';
@@ -18,16 +24,39 @@ class MyCourses extends StatefulWidget {
 }
 
 class _MyCoursesState extends State<MyCourses> {
+  AudioPlayerController audioPlayerController = AudioPlayerController();
+  List<Products> allLectures = [];
   late final List<AudioPlayer> audioPlayer = [];
+  List<MediaItem> mediaItems = [];
   String albumName = "";
   int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  _initiliazeLecture(allLectures) async {
+    log("_initiliazePodcast");
+    audioPlayerController.initiliaze();
+    mediaItems = allLectures
+        .map((item) => MediaItem(
+              id: item.productId.toString(),
+              artUri: Uri.parse(Urls.networkPath + item.banner!),
+              title: item.title!,
+              extras: {'url': Urls.networkPath + item.audio!},
+            ))
+        .toList();
+    await audioHandler.updateQueue(mediaItems);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: Future.wait([getAllLectures(), getBoughtCourses()]),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
-          List<Products> allLectures = snapshot.data[0];
+          allLectures = snapshot.data[0];
           List<Products> myCourses = snapshot.data[1];
           List<Products> allListProducts = [...allLectures, ...myCourses];
 
@@ -141,7 +170,9 @@ class _MyCoursesState extends State<MyCourses> {
   }
 
   Future<List<Products>> getAllLectures() async {
-    return Connection.getAllLectures(context);
+    allLectures = await Connection.getAllLectures(context);
+    _initiliazeLecture(allLectures);
+    return allLectures;
   }
 
   Future<List<Products>> getBoughtCourses() async {

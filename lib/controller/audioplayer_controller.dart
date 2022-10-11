@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
+import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/controller/audio_session.dart';
 
 import 'package:goodali/controller/duration_state.dart';
@@ -87,7 +88,7 @@ class AudioPlayerController with ChangeNotifier {
       if (buttonNotifier.value == ButtonState.paused) {
         AudioPlayerModel _audio = AudioPlayerModel(
             productID: int.parse(mediaItem?.id ?? "0"),
-            audioPosition: oldState.progress?.inMilliseconds,
+            audioPosition: oldState.progress?.inSeconds,
             audioUrl: mediaItem?.extras?['audioUrl'],
             banner: mediaItem?.artUri?.path,
             title: mediaItem?.title);
@@ -96,7 +97,7 @@ class AudioPlayerController with ChangeNotifier {
     });
   }
 
-  Future<int> getSavedPosition(MediaItem mediaItem) async {
+  Future<int> getSavedPosition(AudioPlayerModel mediaItem) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
     List<AudioPlayerModel> decodedProduct = decodedAudioString
@@ -104,10 +105,8 @@ class AudioPlayerController with ChangeNotifier {
         .toList();
     int savedPosition = 0;
 
-    AudioPlayerModel audioFile = toAudioModel(mediaItem);
-
     for (var item in decodedProduct) {
-      if (audioFile.title == item.title) {
+      if (mediaItem.title == item.title) {
         savedPosition = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
     }
@@ -131,10 +130,17 @@ class AudioPlayerController with ChangeNotifier {
     return value;
   }
 
-  toAudioModel(MediaItem item) => AudioPlayerModel(
-      productID: int.parse(item.id),
-      audioPosition: item.duration?.inMilliseconds ?? 0,
-      audioUrl: item.extras?['audioUrl'],
-      banner: item.artUri?.origin,
+  toAudioModel(Products item) => AudioPlayerModel(
+      productID: item.productId,
+      audioPosition: 0,
+      audioUrl: item.audio,
+      banner: item.banner,
       title: item.title);
+
+  toMediaItem(AudioPlayerModel products) => MediaItem(
+      id: products.productID.toString(),
+      artUri: Uri.parse(Urls.networkPath + products.banner!),
+      extras: {"url": products.audioUrl},
+      duration: Duration(milliseconds: products.audioPosition ?? 0),
+      title: products.title ?? "");
 }

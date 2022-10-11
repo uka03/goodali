@@ -357,39 +357,39 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         ),
                       ),
                     ),
-                    if (isClicked || savedPosition != Duration.zero)
-                      Row(
-                        children: [
-                          const SizedBox(width: 14),
-                          SizedBox(
-                            width: 90,
-                            child: SfLinearGauge(
-                              minimum: 0,
-                              maximum: duration.inSeconds.toDouble() / 10,
-                              showLabels: false,
-                              showAxisTrack: false,
-                              showTicks: false,
-                              ranges: [
-                                LinearGaugeRange(
-                                  position: LinearElementPosition.inside,
-                                  edgeStyle: LinearEdgeStyle.bothCurve,
-                                  startValue: 0,
-                                  color: MyColors.border1,
-                                  endValue: duration.inSeconds.toDouble() / 10,
-                                ),
-                              ],
-                              barPointers: [
-                                LinearBarPointer(
-                                    position: LinearElementPosition.inside,
-                                    edgeStyle: LinearEdgeStyle.bothCurve,
-                                    color: MyColors.primaryColor,
-                                    // color: MyColors.border1,
-                                    value: position.inSeconds.toDouble() / 10)
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    // if (isClicked || savedPosition != Duration.zero)
+                    //   Row(
+                    //     children: [
+                    //       const SizedBox(width: 14),
+                    //       SizedBox(
+                    //         width: 90,
+                    //         child: SfLinearGauge(
+                    //           minimum: 0,
+                    //           maximum: duration.inSeconds.toDouble() / 10,
+                    //           showLabels: false,
+                    //           showAxisTrack: false,
+                    //           showTicks: false,
+                    //           ranges: [
+                    //             LinearGaugeRange(
+                    //               position: LinearElementPosition.inside,
+                    //               edgeStyle: LinearEdgeStyle.bothCurve,
+                    //               startValue: 0,
+                    //               color: MyColors.border1,
+                    //               endValue: duration.inSeconds.toDouble() / 10,
+                    //             ),
+                    //           ],
+                    //           barPointers: [
+                    //             LinearBarPointer(
+                    //                 position: LinearElementPosition.inside,
+                    //                 edgeStyle: LinearEdgeStyle.bothCurve,
+                    //                 color: MyColors.primaryColor,
+                    //                 // color: MyColors.border1,
+                    //                 value: position.inSeconds.toDouble() / 10)
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
                     const SizedBox(width: 10),
                     Text(formatTime(duration - position) + "мин",
                         style: const TextStyle(

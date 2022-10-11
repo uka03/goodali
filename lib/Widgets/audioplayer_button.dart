@@ -24,13 +24,26 @@ class AudioPlayerButton extends StatelessWidget {
       builder: (BuildContext context, Products? value, Widget? child) {
         var buttonState = buttonNotifier.value;
         var currentTitle = value?.title ?? value?.lectureTitle ?? "";
-        log(currentTitle);
         bool isPlaying =
             currentTitle == title && buttonState == ButtonState.playing
                 ? true
                 : false;
-
-        if (!isPlaying) {
+        bool isBuffering =
+            currentTitle == title && buttonState == ButtonState.loading
+                ? true
+                : false;
+        print("isBuffering $isBuffering");
+        if (isBuffering) {
+          return const CircleAvatar(
+              backgroundColor: MyColors.input,
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                  strokeWidth: 2,
+                ),
+              ));
+        } else if (!isPlaying) {
           return CircleAvatar(
               backgroundColor: MyColors.input,
               child: IconButton(
@@ -43,16 +56,6 @@ class AudioPlayerButton extends StatelessWidget {
                   onPressed: () {
                     onPlay();
                   }));
-        } else if (buttonState == ButtonState.loading) {
-          return const CircleAvatar(
-              backgroundColor: MyColors.input,
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(
-                  color: Colors.black,
-                  strokeWidth: 2,
-                ),
-              ));
         } else {
           return CircleAvatar(
             backgroundColor: MyColors.input,

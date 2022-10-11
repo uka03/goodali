@@ -23,7 +23,6 @@ class CourseDetail extends StatefulWidget {
 class _CourseDetailState extends State<CourseDetail> {
   @override
   void initState() {
-    print(widget.courseProducts.body);
     developer.log(widget.courseProducts.body.toString());
     // print(object)
     super.initState();

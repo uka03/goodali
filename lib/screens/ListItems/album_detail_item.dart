@@ -89,29 +89,29 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     super.initState();
   }
 
-  Future<void> setAudio(Duration duration) async {
-    try {
-      isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
-      developer.log(isbgPlaying.toString(), name: "isbgPlaying");
+  // Future<void> setAudio(Duration duration) async {
+  //   try {
+  //     isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
+  //     developer.log(isbgPlaying.toString(), name: "isbgPlaying");
 
-      item = MediaItem(
-          id: widget.products.id.toString(),
-          title: widget.products.title ?? "",
-          album: widget.albumName,
-          duration: duration,
-          artUri: Uri.parse(banner),
-          extras: {
-            "audioUrl": Urls.networkPath + (widget.products.audio ?? "")
-          });
-      mediaItems.add(item);
+  //     item = MediaItem(
+  //         id: widget.products.id.toString(),
+  //         title: widget.products.title ?? "",
+  //         album: widget.albumName,
+  //         duration: duration,
+  //         artUri: Uri.parse(banner),
+  //         extras: {
+  //           "audioUrl": Urls.networkPath + (widget.products.audio ?? "")
+  //         });
+  //     mediaItems.add(item);
 
-      // await audioHandler.updateQueue(mediaItems);
+  //     // await audioHandler.updateQueue(mediaItems);
 
-      audioPlayerController.initiliaze();
-    } on PlayerInterruptedException catch (e) {
-      developer.log(e.toString());
-    }
-  }
+  //     audioPlayerController.initiliaze();
+  //   } on PlayerInterruptedException catch (e) {
+  //     developer.log(e.toString());
+  //   }
+  // }
 
   Future<Duration> getTotalDuration() async {
     try {
@@ -123,7 +123,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         });
       }
       developer.log(duration.toString());
-      setAudio(duration);
+      // setAudio(duration);
     } catch (e) {}
     return duration;
   }

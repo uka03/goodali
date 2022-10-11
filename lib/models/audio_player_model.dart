@@ -1,5 +1,3 @@
-import 'package:audio_service/audio_service.dart';
-
 class AudioPlayerModel {
   int? productID;
   String? title;

@@ -179,14 +179,11 @@ class _MoodDetailState extends State<MoodDetail> {
 
     // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
-      print(moodItemID);
-      print(item.productID);
       if (moodItemID == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
       }
     }
     position = Duration(milliseconds: saveddouble);
-    print("position $position");
     return position;
   }
 

@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
@@ -8,7 +9,6 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_pod
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/unlistened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
-import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 
 class Podcast extends StatefulWidget {
   const Podcast({Key? key}) : super(key: key);
@@ -19,6 +19,12 @@ class Podcast extends StatefulWidget {
 
 class _PodcastState extends State<Podcast> {
   late final future = getPodcastList();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

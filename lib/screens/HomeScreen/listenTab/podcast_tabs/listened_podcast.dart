@@ -10,6 +10,7 @@ typedef OnTap = Function(Products audioObject);
 
 class ListenedPodcast extends StatefulWidget {
   final OnTap onTap;
+
   const ListenedPodcast({Key? key, required this.onTap}) : super(key: key);
 
   @override
@@ -37,12 +38,6 @@ class _ListenedPodcastState extends State<ListenedPodcast>
               padding: EdgeInsets.zero,
               itemCount: value.listenedPodcast.length,
               itemBuilder: (context, index) {
-                audioPlayer.add(AudioPlayer());
-                for (var i = 0; i < audioPlayer.length; i++) {
-                  if (currentIndex != i) {
-                    audioPlayer[i].pause();
-                  }
-                }
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 10),
