@@ -9,6 +9,7 @@ import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
@@ -18,11 +19,13 @@ import 'package:provider/provider.dart';
 
 import 'dart:developer' as developer;
 
+import 'package:rxdart/rxdart.dart';
+
 typedef OnTap = Function(Products audioObject);
 
 class PodcastItem extends StatefulWidget {
   final Products podcastItem;
-  final MediaItem? mediaItem;
+
   final List<Products> podcastList;
   final OnTap onTap;
   final int index;
@@ -33,7 +36,6 @@ class PodcastItem extends StatefulWidget {
     required this.podcastList,
     required this.index,
     required this.onTap,
-    this.mediaItem = const MediaItem(id: "", title: ""),
   }) : super(key: key);
 
   @override
@@ -43,11 +45,21 @@ class PodcastItem extends StatefulWidget {
 class _PodcastItemState extends State<PodcastItem> {
   AudioPlayerController audioPlayerController = AudioPlayerController();
   AudioPlayer audioPlayer = AudioPlayer();
+
   String audioUrl = '';
   Duration duration = Duration.zero;
   int savedDuration = 0;
   bool isLoading = true;
   bool isClicked = false;
+  MediaItem? mediaItem;
+  Stream<DurationState>? _durationState;
+
+  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
+      .map((state) => state.bufferedPosition)
+      .distinct();
+
+  Stream<Duration?> get _durationStream =>
+      audioHandler.mediaItem.map((item) => item?.duration).distinct();
 
   @override
   void initState() {
@@ -61,6 +73,32 @@ class _PodcastItemState extends State<PodcastItem> {
     super.initState();
   }
 
+  _initiliazePodcast(Duration duration) async {
+    audioPlayerController.initiliaze();
+
+    int savedPosition = await AudioPlayerController().getSavedPosition(
+        audioPlayerController.toAudioModel(widget.podcastItem));
+
+    _durationState =
+        Rx.combineLatest3<Duration?, Duration, Duration, DurationState>(
+            _durationStream,
+            AudioService.position,
+            _bufferedPositionStream,
+            (duration, position, buffered) =>
+                DurationState(position, buffered, duration));
+
+    mediaItem = MediaItem(
+      id: widget.podcastItem.productId.toString(),
+      artUri: Uri.parse(Urls.networkPath + widget.podcastItem.banner!),
+      title: widget.podcastItem.title!,
+      duration: duration,
+      extras: {
+        'url': Urls.networkPath + widget.podcastItem.audio!,
+        "saved_position": savedPosition
+      },
+    );
+  }
+
   Future<Duration> getTotalDuration() async {
     try {
       var _totalduration = await audioPlayer.setUrl(audioUrl) ?? Duration.zero;
@@ -70,18 +108,12 @@ class _PodcastItemState extends State<PodcastItem> {
           isLoading = false;
         });
       }
-      AudioPlayerModel audioPlayerModel = AudioPlayerModel(
-        productID: widget.podcastItem.productId,
-        audioPosition: 0,
-        audioUrl: widget.podcastItem.audio,
-        banner: widget.podcastItem.banner,
-        title: widget.podcastItem.title,
-      );
-
       savedDuration = await audioPlayerController.getSavedPosition(
           audioPlayerController.toAudioModel(widget.podcastItem));
       duration = duration - Duration(milliseconds: savedDuration);
+
       developer.log(duration.toString());
+
       return duration;
     } catch (e) {
       developer.log(e.toString(), name: "totalDuration error");
@@ -135,8 +167,8 @@ class _PodcastItemState extends State<PodcastItem> {
           children: [
             AudioPlayerButton(
               onPlay: () async {
-                await audioHandler.skipToQueueItem(widget.index);
-                // audioHandler.playMediaItem(widget.mediaItem!);
+                await audioHandler.skipToQueueItem(widget.podcastItem.id!);
+                print(widget.podcastItem.id!);
                 audioHandler.play();
                 setState(() {
                   isClicked = true;

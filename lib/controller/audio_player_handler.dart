@@ -22,10 +22,9 @@ class AudioPlayerHandler extends BaseAudioHandler
     AudioSession.instance.then((session) {
       session.configure(const AudioSessionConfiguration.speech());
     });
-
     _loadEmptyPlaylist();
     _notifyAudioHandlerAboutPlaybackEvents();
-    _listenForDurationChanges();
+    // _listenForDurationChanges();
     // _listenForCurrentSongIndexChanges();
   }
 
@@ -33,9 +32,7 @@ class AudioPlayerHandler extends BaseAudioHandler
     try {
       await _player.setAudioSource(_playlist);
     } catch (e) {
-      if (kDebugMode) {
-        print("Error: $e");
-      }
+      print("Error: $e");
     }
   }
 
@@ -48,16 +45,6 @@ class AudioPlayerHandler extends BaseAudioHandler
       _queue[index].copyWith(duration: duration);
       mediaItem.add(_queue[index]);
       log(_queue[index].title);
-    });
-  }
-
-  void _listenForCurrentSongIndexChanges() {
-    _player.currentIndexStream.listen((index) {
-      final playlist = queue.value;
-      log(playlist.length.toString(), name: "hduf");
-      log(index.toString(), name: "currentlyindex");
-      if (index == null || _queue.isEmpty) return;
-      mediaItem.add(playlist[index]);
     });
   }
 
@@ -106,70 +93,60 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> skipToQueueItem(int index) async {
-    // log(queue.value.length.toString(), name: "queue.value");
-    // if (index < 0 || index >= queue.value.length) return;
+    log(index.toString(), name: "Index");
+    final newIndex = _queue.indexWhere((item) => item.id == index.toString());
+    log(newIndex.toString(), name: "newIndex");
+    log(_queue[1].id.toString(), name: "_queue.length");
+    if (newIndex == -1) return;
 
-    // log(index.toString(), name: "index");
-    // log(_queue[index].extras!['url'].toString(), name: "url");
-
-    // _player.seek(Duration(seconds: savedPosition), index: index);
-    // return super.skipToQueueItem(index);
+    log(_queue[newIndex].title, name: "title");
+    _player.seek(Duration.zero, index: newIndex);
   }
 
   @override
-  Future<void> playFromMediaId(String mediaId, [Map<String, dynamic>? extras]) {
-    if (extras!['saved_position'] > 0) {
-      _player.seek(extras['saved_position']);
-    }
-    return super.playFromMediaId(mediaId, extras);
-  }
-
-  @override
-  Future<void> updateQueue(List<MediaItem> newQueue) async {
-    log(newQueue.length.toString(), name: "newQueue");
-    queue.add(_queue = newQueue);
-    await _playlist.clear();
-    await _playlist.addAll(_itemsToSources(newQueue));
-  }
-
-  List<AudioSource> _itemsToSources(List<MediaItem> mediaItems) =>
-      mediaItems.map(_itemToSource).toList();
-
-  AudioSource _itemToSource(MediaItem mediaItem) {
-    final audioSource = AudioSource.uri(Uri.parse(mediaItem.extras!['url']));
-    _mediaItemExpando[audioSource] = mediaItem;
-    return audioSource;
-  }
-
-  UriAudioSource _createAudioSource(MediaItem mediaItem) {
-    return AudioSource.uri(
-      Uri.parse(mediaItem.extras!['audioUrl']),
-      tag: mediaItem,
-    );
-  }
-
-  @override
-  Future<void> playMediaItem(MediaItem item) {
+  Future<void> playMediaItem(MediaItem item) async {
+    debugPrint("play media item");
     mediaItem.add(item);
     if (item.extras!['saved_position'] > 0) {
       _player.seek(Duration(seconds: item.extras!['saved_position']));
     }
-    return super.playMediaItem(item);
+    _player.setUrl(item.extras!['url']);
   }
 
   @override
-  Future<void> addQueueItems(List<MediaItem> mediaItems) async {
+  Future<void> updateQueue(List<MediaItem> newQueue) async {
+    queue.add(_queue = newQueue);
+
+    await _player.setAudioSource(ConcatenatingAudioSource(
+        children: newQueue
+            .map((e) => AudioSource.uri(Uri.parse(e.extras!['url'])))
+            .toList()));
+  }
+
+  @override
+  Future<void> addQueueItems(List<MediaItem> mediaItems) {
     final audioSource = mediaItems.map(_createAudioSource);
     _playlist.addAll(audioSource.toList());
 
+    _playlist.clear();
+    _queue.clear();
     final newQueue = queue.value..addAll(mediaItems);
     queue.add(_queue = newQueue);
+    log(_queue.length.toString(), name: "title");
+    return super.addQueueItems(mediaItems);
   }
 
   @override
   Future<void> pause() async {
     _player.pause();
     return super.pause();
+  }
+
+  UriAudioSource _createAudioSource(MediaItem mediaItem) {
+    return AudioSource.uri(
+      Uri.parse(mediaItem.extras!['url']),
+      tag: mediaItem,
+    );
   }
 
   @override

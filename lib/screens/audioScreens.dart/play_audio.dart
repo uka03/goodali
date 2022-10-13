@@ -96,6 +96,11 @@ class _PlayAudioState extends State<PlayAudio> {
         valueNotifier: playerExpandProgress,
         minHeight: playerMinHeight,
         maxHeight: playerMaxHeight,
+        onDismiss: () {
+          currentlyPlaying.value = null;
+          audioHandler.stop();
+          audioHandler.customAction("dispose");
+        },
         controller: controller,
         elevation: 4,
         curve: Curves.easeOut,
@@ -325,6 +330,7 @@ class _PlayAudioState extends State<PlayAudio> {
                                   onPressed: () {
                                     audioHandler.play();
                                     AudioPlayerModel _audio = AudioPlayerModel(
+                                        title: currentlyPlay?.title,
                                         productID: currentlyPlay?.id ?? 0,
                                         audioPosition: position.inMilliseconds);
                                     audioPosition.addAudioPosition(_audio);

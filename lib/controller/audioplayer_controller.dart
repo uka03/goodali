@@ -85,15 +85,15 @@ class AudioPlayerController with ChangeNotifier {
         mediaItem?.duration ?? Duration.zero,
       );
 
-      if (buttonNotifier.value == ButtonState.paused) {
-        AudioPlayerModel _audio = AudioPlayerModel(
-            productID: int.parse(mediaItem?.id ?? "0"),
-            audioPosition: oldState.progress?.inSeconds,
-            audioUrl: mediaItem?.extras?['audioUrl'],
-            banner: mediaItem?.artUri?.path,
-            title: mediaItem?.title);
-        AudioPlayerController().savePosition(_audio);
-      }
+      // if (buttonNotifier.value == ButtonState.paused) {
+      //   AudioPlayerModel _audio = AudioPlayerModel(
+      //       productID: int.parse(mediaItem?.id ?? "0"),
+      //       audioPosition: oldState.progress?.inSeconds,
+      //       audioUrl: mediaItem?.extras?['audioUrl'],
+      //       banner: mediaItem?.artUri?.path,
+      //       title: mediaItem?.title);
+      //   AudioPlayerController().savePosition(_audio);
+      // }
     });
   }
 

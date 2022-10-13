@@ -48,7 +48,7 @@ class _PodcastAllState extends State<PodcastAll>
       savedPos.add(savedPosition);
 
       MediaItem mediaItem = MediaItem(
-        id: item.productId.toString(),
+        id: item.id.toString(),
         artUri: Uri.parse(Urls.networkPath + item.banner!),
         title: item.title!,
         extras: {
@@ -59,8 +59,8 @@ class _PodcastAllState extends State<PodcastAll>
 
       mediaItems.add(mediaItem);
     }
-
-    await audioHandler.updateQueue(mediaItems);
+    log(mediaItems.length.toString(), name: "mediaItems.length");
+    await audioHandler.addQueueItems(mediaItems);
   }
 
   @override

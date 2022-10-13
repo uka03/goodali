@@ -20,7 +20,7 @@ class AudioPlayerProvider with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> encodedProducts =
         _audioItems.map((res) => json.encode(res.toJson())).toList();
-    prefs.setStringList("save_audio", encodedProducts);
+    prefs.setStringList("mood_save_audio", encodedProducts);
     notifyListeners();
   }
 

@@ -70,15 +70,10 @@ class _MoodDetailState extends State<MoodDetail> {
         color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
   );
 
-  final _player = ja.AudioPlayer(
-    handleInterruptions: false,
-    androidApplyAudioAttributes: false,
-    handleAudioSessionActivation: false,
-  );
-
   @override
   void initState() {
     super.initState();
+
     getMoodList().then((value) {
       moodItem = value;
       if (value.length == 1) {
@@ -109,11 +104,6 @@ class _MoodDetailState extends State<MoodDetail> {
 
   @override
   void dispose() {
-    // AudioPlayerModel _audio = AudioPlayerModel(
-    //     productID: moodItem[_current.toInt()].id,
-    //     audioPosition: position.inMilliseconds);
-    // _audioPlayerProvider.addAudioPosition(_audio);
-    // print("dispose");
     audioPlayer.dispose();
 
     _pageController.dispose();
@@ -127,7 +117,7 @@ class _MoodDetailState extends State<MoodDetail> {
   initForOthers(String url, int id) async {
     try {
       print("initForOthers $url");
-      // await audioPlayer.dynamicSet(url: url);
+
       duration = await audioPlayer.setUrl(url).then((value) {
             setState(() => isLoading = false);
             return value;
@@ -156,28 +146,23 @@ class _MoodDetailState extends State<MoodDetail> {
               duration: duration,
               artUri: Uri.parse(
                   Urls.networkPath + moodItem[_current.toInt()].banner!),
-              extras: {"position": position.inMilliseconds});
+              extras: {"saved_position": position.inMilliseconds, 'url': url});
           audioHandler.playMediaItem(item);
         });
       });
-
-      AudioSession.instance.then((audioSession) async {
-        await audioSession.configure(const AudioSessionConfiguration.speech());
-        AudioSessionSettings.handleInterruption(audioSession);
-      });
     } catch (e) {
-      print(e);
+      developer.log(e.toString(), name: "mood detail error");
     }
   }
 
   Future getSavedPosition(int moodItemID) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
+    List<String> decodedAudioString =
+        prefs.getStringList("mood_save_audio") ?? [];
     List<AudioPlayerModel> decodedProduct = decodedAudioString
         .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
         .toList();
 
-    // developer.log(decodedProduct.first.audioPosition.toString());
     for (var item in decodedProduct) {
       if (moodItemID == item.productID) {
         saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
