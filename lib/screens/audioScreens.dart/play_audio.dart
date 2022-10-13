@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:audio_service/audio_service.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,6 +15,7 @@ import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/main.dart';
@@ -27,6 +30,7 @@ import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 void onTap() {}
 
@@ -65,6 +69,19 @@ class _PlayAudioState extends State<PlayAudio> {
   String url = "";
   String audioURL = "";
   String introURL = "";
+
+  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
+      .map((state) => state.bufferedPosition)
+      .distinct();
+  Stream<Duration?> get _durationStream =>
+      audioHandler.mediaItem.map((item) => item?.duration).distinct();
+  Stream<DurationState> get _positionDataStream =>
+      Rx.combineLatest3<Duration, Duration, Duration?, DurationState>(
+          AudioService.position,
+          _bufferedPositionStream,
+          _durationStream,
+          (position, bufferedPosition, duration) => DurationState(
+              position, bufferedPosition, duration ?? Duration.zero));
 
   @override
   void initState() {
@@ -145,20 +162,6 @@ class _PlayAudioState extends State<PlayAudio> {
                             borderRadius: BorderRadius.circular(10)),
                       ),
                       const SizedBox(height: 30),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: paddingVertical,
-                            top: paddingVertical,
-                            bottom: paddingVertical),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: ImageView(
-                            imgPath: widget.products.banner ?? "",
-                            width: imageSize,
-                            height: imageSize,
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 40),
                       Text(
                         widget.albumName,
@@ -166,15 +169,35 @@ class _PlayAudioState extends State<PlayAudio> {
                             const TextStyle(fontSize: 12, color: MyColors.gray),
                       ),
                       const SizedBox(height: 10),
-                      Text(
-                        widget.products.title == ""
-                            ? widget.products.lectureTitle ?? ""
-                            : widget.products.title ?? "",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                      Expanded(
+                        child: StreamBuilder<MediaItem?>(
+                          stream: audioHandler.mediaItem,
+                          builder: (context, snapshot) {
+                            final mediaItem = snapshot.data;
+                            if (mediaItem == null) return const SizedBox();
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (mediaItem.artUri != null)
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left: paddingVertical,
+                                        top: paddingVertical,
+                                        bottom: paddingVertical),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: ImageView(
+                                        imgPath: widget.products.banner ?? "",
+                                        width: imageSize,
+                                        height: imageSize,
+                                      ),
+                                    ),
+                                  ),
+                                Text(mediaItem.title),
+                              ],
+                            );
+                          },
+                        ),
                       ),
                       const SizedBox(height: 46),
                       Row(
@@ -227,31 +250,32 @@ class _PlayAudioState extends State<PlayAudio> {
                         ],
                       ),
                       const SizedBox(height: 30),
-                      const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: PlayerProgressBar()),
+                      StreamBuilder<DurationState>(
+                        stream: _positionDataStream,
+                        builder: (context, snapshot) {
+                          final positionData = snapshot.data ??
+                              const DurationState(
+                                  Duration.zero, Duration.zero, Duration.zero);
+                          return ProgressBar(
+                            progress: positionData.progress!,
+                            buffered: positionData.buffered,
+                            total: positionData.total!,
+                            thumbColor: MyColors.primaryColor,
+                            thumbGlowColor: MyColors.primaryColor,
+                            timeLabelTextStyle:
+                                const TextStyle(color: MyColors.gray),
+                            progressBarColor: MyColors.primaryColor,
+                            bufferedBarColor:
+                                MyColors.primaryColor.withOpacity(0.3),
+                            baseBarColor: MyColors.border1,
+                            onSeek: (duration) {
+                              audioHandler.seek(duration);
+                              audioHandler.play();
+                            },
+                          );
+                        },
+                      ),
                       const SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          InkWell(
-                            onTap: buttonBackWard5Seconds,
-                            child: SvgPicture.asset(
-                              "assets/images/replay_5.svg",
-                            ),
-                          ),
-                          const CircleAvatar(
-                              radius: 36,
-                              backgroundColor: MyColors.primaryColor,
-                              child: PlayerButtons()),
-                          InkWell(
-                            onTap: buttonForward15Seconds,
-                            child: SvgPicture.asset(
-                              "assets/images/forward_15.svg",
-                            ),
-                          ),
-                        ],
-                      )
                     ],
                   ),
                 ),
@@ -385,24 +409,98 @@ class _PlayAudioState extends State<PlayAudio> {
           );
         });
   }
+}
+
+class ControlButtons extends StatefulWidget {
+  final AudioPlayerHandler audioHandler;
+  final Duration position;
+  final Duration duration;
+
+  const ControlButtons(this.audioHandler, this.duration, this.position,
+      {Key? key})
+      : super(key: key);
+
+  @override
+  State<ControlButtons> createState() => _ControlButtonsState();
+}
+
+class _ControlButtonsState extends State<ControlButtons> {
+  Duration _position = Duration.zero;
+  Duration _duration = Duration.zero;
+  @override
+  void initState() {
+    _position = widget.position;
+    _duration = widget.duration;
+    super.initState();
+  }
 
   buttonForward15Seconds() {
-    position = position + const Duration(seconds: 15);
+    _position = _position + const Duration(seconds: 15);
 
-    if (duration > position) {
-      audioHandler.seek(position);
-    } else if (duration < position) {
-      audioHandler.seek(duration);
+    if (_duration > _position) {
+      widget.audioHandler.seek(_position);
+    } else if (_duration < _position) {
+      widget.audioHandler.seek(_duration);
     }
   }
 
   buttonBackWard5Seconds() {
-    position = position - const Duration(seconds: 5);
+    _position = _position - const Duration(seconds: 5);
 
-    if (position < const Duration(seconds: 0)) {
-      audioHandler.seek(const Duration(seconds: 0));
+    if (_position < const Duration(seconds: 0)) {
+      widget.audioHandler.seek(const Duration(seconds: 0));
     } else {
-      audioHandler.seek(position);
+      widget.audioHandler.seek(_position);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: buttonBackWard5Seconds,
+          child: SvgPicture.asset(
+            "assets/images/replay_5.svg",
+          ),
+        ),
+        StreamBuilder<PlaybackState>(
+          stream: widget.audioHandler.playbackState,
+          builder: (context, snapshot) {
+            final playbackState = snapshot.data;
+            final processingState = playbackState?.processingState;
+            final playing = playbackState?.playing;
+            if (processingState == AudioProcessingState.loading ||
+                processingState == AudioProcessingState.buffering) {
+              return Container(
+                margin: const EdgeInsets.all(8.0),
+                width: 64.0,
+                height: 64.0,
+                child: const CircularProgressIndicator(),
+              );
+            } else if (playing != true) {
+              return IconButton(
+                icon: const Icon(Icons.play_arrow),
+                iconSize: 64.0,
+                onPressed: widget.audioHandler.play,
+              );
+            } else {
+              return IconButton(
+                icon: const Icon(Icons.pause),
+                iconSize: 64.0,
+                onPressed: widget.audioHandler.pause,
+              );
+            }
+          },
+        ),
+        InkWell(
+          onTap: buttonForward15Seconds,
+          child: SvgPicture.asset(
+            "assets/images/forward_15.svg",
+          ),
+        ),
+      ],
+    );
   }
 }

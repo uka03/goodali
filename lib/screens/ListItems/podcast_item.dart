@@ -52,14 +52,6 @@ class _PodcastItemState extends State<PodcastItem> {
   bool isLoading = true;
   bool isClicked = false;
   MediaItem? mediaItem;
-  Stream<DurationState>? _durationState;
-
-  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
-      .map((state) => state.bufferedPosition)
-      .distinct();
-
-  Stream<Duration?> get _durationStream =>
-      audioHandler.mediaItem.map((item) => item?.duration).distinct();
 
   @override
   void initState() {
@@ -73,31 +65,18 @@ class _PodcastItemState extends State<PodcastItem> {
     super.initState();
   }
 
-  _initiliazePodcast(Duration duration) async {
-    audioPlayerController.initiliaze();
-
-    int savedPosition = await AudioPlayerController().getSavedPosition(
-        audioPlayerController.toAudioModel(widget.podcastItem));
-
-    _durationState =
-        Rx.combineLatest3<Duration?, Duration, Duration, DurationState>(
-            _durationStream,
-            AudioService.position,
-            _bufferedPositionStream,
-            (duration, position, buffered) =>
-                DurationState(position, buffered, duration));
-
-    mediaItem = MediaItem(
-      id: widget.podcastItem.productId.toString(),
-      artUri: Uri.parse(Urls.networkPath + widget.podcastItem.banner!),
-      title: widget.podcastItem.title!,
-      duration: duration,
-      extras: {
-        'url': Urls.networkPath + widget.podcastItem.audio!,
-        "saved_position": savedPosition
-      },
-    );
-  }
+  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
+      .map((state) => state.bufferedPosition)
+      .distinct();
+  Stream<Duration?> get _durationStream =>
+      audioHandler.mediaItem.map((item) => item?.duration).distinct();
+  Stream<DurationState> get _positionDataStream =>
+      Rx.combineLatest3<Duration, Duration, Duration?, DurationState>(
+          AudioService.position,
+          _bufferedPositionStream,
+          _durationStream,
+          (position, bufferedPosition, duration) => DurationState(
+              position, bufferedPosition, duration ?? Duration.zero));
 
   Future<Duration> getTotalDuration() async {
     try {
@@ -167,7 +146,7 @@ class _PodcastItemState extends State<PodcastItem> {
           children: [
             AudioPlayerButton(
               onPlay: () async {
-                await audioHandler.skipToQueueItem(widget.podcastItem.id!);
+                audioHandler.skipToQueueItem(widget.index);
                 print(widget.podcastItem.id!);
                 audioHandler.play();
                 setState(() {

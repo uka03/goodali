@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/main.dart';
 import 'dart:developer';
 import 'package:goodali/models/products_model.dart';
@@ -39,7 +40,6 @@ class _PodcastAllState extends State<PodcastAll>
   }
 
   _initiliazePodcast() async {
-    log("_initiliazePodcast");
     audioPlayerController.initiliaze();
 
     for (var item in widget.podcastList) {
@@ -70,28 +70,39 @@ class _PodcastAllState extends State<PodcastAll>
       RefreshIndicator(
         color: MyColors.primaryColor,
         onRefresh: _refresh,
-        child: ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.only(top: 13, bottom: 15),
-          itemBuilder: (BuildContext context, int index) {
-            return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: PodcastItem(
-                  onTap: (product) => widget.onTap(product),
-                  index: index,
-                  podcastList: widget.podcastList,
-                  podcastItem: widget.podcastList[index],
-                ));
-          },
-          itemCount: widget.isHomeScreen == true
-              ? widget.podcastList.length > 5
-                  ? 5
-                  : widget.podcastList.length
-              : widget.podcastList.length,
-          separatorBuilder: (BuildContext context, int index) => const Divider(
-            endIndent: 18,
-            indent: 18,
+        child: SizedBox(
+          height: 240.0,
+          child: StreamBuilder<QueueState>(
+            stream: audioHandler.queueState,
+            builder: (context, snapshot) {
+              final queueState = snapshot.data ?? QueueState.empty;
+              final queue = queueState.queue;
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(top: 13, bottom: 15),
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: PodcastItem(
+                        onTap: (product) => widget.onTap(product),
+                        index: index,
+                        podcastList: widget.podcastList,
+                        podcastItem: widget.podcastList[index],
+                      ));
+                },
+                itemCount: widget.isHomeScreen == true
+                    ? widget.podcastList.length > 5
+                        ? 5
+                        : widget.podcastList.length
+                    : widget.podcastList.length,
+                separatorBuilder: (BuildContext context, int index) =>
+                    const Divider(
+                  endIndent: 18,
+                  indent: 18,
+                ),
+              );
+            },
           ),
         ),
       ),

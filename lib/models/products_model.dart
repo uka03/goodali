@@ -1,3 +1,6 @@
+import 'package:audio_service/audio_service.dart';
+import 'package:goodali/Utils/urls.dart';
+
 class Products {
   String? audio;
   String? banner;
@@ -78,4 +81,13 @@ class Products {
 
     return data;
   }
+
+  MediaItem toMediaItem() => MediaItem(
+        id: id.toString(),
+        title: title ?? "",
+        artUri: Uri.parse(Urls.networkPath + (audio ?? "")),
+        extras: <String, dynamic>{
+          'url': Urls.networkPath + (audio ?? ""),
+        },
+      );
 }

@@ -8,7 +8,8 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/controller/audio_player_handler.dart';
+
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/screens/Auth/enable_biometric.dart';
 import 'package:goodali/screens/blank.dart';
 import 'package:goodali/screens/bottom_bar.dart';
@@ -21,7 +22,7 @@ late AudioHandler audioHandler;
 
 Future<void> main() async {
   audioHandler = await AudioService.init(
-    builder: () => AudioPlayerHandler(),
+    builder: () => AudioPlayerHandlerImpl(),
     config: const AudioServiceConfig(
       androidNotificationIcon: 'mipmap/ic_launcher_round',
       androidNotificationChannelId: 'com.example.example.audio',
