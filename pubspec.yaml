@@ -32,7 +32,7 @@ dependencies:
   shared_preferences: ^2.0.15
   provider: ^6.0.3
   flutter_svg: ^1.0.3
-  syncfusion_flutter_gauges: 20.1.55
+  syncfusion_flutter_gauges: ^20.3.49
   syncfusion_flutter_sliders: ^20.2.40
   readmore: ^2.2.0
   top_snackbar_flutter: ^2.1.1
@@ -64,6 +64,7 @@ dependencies:
   extended_image: ^6.1.0
   youtube_player_flutter: ^8.0.0
   async: ^2.8.2
+  ffmpeg_kit_flutter: ^5.1.0
 
 dev_dependencies:
   flutter_test:

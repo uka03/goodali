@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'package:goodali/main.dart';
 
 class PlayerProgressBar extends StatelessWidget {
   const PlayerProgressBar({Key? key}) : super(key: key);

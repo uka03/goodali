@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
@@ -10,18 +9,17 @@ import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/controller/audio_session.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
-import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
-import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final currentlyPlaying = ValueNotifier<Products?>(null);
-
+final playlistNotifier = ValueNotifier<List<String>>([]);
 final playerExpandProgress = ValueNotifier<double>(playerMinHeight);
 final currentPlayingItem =
     ValueNotifier<MediaItem>(const MediaItem(id: "", title: ''));
@@ -44,6 +42,7 @@ class AudioPlayerController with ChangeNotifier {
     _listenToPosition();
     _listenToTotalDuration();
     _listenToPlaybackState();
+    listenToChangesInPlaylist();
   }
 
   _listenToPlaybackState() {
@@ -60,6 +59,17 @@ class AudioPlayerController with ChangeNotifier {
       } else {
         audioHandler.seek(Duration.zero);
         audioHandler.pause();
+      }
+    });
+  }
+
+  void listenToChangesInPlaylist() {
+    audioHandler.queue.listen((playlist) {
+      if (playlist.isEmpty) {
+        playlistNotifier.value = [];
+      } else {
+        final newList = playlist.map((item) => item.title).toList();
+        playlistNotifier.value = newList;
       }
     });
   }

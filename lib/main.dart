@@ -1,4 +1,3 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
@@ -18,19 +17,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
-late AudioHandler audioHandler;
-
 Future<void> main() async {
-  audioHandler = await AudioService.init(
-    builder: () => AudioPlayerHandlerImpl(),
-    config: const AudioServiceConfig(
-      androidNotificationIcon: 'mipmap/ic_launcher_round',
-      androidNotificationChannelId: 'com.example.example.audio',
-      androidNotificationChannelName: 'Audio Service',
-      androidNotificationOngoing: true,
-      androidStopForegroundOnPause: true,
-    ),
-  );
+  await initAudioHandler();
 
   WidgetsFlutterBinding.ensureInitialized();
   CacheManager.logLevel = CacheManagerLogLevel.verbose;

@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -9,9 +10,8 @@ import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
-import 'package:goodali/main.dart';
-import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
@@ -51,8 +51,7 @@ class _PodcastItemState extends State<PodcastItem> {
   int savedDuration = 0;
   bool isLoading = true;
   bool isClicked = false;
-  MediaItem? mediaItem;
-
+  var _totalduration = Duration.zero;
   @override
   void initState() {
     if (widget.podcastItem.audio != "Audio failed to upload") {
@@ -80,7 +79,9 @@ class _PodcastItemState extends State<PodcastItem> {
 
   Future<Duration> getTotalDuration() async {
     try {
-      var _totalduration = await audioPlayer.setUrl(audioUrl) ?? Duration.zero;
+      if (_totalduration == Duration.zero) {
+        _totalduration = await getFileDuration(audioUrl);
+      }
       if (mounted) {
         setState(() {
           duration = _totalduration;
@@ -90,14 +91,19 @@ class _PodcastItemState extends State<PodcastItem> {
       savedDuration = await audioPlayerController.getSavedPosition(
           audioPlayerController.toAudioModel(widget.podcastItem));
       duration = duration - Duration(milliseconds: savedDuration);
-
-      developer.log(duration.toString());
-
       return duration;
     } catch (e) {
       developer.log(e.toString(), name: "totalDuration error");
       return Duration.zero;
     }
+  }
+
+  Future<Duration> getFileDuration(String mediaPath) async {
+    final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
+    final mediaInfo = mediaInfoSession.getMediaInformation()!;
+    final double duration = double.parse(mediaInfo.getDuration()!);
+    print(duration);
+    return Duration(milliseconds: (duration * 1000).toInt());
   }
 
   @override
@@ -146,12 +152,14 @@ class _PodcastItemState extends State<PodcastItem> {
           children: [
             AudioPlayerButton(
               onPlay: () async {
-                audioHandler.skipToQueueItem(widget.index);
-                print(widget.podcastItem.id!);
-                audioHandler.play();
+                if (isClicked == true) return;
+                await audioHandler.skipToQueueItem(widget.index);
+                await audioHandler.play();
+
                 setState(() {
                   isClicked = true;
                 });
+
                 podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
                 if (!podcastProvider.sameItemCheck) {
                   podcastProvider.addListenedPodcast(
@@ -161,7 +169,6 @@ class _PodcastItemState extends State<PodcastItem> {
               },
               onPause: () {
                 widget.onTap(widget.podcastItem);
-
                 audioHandler.pause().then((value) =>
                     podcastProvider.unListenedPodcastFun(
                         widget.podcastItem, widget.podcastList));

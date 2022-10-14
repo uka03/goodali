@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
-import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:provider/provider.dart';

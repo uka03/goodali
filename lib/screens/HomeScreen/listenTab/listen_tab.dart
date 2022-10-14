@@ -25,6 +25,8 @@ class _ListenTabbarState extends State<ListenTabbar>
     with AutomaticKeepAliveClientMixin<ListenTabbar> {
   @override
   bool get wantKeepAlive => true;
+  List<Products> popdcastList = [];
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();

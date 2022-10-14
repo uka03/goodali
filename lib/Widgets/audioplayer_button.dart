@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/products_model.dart';
 
@@ -54,7 +53,12 @@ class AudioPlayerButton extends StatelessWidget {
                     size: 30.0,
                   ),
                   onPressed: () {
-                    onPlay();
+                    if (currentTitle == title &&
+                        buttonState == ButtonState.paused) {
+                      audioHandler.play();
+                    } else {
+                      onPlay();
+                    }
                   }));
         } else {
           return CircleAvatar(

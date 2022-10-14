@@ -15,8 +15,8 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
-import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 
@@ -468,7 +468,6 @@ class _CourseTasksState extends State<CourseTasks> {
                   onSeek: (duration) async {
                     final position = duration;
                     await audioHandler.seek(position);
-
                     await audioHandler.play();
                   },
                 ),

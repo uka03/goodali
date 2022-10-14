@@ -1,177 +1,132 @@
-// import 'dart:developer';
-
 // import 'package:audio_service/audio_service.dart';
 // import 'package:audio_session/audio_session.dart';
-// import 'package:flutter/foundation.dart';
-// import 'package:goodali/controller/audioplayer_controller.dart';
-
-// import 'package:goodali/models/products_model.dart';
+// import 'package:goodali/repository.dart/podcast_repository.dart';
 // import 'package:just_audio/just_audio.dart';
 // import 'package:rxdart/rxdart.dart';
 
+// late AudioHandler audioHandler;
+
+// Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
+//       builder: () => AudioPlayerHandler(),
+//       config: const AudioServiceConfig(
+//         androidNotificationChannelId: 'com.ryanheise.myapp.channel.audio',
+//         androidNotificationChannelName: 'Audio playback',
+//         androidNotificationOngoing: true,
+//       ),
+//     );
+
+// /// An [AudioHandler] for playing a single item.
 // class AudioPlayerHandler extends BaseAudioHandler
-//     with SeekHandler, QueueHandler {
-//   final _player = AudioPlayer();
-//   var _queue = <MediaItem>[];
+//     with QueueHandler, SeekHandler {
+//   List<MediaItem> _podcastList = [];
 //   final _playlist = ConcatenatingAudioSource(children: []);
-//   final currentSong = BehaviorSubject<Products>();
-//   List<MediaItem> get queuea => _queue;
+//   final _player = AudioPlayer();
 //   final _mediaItemExpando = Expando<MediaItem>();
+//   @override
+//   final BehaviorSubject<double> speed = BehaviorSubject.seeded(1.0);
+//   final BehaviorSubject<List<MediaItem>> _recentSubject =
+//       BehaviorSubject.seeded(<MediaItem>[]);
 
+//   /// Initialise our audio handler.
 //   AudioPlayerHandler() {
-//     AudioSession.instance.then((session) {
-//       session.configure(const AudioSessionConfiguration.speech());
-//     });
-//     _loadEmptyPlaylist();
-//     _notifyAudioHandlerAboutPlaybackEvents();
-//     // _listenForDurationChanges();
-//     // _listenForCurrentSongIndexChanges();
+//     _init();
 //   }
+//   Future<void> _init() async {
+//     final session = await AudioSession.instance;
+//     await session.configure(const AudioSessionConfiguration.speech());
+//     // Activate the audio session before playing audio.
+//     if (await session.setActive(true)) {
+//       play();
+//     } else {
+//       // The request was denied and the app should not play audio
+//     }
+//     // Broadcast speed changes. Debounce so that we don't flood the notification
+//     // with updates.
+//     speed.debounceTime(const Duration(milliseconds: 250)).listen((speed) {
+//       playbackState.add(playbackState.value.copyWith(speed: speed));
+//     });
+//     // Load and broadcast the initial queue
+//     _podcastList = await PodcastRepository.getPodcastList();
+//     queue.add(_podcastList);
 
-//   Future<void> _loadEmptyPlaylist() async {
+//     mediaItem
+//         .whereType<MediaItem>()
+//         .listen((item) => _recentSubject.add([item]));
+//     // Broadcast media item changes.
+//     _player.currentIndexStream.listen((index) {
+//       if (index != null) mediaItem.add(queue.value[index]);
+//     });
+//     // Propagate all events from the audio player to AudioService clients.
+//     _player.playbackEventStream.listen(_broadcastState);
+//     // In this example, the service stops when reaching the end.
+//     _player.processingStateStream.listen((state) {
+//       if (state == ProcessingState.completed) stop();
+//     });
 //     try {
-//       await _player.setAudioSource(_playlist);
+//       // After a cold restart (on Android), _player.load jumps straight from
+//       // the loading state to the completed state. Inserting a delay makes it
+//       // work. Not sure why!
+//       //await Future.delayed(Duration(seconds: 2)); // magic delay
+//       await _player.setAudioSource(ConcatenatingAudioSource(
+//         children: queue.value
+//             .map((item) => AudioSource.uri(Uri.parse(item.id)))
+//             .toList(),
+//       ));
 //     } catch (e) {
+//       // ignore: avoid_print
 //       print("Error: $e");
 //     }
 //   }
 
-//   void _listenForDurationChanges() {
-//     _player.durationStream.listen((duration) {
-//       var index = _player.currentIndex;
-
-//       log(index.toString(), name: "currently playing index");
-//       if (index == null || _queue.isEmpty) return;
-//       _queue[index].copyWith(duration: duration);
-//       mediaItem.add(_queue[index]);
-//       log(_queue[index].title);
-//     });
-//   }
-
-//   void _notifyAudioHandlerAboutPlaybackEvents() {
-//     _player.playbackEventStream.listen((PlaybackEvent event) {
-//       final playing = _player.playing;
-//       playbackState.add(playbackState.value.copyWith(
-//         controls: [
-//           MediaControl.skipToPrevious,
-//           if (playing) MediaControl.pause else MediaControl.play,
-//           MediaControl.stop,
-//           MediaControl.skipToNext,
-//         ],
-//         systemActions: const {
-//           MediaAction.seek,
-//         },
-//         androidCompactActionIndices: const [0, 1, 3],
-//         processingState: const {
-//           ProcessingState.idle: AudioProcessingState.idle,
-//           ProcessingState.loading: AudioProcessingState.loading,
-//           ProcessingState.buffering: AudioProcessingState.buffering,
-//           ProcessingState.ready: AudioProcessingState.ready,
-//           ProcessingState.completed: AudioProcessingState.completed,
-//         }[_player.processingState]!,
-//         repeatMode: const {
-//           LoopMode.off: AudioServiceRepeatMode.none,
-//           LoopMode.one: AudioServiceRepeatMode.one,
-//           LoopMode.all: AudioServiceRepeatMode.all,
-//         }[_player.loopMode]!,
-//         playing: playing,
-//         updatePosition: _player.position,
-//         bufferedPosition: _player.bufferedPosition,
-//         speed: _player.speed,
-//         queueIndex: event.currentIndex,
-//       ));
-//     });
-//   }
+//   // In this simple example, we handle only 4 actions: play, pause, seek and
+//   // stop. Any button press from the Flutter UI, notification, lock screen or
+//   // headset will be routed through to these 4 methods so that you can handle
+//   // your audio playback logic in one place.
 
 //   @override
-//   Future<void> play() async {
-//     debugPrint("audio handler play");
-
-//     _player.play();
-//     return super.play();
-//   }
+//   Future<void> play() => _player.play();
 
 //   @override
-//   Future<void> skipToQueueItem(int index) async {
-//     log(index.toString(), name: "Index");
-//     final newIndex = _queue.indexWhere((item) => item.id == index.toString());
-//     log(newIndex.toString(), name: "newIndex");
-//     log(_queue[1].id.toString(), name: "_queue.length");
-//     if (newIndex == -1) return;
-//     mediaItem.add(_queue[newIndex]);
-//     log(_queue[newIndex].title, name: "title");
-//     _player.setUrl(_queue[newIndex].extras!['url']);
-//   }
+//   Future<void> pause() => _player.pause();
 
 //   @override
-//   Future<void> playMediaItem(MediaItem item) async {
-//     debugPrint("play media item");
-//     mediaItem.add(item);
-//     if (item.extras!['saved_position'] > 0) {
-//       _player.seek(Duration(seconds: item.extras!['saved_position']));
-//     }
-//     _player.setUrl(item.extras!['url']);
-//   }
+//   Future<void> seek(Duration position) => _player.seek(position);
 
 //   @override
-//   Future<void> updateQueue(List<MediaItem> newQueue) async {
-//     queue.add(_queue = newQueue);
+//   Future<void> stop() => _player.stop();
 
-//     await _player.setAudioSource(ConcatenatingAudioSource(
-//         children: newQueue
-//             .map((e) => AudioSource.uri(Uri.parse(e.extras!['url'])))
-//             .toList()));
-//   }
-
-//   @override
-//   Future<void> addQueueItems(List<MediaItem> mediaItems) {
-//     final audioSource = mediaItems.map(_createAudioSource);
-//     _playlist.addAll(audioSource.toList());
-
-//     _playlist.clear();
-//     _queue.clear();
-//     final newQueue = queue.value..addAll(mediaItems);
-//     queue.add(_queue = newQueue);
-//     log(_queue.length.toString(), name: "title");
-//     return super.addQueueItems(mediaItems);
-//   }
-
-//   @override
-//   Future<void> pause() async {
-//     _player.pause();
-//     return super.pause();
-//   }
-
-//   UriAudioSource _createAudioSource(MediaItem mediaItem) {
-//     return AudioSource.uri(
-//       Uri.parse(mediaItem.extras!['url']),
-//       tag: mediaItem,
-//     );
-//   }
-
-//   @override
-//   Future<void> seek(Duration position) {
-//     _player.seek(position);
-//     return super.pause();
-//   }
-
-//   @override
-//   Future<void> skipToNext() => _player.seekToNext();
-
-//   @override
-//   Future<void> skipToPrevious() => _player.seekToPrevious();
-
-//   @override
-//   Future customAction(String name, [Map<String, dynamic>? extras]) async {
-//     if (name == 'dispose') {
-//       await _player.dispose();
-//       super.stop();
-//     }
-//   }
-
-//   @override
-//   Future<void> stop() async {
-//     await _player.stop();
-//     return super.stop();
+//   /// Transform a just_audio event into an audio_service state.
+//   ///
+//   /// This method is used from the constructor. Every event received from the
+//   /// just_audio player will be transformed into an audio_service state so that
+//   /// it can be broadcast to audio_service clients.
+//   void _broadcastState(PlaybackEvent event) {
+//     final playing = _player.playing;
+//     playbackState.add(playbackState.value.copyWith(
+//       controls: [
+//         MediaControl.skipToPrevious,
+//         if (playing) MediaControl.pause else MediaControl.play,
+//         MediaControl.stop,
+//         MediaControl.skipToNext,
+//       ],
+//       systemActions: const {
+//         MediaAction.seek,
+//         MediaAction.seekForward,
+//         MediaAction.seekBackward,
+//       },
+//       androidCompactActionIndices: const [0, 1, 3],
+//       processingState: const {
+//         ProcessingState.idle: AudioProcessingState.idle,
+//         ProcessingState.loading: AudioProcessingState.loading,
+//         ProcessingState.buffering: AudioProcessingState.buffering,
+//         ProcessingState.ready: AudioProcessingState.ready,
+//         ProcessingState.completed: AudioProcessingState.completed,
+//       }[_player.processingState]!,
+//       playing: playing,
+//       updatePosition: _player.position,
+//       bufferedPosition: _player.bufferedPosition,
+//       speed: _player.speed,
+//       queueIndex: event.currentIndex,
+//     ));
 //   }
 // }
