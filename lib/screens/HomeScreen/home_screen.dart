@@ -2,6 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
+import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
@@ -19,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final CarouselController _controller = CarouselController();
+  List<BannerModel> bannerList = [];
   int _current = 0;
 
   List colorList = [
@@ -26,6 +29,12 @@ class _HomeScreenState extends State<HomeScreen> {
     MyColors.secondary,
     MyColors.border1
   ];
+
+  @override
+  void initState() {
+    getBannerList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,5 +139,10 @@ class _HomeScreenState extends State<HomeScreen> {
         }).toList(),
       ),
     ]);
+  }
+
+  Future getBannerList() async {
+    bannerList = await Connection.getBannerList(context);
+    return bannerList;
   }
 }

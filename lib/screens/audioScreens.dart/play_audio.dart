@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
@@ -11,17 +9,17 @@ import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/urls.dart';
+
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
+
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/screens/audioScreens.dart/player_buttons.dart';
-import 'package:goodali/screens/audioScreens.dart/progress_bar.dart';
 import 'package:miniplayer/miniplayer.dart';
 
 import 'package:goodali/models/products_model.dart';
@@ -244,9 +242,16 @@ class _PlayAudioState extends State<PlayAudio> {
                         ],
                       ),
                       const SizedBox(height: 30),
-                      const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: PlayerProgressBar()),
+                      Text(
+                        widget.products.title == ""
+                            ? widget.products.lectureTitle ?? ""
+                            : widget.products.title ?? "",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
                       const SizedBox(height: 30),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

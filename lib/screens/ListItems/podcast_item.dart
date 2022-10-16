@@ -20,12 +20,12 @@ import 'package:provider/provider.dart';
 import 'dart:developer' as developer;
 
 import 'package:rxdart/rxdart.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 typedef OnTap = Function(Products audioObject);
 
 class PodcastItem extends StatefulWidget {
   final Products podcastItem;
-
   final List<Products> podcastList;
   final OnTap onTap;
   final int index;
@@ -45,7 +45,7 @@ class PodcastItem extends StatefulWidget {
 class _PodcastItemState extends State<PodcastItem> {
   AudioPlayerController audioPlayerController = AudioPlayerController();
   AudioPlayer audioPlayer = AudioPlayer();
-
+  Stream<DurationState>? _durationState;
   String audioUrl = '';
   Duration duration = Duration.zero;
   int savedDuration = 0;
@@ -67,15 +67,27 @@ class _PodcastItemState extends State<PodcastItem> {
   Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
       .map((state) => state.bufferedPosition)
       .distinct();
-  Stream<Duration?> get _durationStream =>
-      audioHandler.mediaItem.map((item) => item?.duration).distinct();
-  Stream<DurationState> get _positionDataStream =>
-      Rx.combineLatest3<Duration, Duration, Duration?, DurationState>(
-          AudioService.position,
-          _bufferedPositionStream,
-          _durationStream,
-          (position, bufferedPosition, duration) => DurationState(
-              position, bufferedPosition, duration ?? Duration.zero));
+
+  // _initiliazePodcast(Duration duration, int savedDuration) async {
+  //   audioPlayerController.initiliaze();
+
+  //   setState(() {
+  //     _durationState =
+  //         Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
+  //             audioHandler.mediaItem,
+  //             AudioService.position,
+  //             _bufferedPositionStream,
+  //             (mediaItem, position, buffered) =>
+  //                 DurationState(position, buffered, mediaItem?.duration));
+  //   });
+
+  //   mediaItem = MediaItem(
+  //       id: widget.podcastItem.id.toString(),
+  //       title: widget.podcastItem.title ?? "",
+  //       duration: duration,
+  //       artUri: Uri.parse(Urls.networkPath + widget.podcastItem.banner!),
+  //       extras: {"saved_position": savedDuration, 'url': audioUrl});
+  // }
 
   Future<Duration> getTotalDuration() async {
     try {
@@ -188,7 +200,48 @@ class _PodcastItemState extends State<PodcastItem> {
                 : Row(
                     children: [
                       (savedDuration > 0 || isClicked)
-                          ? AudioProgressBar(totalDuration: duration)
+                          ? StreamBuilder<DurationState>(
+                              stream: _durationState,
+                              builder: (context, snapshot) {
+                                final durationState = snapshot.data;
+                                final position =
+                                    durationState?.progress ?? Duration.zero;
+
+                                duration = durationState?.total ?? duration;
+                                return SizedBox(
+                                    width: 90,
+                                    child: SfLinearGauge(
+                                      minimum: 0,
+                                      maximum:
+                                          (duration.inSeconds.toDouble() / 10),
+                                      showLabels: false,
+                                      showAxisTrack: false,
+                                      showTicks: false,
+                                      ranges: [
+                                        LinearGaugeRange(
+                                          position:
+                                              LinearElementPosition.inside,
+                                          edgeStyle: LinearEdgeStyle.bothCurve,
+                                          startValue: 0,
+                                          color: MyColors.border1,
+                                          endValue:
+                                              (duration.inSeconds.toDouble() /
+                                                  10),
+                                        ),
+                                      ],
+                                      barPointers: [
+                                        LinearBarPointer(
+                                            position:
+                                                LinearElementPosition.inside,
+                                            edgeStyle:
+                                                LinearEdgeStyle.bothCurve,
+                                            color: MyColors.primaryColor,
+                                            value:
+                                                (position.inSeconds.toDouble() /
+                                                    10))
+                                      ],
+                                    ));
+                              })
                           : Container(),
                       const SizedBox(width: 10),
                       AudioplayerTimer(

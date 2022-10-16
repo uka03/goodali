@@ -37,4 +37,5 @@ class Urls {
   static final insertPostReply = "$host/insert_post_reply";
   static final getSimilarPost = "$host/similar_post";
   static final getSimilarVideo = "$host/similar_video";
+  static final getBannerList = "$host/banner_list";
 }

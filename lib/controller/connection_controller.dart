@@ -8,6 +8,7 @@ import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/article_model.dart';
+import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/models/course_lessons_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/courses_item.dart';
@@ -541,7 +542,6 @@ class Connection {
   static Future<List<CourseLessonsTasksModel>> getCoursesTasks(
       BuildContext context, String id) async {
     try {
-      print("idididi $id");
       final response = await Http()
           .getDio(context, headerTypebearer)
           .get(Urls.getCoursesTasks + id);
@@ -786,6 +786,24 @@ class Connection {
       }
     } catch (error) {
       developer.log("error video list $error");
+      return [];
+    }
+  }
+
+  static Future<List<BannerModel>> getBannerList(BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypeNone).post(Urls.getBannerList);
+
+      if (response.statusCode == 200) {
+        return (response.data['data'] as List)
+            .map((e) => BannerModel.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (error) {
+      developer.log("error banner $error");
       return [];
     }
   }

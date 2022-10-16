@@ -11,27 +11,18 @@ class SearchScreen extends SearchDelegate {
     'France'
   ];
 
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     backgroundColor: Colors.white,
-  //     body: Column(
-  //       children: [SearchBar()],
-  //     ),
-  //   );
-  // }
-
   @override
   ThemeData appBarTheme(BuildContext context) {
     return ThemeData(
       applyElevationOverlayColor: true,
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         headline6: TextStyle(fontSize: 20.0, color: MyColors.black),
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: const InputDecorationTheme(
         border: InputBorder.none,
       ),
     );
@@ -62,6 +53,7 @@ class SearchScreen extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
+
     for (var item in allData) {
       if (item.toLowerCase().contains(query.toLowerCase())) {
         matchQuery.add(item);
