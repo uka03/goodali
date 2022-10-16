@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -31,7 +32,7 @@ class AlbumDetailItem extends StatefulWidget {
   final bool isBought;
   final AudioPlayer audioPlayer;
   final OnTap onTap;
-
+  final int index;
   const AlbumDetailItem(
       {Key? key,
       required this.products,
@@ -40,7 +41,8 @@ class AlbumDetailItem extends StatefulWidget {
       required this.isBought,
       required this.audioPlayer,
       this.albumProducts,
-      required this.onTap})
+      required this.onTap,
+      required this.index})
       : super(key: key);
 
   @override
@@ -65,6 +67,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   bool isPlaying = false;
   bool isLoading = true;
   bool isbgPlaying = false;
+  var _totalduration = Duration.zero;
   String url = "";
   String audioURL = "";
   String introURL = "";
@@ -86,43 +89,31 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     super.initState();
   }
 
-  // Future<void> setAudio(Duration duration) async {
-  //   try {
-  //     isbgPlaying = buttonNotifier.value == ButtonState.playing ? true : false;
-  //     developer.log(isbgPlaying.toString(), name: "isbgPlaying");
-
-  //     item = MediaItem(
-  //         id: widget.products.id.toString(),
-  //         title: widget.products.title ?? "",
-  //         album: widget.albumName,
-  //         duration: duration,
-  //         artUri: Uri.parse(banner),
-  //         extras: {
-  //           "audioUrl": Urls.networkPath + (widget.products.audio ?? "")
-  //         });
-  //     mediaItems.add(item);
-
-  //     // await audioHandler.updateQueue(mediaItems);
-
-  //     audioPlayerController.initiliaze();
-  //   } on PlayerInterruptedException catch (e) {
-  //     developer.log(e.toString());
-  //   }
-  // }
-
   Future<Duration> getTotalDuration() async {
     try {
-      var _totalduration = await audioPlayer.setUrl(url) ?? Duration.zero;
+      if (_totalduration == Duration.zero) {
+        _totalduration = await getFileDuration(url);
+      }
       if (mounted) {
         setState(() {
           duration = _totalduration;
           isLoading = false;
         });
       }
-      developer.log(duration.toString());
-      // setAudio(duration);
+      savedPosition = await audioPlayerController.getSavedPosition(
+          audioPlayerController.toAudioModel(widget.products));
+      duration = duration - Duration(milliseconds: savedPosition);
+      return duration;
     } catch (e) {}
     return duration;
+  }
+
+  Future<Duration> getFileDuration(String mediaPath) async {
+    final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
+    final mediaInfo = mediaInfoSession.getMediaInformation()!;
+    final double duration = double.parse(mediaInfo.getDuration()!);
+
+    return Duration(milliseconds: (duration * 1000).toInt());
   }
 
   getCachedFile(String url) async {
@@ -185,13 +176,14 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           Row(
             children: [
               AudioPlayerButton(
-                onPlay: () {
+                onPlay: () async {
+                  if (isPlaying == true) return;
                   setState(() {
                     isPlaying = true;
                   });
 
-                  audioHandler.playMediaItem(item);
-                  audioHandler.play();
+                  await audioHandler.skipToQueueItem(widget.index);
+                  await audioHandler.play();
 
                   widget.onTap(widget.products);
                 },

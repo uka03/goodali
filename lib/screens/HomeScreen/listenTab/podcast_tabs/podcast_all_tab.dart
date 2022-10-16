@@ -42,6 +42,7 @@ class _PodcastAllState extends State<PodcastAll>
 
   _initiliazePodcast() async {
     audioPlayerController.initiliaze();
+    audioHandler.queue.value.clear();
     if (mediaItems.isNotEmpty) return;
     for (var item in widget.podcastList) {
       int savedPosition = await AudioPlayerController()

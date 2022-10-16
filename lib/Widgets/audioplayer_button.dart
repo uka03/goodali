@@ -31,7 +31,6 @@ class AudioPlayerButton extends StatelessWidget {
             currentTitle == title && buttonState == ButtonState.loading
                 ? true
                 : false;
-        print("isBuffering $isBuffering");
         if (isBuffering) {
           return const CircleAvatar(
               backgroundColor: MyColors.input,

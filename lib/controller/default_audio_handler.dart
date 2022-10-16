@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -130,6 +131,17 @@ class AudioPlayerHandler extends BaseAudioHandler
       speed: _player.speed,
       queueIndex: event.currentIndex,
     ));
+  }
+
+  @override
+  Future<void> playMediaItem(MediaItem item) async {
+    debugPrint("play media item");
+    mediaItem.add(item);
+    if (item.extras!['saved_position'] > 0) {
+      _player.seek(Duration(seconds: item.extras!['saved_position']));
+
+      _player.setUrl(item.extras!['url']);
+    }
   }
 }
 

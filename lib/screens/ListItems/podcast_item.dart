@@ -156,9 +156,11 @@ class _PodcastItemState extends State<PodcastItem> {
                 await audioHandler.skipToQueueItem(widget.index);
                 await audioHandler.play();
 
-                setState(() {
-                  isClicked = true;
-                });
+                if (mounted) {
+                  setState(() {
+                    isClicked = true;
+                  });
+                }
 
                 podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
                 if (!podcastProvider.sameItemCheck) {

@@ -30,24 +30,49 @@ class _MyCoursesState extends State<MyCourses> {
   List<MediaItem> mediaItems = [];
   String albumName = "";
   int currentIndex = 0;
+  List<int> savedPos = [];
 
   @override
   void initState() {
+    getAllLectures();
     super.initState();
   }
 
-  _initiliazeLecture(allLectures) async {
-    log("_initiliazePodcast");
+  _initiliazeLecture(List<Products> allLectures) async {
     audioPlayerController.initiliaze();
-    mediaItems = allLectures
-        .map((item) => MediaItem(
-              id: item.productId.toString(),
-              artUri: Uri.parse(Urls.networkPath + item.banner!),
-              title: item.title!,
-              extras: {'url': Urls.networkPath + item.audio!},
-            ))
-        .toList();
-    await audioHandler.updateQueue(mediaItems);
+    audioHandler.queue.value.clear();
+    if (mediaItems.isNotEmpty) return;
+    for (var item in allLectures) {
+      int savedPosition = await AudioPlayerController()
+          .getSavedPosition(audioPlayerController.toAudioModel(item));
+      savedPos.add(savedPosition);
+
+      MediaItem mediaItem = MediaItem(
+        id: item.id.toString(),
+        artUri: Uri.parse(Urls.networkPath + item.banner!),
+        title: item.title!,
+        extras: {
+          'url': Urls.networkPath + item.audio!,
+          "saved_position": savedPosition
+        },
+      );
+      mediaItems.add(mediaItem);
+    }
+    log(mediaItems.length.toString(), name: "mediaItems.length");
+
+    //Audio queue нь mediaItems тай адил биш байвал
+    //Queue рүү нэмнэ.
+
+    var firstItem = await audioHandler.queue.first;
+    if (audioHandler.queue.value.isEmpty ||
+        identical(firstItem, mediaItems.first) == true) {
+      await audioHandler.addQueueItems(mediaItems);
+    }
+  }
+
+  onPlayButtonClicked(Products products) {
+    // _initiliazeLecture();
+    widget.onTap(products);
   }
 
   @override
@@ -127,12 +152,13 @@ class _MyCoursesState extends State<MyCourses> {
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
                 AlbumDetailItem(
+                  index: index,
                   isBought: true,
                   audioPlayer: audioPlayer[index],
                   products: allLectures[index],
                   albumName: albumName,
                   productsList: allLectures,
-                  onTap: (lecture) => widget.onTap(lecture),
+                  onTap: (product) => onPlayButtonClicked(product),
                 ),
               ],
             );

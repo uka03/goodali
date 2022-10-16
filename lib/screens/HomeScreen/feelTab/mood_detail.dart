@@ -116,8 +116,6 @@ class _MoodDetailState extends State<MoodDetail> {
 
   initForOthers(String url, int id) async {
     try {
-      print("initForOthers $url");
-
       duration = await audioPlayer.setUrl(url).then((value) {
             setState(() => isLoading = false);
             return value;
