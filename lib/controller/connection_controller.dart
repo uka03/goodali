@@ -20,6 +20,7 @@ import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/models/mood_item.dart';
 import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/models/qpay.dart';
+import 'package:goodali/models/search_model.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/models/video_model.dart';
 import 'package:http/http.dart' as http;
@@ -795,7 +796,7 @@ class Connection {
       final response =
           await Http().getDio(context, headerTypeNone).post(Urls.getBannerList);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data["status"] == 1) {
         return (response.data['data'] as List)
             .map((e) => BannerModel.fromJson(e))
             .toList();
@@ -804,6 +805,26 @@ class Connection {
       }
     } catch (error) {
       developer.log("error banner $error");
+      return [];
+    }
+  }
+
+  static Future<List<SearchModel>> getSearchText(BuildContext context,
+      {String? query}) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypeNone)
+          .post(Urls.search, data: {"value": query});
+
+      if (response.statusCode == 200 && response.data["status"] == 1) {
+        return (response.data['data'] as List)
+            .map((e) => SearchModel.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (error) {
+      developer.log("search error $error");
       return [];
     }
   }

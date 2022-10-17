@@ -5,7 +5,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/course_list_item.dart';
-import 'package:iconly/iconly.dart';
+
 import 'package:provider/provider.dart';
 
 class CourseList extends StatefulWidget {
@@ -43,14 +43,13 @@ class _CourseListState extends State<CourseList> {
 
   Widget courseList() {
     return Consumer<Auth>(builder: (context, value, child) {
-      print("value23 ${value.isAuth}");
       return FutureBuilder(
         future: value.isAuth ? getTrainingDetailLogged() : getTrainingDetail(),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
             List<Products> listItem = snapshot.data;
-            print(listItem.length);
+
             return ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,

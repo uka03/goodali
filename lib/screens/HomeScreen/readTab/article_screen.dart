@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/filter_button.dart';
+import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/article_model.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_detail.dart';
 import 'package:goodali/screens/ListItems/article_item.dart';
 
 class ArticleScreen extends StatefulWidget {
-  final List<ArticleModel> articleModel;
-  const ArticleScreen({Key? key, required this.articleModel}) : super(key: key);
+  final int? id;
+  const ArticleScreen({Key? key, this.id}) : super(key: key);
 
   @override
   State<ArticleScreen> createState() => _ArticleScreenState();
@@ -42,25 +43,58 @@ class _ArticleScreenState extends State<ArticleScreen> {
               ),
             ];
           },
-          body: ListView.separated(
-            itemCount: widget.articleModel.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
-              child: GestureDetector(
-                  onTap: () => Navigator.of(context, rootNavigator: true).push(
-                      MaterialPageRoute(
-                          builder: (context) => ArticleDetail(
-                              articleItem: widget.articleModel[index]))),
-                  child: ArtcileItem(
-                    articleModel: widget.articleModel[index],
-                  )),
-            ),
-            separatorBuilder: (BuildContext context, int index) =>
-                const Divider(
-                    color: MyColors.border1, endIndent: 20, indent: 20),
+          body: FutureBuilder(
+            future: getArticle(),
+            builder: (BuildContext context,
+                AsyncSnapshot<List<ArticleModel>> snapshot) {
+              if (snapshot.hasData) {
+                List<ArticleModel> artcileList = snapshot.data ?? [];
+                List<ArticleModel> searchList = [];
+                if (widget.id != null) {
+                  for (var item in artcileList) {
+                    if (item.id == widget.id) {
+                      searchList.add(item);
+                    }
+                  }
+                }
+
+                return ListView.separated(
+                  itemCount: widget.id != null
+                      ? searchList.length
+                      : artcileList.length,
+                  itemBuilder: (context, index) => Padding(
+                    padding:
+                        const EdgeInsets.only(top: 20.0, left: 20, right: 20),
+                    child: GestureDetector(
+                        onTap: () => Navigator.of(context, rootNavigator: true)
+                            .push(MaterialPageRoute(
+                                builder: (context) => ArticleDetail(
+                                    articleItem: widget.id != null
+                                        ? searchList[index]
+                                        : artcileList[index]))),
+                        child: ArtcileItem(
+                          articleModel: widget.id != null
+                              ? searchList[index]
+                              : artcileList[index],
+                        )),
+                  ),
+                  separatorBuilder: (BuildContext context, int index) =>
+                      const Divider(
+                          color: MyColors.border1, endIndent: 20, indent: 20),
+                );
+              } else {
+                return const Center(
+                    child: CircularProgressIndicator(
+                        color: MyColors.primaryColor));
+              }
+            },
           )),
       floatingActionButton: FilterButton(onPress: () {}),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+
+  Future<List<ArticleModel>> getArticle() {
+    return Connection.getArticle(context);
   }
 }

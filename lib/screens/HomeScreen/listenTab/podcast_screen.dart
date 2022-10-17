@@ -11,7 +11,8 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/unlistened_pod
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 
 class Podcast extends StatefulWidget {
-  const Podcast({Key? key}) : super(key: key);
+  final int? id;
+  const Podcast({Key? key, this.id}) : super(key: key);
 
   @override
   State<Podcast> createState() => _PodcastState();
@@ -78,18 +79,28 @@ class _PodcastState extends State<Podcast> {
                   if (snapshot.hasData &&
                       ConnectionState.done == snapshot.connectionState) {
                     List<Products> podcastList = snapshot.data;
+                    List<Products> searchList = [];
+                    if (widget.id != null) {
+                      for (var item in podcastList) {
+                        if (item.id == widget.id) {
+                          searchList.add(item);
+                        }
+                      }
+                    }
                     return TabBarView(children: [
                       PodcastAll(
                         onTap: (audioObject) {
                           currentlyPlaying.value = audioObject;
                         },
-                        podcastList: podcastList,
+                        podcastList:
+                            widget.id != null ? searchList : podcastList,
                       ),
                       NotListenedPodcast(
                         onTap: (audioObject) {
                           currentlyPlaying.value = audioObject;
                         },
-                        podcastList: podcastList,
+                        podcastList:
+                            widget.id != null ? searchList : podcastList,
                       ),
                       DownloadedPodcast(
                         onTap: (audioObject) {

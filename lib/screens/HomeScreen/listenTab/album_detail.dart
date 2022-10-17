@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
@@ -24,16 +23,20 @@ import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 typedef OnTap = Function(Products products);
 
 class AlbumDetail extends StatefulWidget {
-  final Products albumProduct;
+  final Products? albumProduct;
   final OnTap onTap;
+  final int? id;
 
-  const AlbumDetail({Key? key, required this.albumProduct, required this.onTap})
-      : super(key: key);
+  const AlbumDetail({
+    Key? key,
+    this.albumProduct,
+    required this.onTap,
+    this.id,
+  }) : super(key: key);
 
   @override
   State<AlbumDetail> createState() => _AlbumDetailState();
@@ -47,6 +50,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   late final AudioPlayer introAudioPlayer = AudioPlayer();
   List<int> albumProductsList = [];
   List<Products> lectureList = [];
+  Products albumItem = Products();
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
@@ -113,7 +117,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
   setAlbumIntroAudio() {
     try {
       introAudioPlayer
-          .setUrl(Urls.networkPath + widget.albumProduct.audio!)
+          .setUrl(Urls.networkPath +
+              (widget.albumProduct?.audio ?? albumItem.audio ?? ""))
           .then((value) {
         duration = value ?? Duration.zero;
       });
@@ -181,17 +186,15 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Container(
-                            //     height: imageSize,
-                            //     width: imageSize,
-                            //     color: Colors.indigo[200]),
                             Opacity(
                               opacity: imageOpacity.clamp(0, 1),
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(14),
                                   child: Image.network(
                                     Urls.networkPath +
-                                        (widget.albumProduct.banner ?? ""),
+                                        (widget.albumProduct?.banner ??
+                                            albumItem.banner ??
+                                            ""),
                                     width: imageSize,
                                     height: imageSize,
                                     loadingBuilder: (BuildContext context,
@@ -241,7 +244,9 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       child: Column(children: [
                         SizedBox(height: initialSize + 32),
                         Text(
-                          widget.albumProduct.title ?? "",
+                          widget.albumProduct?.title ??
+                              albumItem.title ??
+                              "" "",
                           style: const TextStyle(
                               fontSize: 20,
                               color: MyColors.black,
@@ -252,12 +257,14 @@ class _AlbumDetailState extends State<AlbumDetail> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 20.0),
                             child: CustomReadMoreText(
-                              text: widget.albumProduct.body ?? "",
+                              text: widget.albumProduct?.body ??
+                                  albumItem.body ??
+                                  "",
                               textAlign: TextAlign.center,
                             )),
                         const SizedBox(height: 20),
                         const Divider(endIndent: 20, indent: 20),
-                        lecture(context, lectureList),
+                        if (widget.id == null) lecture(context, lectureList),
                         const SizedBox(height: 70),
                       ]),
                     ),
@@ -281,12 +288,16 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   for (var item in lectureList) {
                     albumProductsList.add(item.productId!);
                   }
-                  cart.addItemsIndex(widget.albumProduct.productId!,
+                  cart.addItemsIndex(
+                      (widget.albumProduct?.productId ??
+                          widget.albumProduct?.id ??
+                          0),
                       albumProductIDs: albumProductsList);
                   if (!cart.sameItemCheck) {
-                    cart.addProducts(widget.albumProduct);
-                    cart.addTotalPrice(
-                        widget.albumProduct.price?.toDouble() ?? 0.0);
+                    cart.addProducts(widget.albumProduct ?? albumItem);
+                    cart.addTotalPrice(widget.albumProduct?.price?.toDouble() ??
+                        albumItem.price?.toDouble() ??
+                        0.0);
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -325,7 +336,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     ClipRRect(
                         borderRadius: BorderRadius.circular(4),
                         child: ImageView(
-                            imgPath: widget.albumProduct.banner ?? "",
+                            imgPath: widget.albumProduct?.banner ?? "",
                             width: 40,
                             height: 40)),
                     const SizedBox(width: 15),
@@ -364,7 +375,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                             currentIndex = audioPlayer.length + 1;
                           });
                           AudioPlayerModel _audio = AudioPlayerModel(
-                              productID: widget.albumProduct.productId,
+                              productID: widget.albumProduct?.productId,
                               audioPosition: position.inMilliseconds);
                           _audioPlayerProvider.addAudioPosition(_audio);
                           if (isPlaying) {
@@ -431,7 +442,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
                 return AlbumDetailItem(
                   products: product[index],
                   isBought: false,
-                  albumName: widget.albumProduct.title!,
+                  albumName:
+                      widget.albumProduct?.title! ?? albumItem.title ?? "",
                   audioPlayer: audioPlayer[index],
                   productsList: product,
                   index: index,
@@ -466,21 +478,31 @@ class _AlbumDetailState extends State<AlbumDetail> {
               builder: (BuildContext context,
                   void Function(void Function()) setState) {
                 return IntroAudio(
-                    products: widget.albumProduct,
+                    products: widget.albumProduct ?? Products(),
                     productsList: [],
                     audioPlayer: introAudioPlayer);
               },
             ));
   }
 
-  Future<List<Products>> getAlbumLectures() async {
-    return await Connection.getAlbumLectures(
-        context, widget.albumProduct.id.toString());
+  Future<List<Products>> getProducts() {
+    return Connection.getProducts(context, "0");
+  }
+
+  Future<List<Products>> getAlbumLectures() {
+    return Connection.getAlbumLectures(
+        context,
+        widget.id != null
+            ? widget.id.toString()
+            : widget.albumProduct?.id.toString() ?? "0");
   }
 
   Future<List<Products>> getLectureListLogged() async {
     lectureList = await Connection.getLectureListLogged(
-        context, widget.albumProduct.id.toString());
+        context,
+        widget.id != null
+            ? widget.id.toString()
+            : widget.albumProduct?.id.toString() ?? "0");
     _initiliazePodcast(lectureList);
     return lectureList;
   }

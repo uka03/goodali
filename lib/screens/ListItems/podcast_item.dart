@@ -19,7 +19,6 @@ import 'package:provider/provider.dart';
 
 import 'dart:developer' as developer;
 
-import 'package:rxdart/rxdart.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 typedef OnTap = Function(Products audioObject);
@@ -63,31 +62,6 @@ class _PodcastItemState extends State<PodcastItem> {
     }
     super.initState();
   }
-
-  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
-      .map((state) => state.bufferedPosition)
-      .distinct();
-
-  // _initiliazePodcast(Duration duration, int savedDuration) async {
-  //   audioPlayerController.initiliaze();
-
-  //   setState(() {
-  //     _durationState =
-  //         Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
-  //             audioHandler.mediaItem,
-  //             AudioService.position,
-  //             _bufferedPositionStream,
-  //             (mediaItem, position, buffered) =>
-  //                 DurationState(position, buffered, mediaItem?.duration));
-  //   });
-
-  //   mediaItem = MediaItem(
-  //       id: widget.podcastItem.id.toString(),
-  //       title: widget.podcastItem.title ?? "",
-  //       duration: duration,
-  //       artUri: Uri.parse(Urls.networkPath + widget.podcastItem.banner!),
-  //       extras: {"saved_position": savedDuration, 'url': audioUrl});
-  // }
 
   Future<Duration> getTotalDuration() async {
     try {

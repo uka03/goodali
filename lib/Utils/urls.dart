@@ -38,4 +38,5 @@ class Urls {
   static final getSimilarPost = "$host/similar_post";
   static final getSimilarVideo = "$host/similar_video";
   static final getBannerList = "$host/banner_list";
+  static final search = "$host/search_text";
 }
