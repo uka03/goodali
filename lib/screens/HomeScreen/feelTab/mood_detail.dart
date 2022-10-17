@@ -26,7 +26,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MoodDetail extends StatefulWidget {
   final String moodListId;
-  const MoodDetail({Key? key, required this.moodListId}) : super(key: key);
+  final String? id;
+  const MoodDetail({Key? key, required this.moodListId, this.id})
+      : super(key: key);
 
   @override
   State<MoodDetail> createState() => _MoodDetailState();
@@ -41,11 +43,9 @@ class _MoodDetailState extends State<MoodDetail> {
   Stream<DurationState>? _durationState;
   List<MoodItem> moodItem = [];
   AudioPlayer audioPlayer = AudioPlayer();
-  PlayerState? playerState;
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
-  Duration savedPosition = Duration.zero;
   int saveddouble = 0;
 
   double _current = 0;
@@ -54,7 +54,6 @@ class _MoodDetailState extends State<MoodDetail> {
 
   String url = "";
   String imgUrl = "";
-  String manuFacturer = "";
 
   Widget rightButton = const Text(
     "Дараах",
@@ -108,8 +107,6 @@ class _MoodDetailState extends State<MoodDetail> {
 
   initForOthers(String url, int id) async {
     try {
-      print("initForOthers $url");
-
       duration = await audioPlayer.setUrl(url).then((value) {
             setState(() => isLoading = false);
             return value;
@@ -221,8 +218,6 @@ class _MoodDetailState extends State<MoodDetail> {
                         controller: _pageController,
                         itemCount: moodItem.length,
                         onPageChanged: (int page) {
-                          print(page);
-                          print(moodItem.length);
                           if (url != "") {
                             initForOthers(
                                 url, moodItem[_current.toInt() + 1].id ?? 0);
@@ -521,7 +516,8 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   Future<List<MoodItem>> getMoodList() async {
-    moodItem = await Connection.getMoodItem(context, widget.moodListId);
+    moodItem = await Connection.getMoodItem(
+        context, widget.id != null ? widget.id! : widget.moodListId);
     setState(() {
       moodItem = moodItem;
     });

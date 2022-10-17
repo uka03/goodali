@@ -1,5 +1,6 @@
-import 'dart:convert';
+import 'dart:developer';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
@@ -13,6 +14,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
@@ -21,7 +23,6 @@ import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 typedef OnTap = Function(Products products);
 
@@ -29,8 +30,11 @@ class AlbumDetail extends StatefulWidget {
   final Products albumProduct;
   final OnTap onTap;
 
-  const AlbumDetail({Key? key, required this.albumProduct, required this.onTap})
-      : super(key: key);
+  const AlbumDetail({
+    Key? key,
+    required this.albumProduct,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   State<AlbumDetail> createState() => _AlbumDetailState();
@@ -61,9 +65,14 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
   int saveddouble = 0;
 
+  List<MediaItem> mediaItems = [];
+  List<int> savedPos = [];
+
   @override
   void initState() {
     super.initState();
+    bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
+    if (isAuth) getLectureListLogged();
     imageSize = initialSize;
 
     _controller = ScrollController()
@@ -105,24 +114,46 @@ class _AlbumDetailState extends State<AlbumDetail> {
   setAlbumIntroAudio() {
     try {
       introAudioPlayer
-          .setUrl(Urls.networkPath + widget.albumProduct.audio!)
+          .setUrl(Urls.networkPath + (widget.albumProduct.audio ?? ""))
           .then((value) {
         duration = value ?? Duration.zero;
-        // audioPlayerController
-        //     .getSavedPosition(widget.albumProduct.productId!)
-        //     .then((value) {
-        //   if (value != 0) {
-        //     savedPosition = value;
-        //     position = Duration(milliseconds: savedPosition);
-        //     duration = duration - position;
-        //     introAudioPlayer.setUrl(
-        //         Urls.networkPath + widget.albumProduct.audio!,
-        //         initialPosition: position);
-        //   } else {}
-        // });
       });
     } catch (e) {
       debugPrint(e.toString());
+    }
+  }
+
+  _initiliazePodcast(List<Products> lectureList) async {
+    log("initiliaze album lecture");
+    audioPlayerController.initiliaze();
+    audioHandler.queue.value.clear();
+
+    log(lectureList.length.toString(), name: "lesture list");
+    for (var item in lectureList) {
+      int savedPosition = await AudioPlayerController()
+          .getSavedPosition(audioPlayerController.toAudioModel(item));
+      savedPos.add(savedPosition);
+
+      MediaItem mediaItem = MediaItem(
+        id: item.id.toString(),
+        artUri: Uri.parse(Urls.networkPath + item.banner!),
+        title: item.title!,
+        extras: {
+          'url': Urls.networkPath + item.audio!,
+          "saved_position": savedPosition
+        },
+      );
+      mediaItems.add(mediaItem);
+    }
+
+    //Audio queue нь mediaItems тай адил биш байвал
+    //Queue рүү нэмнэ.
+
+    var firstItem = await audioHandler.queue.first;
+    if (audioHandler.queue.value.isEmpty ||
+        identical(firstItem, mediaItems.first) == true) {
+      log("initiliaze add queue lecture", name: mediaItems.length.toString());
+      await audioHandler.addQueueItems(mediaItems);
     }
   }
 
@@ -131,11 +162,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
     final cart = Provider.of<CartProvider>(context);
     return WillPopScope(
       onWillPop: () async {
-        print("onwiilppaoop");
-        // AudioPlayerModel _audio = AudioPlayerModel(
-        //     productID: widget.products.productId,
-        //     audioPosition: position.inMilliseconds);
-        // _audioPlayerProvider.addAudioPosition(_audio);
         return true;
       },
       child: Scaffold(
@@ -156,10 +182,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Container(
-                            //     height: imageSize,
-                            //     width: imageSize,
-                            //     color: Colors.indigo[200]),
                             Opacity(
                               opacity: imageOpacity.clamp(0, 1),
                               child: ClipRRect(
@@ -216,7 +238,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       child: Column(children: [
                         SizedBox(height: initialSize + 32),
                         Text(
-                          widget.albumProduct.title ?? "",
+                          widget.albumProduct.title ?? "" "",
                           style: const TextStyle(
                               fontSize: 20,
                               color: MyColors.black,
@@ -256,7 +278,10 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   for (var item in lectureList) {
                     albumProductsList.add(item.productId!);
                   }
-                  cart.addItemsIndex(widget.albumProduct.productId!,
+                  cart.addItemsIndex(
+                      (widget.albumProduct.productId ??
+                          widget.albumProduct.id ??
+                          0),
                       albumProductIDs: albumProductsList);
                   if (!cart.sameItemCheck) {
                     cart.addProducts(widget.albumProduct);
@@ -357,39 +382,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         ),
                       ),
                     ),
-                    // if (isClicked || savedPosition != Duration.zero)
-                    //   Row(
-                    //     children: [
-                    //       const SizedBox(width: 14),
-                    //       SizedBox(
-                    //         width: 90,
-                    //         child: SfLinearGauge(
-                    //           minimum: 0,
-                    //           maximum: duration.inSeconds.toDouble() / 10,
-                    //           showLabels: false,
-                    //           showAxisTrack: false,
-                    //           showTicks: false,
-                    //           ranges: [
-                    //             LinearGaugeRange(
-                    //               position: LinearElementPosition.inside,
-                    //               edgeStyle: LinearEdgeStyle.bothCurve,
-                    //               startValue: 0,
-                    //               color: MyColors.border1,
-                    //               endValue: duration.inSeconds.toDouble() / 10,
-                    //             ),
-                    //           ],
-                    //           barPointers: [
-                    //             LinearBarPointer(
-                    //                 position: LinearElementPosition.inside,
-                    //                 edgeStyle: LinearEdgeStyle.bothCurve,
-                    //                 color: MyColors.primaryColor,
-                    //                 // color: MyColors.border1,
-                    //                 value: position.inSeconds.toDouble() / 10)
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
                     const SizedBox(width: 10),
                     Text(formatTime(duration - position) + "мин",
                         style: const TextStyle(
@@ -439,9 +431,10 @@ class _AlbumDetailState extends State<AlbumDetail> {
                 return AlbumDetailItem(
                   products: product[index],
                   isBought: false,
-                  albumName: widget.albumProduct.title!,
+                  albumName: widget.albumProduct.title ?? "",
                   audioPlayer: audioPlayer[index],
                   productsList: product,
+                  index: index,
                   albumProducts: widget.albumProduct,
                   onTap: (lecture) => widget.onTap(lecture),
                 );
@@ -480,13 +473,15 @@ class _AlbumDetailState extends State<AlbumDetail> {
             ));
   }
 
-  Future<List<Products>> getAlbumLectures() async {
-    return await Connection.getAlbumLectures(
+  Future<List<Products>> getAlbumLectures() {
+    return Connection.getAlbumLectures(
         context, widget.albumProduct.id.toString());
   }
 
   Future<List<Products>> getLectureListLogged() async {
-    return await Connection.getLectureListLogged(
+    lectureList = await Connection.getLectureListLogged(
         context, widget.albumProduct.id.toString());
+    _initiliazePodcast(lectureList);
+    return lectureList;
   }
 }

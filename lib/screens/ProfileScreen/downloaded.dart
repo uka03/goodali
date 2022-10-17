@@ -34,6 +34,7 @@ class _DownloadedState extends State<Downloaded> {
                 itemCount: value.items.length,
                 itemBuilder: (context, index) {
                   return AlbumDetailItem(
+                    index: index,
                     products: value.downloadedItem[index],
                     audioPlayer: AudioPlayer(),
                     albumName: value.downloadedItem[index].albumTitle ?? "",

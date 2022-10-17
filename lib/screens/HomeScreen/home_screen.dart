@@ -1,9 +1,18 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
+import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/models/banner_model.dart';
+import 'package:goodali/models/products_model.dart';
+import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
@@ -19,13 +28,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final CarouselController _controller = CarouselController();
+  List<BannerModel> bannerList = [];
   int _current = 0;
 
-  List colorList = [
-    MyColors.primaryColor,
-    MyColors.secondary,
-    MyColors.border1
-  ];
+  @override
+  void initState() {
+    getBannerList();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,25 +91,46 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  late List<Widget> imageSliders = colorList
-      .map((item) => Container(
-            width: MediaQuery.of(context).size.width,
-            color: item,
-            child: const Center(
-                child: Text(
-              "Banner Here",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
-            )),
-          ))
-      .toList();
-
   Widget banner() {
     return Stack(alignment: Alignment.bottomCenter, children: [
       CarouselSlider(
-        items: imageSliders,
+        items: bannerList
+            .map((item) => GestureDetector(
+                  onTap: () {
+                    switch (item.productType) {
+                      case 0:
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) =>
+                                    AlbumLecture(productID: item.productID)));
+                        break;
+                      case 1:
+                        // Navigator.push(context, MaterialPageRoute(builder: (_) => const ()));
+                        break;
+                      case 2:
+                        // Navigator.push(context, MaterialPageRoute(builder: (_) => const Cours()));
+                        break;
+                      case 3:
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AlbumLecture()));
+                        break;
+                      case 4:
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AlbumLecture()));
+                        break;
+                      default:
+                    }
+                  },
+                  child: ImageView(
+                      imgPath: item.banner!,
+                      width: MediaQuery.of(context).size.width),
+                ))
+            .toList(),
         carouselController: _controller,
         options: CarouselOptions(
           aspectRatio: 2.3,
@@ -113,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: colorList.asMap().entries.map((entry) {
+        children: bannerList.asMap().entries.map((entry) {
           return GestureDetector(
             onTap: () => _controller.animateToPage(entry.key),
             child: Container(
@@ -130,5 +161,13 @@ class _HomeScreenState extends State<HomeScreen> {
         }).toList(),
       ),
     ]);
+  }
+
+  Future getBannerList() async {
+    bannerList = await Connection.getBannerList(context);
+    setState(() {
+      bannerList = bannerList;
+    });
+    return bannerList;
   }
 }

@@ -26,7 +26,6 @@ typedef OnTap = Function(Products audioObject);
 
 class PodcastItem extends StatefulWidget {
   final Products podcastItem;
-
   final List<Products> podcastList;
   final OnTap onTap;
   final int index;

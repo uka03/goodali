@@ -57,8 +57,7 @@ class _ReadTabbarState extends State<ReadTabbar>
                               onPressed: () {
                                 Navigator.of(context, rootNavigator: true).push(
                                     MaterialPageRoute(
-                                        builder: (_) => ArticleScreen(
-                                            articleModel: articleList)));
+                                        builder: (_) => const ArticleScreen()));
                               },
                               icon: const Icon(IconlyLight.arrow_right))
                         ],

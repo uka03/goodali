@@ -13,7 +13,8 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_ta
 import 'package:goodali/services/podcast_service.dart';
 
 class Podcast extends StatefulWidget {
-  const Podcast({Key? key}) : super(key: key);
+  final int? id;
+  const Podcast({Key? key, this.id}) : super(key: key);
 
   @override
   State<Podcast> createState() => _PodcastState();

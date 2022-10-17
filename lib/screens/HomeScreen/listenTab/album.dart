@@ -7,7 +7,11 @@ import 'package:goodali/screens/ListItems/album_item.dart';
 import 'package:provider/provider.dart';
 
 class AlbumLecture extends StatefulWidget {
-  const AlbumLecture({Key? key}) : super(key: key);
+  final int? id;
+  final int? productType;
+  final int? productID;
+  const AlbumLecture({Key? key, this.id, this.productType, this.productID})
+      : super(key: key);
 
   @override
   State<AlbumLecture> createState() => _AlbumLectureState();
@@ -59,7 +63,25 @@ class _AlbumLectureState extends State<AlbumLecture> {
                       if (snapshot.connectionState == ConnectionState.done &&
                           snapshot.hasData) {
                         List<Products> albumList = snapshot.data;
-                        return albumLecture(context, albumList);
+                        List<Products> searchResult = [];
+                        List<Products> banner = [];
+                        if (widget.id != null) {
+                          for (var item in albumList) {
+                            if (widget.id == item.id) {
+                              searchResult.add(item);
+                            }
+                            if (widget.productID == item.id) {
+                              banner.add(item);
+                            }
+                          }
+                        }
+                        return albumLecture(
+                            context,
+                            widget.productID != null
+                                ? banner
+                                : widget.id != null
+                                    ? searchResult
+                                    : albumList);
                       } else {
                         return const Center(
                             child: CircularProgressIndicator(

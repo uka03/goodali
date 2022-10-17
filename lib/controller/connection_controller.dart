@@ -8,6 +8,7 @@ import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/article_model.dart';
+import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/models/course_lessons_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/courses_item.dart';
@@ -19,6 +20,7 @@ import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/models/mood_item.dart';
 import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/models/qpay.dart';
+import 'package:goodali/models/search_model.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/models/video_model.dart';
 import 'package:http/http.dart' as http;
@@ -541,7 +543,6 @@ class Connection {
   static Future<List<CourseLessonsTasksModel>> getCoursesTasks(
       BuildContext context, String id) async {
     try {
-      print("idididi $id");
       final response = await Http()
           .getDio(context, headerTypebearer)
           .get(Urls.getCoursesTasks + id);
@@ -786,6 +787,44 @@ class Connection {
       }
     } catch (error) {
       developer.log("error video list $error");
+      return [];
+    }
+  }
+
+  static Future<List<BannerModel>> getBannerList(BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypeNone).post(Urls.getBannerList);
+
+      if (response.statusCode == 200 && response.data["status"] == 1) {
+        return (response.data['data'] as List)
+            .map((e) => BannerModel.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (error) {
+      developer.log("error banner $error");
+      return [];
+    }
+  }
+
+  static Future<List<SearchModel>> getSearchText(BuildContext context,
+      {String? query}) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypeNone)
+          .post(Urls.search, data: {"value": query});
+
+      if (response.statusCode == 200 && response.data["status"] == 1) {
+        return (response.data['data'] as List)
+            .map((e) => SearchModel.fromJson(e))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (error) {
+      developer.log("search error $error");
       return [];
     }
   }

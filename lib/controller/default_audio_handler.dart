@@ -142,6 +142,16 @@ class AudioPlayerHandler extends BaseAudioHandler
       queueIndex: event.currentIndex,
     ));
   }
+
+  @override
+  Future<void> playMediaItem(MediaItem item) async {
+    mediaItem.add(item);
+    if (item.extras!['saved_position'] > 0) {
+      _player.seek(Duration(seconds: item.extras!['saved_position']));
+
+      _player.setUrl(item.extras!['url']);
+    }
+  }
 }
 
 // import 'package:audio_service/audio_service.dart';
@@ -312,7 +322,6 @@ class AudioPlayerHandler extends BaseAudioHandler
 //   Future<void> addQueueItem(MediaItem mediaItem) async {
 //     await _playlist.add(_itemToSource(mediaItem));
 //   }
-
 
 //   @override
 //   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
