@@ -65,6 +65,7 @@ dependencies:
   youtube_player_flutter: ^8.0.0
   async: ^2.8.2
   ffmpeg_kit_flutter: ^5.1.0
+  sembast: ^3.1.2
 
 dev_dependencies:
   flutter_test:

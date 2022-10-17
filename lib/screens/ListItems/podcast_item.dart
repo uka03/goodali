@@ -1,4 +1,5 @@
-import 'package:audio_service/audio_service.dart';
+import 'dart:developer';
+
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
@@ -12,14 +13,14 @@ import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:goodali/services/podcast_service.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 import 'dart:developer' as developer;
-
-import 'package:rxdart/rxdart.dart';
 
 typedef OnTap = Function(Products audioObject);
 
@@ -29,6 +30,7 @@ class PodcastItem extends StatefulWidget {
   final List<Products> podcastList;
   final OnTap onTap;
   final int index;
+  final PodcastService service;
 
   const PodcastItem({
     Key? key,
@@ -36,6 +38,7 @@ class PodcastItem extends StatefulWidget {
     required this.podcastList,
     required this.index,
     required this.onTap,
+    required this.service,
   }) : super(key: key);
 
   @override
@@ -45,13 +48,12 @@ class PodcastItem extends StatefulWidget {
 class _PodcastItemState extends State<PodcastItem> {
   AudioPlayerController audioPlayerController = AudioPlayerController();
   AudioPlayer audioPlayer = AudioPlayer();
-
   String audioUrl = '';
   Duration duration = Duration.zero;
-  int savedDuration = 0;
   bool isLoading = true;
-  bool isClicked = false;
   var _totalduration = Duration.zero;
+  var progressMax = Duration.zero;
+  var savedDuration = 0;
   @override
   void initState() {
     if (widget.podcastItem.audio != "Audio failed to upload") {
@@ -64,37 +66,48 @@ class _PodcastItemState extends State<PodcastItem> {
     super.initState();
   }
 
-  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
-      .map((state) => state.bufferedPosition)
-      .distinct();
-  Stream<Duration?> get _durationStream =>
-      audioHandler.mediaItem.map((item) => item?.duration).distinct();
-  Stream<DurationState> get _positionDataStream =>
-      Rx.combineLatest3<Duration, Duration, Duration?, DurationState>(
-          AudioService.position,
-          _bufferedPositionStream,
-          _durationStream,
-          (position, bufferedPosition, duration) => DurationState(
-              position, bufferedPosition, duration ?? Duration.zero));
+  Future<Products?> updateSavedPosition(PodcastService service) async {
+    var item = currentlyPlaying.value;
 
-  Future<Duration> getTotalDuration() async {
-    try {
-      if (_totalduration == Duration.zero) {
-        _totalduration = await getFileDuration(audioUrl);
+    if (item != null) {
+      if (item.title == widget.podcastItem.title) {
+        setState(() {
+          savedDuration = durationStateNotifier.value.progress!.inMilliseconds;
+        });
       }
+      item.position = durationStateNotifier.value.progress!.inMilliseconds;
+      log('${item.position}');
+      return await service.saveEpisode(item);
+    }
+
+    return null;
+  }
+
+  getTotalDuration() async {
+    try {
+      if (widget.podcastItem.duration == null ||
+          widget.podcastItem.duration == 0) {
+        _totalduration = await getFileDuration(audioUrl);
+      } else {
+        _totalduration = Duration(milliseconds: widget.podcastItem.duration!);
+      }
+
+      if (savedDuration == 0) {
+        savedDuration = widget.podcastItem.position!;
+      }
+      progressMax = _totalduration;
+
+      if (widget.podcastItem.position != null) {
+        _totalduration = _totalduration - Duration(milliseconds: savedDuration);
+      }
+
       if (mounted) {
         setState(() {
-          duration = _totalduration;
           isLoading = false;
         });
       }
-      savedDuration = await audioPlayerController.getSavedPosition(
-          audioPlayerController.toAudioModel(widget.podcastItem));
-      duration = duration - Duration(milliseconds: savedDuration);
-      return duration;
     } catch (e) {
       developer.log(e.toString(), name: "totalDuration error");
-      return Duration.zero;
     }
   }
 
@@ -102,7 +115,8 @@ class _PodcastItemState extends State<PodcastItem> {
     final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
     final mediaInfo = mediaInfoSession.getMediaInformation()!;
     final double duration = double.parse(mediaInfo.getDuration()!);
-    print(duration);
+    widget.podcastItem.duration = (duration * 1000).toInt();
+    await widget.service.saveEpisode(widget.podcastItem);
     return Duration(milliseconds: (duration * 1000).toInt());
   }
 
@@ -148,64 +162,85 @@ class _PodcastItemState extends State<PodcastItem> {
           ],
         ),
         const SizedBox(height: 14),
-        Row(
-          children: [
-            AudioPlayerButton(
-              onPlay: () async {
-                if (isClicked == true) return;
-                await audioHandler.skipToQueueItem(widget.index);
-                await audioHandler.play();
+        ValueListenableBuilder(
+            valueListenable: durationStateNotifier,
+            builder: (context, DurationState value, child) {
+              var buttonState = buttonNotifier.value;
+              var currently = currentlyPlaying.value;
+              bool isPlaying = currently?.title == widget.podcastItem.title &&
+                      buttonState == ButtonState.playing
+                  ? true
+                  : false;
 
-                setState(() {
-                  isClicked = true;
-                });
+              return Row(
+                children: [
+                  AudioPlayerButton(
+                    onPlay: () async {
+                      await updateSavedPosition(widget.service);
 
-                podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
-                if (!podcastProvider.sameItemCheck) {
-                  podcastProvider.addListenedPodcast(
-                      widget.podcastItem, widget.podcastList);
-                }
-                widget.onTap(widget.podcastItem);
-              },
-              onPause: () {
-                widget.onTap(widget.podcastItem);
-                audioHandler.pause().then((value) =>
-                    podcastProvider.unListenedPodcastFun(
-                        widget.podcastItem, widget.podcastList));
-              },
-              title: widget.podcastItem.title ?? "",
-            ),
-            const SizedBox(width: 10),
-            isLoading
-                ? const SizedBox(
-                    width: 30,
-                    child: LinearProgressIndicator(
-                        backgroundColor: Colors.transparent,
-                        minHeight: 2,
-                        color: MyColors.black))
-                : Row(
-                    children: [
-                      (savedDuration > 0 || isClicked)
-                          ? AudioProgressBar(totalDuration: duration)
-                          : Container(),
-                      const SizedBox(width: 10),
-                      AudioplayerTimer(
-                          title: widget.podcastItem.title ?? "",
-                          totalDuration: duration),
-                    ],
+                      currentlyPlaying.value = widget.podcastItem;
+                      await audioHandler.skipToQueueItem(widget.index);
+                      log("${widget.podcastItem.title} : start in : ${savedDuration}");
+                      await audioHandler.seek(
+                        Duration(milliseconds: savedDuration),
+                      );
+                      await audioHandler.play();
+
+                      podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
+                      if (!podcastProvider.sameItemCheck) {
+                        podcastProvider.addListenedPodcast(
+                            widget.podcastItem, widget.podcastList);
+                      }
+                      await widget.onTap(widget.podcastItem);
+                    },
+                    onPause: () async {
+                      await updateSavedPosition(widget.service);
+                      audioHandler.pause();
+
+                      // audioHandler.pause().then((value) =>
+                      //     podcastProvider.unListenedPodcastFun(
+                      //         widget.podcastItem, widget.podcastList));
+                    },
+                    title: widget.podcastItem.title ?? "",
                   ),
-            const Spacer(),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(IconlyLight.arrow_down, color: MyColors.gray),
-              splashRadius: 1,
-            ),
-            IconButton(
-                splashRadius: 20,
-                onPressed: () {},
-                icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
-          ],
-        ),
+                  const SizedBox(width: 10),
+                  isLoading
+                      ? const SizedBox(
+                          width: 30,
+                          child: LinearProgressIndicator(
+                              backgroundColor: Colors.transparent,
+                              minHeight: 2,
+                              color: MyColors.black))
+                      : Row(
+                          children: [
+                            (savedDuration > 0 || isPlaying)
+                                ? AudioProgressBar(
+                                    totalDuration: progressMax,
+                                    title: widget.podcastItem.title ?? "",
+                                    savedPostion:
+                                        Duration(milliseconds: savedDuration),
+                                  )
+                                : Container(),
+                            const SizedBox(width: 10),
+                            AudioplayerTimer(
+                                title: widget.podcastItem.title ?? "",
+                                totalDuration: _totalduration),
+                          ],
+                        ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(IconlyLight.arrow_down,
+                        color: MyColors.gray),
+                    splashRadius: 1,
+                  ),
+                  IconButton(
+                      splashRadius: 20,
+                      onPressed: () {},
+                      icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
+                ],
+              );
+            }),
         const SizedBox(height: 12)
       ],
     );

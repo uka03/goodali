@@ -1,14 +1,16 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/controller/podcast_state.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:goodali/repository.dart/sembast_repository.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/unlistened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
+import 'package:goodali/services/podcast_service.dart';
 
 class Podcast extends StatefulWidget {
   const Podcast({Key? key}) : super(key: key);
@@ -18,8 +20,8 @@ class Podcast extends StatefulWidget {
 }
 
 class _PodcastState extends State<Podcast> {
+  PodcastService service = PodcastService(repository: SembastRepository());
   late final future = getPodcastList();
-
   @override
   void initState() {
     super.initState();
@@ -72,34 +74,25 @@ class _PodcastState extends State<Podcast> {
                       )))
                 ];
               },
-              body: FutureBuilder(
-                future: future,
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.hasData &&
-                      ConnectionState.done == snapshot.connectionState) {
-                    List<Products> podcastList = snapshot.data;
+              body: ValueListenableBuilder<PodcastState>(
+                valueListenable: podcastsNotifier,
+                builder: (context, snapshot, _) {
+                  if (snapshot.fetched) {
+                    List<Products> podcastList = snapshot.products;
                     return TabBarView(children: [
                       PodcastAll(
-                        onTap: (audioObject) {
-                          currentlyPlaying.value = audioObject;
-                        },
+                        service: service,
                         podcastList: podcastList,
                       ),
                       NotListenedPodcast(
-                        onTap: (audioObject) {
-                          currentlyPlaying.value = audioObject;
-                        },
                         podcastList: podcastList,
+                        service: service,
                       ),
                       DownloadedPodcast(
-                        onTap: (audioObject) {
-                          currentlyPlaying.value = audioObject;
-                        },
+                        service: service,
                       ),
                       ListenedPodcast(
-                        onTap: (audioObject) {
-                          currentlyPlaying.value = audioObject;
-                        },
+                        service: service,
                       )
                     ]);
                   } else {
@@ -113,7 +106,15 @@ class _PodcastState extends State<Podcast> {
     );
   }
 
-  Future<List<Products>> getPodcastList() {
-    return Connection.getPodcastList(context);
+  Future<void> getPodcastList() async {
+    await Connection.getPodcastList(context)
+        .then((value) => () {
+              for (var item in value) {
+                service.saveEpisode(item);
+              }
+            })
+        .onError((error, stackTrace) => () {});
+    var data = await service.loadEpisodes();
+    podcastsNotifier.value = PodcastState(data, true);
   }
 }

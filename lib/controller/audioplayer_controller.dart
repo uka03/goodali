@@ -12,10 +12,15 @@ import 'package:goodali/controller/audio_session.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 
 import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/controller/podcast_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/controller/progress_notifier.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:goodali/repository.dart/sembast_repository.dart';
+import 'package:goodali/services/podcast_service.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final currentlyPlaying = ValueNotifier<Products?>(null);
@@ -27,6 +32,13 @@ final currentPlayingItem =
 final durationStateNotifier = ValueNotifier<DurationState>(
     const DurationState(Duration.zero, Duration.zero, Duration.zero));
 final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
+final progressNotifier = ValueNotifier<ProgressBarState>(const ProgressBarState(
+  current: Duration.zero,
+  total: Duration.zero,
+  buffered: Duration.zero,
+));
+final podcastsNotifier =
+    ValueNotifier<PodcastState>(const PodcastState([], false));
 
 class AudioPlayerController with ChangeNotifier {
   AudioPlayer audioPlayer = AudioPlayer();
@@ -48,8 +60,27 @@ class AudioPlayerController with ChangeNotifier {
   _listenToPlaybackState() {
     audioHandler.playbackState.listen((event) {
       final isPlaying = event.playing;
+
       final processingState = event.processingState;
-      if (processingState == AudioProcessingState.loading ||
+      // log('state $processingState : playing: $isPlaying');
+      // if (currentlyPlaying.value != null) {
+      //   log('${currentlyPlaying.value!.title}');
+      // }
+
+      if ((processingState == AudioProcessingState.idle ||
+              processingState == AudioProcessingState.error) &&
+          !isPlaying) {
+        var item = currentlyPlaying.value;
+        if (item != null) {
+          item.position = durationStateNotifier.value.progress!.inMilliseconds;
+          PodcastService service =
+              PodcastService(repository: SembastRepository());
+          service.saveEpisode(item);
+        }
+      }
+      if (processingState == AudioProcessingState.ready && isPlaying == true) {
+        buttonNotifier.value = ButtonState.playing;
+      } else if (processingState == AudioProcessingState.loading ||
           processingState == AudioProcessingState.buffering) {
         buttonNotifier.value = ButtonState.loading;
       } else if (!isPlaying) {
@@ -94,16 +125,6 @@ class AudioPlayerController with ChangeNotifier {
         oldState.buffered,
         mediaItem?.duration ?? Duration.zero,
       );
-
-      // if (buttonNotifier.value == ButtonState.paused) {
-      //   AudioPlayerModel _audio = AudioPlayerModel(
-      //       productID: int.parse(mediaItem?.id ?? "0"),
-      //       audioPosition: oldState.progress?.inSeconds,
-      //       audioUrl: mediaItem?.extras?['audioUrl'],
-      //       banner: mediaItem?.artUri?.path,
-      //       title: mediaItem?.title);
-      //   AudioPlayerController().savePosition(_audio);
-      // }
     });
   }
 

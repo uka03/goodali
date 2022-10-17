@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
+import 'package:goodali/services/podcast_service.dart';
 import 'package:provider/provider.dart';
 
 typedef OnTap = Function(Products audioObject);
 
 class NotListenedPodcast extends StatefulWidget {
-  final OnTap onTap;
   final List<Products> podcastList;
+  final PodcastService service;
   const NotListenedPodcast(
-      {Key? key, required this.onTap, required this.podcastList})
+      {Key? key, required this.podcastList, required this.service})
       : super(key: key);
 
   @override
@@ -36,7 +37,8 @@ class _NotListenedPodcastState extends State<NotListenedPodcast>
                   index: index,
                   podcastItem: value.unListenedPodcast[index],
                   podcastList: value.unListenedPodcast,
-                  onTap: (product) => widget.onTap(product),
+                  onTap: (product) => () {},
+                  service: widget.service,
                 ),
               );
             },
@@ -53,7 +55,8 @@ class _NotListenedPodcastState extends State<NotListenedPodcast>
                   index: index,
                   podcastItem: widget.podcastList[index],
                   podcastList: widget.podcastList,
-                  onTap: (product) => widget.onTap(product),
+                  onTap: (product) => () {},
+                  service: widget.service,
                 ),
               );
             },

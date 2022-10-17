@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -19,19 +21,20 @@ class AudioPlayerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: currentlyPlaying,
-      builder: (BuildContext context, Products? value, Widget? child) {
-        var buttonState = buttonNotifier.value;
-        var currentTitle = value?.title ?? value?.lectureTitle ?? "";
+      valueListenable: buttonNotifier,
+      builder: (BuildContext context, ButtonState? buttonValue, Widget? child) {
+        Products? currentlyPlay = currentlyPlaying.value;
+        var currentTitle =
+            currentlyPlay?.title ?? currentlyPlay?.lectureTitle ?? "";
         bool isPlaying =
-            currentTitle == title && buttonState == ButtonState.playing
+            currentTitle == title && buttonValue == ButtonState.playing
                 ? true
                 : false;
         bool isBuffering =
-            currentTitle == title && buttonState == ButtonState.loading
+            currentTitle == title && buttonValue == ButtonState.loading
                 ? true
                 : false;
-        print("isBuffering $isBuffering");
+
         if (isBuffering) {
           return const CircleAvatar(
               backgroundColor: MyColors.input,
@@ -54,7 +57,7 @@ class AudioPlayerButton extends StatelessWidget {
                   ),
                   onPressed: () {
                     if (currentTitle == title &&
-                        buttonState == ButtonState.paused) {
+                        buttonValue == ButtonState.paused) {
                       audioHandler.play();
                     } else {
                       onPlay();

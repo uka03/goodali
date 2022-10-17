@@ -113,10 +113,10 @@ class _PlayAudioState extends State<PlayAudio> {
         valueNotifier: playerExpandProgress,
         minHeight: playerMinHeight,
         maxHeight: playerMaxHeight,
-        onDismiss: () {
-          currentlyPlaying.value = null;
-          audioHandler.stop();
+        onDismiss: () async {
+          await audioHandler.stop();
           audioHandler.customAction("dispose");
+          currentlyPlaying.value = null;
         },
         controller: controller,
         elevation: 4,
@@ -380,9 +380,9 @@ class _PlayAudioState extends State<PlayAudio> {
                       ),
                       IconButton(
                           icon: const Icon(Icons.close),
-                          onPressed: () {
+                          onPressed: () async {
+                            await audioHandler.stop();
                             currentlyPlaying.value = null;
-                            audioHandler.stop();
                           }),
                     ],
                   ),

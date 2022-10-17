@@ -17,7 +17,10 @@ class Products {
   String? albumTitle;
   String? lectureTitle;
   bool? isBought;
+  bool? played;
   int? audioCount;
+  int? position;
+  int? duration;
   String? trainingBanner;
 
   Products(
@@ -57,6 +60,9 @@ class Products {
     isBought = json['is_bought'] ?? false;
     audioCount = json['audio_count'] ?? 0;
     trainingBanner = json['t_banner'] ?? "";
+    duration = json['duration'] ?? 0;
+    position = json['position'] ?? 0;
+    played = json['played'] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -78,7 +84,9 @@ class Products {
     data['is_bought'] = isBought;
     data["audio_count"] = audioCount;
     data['t_banner'] = trainingBanner;
-
+    data['duration'] = duration;
+    data['position'] = position;
+    data['played'] = played;
     return data;
   }
 
@@ -88,6 +96,8 @@ class Products {
         artUri: Uri.parse(Urls.networkPath + (audio ?? "")),
         extras: <String, dynamic>{
           'url': Urls.networkPath + (audio ?? ""),
+          'position': position ?? 0,
+          'duration': duration ?? 0,
         },
       );
 }

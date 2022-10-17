@@ -1,27 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/controller/audio_session.dart';
-import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
-import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
-import 'package:just_audio_cache/just_audio_cache.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:goodali/models/mood_item.dart';
 
 import 'package:iconly/iconly.dart';

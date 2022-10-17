@@ -1,16 +1,17 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/controller/podcast_state.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:goodali/repository.dart/sembast_repository.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
+import 'package:goodali/services/podcast_service.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
@@ -25,11 +26,12 @@ class _ListenTabbarState extends State<ListenTabbar>
     with AutomaticKeepAliveClientMixin<ListenTabbar> {
   @override
   bool get wantKeepAlive => true;
-  List<Products> popdcastList = [];
   bool isLoading = false;
+  PodcastService service = PodcastService(repository: SembastRepository());
   @override
   void initState() {
     super.initState();
+    getPodcastList();
   }
 
   @override
@@ -83,18 +85,14 @@ class _ListenTabbarState extends State<ListenTabbar>
                     icon: const Icon(IconlyLight.arrow_right))
               ],
             )),
-        FutureBuilder(
-          future: getPodcastList(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData &&
-                ConnectionState.done == snapshot.connectionState) {
-              List<Products> podcastList = snapshot.data;
+        ValueListenableBuilder<PodcastState>(
+          valueListenable: podcastsNotifier,
+          builder: (context, snapshot, _) {
+            if (snapshot.fetched) {
               return PodcastAll(
                 isHomeScreen: true,
-                onTap: (Products audioObject) {
-                  currentlyPlaying.value = audioObject;
-                },
-                podcastList: podcastList,
+                podcastList: snapshot.products,
+                service: service,
               );
             } else {
               return const Center(
@@ -161,7 +159,15 @@ class _ListenTabbarState extends State<ListenTabbar>
     return Connection.getalbumListLogged(context);
   }
 
-  Future<List<Products>> getPodcastList() {
-    return Connection.getPodcastList(context);
+  Future<void> getPodcastList() async {
+    await Connection.getPodcastList(context)
+        .then((value) => () {
+              for (var item in value) {
+                service.saveEpisode(item);
+              }
+            })
+        .onError((error, stackTrace) => () {});
+    var data = await service.loadEpisodes();
+    podcastsNotifier.value = PodcastState(data, true);
   }
 }

@@ -3,15 +3,15 @@ import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
+import 'package:goodali/services/podcast_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 typedef OnTap = Function(Products audioObject);
 
 class DownloadedPodcast extends StatefulWidget {
-  final OnTap onTap;
-
-  const DownloadedPodcast({Key? key, required this.onTap}) : super(key: key);
+  final PodcastService service;
+  const DownloadedPodcast({Key? key, required this.service}) : super(key: key);
 
   @override
   State<DownloadedPodcast> createState() => _DownloadedPodcastState();
@@ -36,7 +36,8 @@ class _DownloadedPodcastState extends State<DownloadedPodcast> {
                     index: index,
                     podcastList: value.downloadedPodcast,
                     podcastItem: value.downloadedPodcast[index],
-                    onTap: (product) => widget.onTap(product),
+                    onTap: (product) => () {},
+                    service: widget.service,
                   ));
             });
       } else {

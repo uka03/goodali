@@ -1,5 +1,8 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/controller/progress_notifier.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -17,7 +20,6 @@ Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
 /// An [AudioHandler] for playing a single item.
 class AudioPlayerHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
-  List<MediaItem> _podcastList = [];
   final _player = AudioPlayer();
 
   @override
@@ -63,6 +65,13 @@ class AudioPlayerHandler extends BaseAudioHandler
     _player.processingStateStream.listen((state) {
       if (state == ProcessingState.completed) stop();
     });
+    _player.positionStream.listen((event) {
+      progressNotifier.value = ProgressBarState(
+        current: event,
+        total: event,
+        buffered: event,
+      );
+    });
     try {
       // After a cold restart (on Android), _player.load jumps straight from
       // the loading state to the completed state. Inserting a delay makes it
@@ -97,7 +106,9 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> pause() => _player.pause();
 
   @override
-  Future<void> seek(Duration position) => _player.seek(position);
+  Future<void> seek(Duration position) {
+    return _player.seek(position);
+  }
 
   @override
   Future<void> stop() => _player.stop();

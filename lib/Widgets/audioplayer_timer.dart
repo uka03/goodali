@@ -4,6 +4,7 @@ import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/controller/progress_notifier.dart';
 
 class AudioplayerTimer extends StatelessWidget {
   final String title;
@@ -15,13 +16,13 @@ class AudioplayerTimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: durationStateNotifier,
-      builder: (context, DurationState value, child) {
+      valueListenable: progressNotifier,
+      builder: (context, ProgressBarState value, child) {
         var buttonState = buttonNotifier.value;
         var currently = currentlyPlaying.value;
 
         Duration duration = totalDuration;
-        Duration position = value.progress ?? Duration.zero;
+        Duration position = value.current ?? Duration.zero;
 
         bool isPlaying =
             currently?.title == title && buttonState == ButtonState.playing
