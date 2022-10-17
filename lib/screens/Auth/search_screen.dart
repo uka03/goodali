@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
-import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/search_model.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/mood_detail.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
-import 'package:goodali/screens/HomeScreen/readTab/article_detail.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/blank.dart';
 

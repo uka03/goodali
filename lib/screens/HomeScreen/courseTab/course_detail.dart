@@ -88,7 +88,7 @@ class _CourseDetailState extends State<CourseDetail> {
 
           if (courseList.isNotEmpty) {
             for (var item in courseList) {
-              if (item.productId == widget.id) {
+              if (item.id == widget.id) {
                 courseDetail = item;
               }
             }

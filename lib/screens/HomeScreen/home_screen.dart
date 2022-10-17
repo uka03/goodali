@@ -102,10 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => AlbumDetail(
-                                      id: item.productID,
-                                      onTap: (Products products) {},
-                                    )));
+                                builder: (_) =>
+                                    AlbumLecture(productID: item.productID)));
                         break;
                       case 1:
                         // Navigator.push(context, MaterialPageRoute(builder: (_) => const ()));

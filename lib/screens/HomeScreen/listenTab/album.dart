@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 class AlbumLecture extends StatefulWidget {
   final int? id;
   final int? productType;
-  const AlbumLecture({Key? key, this.id, this.productType}) : super(key: key);
+  final int? productID;
+  const AlbumLecture({Key? key, this.id, this.productType, this.productID})
+      : super(key: key);
 
   @override
   State<AlbumLecture> createState() => _AlbumLectureState();
@@ -62,15 +64,24 @@ class _AlbumLectureState extends State<AlbumLecture> {
                           snapshot.hasData) {
                         List<Products> albumList = snapshot.data;
                         List<Products> searchResult = [];
+                        List<Products> banner = [];
                         if (widget.id != null) {
                           for (var item in albumList) {
                             if (widget.id == item.id) {
                               searchResult.add(item);
                             }
+                            if (widget.productID == item.id) {
+                              banner.add(item);
+                            }
                           }
                         }
-                        return albumLecture(context,
-                            widget.id != null ? searchResult : albumList);
+                        return albumLecture(
+                            context,
+                            widget.productID != null
+                                ? banner
+                                : widget.id != null
+                                    ? searchResult
+                                    : albumList);
                       } else {
                         return const Center(
                             child: CircularProgressIndicator(
