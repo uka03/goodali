@@ -55,7 +55,8 @@ class _ListenTabbarState extends State<ListenTabbar>
                       fontWeight: FontWeight.bold)),
               IconButton(
                   onPressed: () {
-                    Navigator.of(context, rootNavigator: true).push(
+                    Navigator.push(
+                        context,
                         MaterialPageRoute(
                             builder: (_) => const AlbumLecture()));
                   },
@@ -79,7 +80,7 @@ class _ListenTabbarState extends State<ListenTabbar>
                         fontWeight: FontWeight.bold)),
                 IconButton(
                     onPressed: () {
-                      Navigator.of(context, rootNavigator: true).push(
+                      Navigator.push(context,
                           MaterialPageRoute(builder: (_) => const Podcast()));
                     },
                     icon: const Icon(IconlyLight.arrow_right))
@@ -113,7 +114,7 @@ class _ListenTabbarState extends State<ListenTabbar>
                         fontWeight: FontWeight.bold)),
                 IconButton(
                     onPressed: () {
-                      Navigator.of(context, rootNavigator: true).push(
+                      Navigator.push(context,
                           MaterialPageRoute(builder: (_) => const VideoList()));
                     },
                     icon: const Icon(IconlyLight.arrow_right))

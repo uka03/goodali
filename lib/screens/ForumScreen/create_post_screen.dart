@@ -65,7 +65,7 @@ class _CreatePostState extends State<CreatePost> {
                   controller: textController,
                   hintText: "Энд бичнэ үү",
                   maxLines: null,
-                  maxLength: 600),
+                  maxLength: 1000),
             ],
           ),
         ),
@@ -85,19 +85,19 @@ class _CreatePostState extends State<CreatePost> {
   showModalTag() {
     showModalBottomSheet(
         context: context,
+        isScrollControlled: true,
         backgroundColor: Colors.white,
-        useRootNavigator: true,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
               builder: (BuildContext context,
                   void Function(void Function()) setState) {
-                return Padding(
-                  padding: const EdgeInsets.all(20.0),
+                return SingleChildScrollView(
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      const SizedBox(height: 20),
                       Container(
                         width: 38,
                         height: 6,
@@ -119,9 +119,7 @@ class _CreatePostState extends State<CreatePost> {
                               ConnectionState.done ==
                                   snapshot.connectionState) {
                             tagList = snapshot.data;
-                            return Expanded(
-                                child: Container(
-                              height: 45,
+                            return Container(
                               width: MediaQuery.of(context).size.width,
                               margin: const EdgeInsets.fromLTRB(12, 20, 20, 0),
                               child: Wrap(
@@ -167,7 +165,7 @@ class _CreatePostState extends State<CreatePost> {
                                           )));
                                 }).toList(),
                               ),
-                            ));
+                            );
                           } else {
                             return const Center(
                                 child: CircularProgressIndicator(
@@ -176,27 +174,33 @@ class _CreatePostState extends State<CreatePost> {
                           }
                         },
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       _noTabsSelected
-                          ? const Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Text("Холбогдох сэдэвээ сонгоно уу",
-                                  style: TextStyle(
-                                      color: MyColors.error, fontSize: 12)),
+                          ? const Padding(
+                              padding: EdgeInsets.only(left: 20.0),
+                              child: Align(
+                                alignment: Alignment.bottomLeft,
+                                child: Text("Холбогдох сэдэвээ сонгоно уу",
+                                    style: TextStyle(
+                                        color: MyColors.error, fontSize: 12)),
+                              ),
                             )
                           : const SizedBox(),
                       const SizedBox(height: 10),
-                      CustomElevatedButton(
-                          text: "Сонгох",
-                          onPress: () {
-                            if (selectedTabs.isEmpty) {
-                              setState(() => _noTabsSelected = true);
-                            } else {
-                              setState(() => _noTabsSelected = false);
-                              Navigator.pop(context);
-                              showPostTypeSheet();
-                            }
-                          }),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: CustomElevatedButton(
+                            text: "Сонгох",
+                            onPress: () {
+                              if (selectedTabs.isEmpty) {
+                                setState(() => _noTabsSelected = true);
+                              } else {
+                                setState(() => _noTabsSelected = false);
+                                Navigator.pop(context);
+                                showPostTypeSheet();
+                              }
+                            }),
+                      ),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -208,8 +212,8 @@ class _CreatePostState extends State<CreatePost> {
   showPostTypeSheet() {
     showModalBottomSheet(
         context: context,
+        isScrollControlled: true,
         backgroundColor: Colors.white,
-        useRootNavigator: true,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),

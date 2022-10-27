@@ -13,7 +13,12 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 class PostDetail extends StatefulWidget {
   final PostListModel postItem;
   final bool isHearted;
-  const PostDetail({Key? key, required this.postItem, required this.isHearted})
+  final VoidCallback onRefresh;
+  const PostDetail(
+      {Key? key,
+      required this.postItem,
+      required this.isHearted,
+      required this.onRefresh})
       : super(key: key);
 
   @override
@@ -37,51 +42,62 @@ class _PostDetailState extends State<PostDetail> {
         noCard: true,
         title: "Сэтгэгдэл",
       ),
-      body: Column(
-        children: [
-          PostItem(postItem: widget.postItem, isHearted: widget.isHearted),
-          Container(
-            margin: const EdgeInsets.all(18),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-              color: MyColors.input,
-            ),
-            child: Row(
-              children: [
-                const Icon(IconlyLight.edit),
-                const SizedBox(width: 14),
-                SizedBox(
-                  width: 200,
-                  child: TextField(
-                    onTap: () {
-                      showReplyModal();
-                    },
-                    cursorColor: MyColors.primaryColor,
-                    decoration: const InputDecoration(
-                        border: InputBorder.none, hintText: "Сэтгэгдэл бичих"),
-                  ),
+      body: RefreshIndicator(
+        color: MyColors.primaryColor,
+        onRefresh: () async {
+          setState(() {
+            widget.onRefresh();
+          });
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PostItem(postItem: widget.postItem, isHearted: widget.isHearted),
+              Container(
+                margin: const EdgeInsets.all(18),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                  color: MyColors.input,
                 ),
-              ],
-            ),
-          ),
-          const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
-          comments.isEmpty
-              ? Expanded(
-                  child: Center(
-                    child: SvgPicture.asset("assets/images/no_chat_history.svg",
-                        semanticsLabel: 'Acme Logo'),
-                  ),
-                )
-              : Expanded(
-                  child: ListView.builder(
+                child: Row(
+                  children: [
+                    const Icon(IconlyLight.edit),
+                    const SizedBox(width: 14),
+                    SizedBox(
+                      width: 200,
+                      child: TextField(
+                        onTap: () {
+                          showReplyModal();
+                        },
+                        cursorColor: MyColors.primaryColor,
+                        decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Сэтгэгдэл бичих"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
+              comments.isEmpty
+                  ? Center(
+                      child: SvgPicture.asset(
+                          "assets/images/no_chat_history.svg",
+                          semanticsLabel: 'Acme Logo'),
+                    )
+                  : ListView.builder(
                       itemCount: comments.length,
                       shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
                         return ReplyItem(postReplys: comments[index]);
-                      }),
-                )
-        ],
+                      })
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -89,13 +105,10 @@ class _PostDetailState extends State<PostDetail> {
   showReplyModal() {
     showModalBottomSheet(
         context: context,
-        useRootNavigator: true,
         isScrollControlled: true,
         builder: (_) {
           return StatefulBuilder(builder:
               (BuildContext context, void Function(void Function()) setState) {
-            bool isTyped = false;
-
             return SingleChildScrollView(
                 child: Container(
               padding: EdgeInsets.only(
@@ -154,6 +167,7 @@ class _PostDetailState extends State<PostDetail> {
     if (isCommented) {
       showTopSnackBar(context,
           const CustomTopSnackBar(type: 1, text: "Сэтгэгдэл илгээгдлээ"));
+      widget.onRefresh();
     } else {
       showTopSnackBar(
           context, const CustomTopSnackBar(type: 0, text: "Дахин оролдоно уу"));

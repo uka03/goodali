@@ -82,13 +82,13 @@ class _ArticleScreenState extends State<ArticleScreen> {
                       padding:
                           const EdgeInsets.only(top: 20.0, left: 20, right: 20),
                       child: GestureDetector(
-                          onTap: () =>
-                              Navigator.of(context, rootNavigator: true).push(
-                                  MaterialPageRoute(
-                                      builder: (context) => ArticleDetail(
-                                          articleItem: widget.id != null
-                                              ? searchList[index]
-                                              : artcileList[index]))),
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ArticleDetail(
+                                      articleItem: widget.id != null
+                                          ? searchList[index]
+                                          : artcileList[index]))),
                           child: ArtcileItem(
                             articleModel: filteredList.isNotEmpty
                                 ? filteredList[index]
@@ -120,7 +120,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
     showModalBottomSheet(
         context: context,
         backgroundColor: Colors.white,
-        useRootNavigator: true,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),

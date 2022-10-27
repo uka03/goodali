@@ -11,7 +11,9 @@ import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:iconly/iconly.dart';
 
 class ForumScreen extends StatefulWidget {
-  const ForumScreen({Key? key}) : super(key: key);
+  final void Function() goToFirstTab;
+
+  const ForumScreen({Key? key, required this.goToFirstTab}) : super(key: key);
 
   @override
   State<ForumScreen> createState() => _ForumScreenState();

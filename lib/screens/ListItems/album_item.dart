@@ -13,8 +13,9 @@ class AlbumItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () =>
-          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
               builder: (context) => AlbumDetail(
                     onTap: (audioObject) {
                       currentlyPlaying.value = audioObject;

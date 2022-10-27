@@ -59,7 +59,7 @@ class _CourseTabbarState extends State<CourseTabbar> {
               child: Container(
                   margin: const EdgeInsets.only(top: 100),
                   child: const Text(
-                    "Нэвтэрч орон үргэлжлүүлнэ үү...",
+                    "",
                     style: TextStyle(color: MyColors.gray, fontSize: 16),
                   )),
             );

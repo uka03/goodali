@@ -27,118 +27,110 @@ class _BottomTabbarState extends State<BottomTabbar> {
     super.initState();
   }
 
+  void goToFirstTab() {
+    setState(() {
+      selectedIndex = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MiniplayerWillPopScope(
-      onWillPop: () async {
-        final NavigatorState? navigator = navigatorKey.currentState;
-        if (!navigator!.canPop()) return true;
-        navigator.pop();
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: playerExpandProgress,
+        builder: (BuildContext context, double height, Widget? child) {
+          final value = percentageFromValueInRange(
+              min: playerMinHeight, max: playerMaxHeight, value: height);
 
-        return false;
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        bottomNavigationBar: ValueListenableBuilder(
-          valueListenable: playerExpandProgress,
-          builder: (BuildContext context, double height, Widget? child) {
-            final value = percentageFromValueInRange(
-                min: playerMinHeight, max: playerMaxHeight, value: height);
+          var opacity = 1 - value;
+          if (opacity < 0) opacity = 0;
+          if (opacity > 1) opacity = 1;
 
-            var opacity = 1 - value;
-            if (opacity < 0) opacity = 0;
-            if (opacity > 1) opacity = 1;
-
-            double bottomBarHeight = kBottomNavigationBarHeight;
-            if (Platform.isIOS) {
-              bottomBarHeight = kBottomNavigationBarHeight + 30;
-            }
-            return SizedBox(
-              height: bottomBarHeight - bottomBarHeight * value,
-              child: Transform.translate(
-                offset: Offset(
-                    0.0, (kBottomNavigationBarHeight + 30) * value * 0.5),
-                child: Opacity(
-                  opacity: opacity,
-                  child: OverflowBox(
-                    maxHeight: kBottomNavigationBarHeight + 30,
-                    child: child,
-                  ),
+          double bottomBarHeight = kBottomNavigationBarHeight;
+          if (Platform.isIOS) {
+            bottomBarHeight = kBottomNavigationBarHeight + 30;
+          }
+          return SizedBox(
+            height: bottomBarHeight - bottomBarHeight * value,
+            child: Transform.translate(
+              offset:
+                  Offset(0.0, (kBottomNavigationBarHeight + 30) * value * 0.5),
+              child: Opacity(
+                opacity: opacity,
+                child: OverflowBox(
+                  maxHeight: kBottomNavigationBarHeight + 30,
+                  child: child,
                 ),
               ),
-            );
-          },
-          child: BottomNavigationBar(
-            elevation: 0,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 6.0),
-                    child: Icon(Icons.circle_outlined),
-                  ),
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 6.0),
-                    child: Icon(Icons.circle_outlined),
-                  ),
-                  label: 'Сэтгэл'),
-              BottomNavigationBarItem(
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 6.0),
-                    child: Icon(Icons.forum),
-                  ),
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 6.0),
-                    child: Icon(Icons.home_outlined),
-                  ),
-                  label: "Түүдэг гал"),
-              BottomNavigationBarItem(
-                  activeIcon: Padding(
-                    padding: EdgeInsets.only(bottom: 6.0),
-                    child: Icon(IconlyLight.profile),
-                  ),
-                  icon: Padding(
-                    padding: EdgeInsets.only(bottom: 6.0),
-                    child: Icon(IconlyLight.profile),
-                  ),
-                  label: "Би")
-            ],
-            currentIndex: selectedIndex,
-            type: BottomNavigationBarType.fixed,
-            onTap: (int? value) {
-              onTabTapped(value!);
-            },
-          ),
-        ),
-        body: Stack(
-          children: [
-            Navigator(
-              key: navigatorKey,
-              onGenerateRoute: (RouteSettings settings) => MaterialPageRoute(
-                settings: settings,
-                builder: (BuildContext context) =>
-                    _widgetOptions[selectedIndex],
-              ),
             ),
-            ValueListenableBuilder(
-                valueListenable: currentlyPlaying,
-                builder: (BuildContext context, Products? podcastItem,
-                    Widget? child) {
-                  return podcastItem != null
-                      ? PlayAudio(
-                          products: podcastItem,
-                          albumName: podcastItem.albumTitle ?? "",
-                        )
-                      : Container();
-                }),
+          );
+        },
+        child: BottomNavigationBar(
+          elevation: 0,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(Icons.circle_outlined),
+                ),
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(Icons.circle_outlined),
+                ),
+                label: 'Сэтгэл'),
+            BottomNavigationBarItem(
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(Icons.forum),
+                ),
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(Icons.home_outlined),
+                ),
+                label: "Түүдэг гал"),
+            BottomNavigationBarItem(
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(IconlyLight.profile),
+                ),
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 6.0),
+                  child: Icon(IconlyLight.profile),
+                ),
+                label: "Би")
           ],
+          currentIndex: selectedIndex,
+          type: BottomNavigationBarType.fixed,
+          onTap: (int? value) {
+            onTabTapped(value!);
+          },
         ),
+      ),
+      body: Stack(
+        children: [
+          _widgetOptions[selectedIndex],
+          ValueListenableBuilder(
+              valueListenable: currentlyPlaying,
+              builder:
+                  (BuildContext context, Products? podcastItem, Widget? child) {
+                return podcastItem != null
+                    ? PlayAudio(
+                        products: podcastItem,
+                        albumName: podcastItem.albumTitle ?? "",
+                      )
+                    : Container();
+              }),
+        ],
       ),
     );
   }
 
   final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
-    const ForumScreen(),
+    ForumScreen(
+      goToFirstTab: goToFirstTab(),
+    ),
     const ProfileScreen(),
   ];
 

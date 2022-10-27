@@ -6,7 +6,6 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/article_model.dart';
 import 'package:goodali/screens/ListItems/article_item.dart';
-import 'package:goodali/screens/blank.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class ArticleDetail extends StatefulWidget {

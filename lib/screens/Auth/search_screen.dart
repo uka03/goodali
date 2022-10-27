@@ -106,21 +106,23 @@ class SearchScreen extends SearchDelegate {
                                       id: searchResult[index].id)));
                           break;
                         case 'mood':
-                          Navigator.of(context, rootNavigator: true).push(
+                          Navigator.push(
+                              context,
                               MaterialPageRoute(
                                   builder: (_) => MoodDetail(
                                       moodListId:
                                           searchResult[index].id.toString())));
                           break;
                         case 'podcast':
-                          Navigator.of(context, rootNavigator: true).push(
+                          Navigator.push(
+                              context,
                               MaterialPageRoute(
                                   builder: (_) =>
                                       Podcast(id: searchResult[index].id)));
                           break;
 
                         default:
-                          Navigator.of(context, rootNavigator: true).push(
+                          Navigator.push(context,
                               MaterialPageRoute(builder: (_) => const Blank()));
                           break;
                       }

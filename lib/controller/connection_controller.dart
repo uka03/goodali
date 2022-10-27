@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -448,8 +449,6 @@ class Connection {
       var url = Uri.parse(Urls.albumListLogged);
       var response =
           await http.post(url, headers: {"Authorization": "Bearer $token"});
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         return (jsonDecode(response.body) as List)
@@ -590,6 +589,7 @@ class Connection {
     try {
       final response =
           await Http().getDio(context, headerTypeNone).post(Urls.podcastList);
+      log(response.data.toString());
 
       if (response.statusCode == 200) {
         return (response.data as List)

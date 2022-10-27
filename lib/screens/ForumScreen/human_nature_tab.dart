@@ -44,6 +44,9 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                             context,
                             MaterialPageRoute(
                                 builder: (_) => PostDetail(
+                                    onRefresh: () {
+                                      _refresh();
+                                    },
                                     postItem: postList[index],
                                     isHearted: isHearted[index]))),
                         child: PostItem(

@@ -22,7 +22,7 @@ class AudioplayerTimer extends StatelessWidget {
         var currently = currentlyPlaying.value;
 
         Duration duration = totalDuration;
-        Duration position = value.current ?? Duration.zero;
+        Duration position = value.current;
 
         bool isPlaying =
             currently?.title == title && buttonState == ButtonState.playing

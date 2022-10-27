@@ -55,7 +55,8 @@ class _ReadTabbarState extends State<ReadTabbar>
                                   fontWeight: FontWeight.bold)),
                           IconButton(
                               onPressed: () {
-                                Navigator.of(context, rootNavigator: true).push(
+                                Navigator.push(
+                                    context,
                                     MaterialPageRoute(
                                         builder: (_) => const ArticleScreen()));
                               },
@@ -119,7 +120,8 @@ class _ReadTabbarState extends State<ReadTabbar>
         physics: const NeverScrollableScrollPhysics(),
         itemCount: articleList.length > 6 ? 6 : articleList.length,
         itemBuilder: (context, index) => GestureDetector(
-            onTap: () => Navigator.of(context, rootNavigator: true).push(
+            onTap: () => Navigator.push(
+                context,
                 MaterialPageRoute(
                     builder: (context) =>
                         ArticleDetail(articleItem: articleList[index]))),
