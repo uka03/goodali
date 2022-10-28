@@ -109,7 +109,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
       ),
       body: Stack(
         children: [
-          _widgetOptions[selectedIndex],
+          widgetOptions().elementAt(selectedIndex),
           ValueListenableBuilder(
               valueListenable: currentlyPlaying,
               builder:
@@ -126,13 +126,19 @@ class _BottomTabbarState extends State<BottomTabbar> {
     );
   }
 
-  final List<Widget> _widgetOptions = <Widget>[
-    const HomeScreen(),
-    ForumScreen(
-      goToFirstTab: goToFirstTab(),
-    ),
-    const ProfileScreen(),
-  ];
+  List<Widget> widgetOptions() {
+    return [
+      HomeScreen(key: HomeScreen.tabbedPageKey),
+      ForumScreen(goToFirstTab: goToFirstTab),
+      const ProfileScreen(),
+    ];
+  }
+
+  // final List<Widget> _widgetOptions = <Widget>[
+  //   const HomeScreen(),
+  //   ForumScreen(goToFirstTab: goToFirstTab),
+  //   const ProfileScreen(),
+  // ];
 
   void onTabTapped(int index) {
     setState(() {

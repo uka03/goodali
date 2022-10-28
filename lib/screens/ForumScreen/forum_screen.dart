@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/Widgets/search_bar.dart';
 import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:goodali/screens/ForumScreen/human_nature_tab.dart';
+import 'package:goodali/screens/ForumScreen/my_friend_tab.dart';
 import 'package:goodali/screens/ForumScreen/tuudeg_gal_tab.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
@@ -94,8 +96,11 @@ class _ForumScreenState extends State<ForumScreen> {
                   ))
             ];
           },
-          body: const TabBarView(
-              children: [NatureOfHuman(), NuutsBulgem(), NuutsBulgem()]),
+          body: TabBarView(children: [
+            const NatureOfHuman(),
+            NuutsBulgem(goToFirstTab: widget.goToFirstTab),
+            MyFriendTab(goToFirstTab: widget.goToFirstTab)
+          ]),
         ),
       ),
     );

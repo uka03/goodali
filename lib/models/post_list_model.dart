@@ -15,11 +15,13 @@ class PostListModel {
     id = json['id'];
     likes = json['likes'];
     postType = json['post_type'];
-    if (json['replys'] != "") {
+    if (json['replys'] != null && json['replys'] != "") {
       replys = <PostReplys>[];
       json['replys'].forEach((v) {
         replys!.add(PostReplys.fromJson(v));
       });
+    } else {
+      json['replys'] = [];
     }
     title = json['title'];
   }

@@ -20,13 +20,17 @@ import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
 import 'package:goodali/Widgets/search_bar.dart';
 
 class HomeScreen extends StatefulWidget {
+  static final tabbedPageKey = GlobalKey<_HomeScreenState>();
+
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late final tabController = TabController(length: 4, vsync: this);
   final CarouselController _controller = CarouselController();
   List<BannerModel> bannerList = [];
   int _current = 0;
@@ -35,6 +39,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     getBannerList();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -64,10 +74,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   floating: false,
                   pinned: true,
                   delegate: MyDelegate(
-                    const TabBar(
+                    TabBar(
+                      controller: tabController,
                       isScrollable: true,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      tabs: [
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      tabs: const [
                         SizedBox(width: 70, child: Tab(text: "Cонсох")),
                         SizedBox(width: 70, child: Tab(text: "Унших")),
                         SizedBox(width: 70, child: Tab(text: "Мэдрэх")),
@@ -80,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ))
             ];
           },
-          body: const TabBarView(children: [
+          body: TabBarView(controller: tabController, children: const [
             ListenTabbar(),
             ReadTabbar(),
             FeelTabbar(),

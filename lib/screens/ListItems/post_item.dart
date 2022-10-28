@@ -7,7 +7,12 @@ import 'package:iconly/iconly.dart';
 class PostItem extends StatefulWidget {
   final PostListModel postItem;
   final bool isHearted;
-  const PostItem({Key? key, required this.postItem, required this.isHearted})
+  final bool? isMySpecial;
+  const PostItem(
+      {Key? key,
+      required this.postItem,
+      required this.isHearted,
+      this.isMySpecial = false})
       : super(key: key);
 
   @override
@@ -88,32 +93,36 @@ class _PostItemState extends State<PostItem> {
           const SizedBox(height: 15),
           Row(
             children: [
-              Wrap(
-                spacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isLiked = !isLiked;
-                      });
-                      if (isLiked) {
-                        likeCount++;
-                        insertLike(widget.postItem.id ?? 0);
-                      }
-                    },
-                    child: isLiked
-                        ? const Icon(IconlyBold.heart,
-                            color: MyColors.primaryColor)
-                        : const Icon(IconlyLight.heart, color: MyColors.gray),
-                  ),
-                  Text(likeCount.toString(),
-                      style: TextStyle(
-                          color:
-                              isLiked ? MyColors.primaryColor : MyColors.gray,
-                          fontSize: 16))
-                ],
-              ),
+              widget.isMySpecial == false
+                  ? Wrap(
+                      spacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isLiked = !isLiked;
+                            });
+                            if (isLiked) {
+                              likeCount++;
+                              insertLike(widget.postItem.id ?? 0);
+                            }
+                          },
+                          child: isLiked
+                              ? const Icon(IconlyBold.heart,
+                                  color: MyColors.primaryColor)
+                              : const Icon(IconlyLight.heart,
+                                  color: MyColors.gray),
+                        ),
+                        Text(likeCount.toString(),
+                            style: TextStyle(
+                                color: isLiked
+                                    ? MyColors.primaryColor
+                                    : MyColors.gray,
+                                fontSize: 16))
+                      ],
+                    )
+                  : const SizedBox(),
               const SizedBox(width: 15),
               Wrap(
                 spacing: 8,

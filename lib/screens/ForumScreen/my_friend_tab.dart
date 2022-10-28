@@ -5,22 +5,19 @@ import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/screens/Auth/login.dart';
-import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:goodali/screens/ForumScreen/post_detail.dart';
-import 'package:goodali/screens/HomeScreen/home_screen.dart';
 import 'package:goodali/screens/ListItems/post_item.dart';
-import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
-class NuutsBulgem extends StatefulWidget {
+class MyFriendTab extends StatefulWidget {
   final void Function() goToFirstTab;
-  const NuutsBulgem({Key? key, required this.goToFirstTab}) : super(key: key);
+  const MyFriendTab({Key? key, required this.goToFirstTab}) : super(key: key);
 
   @override
-  State<NuutsBulgem> createState() => _NuutsBulgemState();
+  State<MyFriendTab> createState() => _MyFriendTabState();
 }
 
-class _NuutsBulgemState extends State<NuutsBulgem> {
+class _MyFriendTabState extends State<MyFriendTab> {
   List<bool> isHearted = [];
   @override
   Widget build(BuildContext context) {
@@ -52,6 +49,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                                             postItem: postList[index],
                                             isHearted: isHearted[index]))),
                                 child: PostItem(
+                                    isMySpecial: true,
                                     postItem: postList[index],
                                     isHearted: isHearted[index]),
                               );
@@ -132,6 +130,6 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
   }
 
   Future getPostList() {
-    return Connection.getPostList(context, {"post_type": 1});
+    return Connection.getPostList(context, {"post_type": 2});
   }
 }
