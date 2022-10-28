@@ -110,24 +110,13 @@ class _ArticleScreenState extends State<ArticleScreen> {
             },
           )),
       floatingActionButton: FilterButton(onPress: () {
-        FilterTag.showModalTag(context, tagFuture, checkedTag);
+        showModalTag(context, tagFuture, checkedTag);
       }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  Future<List<TagModel>> getTagList() async {
-    return await Connection.getTagList(context);
-  }
-
-  Future<List<ArticleModel>> getArticle() {
-    return Connection.getArticle(context);
-  }
-}
-
-class FilterTag {
-  static showModalTag(
-      BuildContext context, Future tagFuture, List<int> checkedTag) {
+  showModalTag(BuildContext context, Future tagFuture, List<int> checkedTag) {
     showModalBottomSheet(
         context: context,
         backgroundColor: Colors.white,
@@ -212,5 +201,13 @@ class FilterTag {
                 },
               ),
             ));
+  }
+
+  Future<List<TagModel>> getTagList() async {
+    return await Connection.getTagList(context);
+  }
+
+  Future<List<ArticleModel>> getArticle() {
+    return Connection.getArticle(context);
   }
 }

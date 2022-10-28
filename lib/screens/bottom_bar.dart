@@ -134,12 +134,6 @@ class _BottomTabbarState extends State<BottomTabbar> {
     ];
   }
 
-  // final List<Widget> _widgetOptions = <Widget>[
-  //   const HomeScreen(),
-  //   ForumScreen(goToFirstTab: goToFirstTab),
-  //   const ProfileScreen(),
-  // ];
-
   void onTabTapped(int index) {
     setState(() {
       selectedIndex = index;

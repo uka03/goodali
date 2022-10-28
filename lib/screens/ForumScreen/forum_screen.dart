@@ -13,7 +13,7 @@ import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:iconly/iconly.dart';
 
 class ForumScreen extends StatefulWidget {
-  final void Function() goToFirstTab;
+  final VoidCallback goToFirstTab;
 
   const ForumScreen({Key? key, required this.goToFirstTab}) : super(key: key);
 
