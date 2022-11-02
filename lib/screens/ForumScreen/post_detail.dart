@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/post_list_model.dart';
+import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:goodali/screens/ListItems/reply_item.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class PostDetail extends StatefulWidget {
@@ -28,11 +32,18 @@ class PostDetail extends StatefulWidget {
 class _PostDetailState extends State<PostDetail> {
   final TextEditingController _commentController = TextEditingController();
   List<PostReplys> comments = [];
+  bool loginWithBio = false;
 
   @override
   void initState() {
+    checkLoginWithBio();
     comments = widget.postItem.replys ?? [];
     super.initState();
+  }
+
+  checkLoginWithBio() async {
+    final prefs = await SharedPreferences.getInstance();
+    loginWithBio = prefs.getBool("login_biometric") ?? false;
   }
 
   @override
@@ -42,44 +53,64 @@ class _PostDetailState extends State<PostDetail> {
         noCard: true,
         title: "Сэтгэгдэл",
       ),
-      body: RefreshIndicator(
-        color: MyColors.primaryColor,
-        onRefresh: () async {
-          setState(() {
-            widget.onRefresh();
-          });
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      body: Column(children: [
+        PostItem(postItem: widget.postItem, isHearted: widget.isHearted),
+        Container(
+          margin: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+            color: MyColors.input,
+          ),
+          child: Row(
             children: [
-              PostItem(postItem: widget.postItem, isHearted: widget.isHearted),
-              Container(
-                margin: const EdgeInsets.all(18),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                  color: MyColors.input,
+              const Icon(IconlyLight.edit),
+              const SizedBox(width: 14),
+              SizedBox(
+                width: 200,
+                child: TextField(
+                  onTap: () {
+                    bool isAuth =
+                        Provider.of<Auth>(context, listen: false).isAuth;
+                    if (isAuth) {
+                      showReplyModal();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                          backgroundColor: MyColors.error,
+                          behavior: SnackBarBehavior.floating,
+                          action: SnackBarAction(
+                              onPressed: () => loginWithBio
+                                  ? Provider.of<Auth>(context, listen: false)
+                                      .authenticateWithBiometrics(context)
+                                  : showLoginModal(),
+                              label: 'Нэвтрэх',
+                              textColor: Colors.white)));
+                    }
+                  },
+                  cursorColor: MyColors.primaryColor,
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: "Сэтгэгдэл бичих"),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(IconlyLight.edit),
-                    const SizedBox(width: 14),
-                    SizedBox(
-                      width: 200,
-                      child: TextField(
-                        onTap: () {
-                          showReplyModal();
-                        },
-                        cursorColor: MyColors.primaryColor,
-                        decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Сэтгэгдэл бичих"),
-                      ),
+              ),
+              Row(
+                children: [
+                  const Icon(IconlyLight.edit),
+                  const SizedBox(width: 14),
+                  SizedBox(
+                    width: 200,
+                    child: TextField(
+                      onTap: () {
+                        showReplyModal();
+                      },
+                      cursorColor: MyColors.primaryColor,
+                      decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Сэтгэгдэл бичих"),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
               comments.isEmpty
@@ -98,7 +129,7 @@ class _PostDetailState extends State<PostDetail> {
             ],
           ),
         ),
-      ),
+      ]),
     );
   }
 
@@ -155,6 +186,19 @@ class _PostDetailState extends State<PostDetail> {
             ));
           });
         });
+  }
+
+  showLoginModal() {
+    showModalBottomSheet(
+        context: context,
+        isDismissible: false,
+        enableDrag: true,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (BuildContext context) => const LoginBottomSheet());
   }
 
   writeComment() async {

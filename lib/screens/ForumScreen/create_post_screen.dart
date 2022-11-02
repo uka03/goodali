@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
@@ -7,6 +8,9 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/tag_model.dart';
+import 'package:goodali/screens/Auth/login.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class CreatePost extends StatefulWidget {
@@ -21,6 +25,7 @@ class _CreatePostState extends State<CreatePost> {
   TextEditingController titleController = TextEditingController();
   TextEditingController textController = TextEditingController();
   List<int> selectedTabs = [];
+  bool loginWithBio = false;
   List<String> postTypes = [
     'Хүний байгаль',
     'Нууц бүлгэм',
@@ -33,7 +38,13 @@ class _CreatePostState extends State<CreatePost> {
 
   @override
   void initState() {
+    checkLoginWithBio();
     super.initState();
+  }
+
+  checkLoginWithBio() async {
+    final prefs = await SharedPreferences.getInstance();
+    loginWithBio = prefs.getBool("login_biometric") ?? false;
   }
 
   @override
@@ -75,11 +86,39 @@ class _CreatePostState extends State<CreatePost> {
         child: CustomElevatedButton(
             text: "Нийтлэх",
             onPress: () {
-              showModalTag();
+              bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
+              if (isAuth) {
+                showModalTag();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                    backgroundColor: MyColors.error,
+                    behavior: SnackBarBehavior.floating,
+                    action: SnackBarAction(
+                        onPressed: () => loginWithBio
+                            ? Provider.of<Auth>(context, listen: false)
+                                .authenticateWithBiometrics(context)
+                            : showLoginModal(),
+                        label: 'Нэвтрэх',
+                        textColor: Colors.white)));
+              }
             }),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  showLoginModal() {
+    showModalBottomSheet(
+        context: context,
+        isDismissible: false,
+        enableDrag: true,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (BuildContext context) => const LoginBottomSheet());
   }
 
   showModalTag() {

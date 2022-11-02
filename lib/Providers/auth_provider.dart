@@ -19,6 +19,9 @@ class Auth with ChangeNotifier {
   bool _isAuth = false;
   bool get isAuth => _isAuth;
 
+  bool _hasTraining = false;
+  bool get hasTraining => _hasTraining;
+
   bool _canBiometric = false;
   bool get canBiometric => _canBiometric;
 
@@ -58,6 +61,8 @@ class Auth with ChangeNotifier {
           preferences.setString("email", data['email']);
           preferences.setString("password", data['password']);
           preferences.setString("token", response.data['token']);
+          _hasTraining = await preferences.setBool(
+              "has_training", response.data['has_traing']);
 
           String mapToStr = json.encode(response.data);
 
