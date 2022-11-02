@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -5,12 +7,14 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/podcast_state.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:goodali/models/video_model.dart';
 import 'package:goodali/repository.dart/sembast_repository.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
+import 'package:goodali/screens/ListItems/video_item.dart';
 import 'package:goodali/services/podcast_service.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +32,7 @@ class _ListenTabbarState extends State<ListenTabbar>
   bool get wantKeepAlive => true;
   bool isLoading = false;
   PodcastService service = PodcastService(repository: SembastRepository());
+
   @override
   void initState() {
     super.initState();
@@ -120,6 +125,7 @@ class _ListenTabbarState extends State<ListenTabbar>
                     icon: const Icon(IconlyLight.arrow_right))
               ],
             )),
+        videoList()
       ],
     ));
   }
@@ -152,8 +158,34 @@ class _ListenTabbarState extends State<ListenTabbar>
     );
   }
 
+  Widget videoList() {
+    return FutureBuilder(
+      future: getVideoList(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          List<VideoModel> videoList = snapshot.data;
+          return ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: videoList.length > 3 ? 3 : videoList.length,
+              itemBuilder: (BuildContext context, int index) =>
+                  VideoItem(videoModel: videoList[index]));
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(color: MyColors.primaryColor),
+          );
+        }
+      },
+    );
+  }
+
   Future<List<Products>> getProducts() {
     return Connection.getProducts(context, "0");
+  }
+
+  Future<List<VideoModel>> getVideoList() {
+    return Connection.getVideoList(context);
   }
 
   Future<List<Products>> getalbumListLogged() {

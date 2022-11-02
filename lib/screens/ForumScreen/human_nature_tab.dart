@@ -3,12 +3,13 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/screens/ForumScreen/post_detail.dart';
-import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
 
 class NatureOfHuman extends StatefulWidget {
   const NatureOfHuman({Key? key}) : super(key: key);
@@ -20,6 +21,8 @@ class NatureOfHuman extends StatefulWidget {
 class _NatureOfHumanState extends State<NatureOfHuman> {
   late final tagFuture = getTagList();
   List<int> checkedTag = [];
+  List<PostListModel> filteredList = [];
+  List<PostListModel> postList = [];
 
   List<bool> isHearted = [];
 
@@ -39,10 +42,12 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
           builder: (context, AsyncSnapshot snapshot) {
             if (snapshot.hasData &&
                 ConnectionState.done == snapshot.connectionState) {
-              List<PostListModel> postList = snapshot.data;
+              postList = snapshot.data;
               if (postList.isNotEmpty) {
                 return ListView.separated(
-                    itemCount: postList.length,
+                    itemCount: filteredList.isNotEmpty
+                        ? filteredList.length
+                        : postList.length,
                     itemBuilder: (BuildContext context, int index) {
                       isHearted.add(false);
                       return GestureDetector(
@@ -56,7 +61,9 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                                     postItem: postList[index],
                                     isHearted: isHearted[index]))),
                         child: PostItem(
-                            postItem: postList[index],
+                            postItem: filteredList.isNotEmpty
+                                ? filteredList[index]
+                                : postList[index],
                             isHearted: isHearted[index]),
                       );
                     },
@@ -84,6 +91,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
   }
 
   showModalTag(BuildContext context, Future tagFuture, List<int> checkedTag) {
+    List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
         backgroundColor: Colors.white,
@@ -121,7 +129,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                               if (snapshot.hasData &&
                                   ConnectionState.done ==
                                       snapshot.connectionState) {
-                                List<TagModel> tagList = snapshot.data;
+                                tagList = snapshot.data;
                                 return ListView.builder(
                                     itemCount: tagList.length,
                                     itemBuilder:
@@ -133,8 +141,11 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                                           onChanged: (bool? value) {
                                             if (value == true) {
                                               setState(() {
-                                                checkedTag.add(
-                                                    tagList[index].id ?? 0);
+                                                if (!checkedTag.contains(
+                                                    tagList[index].id)) {
+                                                  checkedTag.add(
+                                                      tagList[index].id ?? 0);
+                                                }
                                               });
                                             } else {
                                               setState(() {
@@ -158,6 +169,8 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                         CustomElevatedButton(
                             text: "Шүүх",
                             onPress: () {
+                              filterPost(tagList);
+
                               Navigator.pop(context, checkedTag);
                             }),
                         const SizedBox(height: 20),
@@ -177,6 +190,33 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
   Future<void> _refresh() async {
     setState(() {
       getPostList();
+    });
+  }
+
+  filterPost(List<TagModel> tagList) {
+    List<String> selectedTagsName = [];
+    setState(() {
+      for (var item in postList) {
+        for (var id in checkedTag) {
+          if (item.tags!.isNotEmpty) {
+            if (item.tags?.first.id == id &&
+                !filteredList.any((element) => element.id == item.id)) {
+              filteredList.add(item);
+            }
+          }
+          for (var name in tagList) {
+            if (name.id == id) {
+              selectedTagsName.add(name.name ?? "");
+              Provider.of<ForumTagNotifier>(context, listen: false)
+                  .setTags(selectedTagsName);
+            }
+          }
+        }
+      }
+
+      if (checkedTag.isEmpty) {
+        filteredList.clear();
+      }
     });
   }
 

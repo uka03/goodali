@@ -5,6 +5,7 @@ class ArticleModel {
   int? id;
   List<Tags>? tags;
   String? title;
+  int? isSpecial;
 
   ArticleModel(
       {this.banner, this.body, this.createdAt, this.id, this.tags, this.title});
@@ -20,6 +21,7 @@ class ArticleModel {
         tags!.add(Tags.fromJson(v));
       });
     }
+    isSpecial = json['is_special'] ?? 0;
     title = json['title'];
   }
 
@@ -32,6 +34,7 @@ class ArticleModel {
     if (tags != null) {
       data['tags'] = tags!.map((v) => v.toJson()).toList();
     }
+    data['is_special'] = isSpecial;
     data['title'] = title;
     return data;
   }

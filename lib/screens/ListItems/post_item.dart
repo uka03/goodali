@@ -73,9 +73,9 @@ class _PostItemState extends State<PostItem> {
                     border: Border.all(color: MyColors.primaryColor)),
                 child: Center(
                   child: Text(
-                    "Tag name",
-                    style:
-                        TextStyle(color: MyColors.primaryColor, fontSize: 11),
+                    widget.postItem.tags?[0].name ?? "",
+                    style: const TextStyle(
+                        color: MyColors.primaryColor, fontSize: 11),
                   ),
                 ),
               ),

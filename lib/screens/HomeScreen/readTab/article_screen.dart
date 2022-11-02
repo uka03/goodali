@@ -22,6 +22,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
   late final tagFuture = getTagList();
   List<int> checkedTag = [];
   List<ArticleModel> filteredList = [];
+  List<ArticleModel> artcileList = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,21 +56,17 @@ class _ArticleScreenState extends State<ArticleScreen> {
             builder: (BuildContext context,
                 AsyncSnapshot<List<ArticleModel>> snapshot) {
               if (snapshot.hasData) {
-                List<ArticleModel> artcileList = snapshot.data ?? [];
+                artcileList = snapshot.data ?? [];
                 List<ArticleModel> searchList = [];
                 if (widget.id != null) {
                   for (var item in artcileList) {
                     if (item.id == widget.id) {
                       searchList.add(item);
                     }
-                    for (var id in checkedTag) {
-                      if (item.tags?.first.id == id) {
-                        filteredList.add(item);
-                      }
-                    }
                   }
                 }
-                log(filteredList.length.toString());
+                log(filteredList.length.toString(),
+                    name: "filteredList Length");
 
                 return ListView.separated(
                   itemCount: filteredList.isNotEmpty
@@ -166,8 +163,11 @@ class _ArticleScreenState extends State<ArticleScreen> {
                                           onChanged: (bool? value) {
                                             if (value == true) {
                                               setState(() {
-                                                checkedTag.add(
-                                                    tagList[index].id ?? 0);
+                                                if (!checkedTag.contains(
+                                                    tagList[index].id)) {
+                                                  checkedTag.add(
+                                                      tagList[index].id ?? 0);
+                                                }
                                               });
                                             } else {
                                               setState(() {
@@ -191,6 +191,9 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         CustomElevatedButton(
                             text: "Шүүх",
                             onPress: () {
+                              log(checkedTag.length.toString(),
+                                  name: "checkedTag length");
+                              filterPost();
                               Navigator.pop(context, checkedTag);
                             }),
                         const SizedBox(height: 20),
@@ -201,6 +204,22 @@ class _ArticleScreenState extends State<ArticleScreen> {
                 },
               ),
             ));
+  }
+
+  filterPost() {
+    setState(() {
+      for (var item in artcileList) {
+        for (var id in checkedTag) {
+          if (item.tags?.first.id == id &&
+              !filteredList.any((element) => element.id == item.id)) {
+            filteredList.add(item);
+          }
+        }
+      }
+      if (checkedTag.isEmpty) {
+        filteredList.clear();
+      }
+    });
   }
 
   Future<List<TagModel>> getTagList() async {

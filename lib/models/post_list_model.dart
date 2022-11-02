@@ -1,14 +1,22 @@
+import 'package:goodali/models/article_model.dart';
+
 class PostListModel {
   int? id;
   String? title;
-
   List<PostReplys>? replys;
   String? body;
   int? likes;
   int? postType;
+  List<Tags>? tags;
 
   PostListModel(
-      {this.title, this.id, this.body, this.likes, this.postType, this.replys});
+      {this.title,
+      this.id,
+      this.body,
+      this.likes,
+      this.postType,
+      this.replys,
+      this.tags});
 
   PostListModel.fromJson(Map<String, dynamic> json) {
     body = json['body'];
@@ -23,6 +31,12 @@ class PostListModel {
     } else {
       json['replys'] = [];
     }
+    if (json['tags'] != null && json['tags'] != "") {
+      tags = <Tags>[];
+      json['tags'].forEach((v) {
+        tags!.add(Tags.fromJson(v));
+      });
+    }
     title = json['title'];
   }
 
@@ -36,6 +50,9 @@ class PostListModel {
     data["post_type"] = postType;
     if (replys != null) {
       data['replys'] = replys!.map((v) => v.toJson()).toList();
+    }
+    if (tags != null) {
+      data['tags'] = tags!.map((v) => v.toJson()).toList();
     }
 
     return data;

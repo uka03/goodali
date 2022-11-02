@@ -5,6 +5,7 @@ import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
@@ -51,6 +52,8 @@ class _MyAppState extends State<MyApp> {
             create: (_) => AudioDownloadProvider()),
         ChangeNotifierProvider<PodcastProvider>(
             create: (_) => PodcastProvider()),
+        ChangeNotifierProvider<ForumTagNotifier>(
+            create: (_) => ForumTagNotifier()),
       ],
       child: Consumer<Auth>(
         builder: (context, value, child) {

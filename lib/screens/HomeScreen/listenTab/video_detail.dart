@@ -3,6 +3,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/video_model.dart';
+import 'package:goodali/screens/ListItems/video_item.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class VideoDetail extends StatefulWidget {
@@ -36,23 +37,24 @@ class _VideoDetailState extends State<VideoDetail> {
         origin: "https://www.youtube.com/embed/",
         startAt: Duration(seconds: 0),
         autoPlay: true,
+        showFullscreenButton: true,
       ),
     );
     // _controller?.addListener(listener);
   }
 
-  initiliazeSimilarVideo(videoUrl) {
-    _ytbPlayerController = YoutubePlayerController(
-      initialVideoId: videoUrl,
-      params: const YoutubePlayerParams(
-        showControls: true,
-        origin: "https://www.youtube.com/embed/",
-        startAt: Duration(seconds: 0),
-        autoPlay: true,
-      ),
-    );
-    // _controller?.addListener(listener);
-  }
+  // initiliazeSimilarVideo(videoUrl) {
+  //   _ytbPlayerController = YoutubePlayerController(
+  //     initialVideoId: videoUrl,
+  //     params: const YoutubePlayerParams(
+  //       showControls: true,
+  //       origin: "https://www.youtube.com/embed/",
+  //       startAt: Duration(seconds: 0),
+  //       autoPlay: true,
+  //     ),
+  //   );
+  //   // _controller?.addListener(listener);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -121,45 +123,7 @@ class _VideoDetailState extends State<VideoDetail> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: similarVideo.length,
               itemBuilder: (context, index) {
-                initiliazeVideo(similarVideo[index].videoUrl);
-                return GestureDetector(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) =>
-                              VideoDetail(videoModel: similarVideo[index]))),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _ytbPlayerController?.value.isReady != null
-                          ? YoutubePlayerControllerProvider(
-                              controller: _ytbPlayerController ??
-                                  YoutubePlayerController(
-                                      initialVideoId:
-                                          similarVideo[index].videoUrl ?? ""),
-                              child: const YoutubePlayerIFrame(
-                                aspectRatio: 16 / 9,
-                              ),
-                            )
-                          : const CircularProgressIndicator(
-                              color: MyColors.primaryColor),
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              similarVideo[index].title ?? "",
-                              style: const TextStyle(
-                                  color: MyColors.black, fontSize: 16),
-                            ),
-                            const SizedBox(height: 15),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+                return VideoItem(videoModel: similarVideo[index]);
               });
         } else {
           return const Center(
@@ -173,6 +137,7 @@ class _VideoDetailState extends State<VideoDetail> {
   }
 
   Future<List<VideoModel>> getSimilarVideo() {
-    return Connection.getSimilarVideo(context);
+    Map videoID = {"video_id": widget.videoModel.id};
+    return Connection.getSimilarVideo(context, videoID);
   }
 }

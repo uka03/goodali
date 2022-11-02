@@ -1,3 +1,5 @@
+import 'package:goodali/models/article_model.dart';
+
 class VideoModel {
   String? banner;
   String? body;
@@ -5,6 +7,7 @@ class VideoModel {
   int? status;
   String? title;
   String? videoUrl;
+  List<Tags>? tags;
 
   VideoModel(
       {this.banner,
@@ -12,6 +15,7 @@ class VideoModel {
       this.id,
       this.status,
       this.title,
+      this.tags,
       this.videoUrl});
 
   VideoModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +24,13 @@ class VideoModel {
     id = json['id'];
     status = json['status'];
     title = json['title'];
+    if (json['tags'] != null) {
+      tags = <Tags>[];
+      json['tags'].forEach((v) {
+        tags!.add(Tags.fromJson(v));
+      });
+    }
+
     videoUrl = json['video_url'];
   }
 
@@ -30,6 +41,9 @@ class VideoModel {
     data['status'] = status;
     data['title'] = title;
     data['video_url'] = videoUrl;
+    if (tags != null) {
+      data['tags'] = tags!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }

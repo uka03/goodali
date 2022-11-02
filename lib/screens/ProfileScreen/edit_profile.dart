@@ -268,9 +268,11 @@ class _EditProfileState extends State<EditProfile> {
     var stream = await Connection.uploadUserAvatar(context, imageFile);
 
     if (stream["success"]) {
+      if (!mounted) return;
       showTopSnackBar(context,
           const CustomTopSnackBar(type: 1, text: "Амжилттай солигдлоо"));
     } else {
+      if (!mounted) return;
       showTopSnackBar(
           context,
           const CustomTopSnackBar(

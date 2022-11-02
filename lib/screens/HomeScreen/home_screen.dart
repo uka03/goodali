@@ -13,6 +13,8 @@ import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_album.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
@@ -63,8 +65,8 @@ class _HomeScreenState extends State<HomeScreen>
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                  collapsedHeight: 265,
-                  expandedHeight: 265,
+                  collapsedHeight: 271,
+                  expandedHeight: 271,
                   backgroundColor: Colors.white,
                   flexibleSpace: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -73,22 +75,20 @@ class _HomeScreenState extends State<HomeScreen>
               SliverPersistentHeader(
                   floating: false,
                   pinned: true,
-                  delegate: MyDelegate(
-                    TabBar(
-                      controller: tabController,
-                      isScrollable: true,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      tabs: const [
-                        SizedBox(width: 70, child: Tab(text: "Cонсох")),
-                        SizedBox(width: 70, child: Tab(text: "Унших")),
-                        SizedBox(width: 70, child: Tab(text: "Мэдрэх")),
-                        SizedBox(width: 70, child: Tab(text: "Сургалт*"))
-                      ],
-                      labelColor: MyColors.primaryColor,
-                      unselectedLabelColor: MyColors.black,
-                      indicatorColor: MyColors.primaryColor,
-                    ),
-                  ))
+                  delegate: MyDelegate(TabBar(
+                    controller: tabController,
+                    isScrollable: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    tabs: const [
+                      SizedBox(width: 70, child: Tab(text: "Cонсох")),
+                      SizedBox(width: 70, child: Tab(text: "Унших")),
+                      SizedBox(width: 70, child: Tab(text: "Мэдрэх")),
+                      SizedBox(width: 70, child: Tab(text: "Сургалт*"))
+                    ],
+                    labelColor: MyColors.primaryColor,
+                    unselectedLabelColor: MyColors.black,
+                    indicatorColor: MyColors.primaryColor,
+                  )))
             ];
           },
           body: TabBarView(controller: tabController, children: const [
@@ -108,31 +108,28 @@ class _HomeScreenState extends State<HomeScreen>
         items: bannerList
             .map((item) => GestureDetector(
                   onTap: () {
+                    // PRODUCT TYPE 0 - ALBUM, 1 - LECTURE, 2 - TRAINING
                     switch (item.productType) {
                       case 0:
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) =>
-                                    AlbumLecture(productID: item.productID)));
+                                builder: (_) => BannerAlbum(
+                                    productId: item.productID ?? 0)));
                         break;
                       case 1:
-                        // Navigator.push(context, MaterialPageRoute(builder: (_) => const ()));
+                        print("banner lecuture orj irle");
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => BannerAlbum(
+                                      productId: item.productID ?? 0,
+                                      isAlbum: false,
+                                    )));
                         break;
                       case 2:
+                        print("case 2 bailaaa");
                         // Navigator.push(context, MaterialPageRoute(builder: (_) => const Cours()));
-                        break;
-                      case 3:
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const AlbumLecture()));
-                        break;
-                      case 4:
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const AlbumLecture()));
                         break;
                       default:
                     }

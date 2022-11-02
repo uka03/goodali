@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
@@ -24,6 +25,8 @@ class _MyFriendTabState extends State<MyFriendTab> {
   List<bool> isHearted = [];
   late final tagFuture = getTagList();
   List<int> checkedTag = [];
+  List<PostListModel> filteredList = [];
+  List<PostListModel> postList = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,10 +40,12 @@ class _MyFriendTabState extends State<MyFriendTab> {
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData &&
                         ConnectionState.done == snapshot.connectionState) {
-                      List<PostListModel> postList = snapshot.data;
+                      postList = snapshot.data;
                       if (postList.isNotEmpty) {
                         return ListView.separated(
-                            itemCount: postList.length,
+                            itemCount: filteredList.isNotEmpty
+                                ? filteredList.length
+                                : postList.length,
                             itemBuilder: (BuildContext context, int index) {
                               isHearted.add(false);
                               return GestureDetector(
@@ -51,11 +56,15 @@ class _MyFriendTabState extends State<MyFriendTab> {
                                             onRefresh: () {
                                               _refresh();
                                             },
-                                            postItem: postList[index],
+                                            postItem: filteredList.isNotEmpty
+                                                ? filteredList[index]
+                                                : postList[index],
                                             isHearted: isHearted[index]))),
                                 child: PostItem(
                                     isMySpecial: true,
-                                    postItem: postList[index],
+                                    postItem: filteredList.isNotEmpty
+                                        ? filteredList[index]
+                                        : postList[index],
                                     isHearted: isHearted[index]),
                               );
                             },
@@ -145,6 +154,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
   }
 
   showModalTag(BuildContext context, Future tagFuture, List<int> checkedTag) {
+    List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
         backgroundColor: Colors.white,
@@ -182,7 +192,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
                               if (snapshot.hasData &&
                                   ConnectionState.done ==
                                       snapshot.connectionState) {
-                                List<TagModel> tagList = snapshot.data;
+                                tagList = snapshot.data;
                                 return ListView.builder(
                                     itemCount: tagList.length,
                                     itemBuilder:
@@ -219,6 +229,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
                         CustomElevatedButton(
                             text: "Шүүх",
                             onPress: () {
+                              filterPost(tagList);
                               Navigator.pop(context, checkedTag);
                             }),
                         const SizedBox(height: 20),
@@ -229,5 +240,32 @@ class _MyFriendTabState extends State<MyFriendTab> {
                 },
               ),
             ));
+  }
+
+  filterPost(List<TagModel> tagList) {
+    List<String> selectedTagsName = [];
+    setState(() {
+      for (var item in postList) {
+        for (var id in checkedTag) {
+          if (item.tags!.isNotEmpty) {
+            if (item.tags?.first.id == id &&
+                !filteredList.any((element) => element.id == item.id)) {
+              filteredList.add(item);
+            }
+          }
+          for (var name in tagList) {
+            if (name.id == id) {
+              selectedTagsName.add(name.name ?? "");
+              Provider.of<ForumTagNotifier>(context, listen: false)
+                  .setTags(selectedTagsName);
+            }
+          }
+        }
+      }
+
+      if (checkedTag.isEmpty) {
+        filteredList.clear();
+      }
+    });
   }
 }

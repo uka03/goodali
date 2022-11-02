@@ -6,10 +6,7 @@ import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/models/video_model.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/video_detail.dart';
-import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
-import 'package:iconly/iconly.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:goodali/screens/ListItems/video_item.dart';
 
 class VideoList extends StatefulWidget {
   const VideoList({Key? key}) : super(key: key);
@@ -21,32 +18,8 @@ class VideoList extends StatefulWidget {
 class _VideoListState extends State<VideoList> {
   late final tagFuture = getTagList();
   List<int> checkedTag = [];
-  YoutubePlayerController? _ytbPlayerController;
-
-  @override
-  void initState() {
-    _setOrientation([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    super.initState();
-  }
-
-  _setOrientation(List<DeviceOrientation> orientations) {
-    SystemChrome.setPreferredOrientations(orientations);
-  }
-
-  @override
-  void dispose() {
-    _ytbPlayerController?.close();
-    super.dispose();
-  }
-
-  @override
-  void deactivate() {
-    _ytbPlayerController?.pause();
-    super.deactivate();
-  }
+  List<VideoModel> videoList = [];
+  List<VideoModel> filteredList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +57,13 @@ class _VideoListState extends State<VideoList> {
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.hasData &&
                   snapshot.connectionState == ConnectionState.done) {
-                List<VideoModel> videoList = snapshot.data;
+                videoList = snapshot.data;
 
                 if (videoList.isNotEmpty) {
                   return Column(
                     children: [
-                      videoListView(videoList),
+                      videoListView(
+                          filteredList.isNotEmpty ? filteredList : videoList),
                     ],
                   );
                 } else {
@@ -112,62 +86,14 @@ class _VideoListState extends State<VideoList> {
     );
   }
 
-  initiliazeVideo(videoUrl) {
-    _ytbPlayerController = YoutubePlayerController(
-      initialVideoId: videoUrl,
-      params: const YoutubePlayerParams(
-        showControls: true,
-        origin: "https://www.youtube.com/embed/",
-        startAt: Duration(seconds: 0),
-        autoPlay: true,
-      ),
-    );
-    // _controller?.addListener(listener);
-  }
-
   Widget videoListView(List<VideoModel> videoList) {
     return ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: videoList.length,
         itemBuilder: (context, index) {
-          initiliazeVideo(videoList[index].videoUrl);
-          return GestureDetector(
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => VideoDetail(videoModel: videoList[index]))),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ytbPlayerController?.value.isReady != null
-                    ? YoutubePlayerControllerProvider(
-                        controller: _ytbPlayerController ??
-                            YoutubePlayerController(
-                                initialVideoId:
-                                    videoList[index].videoUrl ?? ""),
-                        child: const YoutubePlayerIFrame(
-                          aspectRatio: 16 / 9,
-                        ),
-                      )
-                    : const CircularProgressIndicator(
-                        color: MyColors.primaryColor),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        videoList[index].title ?? "",
-                        style: const TextStyle(
-                            color: MyColors.black, fontSize: 16),
-                      ),
-                      const SizedBox(height: 15),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          return VideoItem(
+            videoModel: videoList[index],
           );
         });
   }
@@ -230,8 +156,11 @@ class _VideoListState extends State<VideoList> {
                                           onChanged: (bool? value) {
                                             if (value == true) {
                                               setState(() {
-                                                checkedTag.add(
-                                                    tagList[index].id ?? 0);
+                                                if (!checkedTag.contains(
+                                                    tagList[index].id)) {
+                                                  checkedTag.add(
+                                                      tagList[index].id ?? 0);
+                                                }
                                               });
                                             } else {
                                               setState(() {
@@ -255,6 +184,7 @@ class _VideoListState extends State<VideoList> {
                         CustomElevatedButton(
                             text: "Шүүх",
                             onPress: () {
+                              filterPost();
                               Navigator.pop(context, checkedTag);
                             }),
                         const SizedBox(height: 20),
@@ -265,5 +195,24 @@ class _VideoListState extends State<VideoList> {
                 },
               ),
             ));
+  }
+
+  filterPost() {
+    setState(() {
+      for (var item in videoList) {
+        for (var id in checkedTag) {
+          if (item.tags!.isNotEmpty) {
+            if (item.tags?.first.id == id &&
+                !filteredList.any((element) => element.id == item.id)) {
+              filteredList.add(item);
+            }
+          }
+        }
+      }
+      print(filteredList.length);
+      if (checkedTag.isEmpty) {
+        filteredList.clear();
+      }
+    });
   }
 }

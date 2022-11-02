@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -11,6 +12,7 @@ import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
 import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:miniplayer/miniplayer.dart';
+import 'package:provider/provider.dart';
 
 class BottomTabbar extends StatefulWidget {
   const BottomTabbar({Key? key}) : super(key: key);
@@ -135,6 +137,9 @@ class _BottomTabbarState extends State<BottomTabbar> {
   }
 
   void onTabTapped(int index) {
+    Provider.of<ForumTagNotifier>(context, listen: false)
+        .selectedForumNames
+        .clear();
     setState(() {
       selectedIndex = index;
     });

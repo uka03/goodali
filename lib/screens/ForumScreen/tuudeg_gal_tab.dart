@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
@@ -7,12 +8,8 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/screens/Auth/login.dart';
-import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:goodali/screens/ForumScreen/post_detail.dart';
-import 'package:goodali/screens/HomeScreen/home_screen.dart';
-import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/ListItems/post_item.dart';
-import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
 class NuutsBulgem extends StatefulWidget {
@@ -27,6 +24,9 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
   late final tagFuture = getTagList();
   List<int> checkedTag = [];
   List<bool> isHearted = [];
+  List<PostListModel> filteredList = [];
+  List<PostListModel> postList = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,10 +40,12 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData &&
                         ConnectionState.done == snapshot.connectionState) {
-                      List<PostListModel> postList = snapshot.data;
+                      postList = snapshot.data;
                       if (postList.isNotEmpty) {
                         return ListView.separated(
-                            itemCount: postList.length,
+                            itemCount: filteredList.isNotEmpty
+                                ? filteredList.length
+                                : postList.length,
                             itemBuilder: (BuildContext context, int index) {
                               isHearted.add(false);
                               return GestureDetector(
@@ -54,10 +56,14 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                                             onRefresh: () {
                                               _refresh();
                                             },
-                                            postItem: postList[index],
+                                            postItem: filteredList.isNotEmpty
+                                                ? filteredList[index]
+                                                : postList[index],
                                             isHearted: isHearted[index]))),
                                 child: PostItem(
-                                    postItem: postList[index],
+                                    postItem: filteredList.isNotEmpty
+                                        ? filteredList[index]
+                                        : postList[index],
                                     isHearted: isHearted[index]),
                               );
                             },
@@ -147,6 +153,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
   }
 
   showModalTag(BuildContext context, Future tagFuture, List<int> checkedTag) {
+    List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
         backgroundColor: Colors.white,
@@ -184,7 +191,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                               if (snapshot.hasData &&
                                   ConnectionState.done ==
                                       snapshot.connectionState) {
-                                List<TagModel> tagList = snapshot.data;
+                                tagList = snapshot.data;
                                 return ListView.builder(
                                     itemCount: tagList.length,
                                     itemBuilder:
@@ -221,6 +228,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                         CustomElevatedButton(
                             text: "Шүүх",
                             onPress: () {
+                              filterPost(tagList);
                               Navigator.pop(context, checkedTag);
                             }),
                         const SizedBox(height: 20),
@@ -231,5 +239,32 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                 },
               ),
             ));
+  }
+
+  filterPost(List<TagModel> tagList) {
+    List<String> selectedTagsName = [];
+    setState(() {
+      for (var item in postList) {
+        for (var id in checkedTag) {
+          if (item.tags!.isNotEmpty) {
+            if (item.tags?.first.id == id &&
+                !filteredList.any((element) => element.id == item.id)) {
+              filteredList.add(item);
+            }
+          }
+          for (var name in tagList) {
+            if (name.id == id) {
+              selectedTagsName.add(name.name ?? "");
+              Provider.of<ForumTagNotifier>(context, listen: false)
+                  .setTags(selectedTagsName);
+            }
+          }
+        }
+      }
+
+      if (checkedTag.isEmpty) {
+        filteredList.clear();
+      }
+    });
   }
 }

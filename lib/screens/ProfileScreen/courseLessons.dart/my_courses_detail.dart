@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
@@ -101,6 +103,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
 
                       String tasks =
                           doneTasks.toString() + "/" + allTasks.toString();
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Card(
@@ -122,13 +125,12 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                                   tasks,
                                   style: const TextStyle(fontSize: 12),
                                 ),
-                                // const Spacer(),
-                                // Text(lessons[index]?.expiry != null ||
-                                //         lessons[index]?.expiry != "" ||
-                                //         lessons[index]!.expiry!.isNotEmpty
-                                //     ? dateTimeFormatter(
-                                //         lessons[index]?.expiry ?? "")
-                                //     : ""),
+                                const Spacer(),
+                                Text(lessons[index]?.expiry == null ||
+                                        lessons[index]?.expiry == ""
+                                    ? "null"
+                                    : dateTimeFormatter(
+                                        lessons[index]?.expiry ?? "")),
                               ]),
                               trailing: const Icon(IconlyLight.arrow_right_2,
                                   size: 18, color: MyColors.gray),

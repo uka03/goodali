@@ -70,7 +70,7 @@ class _AlbumLectureState extends State<AlbumLecture> {
                             if (widget.id == item.id) {
                               searchResult.add(item);
                             }
-                            if (widget.productID == item.id) {
+                            if (widget.productID == item.productId) {
                               banner.add(item);
                             }
                           }

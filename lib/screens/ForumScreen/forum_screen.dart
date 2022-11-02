@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
-import 'package:goodali/Widgets/search_bar.dart';
+import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:goodali/screens/ForumScreen/human_nature_tab.dart';
 import 'package:goodali/screens/ForumScreen/my_friend_tab.dart';
 import 'package:goodali/screens/ForumScreen/tuudeg_gal_tab.dart';
-import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
-import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
 
 class ForumScreen extends StatefulWidget {
   final VoidCallback goToFirstTab;
@@ -81,19 +79,62 @@ class _ForumScreenState extends State<ForumScreen> {
                   floating: false,
                   pinned: true,
                   delegate: MyDelegate(
-                    const TabBar(
-                      isScrollable: true,
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      tabs: [
-                        SizedBox(width: 110, child: Tab(text: "Хүний байгаль")),
-                        SizedBox(width: 110, child: Tab(text: "Нууц бүлгэм")),
-                        SizedBox(width: 110, child: Tab(text: "Миний найз"))
-                      ],
-                      labelColor: MyColors.primaryColor,
-                      unselectedLabelColor: MyColors.black,
-                      indicatorColor: MyColors.primaryColor,
-                    ),
-                  ))
+                      const TabBar(
+                        isScrollable: true,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        tabs: [
+                          SizedBox(
+                              width: 110, child: Tab(text: "Хүний байгаль")),
+                          SizedBox(width: 110, child: Tab(text: "Нууц бүлгэм")),
+                          SizedBox(width: 110, child: Tab(text: "Миний найз"))
+                        ],
+                        labelColor: MyColors.primaryColor,
+                        unselectedLabelColor: MyColors.black,
+                        indicatorColor: MyColors.primaryColor,
+                      ),
+                      container:
+                          // context
+                          //         .watch<ForumTagNotifier>()
+                          //         .selectedForumNames
+                          //         .isEmpty?
+                          null
+                      // : Consumer<ForumTagNotifier>(
+                      //     builder:
+                      //         (BuildContext context, value, Widget? child) {
+                      //       return SizedBox(
+                      //         height: 40,
+                      //         width: MediaQuery.of(context).size.width,
+                      //         child: ListView(
+                      //             scrollDirection: Axis.horizontal,
+                      //             children: value.selectedForumNames
+                      //                 .map((e) => Padding(
+                      //                       padding: const EdgeInsets.only(
+                      //                           left: 8.0),
+                      //                       child: Chip(
+                      //                         padding:
+                      //                             const EdgeInsets.all(2.0),
+                      //                         side: const BorderSide(
+                      //                             color: MyColors.border2,
+                      //                             width: 0.5),
+                      //                         backgroundColor: Colors.white,
+                      //                         label: Text(
+                      //                           e,
+                      //                           style: const TextStyle(
+                      //                               color: MyColors.black),
+                      //                         ),
+                      //                         deleteIcon: const Icon(
+                      //                             Icons.close,
+                      //                             size: 20),
+                      //                         onDeleted: () {
+                      //                           value.removeTags(e);
+                      //                         },
+                      //                       ),
+                      //                     ))
+                      //                 .toList()),
+                      //       );
+                      //     },
+                      //   )
+                      ))
             ];
           },
           body: TabBarView(children: [

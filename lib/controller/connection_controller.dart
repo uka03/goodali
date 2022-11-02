@@ -651,7 +651,7 @@ class Connection {
   static Future<List<TagModel>> getTagList(BuildContext context) async {
     try {
       final response =
-          await Http().getDio(context, headerTypebearer).post(Urls.getTagList);
+          await Http().getDio(context, headerTypeNone).post(Urls.getTagList);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
@@ -773,20 +773,22 @@ class Connection {
     }
   }
 
-  static Future<List<VideoModel>> getSimilarVideo(BuildContext context) async {
+  static Future<List<VideoModel>> getSimilarVideo(
+      BuildContext context, dynamic data) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypebearer).post(Urls.videoList);
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.getSimilarVideo, data: data);
 
       if (response.statusCode == 200) {
-        return (response.data as List)
+        return (response.data["data"] as List)
             .map((e) => VideoModel.fromJson(e))
             .toList();
       } else {
         return [];
       }
     } catch (error) {
-      developer.log("error video list $error");
+      developer.log("error similar video list $error");
       return [];
     }
   }

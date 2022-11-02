@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -31,7 +32,8 @@ double percentageFromValueInRange({required final double min, max, value}) {
   return (value - min) / (max - min);
 }
 
-String dateTimeFormatter(String dateTime) {
+String dateTimeFormatter(dynamic dateTime) {
+  developer.log(dateTime, name: "lfdjdf");
   final dateFormatter = DateFormat("yyyy-MM-dd");
   DateTime formatdate = dateFormatter.parse(dateTime);
 
