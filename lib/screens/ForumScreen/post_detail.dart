@@ -53,83 +53,66 @@ class _PostDetailState extends State<PostDetail> {
         noCard: true,
         title: "Сэтгэгдэл",
       ),
-      body: Column(children: [
-        PostItem(postItem: widget.postItem, isHearted: widget.isHearted),
-        Container(
-          margin: const EdgeInsets.all(18),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-            color: MyColors.input,
-          ),
-          child: Row(
-            children: [
-              const Icon(IconlyLight.edit),
-              const SizedBox(width: 14),
-              SizedBox(
-                width: 200,
-                child: TextField(
-                  onTap: () {
-                    bool isAuth =
-                        Provider.of<Auth>(context, listen: false).isAuth;
-                    if (isAuth) {
-                      showReplyModal();
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content:
-                              const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
-                          backgroundColor: MyColors.error,
-                          behavior: SnackBarBehavior.floating,
-                          action: SnackBarAction(
-                              onPressed: () => loginWithBio
-                                  ? Provider.of<Auth>(context, listen: false)
-                                      .authenticateWithBiometrics(context)
-                                  : showLoginModal(),
-                              label: 'Нэвтрэх',
-                              textColor: Colors.white)));
-                    }
-                  },
-                  cursorColor: MyColors.primaryColor,
-                  decoration: const InputDecoration(
-                      border: InputBorder.none, hintText: "Сэтгэгдэл бичих"),
-                ),
-              ),
-              Row(
-                children: [
-                  const Icon(IconlyLight.edit),
-                  const SizedBox(width: 14),
-                  SizedBox(
-                    width: 200,
-                    child: TextField(
-                      onTap: () {
+      body: SingleChildScrollView(
+        child: Column(children: [
+          PostItem(postItem: widget.postItem, isHearted: widget.isHearted),
+          Container(
+            margin: const EdgeInsets.all(18),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              color: MyColors.input,
+            ),
+            child: Row(
+              children: [
+                const Icon(IconlyLight.edit),
+                const SizedBox(width: 14),
+                SizedBox(
+                  width: 200,
+                  child: TextField(
+                    onTap: () {
+                      bool isAuth =
+                          Provider.of<Auth>(context, listen: false).isAuth;
+                      if (isAuth) {
                         showReplyModal();
-                      },
-                      cursorColor: MyColors.primaryColor,
-                      decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "Сэтгэгдэл бичих"),
-                    ),
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content:
+                                const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                            backgroundColor: MyColors.error,
+                            behavior: SnackBarBehavior.floating,
+                            action: SnackBarAction(
+                                onPressed: () => loginWithBio
+                                    ? Provider.of<Auth>(context, listen: false)
+                                        .authenticateWithBiometrics(context)
+                                    : showLoginModal(),
+                                label: 'Нэвтрэх',
+                                textColor: Colors.white)));
+                      }
+                    },
+                    cursorColor: MyColors.primaryColor,
+                    decoration: const InputDecoration(
+                        border: InputBorder.none, hintText: "Сэтгэгдэл бичих"),
                   ),
-                ],
-              ),
-              const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
-              comments.isEmpty
-                  ? Center(
-                      child: SvgPicture.asset(
-                          "assets/images/no_chat_history.svg",
-                          semanticsLabel: 'Acme Logo'),
-                    )
-                  : ListView.builder(
-                      itemCount: comments.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return ReplyItem(postReplys: comments[index]);
-                      })
-            ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ]),
+          const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
+          comments.isEmpty
+              ? Center(
+                  child: SvgPicture.asset("assets/images/no_chat_history.svg",
+                      semanticsLabel: 'Acme Logo'),
+                )
+              : ListView.builder(
+                  itemCount: comments.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return ReplyItem(postReplys: comments[index]);
+                  })
+        ]),
+      ),
     );
   }
 

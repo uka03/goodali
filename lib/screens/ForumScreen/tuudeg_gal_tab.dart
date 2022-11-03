@@ -34,7 +34,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
         onRefresh: _refresh,
         child: Consumer<Auth>(
           builder: (BuildContext context, value, Widget? child) {
-            if (value.isAuth) {
+            if (value.isAuth && value.hasTraining) {
               return FutureBuilder(
                   future: getPostList(),
                   builder: (context, AsyncSnapshot snapshot) {
@@ -82,7 +82,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                               color: MyColors.primaryColor));
                     }
                   });
-            } else {
+            } else if (value.isAuth && !value.hasTraining) {
               return Center(
                   child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -126,6 +126,12 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                           elevation: 0,
                           primary: MyColors.primaryColor)),
                 ],
+              ));
+            } else {
+              return const Center(
+                  child: Text(
+                "Нэвтэрч орон үргэлжлүүлнэ үү.",
+                style: TextStyle(color: MyColors.gray),
               ));
             }
           },

@@ -86,7 +86,7 @@ class _ForumScreenState extends State<ForumScreen> {
                           SizedBox(
                               width: 110, child: Tab(text: "Хүний байгаль")),
                           SizedBox(width: 110, child: Tab(text: "Нууц бүлгэм")),
-                          SizedBox(width: 110, child: Tab(text: "Миний найз"))
+                          SizedBox(width: 110, child: Tab(text: "Миний нандин"))
                         ],
                         labelColor: MyColors.primaryColor,
                         unselectedLabelColor: MyColors.black,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
@@ -37,51 +38,62 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
       body: RefreshIndicator(
         color: MyColors.primaryColor,
         onRefresh: _refresh,
-        child: FutureBuilder(
-          future: getPostList(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData &&
-                ConnectionState.done == snapshot.connectionState) {
-              postList = snapshot.data;
-              if (postList.isNotEmpty) {
-                return ListView.separated(
-                    itemCount: filteredList.isNotEmpty
-                        ? filteredList.length
-                        : postList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      isHearted.add(false);
-                      return GestureDetector(
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => PostDetail(
-                                    onRefresh: () {
-                                      _refresh();
-                                    },
-                                    postItem: postList[index],
-                                    isHearted: isHearted[index]))),
-                        child: PostItem(
-                            postItem: filteredList.isNotEmpty
-                                ? filteredList[index]
-                                : postList[index],
-                            isHearted: isHearted[index]),
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index) =>
-                        const Divider(
-                          endIndent: 18,
-                          indent: 18,
-                        ));
-              } else {
-                return Container();
-              }
-            } else {
-              return const Center(
-                  child:
-                      CircularProgressIndicator(color: MyColors.primaryColor));
-            }
-          },
-        ),
+        child: Consumer<Auth>(
+            builder: (BuildContext context, value, Widget? child) {
+          if (value.isAuth) {
+            return FutureBuilder(
+              future: getPostList(),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.hasData &&
+                    ConnectionState.done == snapshot.connectionState) {
+                  postList = snapshot.data;
+                  if (postList.isNotEmpty) {
+                    return ListView.separated(
+                        itemCount: filteredList.isNotEmpty
+                            ? filteredList.length
+                            : postList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          isHearted.add(false);
+                          return GestureDetector(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => PostDetail(
+                                        onRefresh: () {
+                                          _refresh();
+                                        },
+                                        postItem: postList[index],
+                                        isHearted: isHearted[index]))),
+                            child: PostItem(
+                                postItem: filteredList.isNotEmpty
+                                    ? filteredList[index]
+                                    : postList[index],
+                                isHearted: isHearted[index]),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const Divider(
+                              endIndent: 18,
+                              indent: 18,
+                            ));
+                  } else {
+                    return Container();
+                  }
+                } else {
+                  return const Center(
+                      child: CircularProgressIndicator(
+                          color: MyColors.primaryColor));
+                }
+              },
+            );
+          } else {
+            return const Center(
+                child: Text(
+              "Нэвтэрч орон үргэлжлүүлнэ үү.",
+              style: TextStyle(color: MyColors.gray),
+            ));
+          }
+        }),
       ),
       floatingActionButton: FilterButton(onPress: () {
         showModalTag(context, tagFuture, checkedTag);

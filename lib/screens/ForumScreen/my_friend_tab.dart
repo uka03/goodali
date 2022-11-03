@@ -84,49 +84,10 @@ class _MyFriendTabState extends State<MyFriendTab> {
                     }
                   });
             } else {
-              return Center(
-                  child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(
-                    width: 280,
-                    child: Text(
-                      "Та онлайн сургалтанд бүртгүүлснээр нууцлалтай ярианд нэгдэх боломжтой",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 14, color: MyColors.gray),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                      child: const Text(
-                        "Сургалт харах",
-                      ),
-                      onPressed: () {
-                        if (value.isAuth) {
-                          widget.goToFirstTab();
-                        } else {
-                          showModalBottomSheet(
-                              context: context,
-                              isDismissible: false,
-                              enableDrag: true,
-                              isScrollControlled: true,
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(12),
-                                      topRight: Radius.circular(12))),
-                              builder: (BuildContext context) =>
-                                  const LoginBottomSheet());
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 24),
-                          elevation: 0,
-                          primary: MyColors.primaryColor)),
-                ],
+              return const Center(
+                  child: Text(
+                "Нэвтэрч орон үргэлжлүүлнэ үү.",
+                style: TextStyle(color: MyColors.gray),
               ));
             }
           },
