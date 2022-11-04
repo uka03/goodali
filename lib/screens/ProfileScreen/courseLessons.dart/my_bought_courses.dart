@@ -152,14 +152,15 @@ class _MyCoursesState extends State<MyCourses> {
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
                 AlbumDetailItem(
-                  index: index,
-                  isBought: true,
-                  audioPlayer: audioPlayer[index],
-                  products: allLectures[index],
-                  albumName: albumName,
-                  productsList: allLectures,
-                  onTap: (product) => onPlayButtonClicked(product),
-                ),
+                    index: index,
+                    isBought: true,
+                    audioPlayer: audioPlayer[index],
+                    products: allLectures[index],
+                    albumName: albumName,
+                    productsList: allLectures,
+                    onTap: () {
+// onPlayButtonClicked(product),
+                    }),
               ],
             );
           });

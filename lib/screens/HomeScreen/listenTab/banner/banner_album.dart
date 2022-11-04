@@ -257,7 +257,7 @@ class _BannerAlbumState extends State<BannerAlbum> {
                             productsList: bannerLecture,
                             index: index,
                             albumProducts: Products(),
-                            onTap: (lecture) {},
+                            onTap: () {},
                           );
                         }
                       },

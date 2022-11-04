@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
@@ -79,7 +80,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
     bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
     widget.albumProduct.isBought == true && isAuth
         ? getLectureListLogged()
-        : getAlbumLectures;
+        : getAlbumLectures();
     imageSize = initialSize;
 
     _controller = ScrollController()
@@ -130,14 +131,16 @@ class _AlbumDetailState extends State<AlbumDetail> {
     }
   }
 
-  _initiliazePodcast(List<Products> lectureList) async {
+  _initiliazePodcast() async {
+    //ENE NOHRIIG YEROOSOO GADNA TALD TUSADN NEG CLASS BOLGOH HEREGTEI YUM BN!
+
     // Shuud xiij boloxgv! Play xiisen vyed 1 udaa xiix
     log("initiliaze album lecture");
     audioPlayerController.initiliaze();
     audioHandler.queue.value.clear();
 
-    log(lectureList.length.toString(), name: "lesture list");
-    for (var item in lectureList) {
+    log(buyList.length.toString(), name: "lesture list");
+    for (var item in buyList) {
       int savedPosition = await AudioPlayerController()
           .getSavedPosition(audioPlayerController.toAudioModel(item));
       savedPos.add(savedPosition);
@@ -187,9 +190,10 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       lectureList.add(products);
                     }
                   }
-                  setState(() {
-                    buyList = lectureList;
-                  });
+                  // setState(() {
+                  buyList = lectureList;
+                  _initiliazePodcast();
+                  // });
                   return Stack(children: [
                     Container(
                         height: containerHeight,
@@ -202,34 +206,23 @@ class _AlbumDetailState extends State<AlbumDetail> {
                               opacity: imageOpacity.clamp(0, 1),
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(14),
-                                  child: Image.network(
-                                    Urls.networkPath +
-                                        (widget.albumProduct.banner ?? ""),
+                                  child: CachedNetworkImage(
+                                    imageUrl:
+                                        "${Urls.networkPath}${widget.albumProduct.banner}",
                                     width: imageSize,
                                     height: imageSize,
-                                    loadingBuilder: (BuildContext context,
-                                        Widget child,
-                                        ImageChunkEvent? loadingProgress) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      }
+                                    progressIndicatorBuilder:
+                                        (context, url, downloadProgress) {
                                       return Center(
                                         child: CircularProgressIndicator(
                                           color: MyColors.primaryColor,
                                           strokeWidth: 2,
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
+                                          value: downloadProgress.progress,
                                         ),
                                       );
                                     },
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stack) {
+                                    errorWidget: (context, url, error) {
                                       if (error is NetworkImageLoadException &&
                                           error.statusCode == 404) {
                                         return const Text("404");
@@ -284,40 +277,38 @@ class _AlbumDetailState extends State<AlbumDetail> {
             );
           },
         ),
-        floatingActionButton: widget.albumProduct.isBought == true
-            ? Container()
-            : Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                  child: CustomElevatedButton(
-                      text: "Худалдаж авах",
-                      onPress: () {
-                        for (var item in buyList) {
-                          albumProductsList.add(item.productId!);
-                        }
-                        cart.addItemsIndex(
-                            (widget.albumProduct.productId ??
-                                widget.albumProduct.id ??
-                                0),
-                            albumProductIDs: albumProductsList);
-                        if (!cart.sameItemCheck) {
-                          cart.addProducts(widget.albumProduct);
-                          cart.addTotalPrice(
-                              widget.albumProduct.price?.toDouble() ?? 0.0);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const CartScreen()));
-                        } else {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const CartScreen()));
-                        }
-                      }),
-                ),
-              ),
+        floatingActionButton: Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+            child: CustomElevatedButton(
+                text: "Худалдаж авах",
+                onPress: () {
+                  for (var item in buyList) {
+                    albumProductsList.add(item.productId!);
+                  }
+                  cart.addItemsIndex(
+                      (widget.albumProduct.productId ??
+                          widget.albumProduct.id ??
+                          0),
+                      albumProductIDs: albumProductsList);
+                  if (!cart.sameItemCheck) {
+                    cart.addProducts(widget.albumProduct);
+                    cart.addTotalPrice(
+                        widget.albumProduct.price?.toDouble() ?? 0.0);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartScreen()));
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CartScreen()));
+                  }
+                }),
+          ),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -423,7 +414,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
             itemBuilder: (BuildContext context, int index) {
               audioPlayer.add(AudioPlayer());
 
-              if (product[index].isBought == false) {
+              if (product[index].isBought == true) {
                 for (var i = 0; i < audioPlayer.length; i++) {
                   if (currentIndex != i) {
                     audioPlayer[i].pause();
@@ -454,7 +445,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   productsList: product,
                   index: index,
                   albumProducts: widget.albumProduct,
-                  onTap: (lecture) => initialSize,
+                  onTap: () => _initiliazePodcast(),
                 );
               }
             },
@@ -496,7 +487,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
         context, widget.albumProduct.id.toString());
     // _initiliazePodcast(lectureList);
     for (var item in data) {
-      item.albumTitle = widget.albumProduct.albumTitle;
+      item.albumTitle = widget.albumProduct.title;
       dataStore.addProduct(products: item);
     }
   }
@@ -504,7 +495,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   Future<void> getLectureListLogged() async {
     var data = await Connection.getLectureListLogged(
         context, widget.albumProduct.id.toString());
-    // _initiliazePodcast(lectureList);
+
     for (var item in data) {
       item.albumTitle = widget.albumProduct.albumTitle;
       dataStore.addProduct(products: item);

@@ -27,7 +27,7 @@ class ImageView extends StatelessWidget {
       width: width,
       fit: BoxFit.cover,
       cache: true, // store in cache
-      enableMemoryCache: false, // do not store in memory
+      enableMemoryCache: true, // do not store in memory
       enableLoadState: false, // hide spinner
       loadStateChanged: (ExtendedImageState state) {
         switch (state.extendedImageLoadState) {

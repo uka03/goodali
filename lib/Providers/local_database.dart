@@ -53,6 +53,11 @@ class HiveBoughtDataStore {
 
     if (datas.isEmpty) {
       await box.add(products);
+    } else {
+      datas.first.isBought = products.isBought;
+      datas.first.audio = products.audio;
+      datas.first.intro = products.intro;
+      await datas.first.save();
     }
   }
 

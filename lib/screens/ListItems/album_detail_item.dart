@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +33,7 @@ class AlbumDetailItem extends StatefulWidget {
   final String albumName;
   final bool isBought;
   final AudioPlayer audioPlayer;
-  final OnTap onTap;
+  final VoidCallback onTap;
   final int index;
   const AlbumDetailItem(
       {Key? key,
@@ -105,7 +107,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
       //     audioPlayerController.toAudioModel(widget.products));
       // duration = duration - Duration(milliseconds: savedPosition);
       return duration;
-    } catch (e) {}
+    } catch (e) {
+      log(e.toString());
+    }
     return duration;
   }
 
@@ -180,7 +184,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
               AudioPlayerButton(
                 onPlay: () async {
                   //END zasah
-                  widget.onTap(widget.products);
+                  widget.onTap;
                   if (isPlaying == true) return;
                   setState(() {
                     isPlaying = true;
@@ -191,7 +195,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   currentlyPlaying.value = widget.products;
                 },
                 onPause: () {
-                  widget.onTap(widget.products);
+                  // widget.onTap(widget.products);
                   developer.log("paused");
 
                   AudioPlayerModel _audio = AudioPlayerModel(
@@ -218,7 +222,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   : AudioplayerTimer(
                       title: widget.products.title ?? "",
                       totalDuration: duration,
-                      savedDuration: duration,
+                      savedDuration: Duration(milliseconds: savedPosition),
                     ),
               const Spacer(),
               widget.products.isBought == false
