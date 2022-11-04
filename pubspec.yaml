@@ -28,12 +28,12 @@ dependencies:
   dio: ^4.0.6
   carousel_slider: ^4.1.1
   iconly: ^1.0.1
-  percent_indicator: 4.0.1
+  percent_indicator: ^4.2.2
   shared_preferences: ^2.0.15
   provider: ^6.0.3
   flutter_svg: ^1.0.3
-  syncfusion_flutter_gauges: 20.1.55
-  syncfusion_flutter_sliders: ^20.2.40
+  syncfusion_flutter_gauges: ^20.3.52
+  syncfusion_flutter_sliders: ^20.3.52
   readmore: ^2.2.0
   top_snackbar_flutter: ^2.1.1
   flutter_widget_from_html: ^0.8.5
@@ -66,6 +66,8 @@ dependencies:
   async: ^2.8.2
   ffmpeg_kit_flutter: ^5.1.0
   sembast: ^3.1.2
+  fwfh_text_style: ^2.22.8+1
+  hive: ^2.2.3
 
 dev_dependencies:
   flutter_test:
