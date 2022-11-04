@@ -17,7 +17,6 @@ import 'package:goodali/controller/default_audio_handler.dart';
 
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
-import 'package:goodali/main.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/screens/audioScreens.dart/player_buttons.dart';
 import 'package:miniplayer/miniplayer.dart';
@@ -351,6 +350,8 @@ class _PlayAudioState extends State<PlayAudio> {
                                   icon: const Icon(Icons.play_arrow_rounded),
                                   onPressed: () {
                                     audioHandler.play();
+
+                                    //ENE NOHOR YAG YAGAAD BN!
                                     AudioPlayerModel _audio = AudioPlayerModel(
                                         title: currentlyPlay?.title,
                                         productID: currentlyPlay?.id ?? 0,
@@ -392,13 +393,31 @@ class _PlayAudioState extends State<PlayAudio> {
                       child: ValueListenableBuilder<DurationState>(
                         valueListenable: durationStateNotifier,
                         builder: (context, durationValue, widget) {
-                          return LinearProgressIndicator(
-                            value:
-                                durationValue.progress!.inMinutes.toDouble() /
-                                    100,
-                            backgroundColor: MyColors.border1,
-                            color: MyColors.primaryColor,
+                          return SizedBox(
+                            height: 2,
+                            width: double.infinity,
+                            child: ProgressBar(
+                              progress: durationValue.progress!,
+                              buffered: durationValue.buffered,
+                              total: durationValue.total!,
+                              onSeek: null,
+                              barHeight: 2,
+                              baseBarColor: MyColors.border1,
+                              progressBarColor: MyColors.primaryColor,
+                              thumbRadius: 0,
+                              thumbGlowRadius: 0,
+                              thumbColor: Colors.transparent,
+                              bufferedBarColor:
+                                  MyColors.primaryColor.withAlpha(20),
+                            ),
                           );
+                          // LinearProgressIndicator(
+                          //   value:
+                          //       durationValue.progress!.inMinutes.toDouble() /
+                          //           100,
+                          //   backgroundColor: MyColors.border1,
+                          //   color: MyColors.primaryColor,
+                          // );
                         },
                       ),
                     )),

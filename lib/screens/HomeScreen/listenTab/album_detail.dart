@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
+import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
@@ -21,6 +22,7 @@ import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/album_intro_item.dart';
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
@@ -43,11 +45,12 @@ class AlbumDetail extends StatefulWidget {
 class _AlbumDetailState extends State<AlbumDetail> {
   AudioPlayerController audioPlayerController = AudioPlayerController();
   late final List<AudioPlayer> audioPlayer = [];
-  late final Future future = getAlbumLectures();
-  late final Future futureLogged = getLectureListLogged();
+  // late final Future future = getAlbumLectures();
+
   late final AudioPlayer introAudioPlayer = AudioPlayer();
   List<int> albumProductsList = [];
-  List<Products> lectureList = [];
+
+  final HiveBoughtDataStore dataStore = HiveBoughtDataStore();
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
@@ -68,11 +71,15 @@ class _AlbumDetailState extends State<AlbumDetail> {
   List<MediaItem> mediaItems = [];
   List<int> savedPos = [];
 
+  List<Products> buyList = [];
+
   @override
   void initState() {
     super.initState();
     bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
-    if (isAuth) getLectureListLogged();
+    widget.albumProduct.isBought == true && isAuth
+        ? getLectureListLogged()
+        : getAlbumLectures;
     imageSize = initialSize;
 
     _controller = ScrollController()
@@ -124,6 +131,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   _initiliazePodcast(List<Products> lectureList) async {
+    // Shuud xiij boloxgv! Play xiisen vyed 1 udaa xiix
     log("initiliaze album lecture");
     audioPlayerController.initiliaze();
     audioHandler.queue.value.clear();
@@ -168,12 +176,20 @@ class _AlbumDetailState extends State<AlbumDetail> {
         appBar: const SimpleAppBar(),
         body: Consumer<Auth>(
           builder: (context, value, child) {
-            return FutureBuilder(
-              future: value.isAuth ? futureLogged : future,
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  lectureList = snapshot.data;
+            return ValueListenableBuilder(
+              valueListenable: HiveBoughtDataStore.box.listenable(),
+              builder: (context, Box box, boxWidgets) {
+                if (box.length > 0) {
+                  List<Products> lectureList = [];
+                  for (int a = 0; a < box.length; a++) {
+                    Products products = box.getAt(a);
+                    if (products.albumTitle == widget.albumProduct.title) {
+                      lectureList.add(products);
+                    }
+                  }
+                  setState(() {
+                    buyList = lectureList;
+                  });
                   return Stack(children: [
                     Container(
                         height: containerHeight,
@@ -268,38 +284,40 @@ class _AlbumDetailState extends State<AlbumDetail> {
             );
           },
         ),
-        floatingActionButton: Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            child: CustomElevatedButton(
-                text: "Худалдаж авах",
-                onPress: () {
-                  for (var item in lectureList) {
-                    albumProductsList.add(item.productId!);
-                  }
-                  cart.addItemsIndex(
-                      (widget.albumProduct.productId ??
-                          widget.albumProduct.id ??
-                          0),
-                      albumProductIDs: albumProductsList);
-                  if (!cart.sameItemCheck) {
-                    cart.addProducts(widget.albumProduct);
-                    cart.addTotalPrice(
-                        widget.albumProduct.price?.toDouble() ?? 0.0);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CartScreen()));
-                  } else {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CartScreen()));
-                  }
-                }),
-          ),
-        ),
+        floatingActionButton: widget.albumProduct.isBought == true
+            ? Container()
+            : Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                  child: CustomElevatedButton(
+                      text: "Худалдаж авах",
+                      onPress: () {
+                        for (var item in buyList) {
+                          albumProductsList.add(item.productId!);
+                        }
+                        cart.addItemsIndex(
+                            (widget.albumProduct.productId ??
+                                widget.albumProduct.id ??
+                                0),
+                            albumProductIDs: albumProductsList);
+                        if (!cart.sameItemCheck) {
+                          cart.addProducts(widget.albumProduct);
+                          cart.addTotalPrice(
+                              widget.albumProduct.price?.toDouble() ?? 0.0);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const CartScreen()));
+                        } else {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const CartScreen()));
+                        }
+                      }),
+                ),
+              ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -430,13 +448,13 @@ class _AlbumDetailState extends State<AlbumDetail> {
               } else {
                 return AlbumDetailItem(
                   products: product[index],
-                  isBought: false,
+                  isBought: product[index].isBought!,
                   albumName: widget.albumProduct.title ?? "",
                   audioPlayer: audioPlayer[index],
                   productsList: product,
                   index: index,
                   albumProducts: widget.albumProduct,
-                  onTap: (lecture) => widget.onTap(lecture),
+                  onTap: (lecture) => initialSize,
                 );
               }
             },
@@ -473,15 +491,23 @@ class _AlbumDetailState extends State<AlbumDetail> {
             ));
   }
 
-  Future<List<Products>> getAlbumLectures() {
-    return Connection.getAlbumLectures(
+  Future<void> getAlbumLectures() async {
+    var data = await Connection.getAlbumLectures(
         context, widget.albumProduct.id.toString());
+    // _initiliazePodcast(lectureList);
+    for (var item in data) {
+      item.albumTitle = widget.albumProduct.albumTitle;
+      dataStore.addProduct(products: item);
+    }
   }
 
-  Future<List<Products>> getLectureListLogged() async {
-    lectureList = await Connection.getLectureListLogged(
+  Future<void> getLectureListLogged() async {
+    var data = await Connection.getLectureListLogged(
         context, widget.albumProduct.id.toString());
-    _initiliazePodcast(lectureList);
-    return lectureList;
+    // _initiliazePodcast(lectureList);
+    for (var item in data) {
+      item.albumTitle = widget.albumProduct.albumTitle;
+      dataStore.addProduct(products: item);
+    }
   }
 }

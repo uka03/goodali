@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
-import 'package:goodali/controller/audioplayer_controller.dart';
-import 'package:goodali/controller/connection_controller.dart';
-import 'package:goodali/controller/podcast_state.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/repository.dart/sembast_repository.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/unlistened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
-import 'package:goodali/services/podcast_service.dart';
+import 'package:hive_flutter/adapters.dart';
+
+import '../../../Providers/local_database.dart';
 
 class Podcast extends StatefulWidget {
   final int? id;
-  const Podcast({Key? key, this.id}) : super(key: key);
+  final HiveDataStore dataStore;
+  const Podcast({Key? key, this.id, required this.dataStore}) : super(key: key);
 
   @override
   State<Podcast> createState() => _PodcastState();
 }
 
 class _PodcastState extends State<Podcast> {
-  PodcastService service = PodcastService(repository: SembastRepository());
-  late final future = getPodcastList();
+  final HiveDataStore dataStore = HiveDataStore();
   @override
   void initState() {
     super.initState();
@@ -75,25 +73,25 @@ class _PodcastState extends State<Podcast> {
                       )))
                 ];
               },
-              body: ValueListenableBuilder<PodcastState>(
-                valueListenable: podcastsNotifier,
-                builder: (context, snapshot, _) {
-                  if (snapshot.fetched) {
-                    List<Products> podcastList = snapshot.products;
+              body: ValueListenableBuilder(
+                valueListenable: HiveDataStore.box.listenable(),
+                builder: (context, Box box, widget) {
+                  if (box.length > 0) {
+                    List<Products> data = [];
+                    for (int a = 0; a < box.length; a++) {
+                      data.add(box.getAt(a));
+                    }
+
                     return TabBarView(children: [
                       PodcastAll(
-                        service: service,
-                        podcastList: podcastList,
+                        podcastList: data,
                       ),
                       NotListenedPodcast(
-                        podcastList: podcastList,
-                        service: service,
+                        dataStore: dataStore,
                       ),
-                      DownloadedPodcast(
-                        service: service,
-                      ),
+                      const DownloadedPodcast(),
                       ListenedPodcast(
-                        service: service,
+                        dataStore: dataStore,
                       )
                     ]);
                   } else {
@@ -105,17 +103,5 @@ class _PodcastState extends State<Podcast> {
                 },
               ))),
     );
-  }
-
-  Future<void> getPodcastList() async {
-    await Connection.getPodcastList(context)
-        .then((value) => () {
-              for (var item in value) {
-                service.saveEpisode(item);
-              }
-            })
-        .onError((error, stackTrace) => () {});
-    var data = await service.loadEpisodes();
-    podcastsNotifier.value = PodcastState(data, true);
   }
 }

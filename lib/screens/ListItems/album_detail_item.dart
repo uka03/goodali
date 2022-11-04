@@ -100,9 +100,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           isLoading = false;
         });
       }
-      savedPosition = await audioPlayerController.getSavedPosition(
-          audioPlayerController.toAudioModel(widget.products));
-      duration = duration - Duration(milliseconds: savedPosition);
+      savedPosition = widget.products.position!;
+      // savedPosition = await audioPlayerController.getSavedPosition(
+      //     audioPlayerController.toAudioModel(widget.products));
+      // duration = duration - Duration(milliseconds: savedPosition);
       return duration;
     } catch (e) {}
     return duration;
@@ -112,7 +113,8 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
     final mediaInfo = mediaInfoSession.getMediaInformation()!;
     final double duration = double.parse(mediaInfo.getDuration()!);
-
+    widget.products.duration = (duration * 1000).toInt();
+    await widget.products.save();
     return Duration(milliseconds: (duration * 1000).toInt());
   }
 
@@ -133,7 +135,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     return GestureDetector(
       onTap: () {
         playerExpandProgress.value = playerMaxHeight;
-        currentlyPlaying.value = widget.products;
+        // currentlyPlaying.value = widget.products;
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -177,6 +179,8 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
             children: [
               AudioPlayerButton(
                 onPlay: () async {
+                  //END zasah
+                  widget.onTap(widget.products);
                   if (isPlaying == true) return;
                   setState(() {
                     isPlaying = true;
@@ -184,8 +188,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
                   await audioHandler.skipToQueueItem(widget.index);
                   await audioHandler.play();
-
-                  widget.onTap(widget.products);
+                  currentlyPlaying.value = widget.products;
                 },
                 onPause: () {
                   widget.onTap(widget.products);
@@ -214,7 +217,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                           color: MyColors.black))
                   : AudioplayerTimer(
                       title: widget.products.title ?? "",
-                      totalDuration: duration),
+                      totalDuration: duration,
+                      savedDuration: duration,
+                    ),
               const Spacer(),
               widget.products.isBought == false
                   ? IconButton(

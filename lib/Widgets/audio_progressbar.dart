@@ -3,7 +3,6 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
-import 'package:goodali/models/products_model.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class AudioProgressBar extends StatelessWidget {

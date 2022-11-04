@@ -7,20 +7,15 @@ import 'package:goodali/controller/default_audio_handler.dart';
 import 'dart:developer';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
-import 'package:goodali/services/podcast_service.dart';
 
 typedef OnTap = Function(Products audioObject);
 
 class PodcastAll extends StatefulWidget {
   final bool? isHomeScreen;
   final List<Products> podcastList;
-  final PodcastService service;
 
   const PodcastAll(
-      {Key? key,
-      required this.podcastList,
-      required this.service,
-      this.isHomeScreen = false})
+      {Key? key, required this.podcastList, this.isHomeScreen = false})
       : super(key: key);
 
   @override
@@ -102,7 +97,6 @@ class _PodcastAllState extends State<PodcastAll>
                       index: index,
                       podcastList: widget.podcastList,
                       podcastItem: widget.podcastList[index],
-                      service: widget.service,
                     ));
               },
               itemCount: widget.isHomeScreen == true

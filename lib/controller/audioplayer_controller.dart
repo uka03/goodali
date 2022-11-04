@@ -17,10 +17,7 @@ import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/controller/progress_notifier.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/repository.dart/sembast_repository.dart';
-import 'package:goodali/services/podcast_service.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final currentlyPlaying = ValueNotifier<Products?>(null);
@@ -73,9 +70,7 @@ class AudioPlayerController with ChangeNotifier {
         var item = currentlyPlaying.value;
         if (item != null) {
           item.position = durationStateNotifier.value.progress!.inMilliseconds;
-          PodcastService service =
-              PodcastService(repository: SembastRepository());
-          service.saveEpisode(item);
+          item.save();
         }
       }
       if (processingState == AudioProcessingState.ready && isPlaying == true) {

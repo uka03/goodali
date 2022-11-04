@@ -9,11 +9,13 @@ import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
+import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/Auth/enable_biometric.dart';
 import 'package:goodali/screens/blank.dart';
 import 'package:goodali/screens/bottom_bar.dart';
 import 'package:goodali/screens/intro_screen.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
@@ -23,7 +25,10 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   CacheManager.logLevel = CacheManagerLogLevel.verbose;
-
+  await Hive.initFlutter();
+  Hive.registerAdapter<Products>(ProductsAdapter());
+  await Hive.openBox<Products>("podcasts");
+  await Hive.openBox<Products>("bought_podcasts");
   runApp(const MyApp());
 }
 
@@ -50,8 +55,8 @@ class _MyAppState extends State<MyApp> {
             create: (_) => AudioPlayerProvider()),
         ChangeNotifierProvider<AudioDownloadProvider>(
             create: (_) => AudioDownloadProvider()),
-        ChangeNotifierProvider<PodcastProvider>(
-            create: (_) => PodcastProvider()),
+        // ChangeNotifierProvider<PodcastProvider>(
+        //     create: (_) => PodcastProvider()),
         ChangeNotifierProvider<ForumTagNotifier>(
             create: (_) => ForumTagNotifier()),
       ],

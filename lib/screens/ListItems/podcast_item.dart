@@ -15,7 +15,6 @@ import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/services/podcast_service.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +28,6 @@ class PodcastItem extends StatefulWidget {
   final List<Products> podcastList;
   final OnTap onTap;
   final int index;
-  final PodcastService service;
 
   const PodcastItem({
     Key? key,
@@ -37,7 +35,6 @@ class PodcastItem extends StatefulWidget {
     required this.podcastList,
     required this.index,
     required this.onTap,
-    required this.service,
   }) : super(key: key);
 
   @override
@@ -65,7 +62,7 @@ class _PodcastItemState extends State<PodcastItem> {
     super.initState();
   }
 
-  Future<Products?> updateSavedPosition(PodcastService service) async {
+  Future<void> updateSavedPosition() async {
     var item = currentlyPlaying.value;
 
     if (item != null) {
@@ -76,10 +73,8 @@ class _PodcastItemState extends State<PodcastItem> {
       }
       item.position = durationStateNotifier.value.progress!.inMilliseconds;
       log('${item.position}');
-      return await service.saveEpisode(item);
+      return item.save();
     }
-
-    return null;
   }
 
   getTotalDuration() async {
@@ -96,9 +91,9 @@ class _PodcastItemState extends State<PodcastItem> {
       }
       progressMax = _totalduration;
 
-      if (widget.podcastItem.position != null) {
-        _totalduration = _totalduration - Duration(milliseconds: savedDuration);
-      }
+      // if (widget.podcastItem.position != null) {
+      //   _totalduration = _totalduration - Duration(milliseconds: savedDuration);
+      // }
 
       if (mounted) {
         setState(() {
@@ -115,13 +110,12 @@ class _PodcastItemState extends State<PodcastItem> {
     final mediaInfo = mediaInfoSession.getMediaInformation()!;
     final double duration = double.parse(mediaInfo.getDuration()!);
     widget.podcastItem.duration = (duration * 1000).toInt();
-    await widget.service.saveEpisode(widget.podcastItem);
+    await widget.podcastItem.save();
     return Duration(milliseconds: (duration * 1000).toInt());
   }
 
   @override
   Widget build(BuildContext context) {
-    final podcastProvider = Provider.of<PodcastProvider>(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -175,7 +169,7 @@ class _PodcastItemState extends State<PodcastItem> {
                 children: [
                   AudioPlayerButton(
                     onPlay: () async {
-                      await updateSavedPosition(widget.service);
+                      await updateSavedPosition();
 
                       currentlyPlaying.value = widget.podcastItem;
                       await audioHandler.skipToQueueItem(widget.index);
@@ -185,15 +179,15 @@ class _PodcastItemState extends State<PodcastItem> {
                       );
                       await audioHandler.play();
 
-                      podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
-                      if (!podcastProvider.sameItemCheck) {
-                        podcastProvider.addListenedPodcast(
-                            widget.podcastItem, widget.podcastList);
-                      }
+                      // podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
+                      // if (!podcastProvider.sameItemCheck) {
+                      //   podcastProvider.addListenedPodcast(
+                      //       widget.podcastItem, widget.podcastList);
+                      // }
                       await widget.onTap(widget.podcastItem);
                     },
                     onPause: () async {
-                      await updateSavedPosition(widget.service);
+                      await updateSavedPosition();
                       audioHandler.pause();
 
                       // audioHandler.pause().then((value) =>
@@ -222,8 +216,11 @@ class _PodcastItemState extends State<PodcastItem> {
                                 : Container(),
                             const SizedBox(width: 10),
                             AudioplayerTimer(
-                                title: widget.podcastItem.title ?? "",
-                                totalDuration: _totalduration),
+                              title: widget.podcastItem.title ?? "",
+                              totalDuration: _totalduration,
+                              savedDuration:
+                                  Duration(milliseconds: savedDuration),
+                            ),
                           ],
                         ),
                   const Spacer(),

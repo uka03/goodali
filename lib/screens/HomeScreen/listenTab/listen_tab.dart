@@ -1,23 +1,20 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
-import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/controller/podcast_state.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/video_model.dart';
-import 'package:goodali/repository.dart/sembast_repository.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
 import 'package:goodali/screens/ListItems/album_item.dart';
 import 'package:goodali/screens/ListItems/video_item.dart';
-import 'package:goodali/services/podcast_service.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+
+import '../../../Providers/local_database.dart';
 
 class ListenTabbar extends StatefulWidget {
   const ListenTabbar({Key? key}) : super(key: key);
@@ -31,8 +28,7 @@ class _ListenTabbarState extends State<ListenTabbar>
   @override
   bool get wantKeepAlive => true;
   bool isLoading = false;
-  PodcastService service = PodcastService(repository: SembastRepository());
-
+  final HiveDataStore dataStore = HiveDataStore();
   @override
   void initState() {
     super.initState();
@@ -85,20 +81,27 @@ class _ListenTabbarState extends State<ListenTabbar>
                         fontWeight: FontWeight.bold)),
                 IconButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => const Podcast()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => Podcast(
+                                    dataStore: dataStore,
+                                  )));
                     },
                     icon: const Icon(IconlyLight.arrow_right))
               ],
             )),
-        ValueListenableBuilder<PodcastState>(
-          valueListenable: podcastsNotifier,
-          builder: (context, snapshot, _) {
-            if (snapshot.fetched) {
+        ValueListenableBuilder(
+          valueListenable: HiveDataStore.box.listenable(),
+          builder: (context, Box box, widget) {
+            if (box.length > 0) {
+              List<Products> data = [];
+              for (int a = 0; a < box.length; a++) {
+                data.add(box.getAt(a));
+              }
               return PodcastAll(
                 isHomeScreen: true,
-                podcastList: snapshot.products,
-                service: service,
+                podcastList: data,
               );
             } else {
               return const Center(
@@ -193,14 +196,10 @@ class _ListenTabbarState extends State<ListenTabbar>
   }
 
   Future<void> getPodcastList() async {
-    await Connection.getPodcastList(context)
-        .then((value) => () {
-              for (var item in value) {
-                service.saveEpisode(item);
-              }
-            })
-        .onError((error, stackTrace) => () {});
-    var data = await service.loadEpisodes();
-    podcastsNotifier.value = PodcastState(data, true);
+    var data = await Connection.getPodcastList(context);
+
+    for (var item in data) {
+      dataStore.addProduct(products: item);
+    }
   }
 }

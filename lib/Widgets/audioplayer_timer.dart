@@ -9,8 +9,12 @@ import 'package:goodali/controller/progress_notifier.dart';
 class AudioplayerTimer extends StatelessWidget {
   final String title;
   final Duration totalDuration;
+  final Duration savedDuration;
   const AudioplayerTimer(
-      {Key? key, required this.title, required this.totalDuration})
+      {Key? key,
+      required this.title,
+      required this.totalDuration,
+      required this.savedDuration})
       : super(key: key);
 
   @override
@@ -21,7 +25,7 @@ class AudioplayerTimer extends StatelessWidget {
         var buttonState = buttonNotifier.value;
         var currently = currentlyPlaying.value;
 
-        Duration duration = totalDuration;
+        Duration duration = savedDuration;
         Duration position = value.current;
 
         bool isPlaying =
@@ -30,10 +34,10 @@ class AudioplayerTimer extends StatelessWidget {
                 : false;
 
         if (isPlaying) {
-          return Text(formatTime(duration - position) + "мин",
+          return Text(formatTime(totalDuration - position) + "мин",
               style: const TextStyle(fontSize: 12, color: MyColors.black));
         } else {
-          return Text(formatTime(duration) + "мин",
+          return Text(formatTime(totalDuration - duration) + "мин",
               style: const TextStyle(fontSize: 12, color: MyColors.black));
         }
       },

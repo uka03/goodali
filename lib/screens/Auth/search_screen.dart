@@ -10,9 +10,12 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/blank.dart';
 
+import '../../Providers/local_database.dart';
+
 class SearchScreen extends SearchDelegate {
   @override
   String get searchFieldLabel => 'Нэрээр хайх';
+  final HiveDataStore dataStore = HiveDataStore();
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -117,8 +120,10 @@ class SearchScreen extends SearchDelegate {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) =>
-                                      Podcast(id: searchResult[index].id)));
+                                  builder: (_) => Podcast(
+                                        id: searchResult[index].id,
+                                        dataStore: dataStore,
+                                      )));
                           break;
 
                         default:

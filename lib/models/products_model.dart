@@ -1,28 +1,52 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:goodali/Utils/urls.dart';
+import 'package:hive/hive.dart';
 
-class Products {
-  String? audio;
-  String? banner;
+part 'products_model.g.dart';
+
+@HiveType(typeId: 0)
+class Products extends HiveObject {
+  @HiveField(0)
   int? id;
+  @HiveField(1)
   int? price;
+  @HiveField(2)
   int? productId;
+  @HiveField(3)
   String? title;
+  @HiveField(4)
   String? intro;
+  @HiveField(5)
   String? name;
+  @HiveField(6)
   int? status;
+  @HiveField(7)
   String? body;
+  @HiveField(8)
   int? order;
+  @HiveField(9)
   String? traingName;
+  @HiveField(10)
   String? albumTitle;
+  @HiveField(11)
   String? lectureTitle;
+  @HiveField(12)
   bool? isBought;
+  @HiveField(13)
   bool? played;
+  @HiveField(14)
   int? audioCount;
+  @HiveField(15)
   int? position;
+  @HiveField(16)
   int? duration;
+  @HiveField(17)
   String? trainingBanner;
-
+  @HiveField(18)
+  String? audio;
+  @HiveField(19)
+  String? banner;
+  @HiveField(20)
   Products(
       {this.audio,
       this.banner,
