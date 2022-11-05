@@ -36,7 +36,6 @@ class _DownloadedState extends State<Downloaded> {
                   return AlbumDetailItem(
                     index: index,
                     products: value.downloadedItem[index],
-                    audioPlayer: AudioPlayer(),
                     albumName: value.downloadedItem[index].albumTitle ?? "",
                     isBought: value.downloadedItem[index].isBought ?? true,
                     onTap: widget.onTap(value.downloadedItem[index]),

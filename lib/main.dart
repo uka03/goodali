@@ -8,6 +8,7 @@ import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/models/products_model.dart';
 
@@ -22,7 +23,8 @@ import 'dart:developer' as developer;
 
 Future<void> main() async {
   await initAudioHandler();
-
+  AudioPlayerController audioPlayerController = AudioPlayerController();
+  audioPlayerController.initiliaze();
   WidgetsFlutterBinding.ensureInitialized();
   CacheManager.logLevel = CacheManagerLogLevel.verbose;
   await Hive.initFlutter();

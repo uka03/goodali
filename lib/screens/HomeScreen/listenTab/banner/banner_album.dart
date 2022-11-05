@@ -243,17 +243,14 @@ class _BannerAlbumState extends State<BannerAlbum> {
                           return AlbumIntroItem(
                             albumName: '',
                             audioPlayer: audioPlayer,
-                            audioPlayerList: [],
                             products: bannerLecture[index],
                             productsList: bannerLecture,
-                            setIndex: (int index) {},
                           );
                         } else {
                           return AlbumDetailItem(
                             products: bannerLecture[index],
                             isBought: false,
                             albumName: "",
-                            audioPlayer: audioPlayer,
                             productsList: bannerLecture,
                             index: index,
                             albumProducts: Products(),

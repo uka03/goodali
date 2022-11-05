@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -26,6 +27,8 @@ final playerExpandProgress = ValueNotifier<double>(playerMinHeight);
 final currentPlayingItem =
     ValueNotifier<MediaItem>(const MediaItem(id: "", title: ''));
 
+final currentPlayingSong = ValueNotifier<String>("");
+
 final durationStateNotifier = ValueNotifier<DurationState>(
     const DurationState(Duration.zero, Duration.zero, Duration.zero));
 final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
@@ -34,6 +37,7 @@ final progressNotifier = ValueNotifier<ProgressBarState>(const ProgressBarState(
   total: Duration.zero,
   buffered: Duration.zero,
 ));
+
 final podcastsNotifier =
     ValueNotifier<PodcastState>(const PodcastState([], false));
 
@@ -169,4 +173,39 @@ class AudioPlayerController with ChangeNotifier {
       extras: {"url": products.audioUrl},
       duration: Duration(milliseconds: products.audioPosition ?? 0),
       title: products.title ?? "");
+}
+
+List<Products> activeList = [];
+
+Future<bool> initiliazePodcast() async {
+  List<MediaItem> mediaItems = [];
+  audioHandler.queue.value.clear();
+
+  log(activeList.length.toString(), name: "lesture list");
+  for (var item in activeList) {
+    MediaItem mediaItem = MediaItem(
+      id: item.id.toString(),
+      artUri: Uri.parse(Urls.networkPath + item.banner!),
+      title: item.title!,
+      duration: item.duration != 0 && item.duration != null
+          ? Duration(milliseconds: item.duration!)
+          : null,
+      extras: {
+        'url': Urls.networkPath + item.audio!,
+      },
+    );
+    mediaItems.add(mediaItem);
+  }
+
+  //Audio queue нь mediaItems тай адил биш байвал
+  //Queue рүү нэмнэ.
+
+  var firstItem = await audioHandler.queue.first;
+  if (audioHandler.queue.value.isEmpty ||
+      identical(firstItem, mediaItems.first) == true) {
+    log("initiliaze add queue lecture", name: mediaItems.length.toString());
+    await audioHandler.addQueueItems(mediaItems);
+    return true;
+  }
+  return false;
 }

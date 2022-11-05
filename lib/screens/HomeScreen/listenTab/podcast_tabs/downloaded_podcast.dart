@@ -33,7 +33,6 @@ class _DownloadedPodcastState extends State<DownloadedPodcast> {
                     index: index,
                     podcastList: value.downloadedPodcast,
                     podcastItem: value.downloadedPodcast[index],
-                    onTap: (product) => () {},
                   ));
             });
       } else {

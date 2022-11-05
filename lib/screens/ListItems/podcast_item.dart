@@ -21,12 +21,10 @@ import 'package:provider/provider.dart';
 
 import 'dart:developer' as developer;
 
-typedef OnTap = Function(Products audioObject);
-
 class PodcastItem extends StatefulWidget {
   final Products podcastItem;
   final List<Products> podcastList;
-  final OnTap onTap;
+  final VoidCallback? onTap;
   final int index;
 
   const PodcastItem({
@@ -34,7 +32,7 @@ class PodcastItem extends StatefulWidget {
     required this.podcastItem,
     required this.podcastList,
     required this.index,
-    required this.onTap,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -170,29 +168,11 @@ class _PodcastItemState extends State<PodcastItem> {
                   AudioPlayerButton(
                     onPlay: () async {
                       await updateSavedPosition();
-
-                      currentlyPlaying.value = widget.podcastItem;
-                      await audioHandler.skipToQueueItem(widget.index);
-                      log("${widget.podcastItem.title} : start in : ${savedDuration}");
-                      await audioHandler.seek(
-                        Duration(milliseconds: savedDuration),
-                      );
-                      await audioHandler.play();
-
-                      // podcastProvider.addPodcastID(widget.podcastItem.id ?? 0);
-                      // if (!podcastProvider.sameItemCheck) {
-                      //   podcastProvider.addListenedPodcast(
-                      //       widget.podcastItem, widget.podcastList);
-                      // }
-                      await widget.onTap(widget.podcastItem);
+                      widget.onTap!.call();
                     },
                     onPause: () async {
                       await updateSavedPosition();
                       audioHandler.pause();
-
-                      // audioHandler.pause().then((value) =>
-                      //     podcastProvider.unListenedPodcastFun(
-                      //         widget.podcastItem, widget.podcastList));
                     },
                     title: widget.podcastItem.title ?? "",
                   ),

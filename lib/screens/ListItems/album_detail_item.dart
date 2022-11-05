@@ -32,7 +32,6 @@ class AlbumDetailItem extends StatefulWidget {
   final List<Products> productsList;
   final String albumName;
   final bool isBought;
-  final AudioPlayer audioPlayer;
   final VoidCallback onTap;
   final int index;
   const AlbumDetailItem(
@@ -41,7 +40,6 @@ class AlbumDetailItem extends StatefulWidget {
       required this.albumName,
       required this.productsList,
       required this.isBought,
-      required this.audioPlayer,
       this.albumProducts,
       required this.onTap,
       required this.index})
@@ -74,7 +72,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   String audioURL = "";
   String introURL = "";
   String banner = "";
-  MediaItem item = MediaItem(id: '', title: "");
   @override
   void initState() {
     if (widget.products.audio != "Audio failed to upload") {
@@ -93,8 +90,11 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   Future<Duration> getTotalDuration() async {
     try {
-      if (_totalduration == Duration.zero) {
+      if (widget.products.duration == null || widget.products.duration == 0) {
         _totalduration = await getFileDuration(url);
+      } else {
+        developer.log(widget.products.isBought.toString(), name: "is Bought");
+        _totalduration = Duration(milliseconds: widget.products.duration!);
       }
       if (mounted) {
         setState(() {
@@ -103,9 +103,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         });
       }
       savedPosition = widget.products.position!;
-      // savedPosition = await audioPlayerController.getSavedPosition(
-      //     audioPlayerController.toAudioModel(widget.products));
-      // duration = duration - Duration(milliseconds: savedPosition);
       return duration;
     } catch (e) {
       log(e.toString());
@@ -135,7 +132,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   @override
   Widget build(BuildContext context) {
-    final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return GestureDetector(
       onTap: () {
         playerExpandProgress.value = playerMaxHeight;
@@ -160,8 +156,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.isBought
-                          ? widget.products.lectureTitle ?? ""
+                      widget.isBought &&
+                              widget.products.lectureTitle != null &&
+                              widget.products.lectureTitle!.isNotEmpty
+                          ? widget.products.lectureTitle!
                           : widget.products.title ?? "",
                       maxLines: 1,
                       softWrap: true,
@@ -182,31 +180,15 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           Row(
             children: [
               AudioPlayerButton(
-                onPlay: () async {
-                  //END zasah
-                  widget.onTap;
-                  if (isPlaying == true) return;
-                  setState(() {
-                    isPlaying = true;
-                  });
-
-                  await audioHandler.skipToQueueItem(widget.index);
-                  await audioHandler.play();
-                  currentlyPlaying.value = widget.products;
-                },
+                onPlay: widget.onTap,
                 onPause: () {
-                  // widget.onTap(widget.products);
-                  developer.log("paused");
-
-                  AudioPlayerModel _audio = AudioPlayerModel(
-                      productID: widget.products.id,
-                      audioPosition: position.inMilliseconds);
-                  _audioPlayerProvider.addAudioPosition(_audio);
                   audioHandler.pause();
                 },
-                title: widget.products.lectureTitle == ""
-                    ? widget.products.title ?? ""
-                    : widget.products.lectureTitle ?? '',
+                title: widget.isBought &&
+                        widget.products.lectureTitle != null &&
+                        widget.products.lectureTitle!.isNotEmpty
+                    ? widget.products.lectureTitle!
+                    : widget.products.title ?? "",
               ),
               // if (isClicked)
               //   AudioProgressBar(
@@ -225,7 +207,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                       savedDuration: Duration(milliseconds: savedPosition),
                     ),
               const Spacer(),
-              widget.products.isBought == false
+              widget.products.isBought == true
                   ? IconButton(
                       splashRadius: 20,
                       onPressed: () {

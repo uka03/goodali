@@ -24,55 +24,39 @@ class PodcastAll extends StatefulWidget {
 
 class _PodcastAllState extends State<PodcastAll>
     with AutomaticKeepAliveClientMixin<PodcastAll> {
-  AudioPlayerController audioPlayerController = AudioPlayerController();
   List<MediaItem> mediaItems = [];
   List<int> savedPos = [];
 
   @override
   void initState() {
     super.initState();
-    //Audio queue хоосон байна уу гэдгийг шалгаад
-    //Хоосон бол queue рүү нэмнэ.
-    if (audioHandler.queue.value.isEmpty) _initiliazePodcast();
+    if (audioHandler.queue.value.isEmpty) initiliaze();
   }
 
-  _initiliazePodcast() async {
-    audioPlayerController.initiliaze();
-    audioHandler.queue.value.clear();
-    if (mediaItems.isNotEmpty) return;
-    for (var item in widget.podcastList) {
-      int savedPosition = await AudioPlayerController()
-          .getSavedPosition(audioPlayerController.toAudioModel(item));
-      savedPos.add(savedPosition);
-
-      MediaItem mediaItem = MediaItem(
-        id: item.id.toString(),
-        artUri: Uri.parse(Urls.networkPath + item.banner!),
-        title: item.title!,
-        duration: item.duration != 0 && item.duration != null
-            ? Duration(milliseconds: item.duration!)
-            : null,
-        extras: {
-          'url': Urls.networkPath + item.audio!,
-          "saved_position": savedPosition
-        },
-      );
-      mediaItems.add(mediaItem);
+  Future<bool> initiliaze() async {
+    if (activeList.isNotEmpty &&
+        activeList.first.name == widget.podcastList.first.name &&
+        activeList.first.id == widget.podcastList.first.id) {
+      return true;
     }
-    log(mediaItems.length.toString(), name: "mediaItems.length");
 
-    //Audio queue нь mediaItems тай адил биш байвал
-    //Queue рүү нэмнэ.
-
-    var firstItem = await audioHandler.queue.first;
-    if (audioHandler.queue.value.isEmpty ||
-        identical(firstItem, mediaItems.first) == true) {
-      await audioHandler.addQueueItems(mediaItems);
-    }
+    activeList = widget.podcastList;
+    await initiliazePodcast();
+    return true;
   }
 
-  onPlayButtonClicked(Products products) {
-    _initiliazePodcast();
+  onPlayButtonClicked(int index) async {
+    await initiliaze();
+    currentlyPlaying.value = widget.podcastList[index];
+    await audioHandler.skipToQueueItem(index);
+    log("Starts in: ${widget.podcastList[index].position}");
+    await audioHandler.seek(
+      Duration(milliseconds: widget.podcastList[index].position!),
+    );
+    await audioHandler.play();
+    await audioHandler.seek(
+      Duration(milliseconds: widget.podcastList[index].position!),
+    );
   }
 
   @override
@@ -93,7 +77,9 @@ class _PodcastAllState extends State<PodcastAll>
                 return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: PodcastItem(
-                      onTap: (product) => onPlayButtonClicked(product),
+                      onTap: () {
+                        onPlayButtonClicked(index);
+                      },
                       index: index,
                       podcastList: widget.podcastList,
                       podcastItem: widget.podcastList[index],

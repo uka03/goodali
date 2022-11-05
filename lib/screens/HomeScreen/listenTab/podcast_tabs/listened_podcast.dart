@@ -52,7 +52,6 @@ class _ListenedPodcastState extends State<ListenedPodcast>
                     index: index,
                     podcastList: data,
                     podcastItem: data[index],
-                    onTap: (product) => () {},
                   ),
                 );
               });

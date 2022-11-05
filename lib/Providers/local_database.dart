@@ -30,6 +30,16 @@ class HiveDataStore {
     await box.putAt(index, userModel);
   }
 
+  Future<void> updatePosition(String title, int id, int position) async {
+    var datas =
+        box.values.where((c) => c.title == title && c.id == id).toList();
+    if (datas.isNotEmpty) {
+      var item = box.get(datas.first.key);
+      item!.position = position;
+      await item.save();
+    }
+  }
+
   /// delete user
   Future<void> deleteProducts({required int index}) async {
     await box.deleteAt(index);
@@ -54,10 +64,12 @@ class HiveBoughtDataStore {
     if (datas.isEmpty) {
       await box.add(products);
     } else {
-      datas.first.isBought = products.isBought;
-      datas.first.audio = products.audio;
-      datas.first.intro = products.intro;
-      await datas.first.save();
+      var item = box.get(datas.first.key);
+      item!.isBought = products.isBought;
+      item.audio = products.audio;
+      item.intro = products.intro;
+      item.title = products.title;
+      await item.save();
     }
   }
 

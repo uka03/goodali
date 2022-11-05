@@ -26,7 +26,6 @@ class MyCourses extends StatefulWidget {
 class _MyCoursesState extends State<MyCourses> {
   AudioPlayerController audioPlayerController = AudioPlayerController();
   List<Products> allLectures = [];
-  late final List<AudioPlayer> audioPlayer = [];
   List<MediaItem> mediaItems = [];
   String albumName = "";
   int currentIndex = 0;
@@ -38,41 +37,25 @@ class _MyCoursesState extends State<MyCourses> {
     super.initState();
   }
 
-  _initiliazeLecture(List<Products> allLectures) async {
-    audioPlayerController.initiliaze();
-    audioHandler.queue.value.clear();
-    if (mediaItems.isNotEmpty) return;
-    for (var item in allLectures) {
-      int savedPosition = await AudioPlayerController()
-          .getSavedPosition(audioPlayerController.toAudioModel(item));
-      savedPos.add(savedPosition);
-
-      MediaItem mediaItem = MediaItem(
-        id: item.id.toString(),
-        artUri: Uri.parse(Urls.networkPath + item.banner!),
-        title: item.title!,
-        extras: {
-          'url': Urls.networkPath + item.audio!,
-          "saved_position": savedPosition
-        },
+  onPlayButtonClicked(int index) async {
+    if (activeList.first.title == allLectures.first.title &&
+        activeList.first.id == allLectures.first.id) {
+      await audioHandler.skipToQueueItem(index);
+      await audioHandler.seek(
+        Duration(milliseconds: allLectures[index].position!),
       );
-      mediaItems.add(mediaItem);
+      await audioHandler.play();
+      currentlyPlaying.value = allLectures[index];
+    } else if (activeList.first.title != allLectures.first.title ||
+        activeList.first.id != allLectures.first.id) {
+      activeList = allLectures;
+      await initiliazePodcast();
+      await audioHandler.skipToQueueItem(index);
+      await audioHandler.seek(
+        Duration(milliseconds: allLectures[index].position!),
+      );
+      await audioHandler.play();
     }
-    log(mediaItems.length.toString(), name: "mediaItems.length");
-
-    //Audio queue нь mediaItems тай адил биш байвал
-    //Queue рүү нэмнэ.
-
-    var firstItem = await audioHandler.queue.first;
-    if (audioHandler.queue.value.isEmpty ||
-        identical(firstItem, mediaItems.first) == true) {
-      await audioHandler.addQueueItems(mediaItems);
-    }
-  }
-
-  onPlayButtonClicked(Products products) {
-    // _initiliazeLecture();
-    widget.onTap(products);
   }
 
   @override
@@ -130,7 +113,6 @@ class _MyCoursesState extends State<MyCourses> {
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemBuilder: (context, index) {
-            audioPlayer.add(AudioPlayer());
             String empty = "";
             if (albumName == allLectures[index].albumTitle) {
               empty = "";
@@ -154,12 +136,11 @@ class _MyCoursesState extends State<MyCourses> {
                 AlbumDetailItem(
                     index: index,
                     isBought: true,
-                    audioPlayer: audioPlayer[index],
                     products: allLectures[index],
                     albumName: albumName,
                     productsList: allLectures,
                     onTap: () {
-// onPlayButtonClicked(product),
+                      onPlayButtonClicked(index);
                     }),
               ],
             );
@@ -198,7 +179,7 @@ class _MyCoursesState extends State<MyCourses> {
 
   Future<List<Products>> getAllLectures() async {
     allLectures = await Connection.getAllLectures(context);
-    _initiliazeLecture(allLectures);
+    // _initiliazeLecture(allLectures);
     return allLectures;
   }
 

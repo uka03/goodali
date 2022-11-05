@@ -45,7 +45,6 @@ class _NotListenedPodcastState extends State<NotListenedPodcast>
                   index: index,
                   podcastItem: data[index],
                   podcastList: data,
-                  onTap: (product) => () {},
                 ),
               );
             },

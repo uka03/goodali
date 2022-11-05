@@ -9,8 +9,8 @@ import 'package:goodali/models/products_model.dart';
 
 class AudioPlayerButton extends StatelessWidget {
   final String title;
-  final Function onPlay;
-  final Function onPause;
+  final VoidCallback onPlay;
+  final VoidCallback onPause;
   const AudioPlayerButton(
       {Key? key,
       required this.title,

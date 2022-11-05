@@ -45,7 +45,6 @@ class AlbumDetail extends StatefulWidget {
 
 class _AlbumDetailState extends State<AlbumDetail> {
   AudioPlayerController audioPlayerController = AudioPlayerController();
-  late final List<AudioPlayer> audioPlayer = [];
   // late final Future future = getAlbumLectures();
 
   late final AudioPlayer introAudioPlayer = AudioPlayer();
@@ -63,22 +62,15 @@ class _AlbumDetailState extends State<AlbumDetail> {
   double containerInitialHeight = 270;
   double imageOpacity = 1;
   bool isPlaying = false;
-  bool isClicked = false;
-  int currentIndex = 1;
-  int savedPosition = 0;
-
-  int saveddouble = 0;
-
-  List<MediaItem> mediaItems = [];
-  List<int> savedPos = [];
 
   List<Products> buyList = [];
-
+  AudioPlayer audioPlayer = AudioPlayer();
   @override
   void initState() {
     super.initState();
+    audioPlayer.setLoopMode(LoopMode.off);
     bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
-    widget.albumProduct.isBought == true && isAuth
+    widget.albumProduct.isBought == true || isAuth
         ? getLectureListLogged()
         : getAlbumLectures();
     imageSize = initialSize;
@@ -115,7 +107,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   @override
   void dispose() {
     introAudioPlayer.dispose();
-    audioPlayer.map((e) => e.dispose());
+    audioPlayer.dispose();
     super.dispose();
   }
 
@@ -128,43 +120,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
       });
     } catch (e) {
       debugPrint(e.toString());
-    }
-  }
-
-  _initiliazePodcast() async {
-    //ENE NOHRIIG YEROOSOO GADNA TALD TUSADN NEG CLASS BOLGOH HEREGTEI YUM BN!
-
-    // Shuud xiij boloxgv! Play xiisen vyed 1 udaa xiix
-    log("initiliaze album lecture");
-    audioPlayerController.initiliaze();
-    audioHandler.queue.value.clear();
-
-    log(buyList.length.toString(), name: "lesture list");
-    for (var item in buyList) {
-      int savedPosition = await AudioPlayerController()
-          .getSavedPosition(audioPlayerController.toAudioModel(item));
-      savedPos.add(savedPosition);
-
-      MediaItem mediaItem = MediaItem(
-        id: item.id.toString(),
-        artUri: Uri.parse(Urls.networkPath + item.banner!),
-        title: item.title!,
-        extras: {
-          'url': Urls.networkPath + item.audio!,
-          "saved_position": savedPosition
-        },
-      );
-      mediaItems.add(mediaItem);
-    }
-
-    //Audio queue нь mediaItems тай адил биш байвал
-    //Queue рүү нэмнэ.
-
-    var firstItem = await audioHandler.queue.first;
-    if (audioHandler.queue.value.isEmpty ||
-        identical(firstItem, mediaItems.first) == true) {
-      log("initiliaze add queue lecture", name: mediaItems.length.toString());
-      await audioHandler.addQueueItems(mediaItems);
     }
   }
 
@@ -190,9 +145,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       lectureList.add(products);
                     }
                   }
-                  // setState(() {
                   buyList = lectureList;
-                  _initiliazePodcast();
                   // });
                   return Stack(children: [
                     Container(
@@ -277,45 +230,48 @@ class _AlbumDetailState extends State<AlbumDetail> {
             );
           },
         ),
-        floatingActionButton: Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            child: CustomElevatedButton(
-                text: "Худалдаж авах",
-                onPress: () {
-                  for (var item in buyList) {
-                    albumProductsList.add(item.productId!);
-                  }
-                  cart.addItemsIndex(
-                      (widget.albumProduct.productId ??
-                          widget.albumProduct.id ??
-                          0),
-                      albumProductIDs: albumProductsList);
-                  if (!cart.sameItemCheck) {
-                    cart.addProducts(widget.albumProduct);
-                    cart.addTotalPrice(
-                        widget.albumProduct.price?.toDouble() ?? 0.0);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CartScreen()));
-                  } else {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CartScreen()));
-                  }
-                }),
-          ),
-        ),
+        floatingActionButton: widget.albumProduct.isBought == true
+            ? Container()
+            : Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                  child: CustomElevatedButton(
+                      text: "Худалдаж авах",
+                      onPress: () {
+                        for (var item in buyList) {
+                          if (item.isBought == false) {
+                            albumProductsList.add(item.productId!);
+                          }
+                        }
+                        cart.addItemsIndex(
+                            (widget.albumProduct.productId ??
+                                widget.albumProduct.id ??
+                                0),
+                            albumProductIDs: albumProductsList);
+                        if (!cart.sameItemCheck) {
+                          cart.addProducts(widget.albumProduct);
+                          cart.addTotalPrice(
+                              widget.albumProduct.price?.toDouble() ?? 0.0);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const CartScreen()));
+                        } else {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const CartScreen()));
+                        }
+                      }),
+                ),
+              ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
 
   Widget lecture(BuildContext context, List<Products> product) {
-    final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -368,14 +324,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
                         splashRadius: 20,
                         padding: EdgeInsets.zero,
                         onPressed: () async {
-                          setState(() {
-                            isClicked = true;
-                            currentIndex = audioPlayer.length + 1;
-                          });
-                          AudioPlayerModel _audio = AudioPlayerModel(
-                              productID: widget.albumProduct.productId,
-                              audioPosition: position.inMilliseconds);
-                          _audioPlayerProvider.addAudioPosition(_audio);
                           if (isPlaying) {
                             introAudioPlayer.pause();
                           } else {
@@ -412,40 +360,46 @@ class _AlbumDetailState extends State<AlbumDetail> {
             shrinkWrap: true,
             padding: const EdgeInsets.only(bottom: 15),
             itemBuilder: (BuildContext context, int index) {
-              audioPlayer.add(AudioPlayer());
-
-              if (product[index].isBought == true) {
-                for (var i = 0; i < audioPlayer.length; i++) {
-                  if (currentIndex != i) {
-                    audioPlayer[i].pause();
-                  }
-                  if (audioPlayer[i].playing) {
-                    introAudioPlayer.pause();
-                  }
-                }
-
+              if (widget.albumProduct.isBought == false &&
+                  product[index].isBought == false) {
                 return AlbumIntroItem(
                   albumName: '',
-                  audioPlayer: audioPlayer[index],
-                  audioPlayerList: audioPlayer,
+                  audioPlayer: audioPlayer,
                   products: product[index],
                   productsList: product,
-                  setIndex: (int index) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
                 );
               } else {
                 return AlbumDetailItem(
                   products: product[index],
                   isBought: product[index].isBought!,
                   albumName: widget.albumProduct.title ?? "",
-                  audioPlayer: audioPlayer[index],
+                  // audioPlayer: audioPlayer[index],
                   productsList: product,
                   index: index,
                   albumProducts: widget.albumProduct,
-                  onTap: () => _initiliazePodcast(),
+                  onTap: () async {
+                    if (widget.albumProduct.isBought == true) {
+                      if (activeList.first.title == product.first.title &&
+                          activeList.first.id == product.first.id) {
+                        await audioHandler.skipToQueueItem(index);
+                        await audioHandler.seek(
+                          Duration(milliseconds: product[index].position!),
+                        );
+                        await audioHandler.play();
+                      } else if (activeList.first.title !=
+                              product.first.title ||
+                          activeList.first.id != product.first.id) {
+                        activeList = product;
+                        await initiliazePodcast();
+                        await audioHandler.skipToQueueItem(index);
+                        await audioHandler.seek(
+                          Duration(milliseconds: product[index].position!),
+                        );
+                        await audioHandler.play();
+                      }
+                      currentlyPlaying.value = product[index];
+                    } else {}
+                  },
                 );
               }
             },
@@ -497,8 +451,9 @@ class _AlbumDetailState extends State<AlbumDetail> {
         context, widget.albumProduct.id.toString());
 
     for (var item in data) {
-      item.albumTitle = widget.albumProduct.albumTitle;
-      dataStore.addProduct(products: item);
+      item.albumTitle = widget.albumProduct.title;
+      await dataStore.addProduct(products: item);
     }
+    setState(() {});
   }
 }

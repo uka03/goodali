@@ -6,8 +6,10 @@ import 'package:goodali/controller/progress_notifier.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
-late AudioHandler audioHandler;
+import '../Providers/local_database.dart';
 
+late AudioHandler audioHandler;
+final HiveDataStore dataStore = HiveDataStore();
 Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
       builder: () => AudioPlayerHandler(),
       config: const AudioServiceConfig(
@@ -71,6 +73,11 @@ class AudioPlayerHandler extends BaseAudioHandler
         total: event,
         buffered: event,
       );
+
+      dataStore.updatePosition(
+          currentlyPlaying.value!.title!,
+          currentlyPlaying.value!.id!,
+          durationStateNotifier.value.progress!.inMilliseconds);
     });
     try {
       // After a cold restart (on Android), _player.load jumps straight from
