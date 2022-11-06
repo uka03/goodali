@@ -11,9 +11,7 @@ import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
 class ForumScreen extends StatefulWidget {
-  final VoidCallback goToFirstTab;
-
-  const ForumScreen({Key? key, required this.goToFirstTab}) : super(key: key);
+  const ForumScreen({Key? key}) : super(key: key);
 
   @override
   State<ForumScreen> createState() => _ForumScreenState();
@@ -139,8 +137,8 @@ class _ForumScreenState extends State<ForumScreen> {
           },
           body: TabBarView(children: [
             const NatureOfHuman(),
-            NuutsBulgem(goToFirstTab: widget.goToFirstTab),
-            MyFriendTab(goToFirstTab: widget.goToFirstTab)
+            const NuutsBulgem(),
+            const MyFriendTab()
           ]),
         ),
       ),

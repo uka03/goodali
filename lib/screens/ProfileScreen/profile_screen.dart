@@ -201,18 +201,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             );
           } else {
-            return Center(
-              child: SizedBox(
-                width: 200,
-                child: CustomElevatedButton(
-                  text: "Нэвтрэх",
-                  onPress: () {
-                    loginWithBio
-                        ? value.authenticateWithBiometrics(context)
-                        : showLoginModal();
-                  },
+            return Column(
+              children: [
+                Image.asset("assets/images/splash_screen.png",
+                    height: 48, width: 169),
+                Center(
+                  child: SizedBox(
+                    width: 200,
+                    child: CustomElevatedButton(
+                      text: "Нэвтрэх",
+                      onPress: () {
+                        loginWithBio
+                            ? value.authenticateWithBiometrics(context)
+                            : showLoginModal();
+                      },
+                    ),
+                  ),
                 ),
-              ),
+              ],
             );
           }
         },

@@ -13,8 +13,7 @@ import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 
 class NuutsBulgem extends StatefulWidget {
-  final VoidCallback goToFirstTab;
-  const NuutsBulgem({Key? key, required this.goToFirstTab}) : super(key: key);
+  const NuutsBulgem({Key? key}) : super(key: key);
 
   @override
   State<NuutsBulgem> createState() => _NuutsBulgemState();
@@ -102,7 +101,6 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                       ),
                       onPressed: () {
                         if (value.isAuth) {
-                          widget.goToFirstTab();
                         } else {
                           showModalBottomSheet(
                               context: context,

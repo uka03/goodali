@@ -41,10 +41,43 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
+    WidgetsBinding.instance!.addObserver(this);
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("app in resumed from background");
+        break;
+      case AppLifecycleState.inactive:
+        print("app is in inactive state");
+        break;
+      case AppLifecycleState.paused:
+        print("app is in paused state");
+        break;
+      case AppLifecycleState.detached:
+        print("app is removed");
+        removeTokenWhenAppKilled();
+        break;
+    }
+  }
+
+  removeTokenWhenAppKilled() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove("token");
   }
 
   @override
@@ -65,11 +98,9 @@ class _MyAppState extends State<MyApp> {
       child: Consumer<Auth>(
         builder: (context, value, child) {
           return MaterialApp(
-              // navigatorKey: navigatorKey,
               title: 'Goodali',
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
-                  // fontFamily: 'Gilroy',
                   scaffoldBackgroundColor: Colors.white,
                   visualDensity: VisualDensity.adaptivePlatformDensity,
                   primaryColor: MyColors.primaryColor,
@@ -93,7 +124,7 @@ class _MyAppState extends State<MyApp> {
                         return const Blank();
                       case ConnectionState.waiting:
                         return const Blank();
-                      default:
+                      case ConnectionState.done:
                         if (!snapshot.hasError) {
                           developer.log(
                               "biometric ${snapshot.data?.getBool("first_biometric")}");
@@ -108,6 +139,8 @@ class _MyAppState extends State<MyApp> {
                         } else {
                           return const BottomTabbar();
                         }
+                      case ConnectionState.active:
+                        return const Blank();
                     }
                   }));
         },

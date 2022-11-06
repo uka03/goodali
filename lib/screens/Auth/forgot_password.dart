@@ -24,7 +24,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       body: Form(
         key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(children: [
             const SizedBox(height: 20),
             const Text("Пин код мартсан",

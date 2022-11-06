@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/global_variables.dart';
@@ -61,8 +63,7 @@ class Auth with ChangeNotifier {
           preferences.setString("email", data['email']);
           preferences.setString("password", data['password']);
           preferences.setString("token", response.data['token']);
-          _hasTraining = await preferences.setBool(
-              "has_training", response.data['has_traing']);
+          preferences.setBool("has_training", response.data['has_traing']);
 
           String mapToStr = json.encode(response.data);
 
@@ -103,6 +104,14 @@ class Auth with ChangeNotifier {
   Future<void> logOut(BuildContext context) async {
     _isAuth = false;
     notifyListeners();
+  }
+
+  Future<bool> checkTraining() async {
+    final preferences = await SharedPreferences.getInstance();
+    _hasTraining = preferences.getBool("has_training") ?? false;
+
+    notifyListeners();
+    return _hasTraining;
   }
 
   Future<void> canBiometrics() async {

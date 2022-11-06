@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/search_model.dart';
@@ -10,12 +11,20 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/blank.dart';
 
-import '../../Providers/local_database.dart';
+import 'package:flutter/material.dart';
 
-class SearchScreen extends SearchDelegate {
+typedef OnSearchChanged = Future<List<String>> Function(String);
+
+class SearchScreen extends SearchDelegate<String> {
+  final OnSearchChanged? onSearchChanged;
+
+  List<String> _oldFilters = const [];
   @override
   String get searchFieldLabel => 'Нэрээр хайх';
   final HiveDataStore dataStore = HiveDataStore();
+
+  SearchScreen({String? searchFieldLabel, required this.onSearchChanged})
+      : super(searchFieldLabel: searchFieldLabel);
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -50,7 +59,7 @@ class SearchScreen extends SearchDelegate {
   Widget? buildLeading(BuildContext context) {
     return IconButton(
         onPressed: () {
-          close(context, null);
+          close(context, query);
         },
         color: MyColors.black,
         icon: const Icon(Icons.arrow_back));
@@ -153,8 +162,25 @@ class SearchScreen extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return Center(
-      child: SvgPicture.asset("assets/images/no_search_history.svg"),
+    return FutureBuilder<List<String>>(
+      future: onSearchChanged != null ? onSearchChanged!(query) : null,
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) _oldFilters = snapshot.data;
+        return ListView.builder(
+          itemCount: _oldFilters.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: const Icon(Icons.restore),
+              title: Text("${_oldFilters[index]}"),
+              onTap: () {
+                query = _oldFilters[index];
+
+                showResults(context);
+              },
+            );
+          },
+        );
+      },
     );
   }
 

@@ -111,7 +111,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
       ),
       body: Stack(
         children: [
-          widgetOptions().elementAt(selectedIndex),
+          _widgetOptions[selectedIndex],
           ValueListenableBuilder(
               valueListenable: currentlyPlaying,
               builder:
@@ -128,13 +128,11 @@ class _BottomTabbarState extends State<BottomTabbar> {
     );
   }
 
-  List<Widget> widgetOptions() {
-    return [
-      HomeScreen(key: HomeScreen.tabbedPageKey),
-      ForumScreen(goToFirstTab: goToFirstTab),
-      const ProfileScreen(),
-    ];
-  }
+  final List<Widget> _widgetOptions = [
+    HomeScreen(key: HomeScreen.tabbedPageKey),
+    const ForumScreen(),
+    const ProfileScreen(),
+  ];
 
   void onTabTapped(int index) {
     Provider.of<ForumTagNotifier>(context, listen: false)

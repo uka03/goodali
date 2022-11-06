@@ -1,20 +1,16 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/banner_model.dart';
-import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
+import 'package:goodali/screens/HomeScreen/courseTab/course_list.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_album.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_album.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_lecture.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
@@ -122,14 +118,17 @@ class _HomeScreenState extends State<HomeScreen>
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => BannerAlbum(
-                                      productId: item.productID ?? 0,
-                                      isAlbum: false,
+                                builder: (_) => BannerLecture(
+                                      productID: item.productID ?? 0,
                                     )));
                         break;
                       case 2:
                         print("case 2 bailaaa");
-                        // Navigator.push(context, MaterialPageRoute(builder: (_) => const Cours()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) =>
+                                    CourseDetail(id: item.productID)));
                         break;
                       default:
                     }

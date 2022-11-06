@@ -32,7 +32,7 @@ class AlbumDetailItem extends StatefulWidget {
   final List<Products> productsList;
   final String albumName;
   final bool isBought;
-  final VoidCallback onTap;
+  final Function onTap;
   final int index;
   const AlbumDetailItem(
       {Key? key,
@@ -180,7 +180,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
           Row(
             children: [
               AudioPlayerButton(
-                onPlay: widget.onTap,
+                onPlay: widget.onTap(),
                 onPause: () {
                   audioHandler.pause();
                 },

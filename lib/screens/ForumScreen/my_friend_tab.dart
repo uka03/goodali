@@ -14,8 +14,7 @@ import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 
 class MyFriendTab extends StatefulWidget {
-  final VoidCallback goToFirstTab;
-  const MyFriendTab({Key? key, required this.goToFirstTab}) : super(key: key);
+  const MyFriendTab({Key? key}) : super(key: key);
 
   @override
   State<MyFriendTab> createState() => _MyFriendTabState();

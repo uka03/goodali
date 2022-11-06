@@ -26,11 +26,9 @@ class _CreatePostState extends State<CreatePost> {
   TextEditingController textController = TextEditingController();
   List<int> selectedTabs = [];
   bool loginWithBio = false;
-  List<String> postTypes = [
-    'Хүний байгаль',
-    'Нууц бүлгэм',
-    'Миний нандин (Зөвхөн танд)'
-  ];
+  bool hasTraining = false;
+
+  List<String> postTypes = [];
 
   List<TagModel> tagList = [];
   bool _noTabsSelected = false;
@@ -39,6 +37,19 @@ class _CreatePostState extends State<CreatePost> {
   @override
   void initState() {
     checkLoginWithBio();
+    Provider.of<Auth>(context, listen: false)
+        .checkTraining()
+        .then((value) => hasTraining = value);
+    if (hasTraining) {
+      postTypes = [
+        'Хүний байгаль',
+        'Нууц бүлгэм',
+        'Миний нандин (Зөвхөн танд)'
+      ];
+    } else {
+      postTypes = ['Хүний байгаль', 'Миний нандин (Зөвхөн танд)'];
+    }
+
     super.initState();
   }
 
@@ -50,61 +61,69 @@ class _CreatePostState extends State<CreatePost> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: const SimpleAppBar(
         title: "Пост нэмэх",
         noCard: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 30),
-              CustomTextField(
-                  controller: titleController,
-                  hintText: "Гарчиг",
-                  maxLength: 50),
-              const SizedBox(height: 40),
-              const Text("Та юу бодож байна?",
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: MyColors.black)),
-              const SizedBox(height: 30),
-              CustomTextField(
-                  controller: textController,
-                  hintText: "Энд бичнэ үү",
-                  maxLines: null,
-                  maxLength: 1000),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: CustomElevatedButton(
-            text: "Нийтлэх",
-            onPress: () {
-              bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
-              if (isAuth) {
-                showModalTag();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
-                    backgroundColor: MyColors.error,
-                    behavior: SnackBarBehavior.floating,
-                    action: SnackBarAction(
-                        onPressed: () => loginWithBio
-                            ? Provider.of<Auth>(context, listen: false)
-                                .authenticateWithBiometrics(context)
-                            : showLoginModal(),
-                        label: 'Нэвтрэх',
-                        textColor: Colors.white)));
-              }
-            }),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: CustomScrollView(slivers: [
+        SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 30),
+                  CustomTextField(
+                      controller: titleController,
+                      hintText: "Гарчиг",
+                      maxLength: 50),
+                  const SizedBox(height: 40),
+                  const Text("Та юу бодож байна?",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: MyColors.black)),
+                  const SizedBox(height: 30),
+                  CustomTextField(
+                      controller: textController,
+                      hintText: "Энд бичнэ үү",
+                      maxLines: null,
+                      maxLength: 1000),
+                  const Spacer(),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: CustomElevatedButton(
+                        text: "Нийтлэх",
+                        onPress: () {
+                          bool isAuth =
+                              Provider.of<Auth>(context, listen: false).isAuth;
+                          if (isAuth) {
+                            showModalTag();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: const Text(
+                                    "Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                                backgroundColor: MyColors.error,
+                                behavior: SnackBarBehavior.floating,
+                                action: SnackBarAction(
+                                    onPressed: () => loginWithBio
+                                        ? Provider.of<Auth>(context,
+                                                listen: false)
+                                            .authenticateWithBiometrics(context)
+                                        : showLoginModal(),
+                                    label: 'Нэвтрэх',
+                                    textColor: Colors.white)));
+                          }
+                        }),
+                  ),
+                  const SizedBox(height: 30)
+                ],
+              ),
+            ))
+      ]),
     );
   }
 
@@ -249,6 +268,9 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   showPostTypeSheet() {
+    print("hasTraining");
+    print(hasTraining);
+
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -293,6 +315,8 @@ class _CreatePostState extends State<CreatePost> {
                                   value: postTypes.indexOf(i),
                                   onChanged: (value) {
                                     setState(() => postType = value as int);
+
+                                    print(postType);
                                   },
                                   title: Text(i,
                                       style: const TextStyle(
@@ -320,6 +344,9 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   insertPost() async {
+    if (!hasTraining) {
+      postType = postType == 0 ? 0 : 2;
+    }
     Map body = {
       "title": titleController.text,
       "body": textController.text,
@@ -328,7 +355,7 @@ class _CreatePostState extends State<CreatePost> {
     };
     print(body);
     var data = await Connection.insertPost(context, body);
-    Navigator.pop(context);
+
     if (data['success']) {
       showTopSnackBar(context,
           const CustomTopSnackBar(type: 1, text: "Амжилттай нийтлэгдлээ"));

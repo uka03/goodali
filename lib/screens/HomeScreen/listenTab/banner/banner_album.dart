@@ -22,9 +22,7 @@ import 'package:provider/provider.dart';
 
 class BannerAlbum extends StatefulWidget {
   final int productId;
-  final bool? isAlbum;
-  const BannerAlbum({Key? key, required this.productId, this.isAlbum = true})
-      : super(key: key);
+  const BannerAlbum({Key? key, required this.productId}) : super(key: key);
 
   @override
   State<BannerAlbum> createState() => _BannerAlbumState();
@@ -270,29 +268,27 @@ class _BannerAlbumState extends State<BannerAlbum> {
                 ),
               ),
             ),
-      floatingActionButton: widget.isAlbum == true
-          ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: CustomElevatedButton(
-                  text: "Худалдаж авах",
-                  onPress: () {
-                    cart.addItemsIndex((widget.productId), albumProductIDs: []);
-                    if (!cart.sameItemCheck) {
-                      cart.addProducts(albumDetail);
-                      cart.addTotalPrice(albumDetail.price?.toDouble() ?? 0.0);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const CartScreen()));
-                    } else {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const CartScreen()));
-                    }
-                  }),
-            )
-          : Container(),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: CustomElevatedButton(
+            text: "Худалдаж авах",
+            onPress: () {
+              cart.addItemsIndex((widget.productId), albumProductIDs: []);
+              if (!cart.sameItemCheck) {
+                cart.addProducts(albumDetail);
+                cart.addTotalPrice(albumDetail.price?.toDouble() ?? 0.0);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CartScreen()));
+              } else {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const CartScreen()));
+              }
+            }),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
@@ -318,22 +314,9 @@ class _BannerAlbumState extends State<BannerAlbum> {
             ));
   }
 
-  Future<List<Products>> getAlbumLectures() async {
-    lectureList = await Connection.getAlbumLectures(context, "2");
-    print(lectureList.length);
-    for (var item in lectureList) {
-      if (item.productId == widget.productId) {
-        bannerLecture.add(item);
-      }
-    }
-    print(bannerLecture.length);
-
-    return lectureList;
-  }
-
   Future<List<Products>> getProducts() async {
     List<Products> albumList = await Connection.getProducts(context, "0");
-    getAlbumLectures();
+
     for (var item in albumList) {
       if (item.productId == widget.productId) {
         setState(() {

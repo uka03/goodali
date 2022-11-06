@@ -110,8 +110,8 @@ class _IntroScreenState extends State<IntroScreen> {
         // ),
         _current != 0
             ? Positioned(
-                bottom: 50,
-                left: 35,
+                bottom: 32,
+                left: 32,
                 child: Container(
                   height: 50,
                   width: 50,
@@ -130,8 +130,8 @@ class _IntroScreenState extends State<IntroScreen> {
             : Container(),
 
         Positioned(
-            bottom: 50,
-            right: 35,
+            bottom: 32,
+            right: 32,
             child: Container(
               height: 50,
               width: _current == 2.0 ? 80 : 50,
@@ -151,7 +151,7 @@ class _IntroScreenState extends State<IntroScreen> {
               ),
             )),
         Positioned(
-          bottom: 60,
+          bottom: 40,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: imgPath.asMap().entries.map((entry) {
@@ -159,8 +159,8 @@ class _IntroScreenState extends State<IntroScreen> {
                 onTap: () => _pageController.nextPage(
                     curve: _kCurve, duration: _kDuration),
                 child: Container(
-                  width: 8.0,
-                  height: 8.0,
+                  width: _current.toInt() == entry.key ? 8.0 : 6,
+                  height: _current.toInt() == entry.key ? 8.0 : 6,
                   margin: const EdgeInsets.symmetric(
                       vertical: 10.0, horizontal: 6.0),
                   decoration: BoxDecoration(

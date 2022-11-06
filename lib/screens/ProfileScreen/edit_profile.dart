@@ -193,9 +193,9 @@ class _EditProfileState extends State<EditProfile> {
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          camerPhoto = await _picker
-                              .pickImage(source: ImageSource.camera)
-                              .whenComplete(() => Navigator.pop(context));
+                          camerPhoto = await _picker.pickImage(
+                              source: ImageSource.camera);
+                          Navigator.pop(context);
                           if (camerPhoto != null) {
                             setState(() {
                               isChanged = true;
@@ -225,9 +225,10 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          image = await _picker
-                              .pickImage(source: ImageSource.gallery)
-                              .whenComplete(() => Navigator.pop(context));
+                          image = await _picker.pickImage(
+                              source: ImageSource.gallery);
+                          Navigator.pop(context);
+
                           if (image != null) {
                             setState(() {
                               isChanged = true;
