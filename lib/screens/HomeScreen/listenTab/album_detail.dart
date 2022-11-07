@@ -1,9 +1,5 @@
-import 'dart:developer';
-
-import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/local_database.dart';
@@ -17,7 +13,6 @@ import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
-import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/album_intro_item.dart';
@@ -45,7 +40,6 @@ class AlbumDetail extends StatefulWidget {
 
 class _AlbumDetailState extends State<AlbumDetail> {
   AudioPlayerController audioPlayerController = AudioPlayerController();
-  // late final Future future = getAlbumLectures();
 
   late final AudioPlayer introAudioPlayer = AudioPlayer();
   List<int> albumProductsList = [];
@@ -363,11 +357,11 @@ class _AlbumDetailState extends State<AlbumDetail> {
               if (widget.albumProduct.isBought == false &&
                   product[index].isBought == false) {
                 return AlbumIntroItem(
-                  albumName: '',
-                  audioPlayer: audioPlayer,
-                  products: product[index],
-                  productsList: product,
-                );
+                    albumName: '',
+                    audioPlayer: audioPlayer,
+                    products: product[index],
+                    productsList: product,
+                    albumProducts: widget.albumProduct);
               } else {
                 return AlbumDetailItem(
                   products: product[index],

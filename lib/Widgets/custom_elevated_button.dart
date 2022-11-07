@@ -23,7 +23,7 @@ class CustomElevatedButton extends StatelessWidget {
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
               elevation: 0,
-              primary: MyColors.primaryColor)),
+              backgroundColor: MyColors.primaryColor)),
     );
   }
 }

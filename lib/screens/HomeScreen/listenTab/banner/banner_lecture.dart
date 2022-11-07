@@ -244,7 +244,7 @@ class _BannerLectureState extends State<BannerLecture> {
                               productsList: bannerLecture,
                               index: index,
                               albumProducts: Products(),
-                              onTap: (Products? lecture) {},
+                              onTap: () {},
                             );
                           }
                         },

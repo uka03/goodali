@@ -43,7 +43,7 @@ class _ArticleDetailState extends State<ArticleDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(title: ""),
+      appBar: const SimpleAppBar(title: "", noCard: true),
       body: Stack(children: [
         SingleChildScrollView(
           controller: _scrollController,
@@ -87,7 +87,7 @@ class _ArticleDetailState extends State<ArticleDetail> {
                         fontWeight: FontWeight.bold,
                         height: 1.7)),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               _similarArticle()
             ],
           ),

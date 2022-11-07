@@ -112,7 +112,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                                       topLeft: Radius.circular(12),
                                       topRight: Radius.circular(12))),
                               builder: (BuildContext context) =>
-                                  const LoginBottomSheet());
+                                  const LoginBottomSheet(isRegistered: true));
                         }
                       },
                       style: ElevatedButton.styleFrom(

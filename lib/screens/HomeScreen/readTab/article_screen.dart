@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
+import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/article_model.dart';
 import 'package:goodali/models/tag_model.dart';
@@ -26,19 +27,29 @@ class _ArticleScreenState extends State<ArticleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                pinned: true,
-                floating: true,
-                elevation: 0,
-                iconTheme: const IconThemeData(color: MyColors.black),
-                backgroundColor: Colors.white,
-                bottom: PreferredSize(
-                    preferredSize:
-                        const Size(double.infinity, kToolbarHeight - 10),
+      appBar: const SimpleAppBar(title: "", noCard: true),
+      body: SingleChildScrollView(
+          child: FutureBuilder(
+        future: getArticle(),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<ArticleModel>> snapshot) {
+          if (snapshot.hasData) {
+            artcileList = snapshot.data ?? [];
+            List<ArticleModel> searchList = [];
+            if (widget.id != null) {
+              for (var item in artcileList) {
+                if (item.id == widget.id) {
+                  searchList.add(item);
+                }
+              }
+            }
+            log(filteredList.length.toString(), name: "filteredList Length");
+
+            return Column(
+              children: [
+                const SizedBox(height: 10),
+                SizedBox(
+                    height: 40,
                     child: Container(
                       padding: const EdgeInsets.only(left: 20),
                       alignment: Alignment.topLeft,
@@ -48,64 +59,44 @@ class _ArticleScreenState extends State<ArticleScreen> {
                               fontWeight: FontWeight.bold,
                               color: MyColors.black)),
                     )),
-              ),
-            ];
-          },
-          body: FutureBuilder(
-            future: getArticle(),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<ArticleModel>> snapshot) {
-              if (snapshot.hasData) {
-                artcileList = snapshot.data ?? [];
-                List<ArticleModel> searchList = [];
-                if (widget.id != null) {
-                  for (var item in artcileList) {
-                    if (item.id == widget.id) {
-                      searchList.add(item);
-                    }
-                  }
-                }
-                log(filteredList.length.toString(),
-                    name: "filteredList Length");
-
-                return ListView.separated(
+                ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
                   itemCount: filteredList.isNotEmpty
                       ? filteredList.length
                       : widget.id != null
                           ? searchList.length
                           : artcileList.length,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding:
-                          const EdgeInsets.only(top: 20.0, left: 20, right: 20),
-                      child: GestureDetector(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ArticleDetail(
-                                      articleItem: widget.id != null
-                                          ? searchList[index]
-                                          : artcileList[index]))),
-                          child: ArtcileItem(
-                            articleModel: filteredList.isNotEmpty
-                                ? filteredList[index]
-                                : widget.id != null
-                                    ? searchList[index]
-                                    : artcileList[index],
-                          )),
-                    );
+                    return GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ArticleDetail(
+                                    articleItem: widget.id != null
+                                        ? searchList[index]
+                                        : artcileList[index]))),
+                        child: ArtcileItem(
+                          articleModel: filteredList.isNotEmpty
+                              ? filteredList[index]
+                              : widget.id != null
+                                  ? searchList[index]
+                                  : artcileList[index],
+                        ));
                   },
                   separatorBuilder: (BuildContext context, int index) =>
                       const Divider(
                           color: MyColors.border1, endIndent: 20, indent: 20),
-                );
-              } else {
-                return const Center(
-                    child: CircularProgressIndicator(
-                        color: MyColors.primaryColor));
-              }
-            },
-          )),
+                ),
+                const SizedBox(height: 60),
+              ],
+            );
+          } else {
+            return const Center(
+                child: CircularProgressIndicator(color: MyColors.primaryColor));
+          }
+        },
+      )),
       floatingActionButton: FilterButton(onPress: () {
         showModalTag(context, tagFuture, checkedTag);
       }),

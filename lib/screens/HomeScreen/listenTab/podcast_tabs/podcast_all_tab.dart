@@ -72,7 +72,7 @@ class _PodcastAllState extends State<PodcastAll>
             return ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(top: 13, bottom: 15),
+              padding: const EdgeInsets.only(bottom: 15),
               itemBuilder: (BuildContext context, int index) {
                 return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),

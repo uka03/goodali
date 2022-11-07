@@ -29,7 +29,7 @@ class _VideoItemState extends State<VideoItem> {
               height: 180,
               width: MediaQuery.of(context).size.width),
           Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

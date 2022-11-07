@@ -5,6 +5,7 @@ import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/screens/Auth/pincode_changed_success.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ForgotPassword extends StatefulWidget {
@@ -33,7 +34,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     fontSize: 24,
                     fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
-            const Text("Та и-мэйл хаягаа оруулна уу",
+            const Text(
+                "Та өөрийн и-мэйл хаягаа оруулснаар бид таньруу шинэ пин код илгээх болно.",
+                textAlign: TextAlign.center,
                 style: TextStyle(color: MyColors.gray)),
             const SizedBox(height: 30),
             TextFormField(
@@ -82,11 +85,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     Navigator.pop(context);
     if (data != {}) {
       if (data["success"] == true) {
-        showTopSnackBar(
-            context,
-            const CustomTopSnackBar(
-                type: 1, text: "   Шинэ нууц үг и-мэйлээр илгээгдлээ"));
-        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const PinCodeChangedSuccess()));
       } else {
         showTopSnackBar(
             context,

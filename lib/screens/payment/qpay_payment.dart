@@ -47,8 +47,8 @@ class _QpayPaymentState extends State<QpayPayment> {
                     openBankApp(widget.qpayUrls[index].link ?? "");
                   },
                   child: Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     height: 64,
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -72,6 +72,7 @@ class _QpayPaymentState extends State<QpayPayment> {
                         const Icon(
                           IconlyLight.arrow_right_2,
                           color: MyColors.gray,
+                          size: 20,
                         ),
                         const SizedBox(width: 20),
                       ],

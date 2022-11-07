@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/audio_progressbar.dart';
 import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
@@ -143,9 +144,11 @@ class _PodcastItemState extends State<PodcastItem> {
                         fontSize: 16,
                         fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 10),
-                  CustomReadMoreText(
-                    text: widget.podcastItem.body ?? "",
+                  const SizedBox(height: 5),
+                  Text(
+                    parseHtmlString(widget.podcastItem.body ?? ""),
+                    style: const TextStyle(
+                        color: MyColors.gray, fontSize: 12, height: 1.5),
                   ),
                 ],
               ),
@@ -207,7 +210,7 @@ class _PodcastItemState extends State<PodcastItem> {
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(IconlyLight.arrow_down,
-                        color: MyColors.gray),
+                        size: 20, color: MyColors.gray),
                     splashRadius: 1,
                   ),
                   IconButton(

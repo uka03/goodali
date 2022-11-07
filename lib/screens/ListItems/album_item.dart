@@ -22,33 +22,32 @@ class AlbumItem extends StatelessWidget {
                     },
                     albumProduct: albumData,
                   ))),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 160,
-            width: 160,
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child:
-                    // Container(
-                    //   color: Colors.pink,
-                    // )
-                    ImageView(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width / 2 - 40,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: ImageView(
                   imgPath: albumData.banner ?? '',
+                  height: MediaQuery.of(context).size.width / 2 - 40,
+                  width: MediaQuery.of(context).size.width / 2 - 40,
                 )),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            albumData.title ?? "",
-            style: const TextStyle(fontWeight: FontWeight.w200),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            albumData.audioCount!.toString() + " audio",
-            style: const TextStyle(fontSize: 12, color: MyColors.border2),
-          ),
-        ],
+            const SizedBox(height: 10),
+            Text(
+              albumData.title ?? "",
+              style: const TextStyle(
+                  color: MyColors.black, fontSize: 16, height: 1.6),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              albumData.audioCount!.toString() + " аудио",
+              style: const TextStyle(fontSize: 12, color: MyColors.gray),
+            ),
+          ],
+        ),
       ),
     );
   }

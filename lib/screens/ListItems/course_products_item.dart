@@ -87,14 +87,16 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
                   color: MyColors.input,
                   borderRadius: BorderRadius.circular(6)),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: const [
+                  SizedBox(width: 15),
                   Text(
                     "Цааш үзэх",
                     style: TextStyle(
                         color: MyColors.black, fontWeight: FontWeight.bold),
                   ),
-                  Icon(IconlyLight.arrow_right_2)
+                  Spacer(),
+                  Icon(IconlyLight.arrow_right_2, size: 18),
+                  SizedBox(width: 8),
                 ],
               ),
             ),

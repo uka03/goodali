@@ -4,6 +4,7 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/payment/choose_payment.dart';
 import 'package:goodali/screens/payment/payment_history.dart';
@@ -24,6 +25,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     bool isAuth = context.watch<Auth>().isAuth;
+
     return Scaffold(
       body: NestedScrollView(
           physics: const NeverScrollableScrollPhysics(),
@@ -118,24 +120,27 @@ class _CartScreenState extends State<CartScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: CustomElevatedButton(
-                onPress: () {
-                  if (isAuth == true) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                ChoosePayment(productIDs: productIds)));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
-                        backgroundColor: MyColors.error,
-                        behavior: SnackBarBehavior.floating,
-                        action: SnackBarAction(
-                            onPressed: () => showLoginModal(),
-                            label: 'Нэвтрэх',
-                            textColor: Colors.white)));
-                  }
-                },
+                onPress: context.watch<CartProvider>().cartItem.isEmpty
+                    ? null
+                    : () {
+                        if (isAuth == true) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChoosePayment(productIDs: productIds)));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content:
+                                  const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                              backgroundColor: MyColors.error,
+                              behavior: SnackBarBehavior.floating,
+                              action: SnackBarAction(
+                                  onPressed: () => showLoginModal(),
+                                  label: 'Нэвтрэх',
+                                  textColor: Colors.white)));
+                        }
+                      },
                 text: "Худалдаж авах",
               ),
             ),
@@ -155,6 +160,7 @@ class _CartScreenState extends State<CartScreen> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) => const LoginBottomSheet());
+        builder: (BuildContext context) =>
+            const LoginBottomSheet(isRegistered: true));
   }
 }

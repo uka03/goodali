@@ -1,5 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/products_model.dart';
@@ -26,87 +28,81 @@ class _AlbumLectureState extends State<AlbumLecture> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                pinned: true,
-                floating: true,
-                // snap: true,
+      appBar: const SimpleAppBar(title: "", noCard: true),
+      body: SingleChildScrollView(
+          // physics: const NeverScrollableScrollPhysics(),
 
-                elevation: 0,
-                iconTheme: const IconThemeData(color: MyColors.black),
-                backgroundColor: Colors.white,
-                bottom: PreferredSize(
-                    preferredSize:
-                        const Size(double.infinity, kToolbarHeight - 10),
-                    child: Container(
-                      padding: const EdgeInsets.only(left: 20),
-                      alignment: Alignment.topLeft,
-                      child: const Text("Цомог",
-                          style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: MyColors.black)),
-                    )),
-              )
-            ];
-          },
-          body: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Consumer<Auth>(
-              builder: (context, value, state) {
-                return FutureBuilder(
-                    future: value.isAuth ? getalbumListLogged() : getProducts(),
-                    builder: (context, AsyncSnapshot snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done &&
-                          snapshot.hasData) {
-                        List<Products> albumList = snapshot.data;
-                        List<Products> searchResult = [];
-                        List<Products> banner = [];
-                        if (widget.id != null) {
-                          for (var item in albumList) {
-                            if (widget.id == item.id) {
-                              searchResult.add(item);
-                            }
-                            if (widget.productID == item.productId) {
-                              banner.add(item);
-                            }
+          child: Column(
+        children: [
+          const SizedBox(height: 10),
+          SizedBox(
+              height: 40,
+              child: Container(
+                padding: const EdgeInsets.only(left: 20),
+                alignment: Alignment.topLeft,
+                child: const Text("Цомог",
+                    style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: MyColors.black)),
+              )),
+          const SizedBox(height: 20),
+          Consumer<Auth>(
+            builder: (context, value, state) {
+              return FutureBuilder(
+                  future: value.isAuth ? getalbumListLogged() : getProducts(),
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      List<Products> albumList = snapshot.data;
+                      List<Products> searchResult = [];
+                      List<Products> banner = [];
+                      if (widget.id != null) {
+                        for (var item in albumList) {
+                          if (widget.id == item.id) {
+                            searchResult.add(item);
+                          }
+                          if (widget.productID == item.productId) {
+                            banner.add(item);
                           }
                         }
-                        return albumLecture(
-                            context,
-                            widget.productID != null
-                                ? banner
-                                : widget.id != null
-                                    ? searchResult
-                                    : albumList);
-                      } else {
-                        return const Center(
-                            child: CircularProgressIndicator(
-                                color: MyColors.primaryColor));
                       }
-                    });
-              },
-            ),
-          )),
+                      return albumLecture(
+                          context,
+                          widget.productID != null
+                              ? banner
+                              : widget.id != null
+                                  ? searchResult
+                                  : albumList);
+                    } else {
+                      return const Center(
+                          child: CircularProgressIndicator(
+                              color: MyColors.primaryColor));
+                    }
+                  });
+            },
+          ),
+        ],
+      )),
     );
   }
 
   Widget albumLecture(BuildContext context, List<Products> albumList) {
-    return GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: albumList.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1,
-            mainAxisExtent: 230,
-            crossAxisSpacing: 20),
-        itemBuilder: (BuildContext context, int index) => Center(
-              child: AlbumItem(albumData: albumList[index]),
-            ));
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: albumList.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: MediaQuery.of(context).size.width /
+                  (MediaQuery.of(context).size.height / 1.4),
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
+              crossAxisCount: 2),
+          itemBuilder: (BuildContext context, int index) =>
+              AlbumItem(albumData: albumList[index])),
+    );
   }
 
   Future<List<Products>> getProducts() {

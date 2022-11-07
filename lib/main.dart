@@ -101,6 +101,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               title: 'Goodali',
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
+                  fontFamily: "Gilroy",
                   scaffoldBackgroundColor: Colors.white,
                   visualDensity: VisualDensity.adaptivePlatformDensity,
                   primaryColor: MyColors.primaryColor,

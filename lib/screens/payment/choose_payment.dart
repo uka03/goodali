@@ -42,8 +42,7 @@ class _ChoosePaymentState extends State<ChoosePayment> {
                 createOrderRequest(context, 0);
               },
               child: Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                margin: const EdgeInsets.symmetric(horizontal: 20),
                 height: 64,
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -60,23 +59,21 @@ class _ChoosePaymentState extends State<ChoosePayment> {
                     Text("QPay",
                         style: TextStyle(fontSize: 16, color: MyColors.black)),
                     Spacer(),
-                    Icon(
-                      IconlyLight.arrow_right_2,
-                      color: MyColors.gray,
-                    ),
+                    Icon(IconlyLight.arrow_right_2,
+                        color: MyColors.gray, size: 20),
                     SizedBox(width: 20),
                   ],
                 ),
               ),
             ),
+            const SizedBox(height: 10),
             GestureDetector(
               onTap: () {
                 Utils.showLoaderDialog(context);
                 createOrderRequest(context, 1);
               },
               child: Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                margin: const EdgeInsets.symmetric(horizontal: 20),
                 height: 64,
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -93,16 +90,14 @@ class _ChoosePaymentState extends State<ChoosePayment> {
                     Text("Карт",
                         style: TextStyle(fontSize: 16, color: MyColors.black)),
                     Spacer(),
-                    Icon(
-                      IconlyLight.arrow_right_2,
-                      color: MyColors.gray,
-                    ),
+                    Icon(IconlyLight.arrow_right_2,
+                        color: MyColors.gray, size: 20),
                     SizedBox(width: 20),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 40),
           ],
         ),
       ),

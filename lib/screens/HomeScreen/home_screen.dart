@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:goodali/Utils/circle_tab_indicator.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/image_view.dart';
@@ -51,7 +52,6 @@ class _HomeScreenState extends State<HomeScreen>
       appBar: const CustomAppBar(
         title: 'Сэтгэл',
         actionButton2: null,
-        // actionButton1: actionButton1,
         isCartButton: true,
       ),
       body: DefaultTabController(
@@ -81,8 +81,15 @@ class _HomeScreenState extends State<HomeScreen>
                       SizedBox(width: 70, child: Tab(text: "Мэдрэх")),
                       SizedBox(width: 70, child: Tab(text: "Сургалт*"))
                     ],
+                    indicatorWeight: 4,
+                    indicator:
+                        const CustomTabIndicator(color: MyColors.primaryColor),
                     labelColor: MyColors.primaryColor,
-                    unselectedLabelColor: MyColors.black,
+                    labelStyle: const TextStyle(
+                        fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                    unselectedLabelStyle: const TextStyle(
+                        fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
+                    unselectedLabelColor: MyColors.gray,
                     indicatorColor: MyColors.primaryColor,
                   )))
             ];
@@ -172,9 +179,11 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future getBannerList() async {
     bannerList = await Connection.getBannerList(context);
-    setState(() {
-      bannerList = bannerList;
-    });
+    if (mounted) {
+      setState(() {
+        bannerList = bannerList;
+      });
+    }
     return bannerList;
   }
 }

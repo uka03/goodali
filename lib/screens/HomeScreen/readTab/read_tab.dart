@@ -22,64 +22,60 @@ class _ReadTabbarState extends State<ReadTabbar>
   Widget build(BuildContext context) {
     super.build(context);
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: FutureBuilder(
-          future: getArticle(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.hasData) {
-              List<ArticleModel> articleList = snapshot.data;
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var item in articleList)
-                    if (item.isSpecial == 1)
-                      Column(children: [
-                        const Padding(
-                          padding: EdgeInsets.only(top: 30.0, bottom: 20),
-                          child: Text("Онцлох",
-                              style: TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20.0),
-                          child: ArtcileItem(articleModel: item),
-                        ),
-                      ]),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text("Бичвэр",
-                              style: TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold)),
-                          IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const ArticleScreen()));
-                              },
-                              icon: const Icon(IconlyLight.arrow_right))
-                        ],
-                      )),
-                  article(context, articleList)
-                ],
-              );
-            } else {
-              return const Center(
-                  child:
-                      CircularProgressIndicator(color: MyColors.primaryColor));
-            }
-          },
-        ),
+      child: FutureBuilder(
+        future: getArticle(),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            List<ArticleModel> articleList = snapshot.data;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var item in articleList)
+                  if (item.isSpecial == 1)
+                    Column(children: [
+                      const Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text("Онцлох",
+                            style: TextStyle(
+                                color: MyColors.black,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: ArtcileItem(articleModel: item),
+                      ),
+                    ]),
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Бичвэр",
+                            style: TextStyle(
+                                color: MyColors.black,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold)),
+                        IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const ArticleScreen()));
+                            },
+                            icon: const Icon(IconlyLight.arrow_right))
+                      ],
+                    )),
+                article(context, articleList)
+              ],
+            );
+          } else {
+            return const Center(
+                child: CircularProgressIndicator(color: MyColors.primaryColor));
+          }
+        },
       ),
     );
   }
@@ -122,20 +118,19 @@ class _ReadTabbarState extends State<ReadTabbar>
   }
 
   Widget article(BuildContext context, List<ArticleModel> articleList) {
-    return ListView.builder(
+    return ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: articleList.length > 6 ? 6 : articleList.length,
+        separatorBuilder: (BuildContext context, int index) =>
+            const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
         itemBuilder: (context, index) => GestureDetector(
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
                         ArticleDetail(articleItem: articleList[index]))),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: ArtcileItem(articleModel: articleList[index]),
-            )));
+            child: ArtcileItem(articleModel: articleList[index])));
   }
 
   Future<List<ArticleModel>> getArticle() {

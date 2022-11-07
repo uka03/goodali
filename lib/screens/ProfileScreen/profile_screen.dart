@@ -203,21 +203,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else {
             return Column(
               children: [
+                const SizedBox(height: 100),
                 Image.asset("assets/images/splash_screen.png",
                     height: 48, width: 169),
-                Center(
-                  child: SizedBox(
-                    width: 200,
-                    child: CustomElevatedButton(
-                      text: "Нэвтрэх",
-                      onPress: () {
-                        loginWithBio
-                            ? value.authenticateWithBiometrics(context)
-                            : showLoginModal();
-                      },
-                    ),
+                const SizedBox(height: 30),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 56),
+                  child: Text(
+                    "Сайн байна уу? Та дээрх үйлдлийг хийхийн тулд нэвтрэх хэрэгтэй.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: MyColors.gray),
                   ),
                 ),
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: CustomElevatedButton(
+                    text: "Нэвтрэх",
+                    onPress: () {
+                      loginWithBio
+                          ? value.authenticateWithBiometrics(context)
+                          : showLoginModal(true);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                          child: const Text(
+                            "Бүртгүүлэх",
+                            style:
+                                TextStyle(fontSize: 16, color: MyColors.black),
+                          ),
+                          onPressed: () {
+                            showLoginModal(false);
+                          },
+                          style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              elevation: 0,
+                              backgroundColor: MyColors.input)),
+                    )),
+                const SizedBox(height: 10),
               ],
             );
           }
@@ -226,7 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  showLoginModal() {
+  showLoginModal(bool isRegistered) {
     showModalBottomSheet(
         context: context,
         isDismissible: false,
@@ -235,7 +267,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) => const LoginBottomSheet());
+        builder: (BuildContext context) =>
+            LoginBottomSheet(isRegistered: isRegistered));
   }
 
   showPincodeField() {

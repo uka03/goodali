@@ -53,7 +53,7 @@ dependencies:
   audio_session: ^0.1.10
   device_info_plus: ^4.0.0
   pin_code_fields: ^7.4.0
-  permission_handler: 9.2.0
+  permission_handler: ^10.2.0
   path_provider: ^2.0.11
   flutter_cache_manager: ^3.3.0
   video_player: ^2.4.7
@@ -109,12 +109,12 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Gilroy
-  #     fonts:
-  #       - asset: assets/fonts/Gilroy-Thin.ttf
-  #       - asset: assets/fonts/Gilroy-Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: Gilroy
+      fonts:
+        - asset: assets/fonts/Gilroy-Medium.ttf
+        - asset: assets/fonts/Gilroy-Bold.ttf
+          weight: 700
 
   #
   # For details regarding fonts from package dependencies,

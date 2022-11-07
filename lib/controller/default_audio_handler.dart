@@ -75,9 +75,9 @@ class AudioPlayerHandler extends BaseAudioHandler
       );
 
       dataStore.updatePosition(
-          currentlyPlaying.value!.title!,
-          currentlyPlaying.value!.id!,
-          durationStateNotifier.value.progress!.inMilliseconds);
+          currentlyPlaying.value?.title! ?? "",
+          currentlyPlaying.value?.id! ?? 0,
+          durationStateNotifier.value.progress?.inMilliseconds ?? 0);
     });
     try {
       // After a cold restart (on Android), _player.load jumps straight from

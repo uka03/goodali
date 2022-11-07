@@ -181,7 +181,8 @@ class _PostDetailState extends State<PostDetail> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) => const LoginBottomSheet());
+        builder: (BuildContext context) =>
+            const LoginBottomSheet(isRegistered: true));
   }
 
   writeComment() async {

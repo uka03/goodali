@@ -45,7 +45,7 @@ class _ListenTabbarState extends State<ListenTabbar>
       children: [
         Padding(
           padding:
-              const EdgeInsets.only(top: 30.0, bottom: 20, left: 20, right: 20),
+              const EdgeInsets.only(top: 20.0, bottom: 20, left: 20, right: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -142,14 +142,14 @@ class _ListenTabbarState extends State<ListenTabbar>
               snapshot.hasData) {
             List<Products> albumList = snapshot.data;
             return SizedBox(
-              height: 220,
+              height: 250,
               child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   itemCount: albumList.length,
-                  itemBuilder: (BuildContext context, int index) => Padding(
-                        padding: const EdgeInsets.only(right: 20.0),
-                        child: AlbumItem(albumData: albumList[index]),
-                      )),
+                  itemBuilder: (BuildContext context, int index) => SizedBox(
+                      width: MediaQuery.of(context).size.width / 2 - 20,
+                      child: AlbumItem(albumData: albumList[index]))),
             );
           } else {
             return const Center(

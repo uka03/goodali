@@ -11,7 +11,7 @@ class SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(18),
+      margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -19,14 +19,13 @@ class SearchBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(IconlyLight.search),
+          const Icon(IconlyLight.search, color: MyColors.gray),
           const SizedBox(width: 14),
           SizedBox(
             width: 200,
             child: TextField(
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
-
                 _showSearch(context);
               },
               cursorColor: MyColors.primaryColor,

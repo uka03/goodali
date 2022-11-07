@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -32,12 +33,10 @@ double percentageFromValueInRange({required final double min, max, value}) {
   return (value - min) / (max - min);
 }
 
-String dateTimeFormatter(dynamic dateTime) {
-  developer.log(dateTime, name: "lfdjdf");
-  final dateFormatter = DateFormat("yyyy-MM-dd");
-  DateTime formatdate = dateFormatter.parse(dateTime);
-
-  return dateFormatter.format(formatdate);
+String dateTimeFormatter(String date) {
+  final f = DateFormat('yyyy.MM.dd');
+  DateTime parsedDate = HttpDate.parse(date);
+  return f.format(parsedDate);
 }
 
 int generateRandomCode(int minValue, int maxValue) {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/constans.dart';
+import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/models/products_model.dart';
@@ -69,36 +70,40 @@ class _BottomTabbarState extends State<BottomTabbar> {
           );
         },
         child: BottomNavigationBar(
+          unselectedFontSize: 10,
+          unselectedItemColor: MyColors.gray,
           elevation: 0,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
+          items: <BottomNavigationBarItem>[
+            const BottomNavigationBarItem(
                 activeIcon: Padding(
                   padding: EdgeInsets.only(bottom: 6.0),
                   child: Icon(Icons.circle_outlined),
                 ),
                 icon: Padding(
                   padding: EdgeInsets.only(bottom: 6.0),
-                  child: Icon(Icons.circle_outlined),
+                  child: Icon(Icons.circle_outlined, color: MyColors.gray),
                 ),
                 label: 'Сэтгэл'),
             BottomNavigationBarItem(
                 activeIcon: Padding(
-                  padding: EdgeInsets.only(bottom: 6.0),
-                  child: Icon(Icons.forum),
+                  padding: const EdgeInsets.only(bottom: 6.0),
+                  child: Image.asset("assets/images/tuudeg_gal_icon.png",
+                      height: 27, width: 27, color: MyColors.primaryColor),
                 ),
                 icon: Padding(
-                  padding: EdgeInsets.only(bottom: 6.0),
-                  child: Icon(Icons.home_outlined),
+                  padding: const EdgeInsets.only(bottom: 6.0),
+                  child: Image.asset("assets/images/tuudeg_gal_icon.png",
+                      height: 27, width: 27, color: MyColors.gray),
                 ),
                 label: "Түүдэг гал"),
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
                 activeIcon: Padding(
                   padding: EdgeInsets.only(bottom: 6.0),
                   child: Icon(IconlyLight.profile),
                 ),
                 icon: Padding(
                   padding: EdgeInsets.only(bottom: 6.0),
-                  child: Icon(IconlyLight.profile),
+                  child: Icon(IconlyLight.profile, color: MyColors.gray),
                 ),
                 label: "Би")
           ],

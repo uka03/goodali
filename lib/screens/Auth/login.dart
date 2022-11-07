@@ -7,12 +7,15 @@ import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/screens/Auth/forgot_password.dart';
+import 'package:goodali/screens/Auth/pincode_changed_success.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class LoginBottomSheet extends StatefulWidget {
-  const LoginBottomSheet({Key? key}) : super(key: key);
+  final bool isRegistered;
+  const LoginBottomSheet({Key? key, required this.isRegistered})
+      : super(key: key);
 
   @override
   State<LoginBottomSheet> createState() => _LoginBottomSheetState();
@@ -25,11 +28,17 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   TextEditingController passwordController = TextEditingController();
 
   Color textFieldColor = MyColors.primaryColor;
-  bool isRegitered = true;
+  bool isRegistered = true;
+
+  @override
+  void initState() {
+    isRegistered = widget.isRegistered;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Form(key: _formKey, child: isRegitered ? login() : register());
+    return Form(key: _formKey, child: isRegistered ? login() : register());
   }
 
   Widget login() {
@@ -132,11 +141,12 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                             TextSpan(
                                 text: ' Бүртгүүлэх',
                                 style: const TextStyle(
-                                    color: MyColors.primaryColor),
+                                    color: MyColors.primaryColor,
+                                    fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     setState(() {
-                                      isRegitered = false;
+                                      isRegistered = false;
                                       emailController.text = "";
                                       passwordController.text = "";
                                       nicknameController.text = "";
@@ -248,7 +258,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   textInputAction: TextInputAction.next,
                   style: TextStyle(color: textFieldColor),
                   decoration: const InputDecoration(
-                    hintText: "Nickname",
+                    hintText: "Нууц нэр",
                     enabledBorder: UnderlineInputBorder(
                       borderSide:
                           BorderSide(color: MyColors.border1, width: 0.5),
@@ -306,16 +316,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                         if (_formKey.currentState!.validate()) {
                           FocusManager.instance.primaryFocus?.unfocus();
                           Utils.showLoaderDialog(context);
-                          userRegister().then((value) {
-                            print("value $value");
-                            if (value == true) {
-                              setState(() {
-                                isRegitered = true;
-                                emailController.text = "";
-                                passwordController.text = "";
-                              });
-                            }
-                          });
+                          userRegister();
                         }
                       }),
                   const SizedBox(height: 30),
@@ -328,11 +329,12 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                             TextSpan(
                                 text: ' Нэвтрэх',
                                 style: const TextStyle(
-                                    color: MyColors.primaryColor),
+                                    color: MyColors.primaryColor,
+                                    fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     setState(() {
-                                      isRegitered = true;
+                                      isRegistered = true;
                                       emailController.text = "";
                                       passwordController.text = "";
                                     });
@@ -360,8 +362,14 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
     var data = await Connection.userRegister(context, sendData);
     Navigator.pop(context);
     if (data['success'] == true) {
-      showTopSnackBar(context,
-          const CustomTopSnackBar(type: 1, text: "Амжилттай бүртгэгдлээ"));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => const PinCodeChangedSuccess(
+                    successText: "Баяр хүргье",
+                    descriptionText: "Бүртгэл амжилттай үүслээ.",
+                    buttonText: "Эхлэх",
+                  )));
       return true;
     } else {
       showTopSnackBar(

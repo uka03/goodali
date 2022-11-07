@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Utils/circle_tab_indicator.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
+import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
@@ -29,22 +31,16 @@ class _PodcastState extends State<Podcast> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const SimpleAppBar(noCard: true),
       body: DefaultTabController(
           length: 4,
           child: NestedScrollView(
               physics: const NeverScrollableScrollPhysics(),
               headerSliverBuilder: (context, innerBoxIsScrolled) {
                 return [
-                  SliverAppBar(
-                    pinned: true,
-                    floating: true,
-                    // snap: true,
-                    elevation: 0,
-                    iconTheme: const IconThemeData(color: MyColors.black),
-                    backgroundColor: Colors.white,
-                    bottom: PreferredSize(
-                        preferredSize:
-                            const Size(double.infinity, kToolbarHeight - 10),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                        height: 50,
                         child: Container(
                           padding: const EdgeInsets.only(left: 20),
                           alignment: Alignment.topLeft,
@@ -67,8 +63,16 @@ class _PodcastState extends State<Podcast> {
                           SizedBox(width: 78, child: Tab(text: "Татсан")),
                           SizedBox(width: 78, child: Tab(text: "Сонссон"))
                         ],
+                        indicatorWeight: 4,
+                        indicator:
+                            CustomTabIndicator(color: MyColors.primaryColor),
                         labelColor: MyColors.primaryColor,
-                        unselectedLabelColor: MyColors.black,
+                        labelStyle: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                        unselectedLabelStyle: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontFamily: 'Gilroy'),
+                        unselectedLabelColor: MyColors.gray,
                         indicatorColor: MyColors.primaryColor,
                       )))
                 ];
@@ -82,18 +86,21 @@ class _PodcastState extends State<Podcast> {
                       data.add(box.getAt(a));
                     }
 
-                    return TabBarView(children: [
-                      PodcastAll(
-                        podcastList: data,
-                      ),
-                      NotListenedPodcast(
-                        dataStore: dataStore,
-                      ),
-                      const DownloadedPodcast(),
-                      ListenedPodcast(
-                        dataStore: dataStore,
-                      )
-                    ]);
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: TabBarView(children: [
+                        PodcastAll(
+                          podcastList: data,
+                        ),
+                        NotListenedPodcast(
+                          dataStore: dataStore,
+                        ),
+                        const DownloadedPodcast(),
+                        ListenedPodcast(
+                          dataStore: dataStore,
+                        )
+                      ]),
+                    );
                   } else {
                     return const Center(
                       child: CircularProgressIndicator(
