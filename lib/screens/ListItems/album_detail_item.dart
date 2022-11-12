@@ -5,23 +5,22 @@ import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:goodali/Providers/audio_provider.dart';
-import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/Widgets/audio_progressbar.dart';
 import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
-import 'package:goodali/models/audio_player_model.dart';
+import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:provider/provider.dart';
 import 'dart:developer' as developer;
 
 typedef OnTap = Function(Products audioObject);
@@ -67,11 +66,13 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
   bool isPlaying = false;
   bool isLoading = true;
   bool isbgPlaying = false;
-  var _totalduration = Duration.zero;
   String url = "";
   String audioURL = "";
   String introURL = "";
   String banner = "";
+
+  var _totalduration = Duration.zero;
+
   @override
   void initState() {
     if (widget.products.audio != "Audio failed to upload") {
@@ -96,12 +97,12 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         developer.log(widget.products.isBought.toString(), name: "is Bought");
         _totalduration = Duration(milliseconds: widget.products.duration!);
       }
-      if (mounted) {
-        setState(() {
-          duration = _totalduration;
-          isLoading = false;
-        });
-      }
+
+      setState(() {
+        duration = _totalduration;
+        isLoading = false;
+      });
+
       savedPosition = widget.products.position!;
       return duration;
     } catch (e) {
@@ -132,101 +133,110 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        playerExpandProgress.value = playerMaxHeight;
-        // currentlyPlaying.value = widget.products;
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: ImageView(
-                      imgPath: widget.products.banner ?? "",
-                      width: 40,
-                      height: 40)),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.isBought &&
-                              widget.products.lectureTitle != null &&
-                              widget.products.lectureTitle!.isNotEmpty
-                          ? widget.products.lectureTitle!
-                          : widget.products.title ?? "",
-                      maxLines: 1,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: MyColors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    CustomReadMoreText(text: widget.products.body ?? "")
-                  ],
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              AudioPlayerButton(
-                onPlay: widget.onTap,
-                onPause: () {
-                  audioHandler.pause();
-                },
-                title: widget.isBought &&
-                        widget.products.lectureTitle != null &&
-                        widget.products.lectureTitle!.isNotEmpty
-                    ? widget.products.lectureTitle!
-                    : widget.products.title ?? "",
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: ImageView(
+                    imgPath: widget.products.banner ?? "",
+                    width: 40,
+                    height: 40)),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.isBought &&
+                            widget.products.lectureTitle != null &&
+                            widget.products.lectureTitle!.isNotEmpty
+                        ? widget.products.lectureTitle!
+                        : widget.products.title ?? "",
+                    maxLines: 1,
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: MyColors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  CustomReadMoreText(text: widget.products.body ?? "")
+                ],
               ),
-              // if (isClicked)
-              //   AudioProgressBar(
-              //       savedPosition: savedPosition, totalDuration: duration),
-              const SizedBox(width: 10),
-              isLoading
-                  ? const SizedBox(
-                      width: 30,
-                      child: LinearProgressIndicator(
-                          backgroundColor: Colors.transparent,
-                          minHeight: 2,
-                          color: MyColors.black))
-                  : AudioplayerTimer(
-                      title: widget.products.title ?? "",
-                      totalDuration: duration,
-                      savedDuration: Duration(milliseconds: savedPosition),
-                    ),
-              const Spacer(),
-              widget.products.isBought == true
-                  ? IconButton(
+            )
+          ],
+        ),
+        const SizedBox(height: 14),
+        ValueListenableBuilder(
+            valueListenable: durationStateNotifier,
+            builder: (context, DurationState value, child) {
+              var buttonState = buttonNotifier.value;
+              var currently = currentlyPlaying.value;
+              bool isPlaying = currently?.title == widget.products.title &&
+                      buttonState == ButtonState.playing
+                  ? true
+                  : false;
+
+              return Row(
+                children: [
+                  AudioPlayerButton(
+                    onPlay: () {
+                      widget.onTap.call();
+                    },
+                    onPause: () {
+                      audioHandler.pause();
+                    },
+                    title: widget.products.title ?? "",
+                  ),
+                  const SizedBox(width: 10),
+                  isLoading
+                      ? const SizedBox(
+                          width: 30,
+                          child: LinearProgressIndicator(
+                              backgroundColor: Colors.transparent,
+                              minHeight: 2,
+                              color: MyColors.black))
+                      : Row(
+                          children: [
+                            (savedPosition > 0 || isPlaying)
+                                ? AudioProgressBar(
+                                    totalDuration: duration,
+                                    title: widget.products.title ?? "",
+                                    savedPostion:
+                                        Duration(milliseconds: savedPosition),
+                                  )
+                                : Container(),
+                            const SizedBox(width: 10),
+                            AudioplayerTimer(
+                              title: widget.products.title ?? "",
+                              totalDuration: _totalduration,
+                              savedDuration:
+                                  Duration(milliseconds: savedPosition),
+                            ),
+                          ],
+                        ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(IconlyLight.arrow_down,
+                        size: 20, color: MyColors.gray),
+                    splashRadius: 1,
+                  ),
+                  IconButton(
                       splashRadius: 20,
-                      onPressed: () {
-                        _downloadFile();
-                      },
-                      icon: Icon(IconlyLight.arrow_down,
-                          color: fileInfo != null
-                              ? MyColors.primaryColor
-                              : MyColors.gray))
-                  : Container(),
-              IconButton(
-                  splashRadius: 20,
-                  onPressed: () {},
-                  icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
-            ],
-          ),
-          const SizedBox(height: 12)
-        ],
-      ),
+                      onPressed: () {},
+                      icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
+                ],
+              );
+            }),
+        const SizedBox(height: 12)
+      ],
     );
   }
 }

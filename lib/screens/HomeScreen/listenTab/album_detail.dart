@@ -367,7 +367,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   products: product[index],
                   isBought: product[index].isBought!,
                   albumName: widget.albumProduct.title ?? "",
-                  // audioPlayer: audioPlayer[index],
                   productsList: product,
                   index: index,
                   albumProducts: widget.albumProduct,

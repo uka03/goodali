@@ -6,7 +6,6 @@ import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
-import 'package:goodali/Widgets/custom_textfield.dart';
 
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';

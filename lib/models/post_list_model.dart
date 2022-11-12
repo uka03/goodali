@@ -8,6 +8,9 @@ class PostListModel {
   int? likes;
   int? postType;
   List<Tags>? tags;
+  String? createdAt;
+  String? nickName;
+  bool? selfLike;
 
   PostListModel(
       {this.title,
@@ -16,7 +19,10 @@ class PostListModel {
       this.likes,
       this.postType,
       this.replys,
-      this.tags});
+      this.tags,
+      this.createdAt,
+      this.nickName,
+      this.selfLike});
 
   PostListModel.fromJson(Map<String, dynamic> json) {
     body = json['body'];
@@ -38,6 +44,9 @@ class PostListModel {
       });
     }
     title = json['title'];
+    createdAt = json['created_at'];
+    nickName = json['nick_name'];
+    selfLike = json['self_like'];
   }
 
   Map<String, dynamic> toJson() {
@@ -54,6 +63,9 @@ class PostListModel {
     if (tags != null) {
       data['tags'] = tags!.map((v) => v.toJson()).toList();
     }
+    data["created_at"] = createdAt;
+    data["nick_name"] = nickName;
+    data["self_like"] = selfLike;
 
     return data;
   }

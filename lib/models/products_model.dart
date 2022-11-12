@@ -47,6 +47,8 @@ class Products extends HiveObject {
   @HiveField(19)
   String? banner;
   @HiveField(20)
+  int? moodListId;
+
   Products(
       {this.audio,
       this.banner,
@@ -61,6 +63,7 @@ class Products extends HiveObject {
       this.status,
       this.traingName,
       this.albumTitle,
+      this.moodListId,
       this.lectureTitle,
       this.audioCount,
       this.isBought,
@@ -86,6 +89,7 @@ class Products extends HiveObject {
     trainingBanner = json['t_banner'] ?? "";
     duration = json['duration'] ?? 0;
     position = json['position'] ?? 0;
+    moodListId = json['mood_list_id'] ?? 0;
     played = json['played'] ?? false;
   }
 
@@ -111,6 +115,8 @@ class Products extends HiveObject {
     data['duration'] = duration;
     data['position'] = position;
     data['played'] = played;
+    data['mood_list_id'] = moodListId;
+
     return data;
   }
 

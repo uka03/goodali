@@ -135,11 +135,8 @@ class _ForumScreenState extends State<ForumScreen> {
                       ))
             ];
           },
-          body: TabBarView(children: [
-            const NatureOfHuman(),
-            const NuutsBulgem(),
-            const MyFriendTab()
-          ]),
+          body: TabBarView(
+              children: const [NatureOfHuman(), NuutsBulgem(), MyFriendTab()]),
         ),
       ),
     );

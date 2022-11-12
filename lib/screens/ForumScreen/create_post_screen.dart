@@ -40,6 +40,7 @@ class _CreatePostState extends State<CreatePost> {
     Provider.of<Auth>(context, listen: false)
         .checkTraining()
         .then((value) => hasTraining = value);
+
     if (hasTraining) {
       postTypes = [
         'Хүний байгаль',

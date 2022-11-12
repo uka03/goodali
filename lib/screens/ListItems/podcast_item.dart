@@ -1,26 +1,33 @@
 import 'dart:developer';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:goodali/Providers/podcast_provider.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/audio_progressbar.dart';
 import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
-import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
+import 'package:goodali/controller/download_controller.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:goodali/models/task_info.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:provider/provider.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 import 'dart:developer' as developer;
+
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class PodcastItem extends StatefulWidget {
   final Products podcastItem;
@@ -41,14 +48,21 @@ class PodcastItem extends StatefulWidget {
 }
 
 class _PodcastItemState extends State<PodcastItem> {
+  HiveDownloadedPodcast downloadedPodcast = HiveDownloadedPodcast();
   AudioPlayerController audioPlayerController = AudioPlayerController();
+  DownloadController downloadController = DownloadController();
   AudioPlayer audioPlayer = AudioPlayer();
   String audioUrl = '';
   Duration duration = Duration.zero;
   bool isLoading = true;
+  bool hasGranted = false;
   var _totalduration = Duration.zero;
   var progressMax = Duration.zero;
   var savedDuration = 0;
+  final ReceivePort _port = ReceivePort();
+  int downloadProgress = 0;
+  DownloadTaskStatus downloadTaskStatus = DownloadTaskStatus.undefined;
+
   @override
   void initState() {
     if (widget.podcastItem.audio != "Audio failed to upload") {
@@ -58,6 +72,11 @@ class _PodcastItemState extends State<PodcastItem> {
     if (audioUrl != '') {
       getTotalDuration();
     }
+
+    _bindBackgroundIsolate();
+
+    FlutterDownloader.registerCallback(downloadCallback, step: 1);
+
     super.initState();
   }
 
@@ -111,6 +130,62 @@ class _PodcastItemState extends State<PodcastItem> {
     widget.podcastItem.duration = (duration * 1000).toInt();
     await widget.podcastItem.save();
     return Duration(milliseconds: (duration * 1000).toInt());
+  }
+
+  @override
+  void dispose() {
+    _unbindBackgroundIsolate();
+    super.dispose();
+  }
+
+  void _unbindBackgroundIsolate() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
+  }
+
+  @pragma('vm:entry-point')
+  static void downloadCallback(
+    String id,
+    DownloadTaskStatus status,
+    int progress,
+  ) {
+    print(
+      'Callback on background isolate: '
+      'task ($id) is in status ($status) and process ($progress)',
+    );
+
+    IsolateNameServer.lookupPortByName('downloader_send_port')
+        ?.send([id, status, progress]);
+  }
+
+  void _bindBackgroundIsolate() async {
+    final isSuccess = IsolateNameServer.registerPortWithName(
+      _port.sendPort,
+      'downloader_send_port',
+    );
+    if (!isSuccess) {
+      _unbindBackgroundIsolate();
+      _bindBackgroundIsolate();
+      return;
+    }
+    _port.listen((dynamic data) {
+      final taskId = (data as List<dynamic>)[0] as String;
+      final status = data[1] as DownloadTaskStatus;
+      final progress = data[2] as int;
+
+      print(
+        'Callback on UI isolate: '
+        'task ($taskId) is in status ($status) and process ($progress)',
+      );
+
+      setState(() {
+        downloadTaskStatus = status;
+        downloadProgress = progress;
+      });
+    });
+    if (downloadTaskStatus == DownloadTaskStatus.complete) {
+      print("podcast nemegdlee");
+      downloadedPodcast.addProduct(products: widget.podcastItem);
+    }
   }
 
   @override
@@ -207,12 +282,7 @@ class _PodcastItemState extends State<PodcastItem> {
                           ],
                         ),
                   const Spacer(),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(IconlyLight.arrow_down,
-                        size: 20, color: MyColors.gray),
-                    splashRadius: 1,
-                  ),
+                  downloadButton(),
                   IconButton(
                       splashRadius: 20,
                       onPressed: () {},
@@ -223,5 +293,51 @@ class _PodcastItemState extends State<PodcastItem> {
         const SizedBox(height: 12)
       ],
     );
+  }
+
+  Widget downloadButton() {
+    print(downloadTaskStatus);
+    if (downloadTaskStatus == DownloadTaskStatus.undefined) {
+      return IconButton(
+        onPressed: () async {
+          hasGranted = await downloadController.checkPermission();
+          if (hasGranted) {
+            downloadController
+                .download(Urls.networkPath + widget.podcastItem.audio!);
+          } else {
+            showTopSnackBar(
+                context,
+                const CustomTopSnackBar(
+                    type: 0, text: "Grant storage permission to continue"));
+          }
+        },
+        icon:
+            const Icon(IconlyLight.arrow_down, size: 20, color: MyColors.gray),
+        splashRadius: 1,
+      );
+    } else if (downloadTaskStatus == DownloadTaskStatus.running) {
+      return Row(
+        children: [
+          Text(downloadProgress.toString() + "%"),
+          IconButton(
+            onPressed: () {},
+            constraints: const BoxConstraints(minHeight: 32, minWidth: 32),
+            icon: const Icon(Icons.pause, color: Colors.yellow),
+            tooltip: 'Pause',
+          ),
+        ],
+      );
+    } else if (downloadTaskStatus == DownloadTaskStatus.complete) {
+      return IconButton(
+        onPressed: () {},
+        icon: const Icon(IconlyLight.arrow_down,
+            size: 20, color: MyColors.primaryColor),
+        splashRadius: 1,
+      );
+    } else if (downloadTaskStatus == DownloadTaskStatus.enqueued) {
+      return CircularPercentIndicator(radius: 16);
+    } else {
+      return Container();
+    }
   }
 }

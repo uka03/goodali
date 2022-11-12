@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
-import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
@@ -25,12 +25,16 @@ Future<void> main() async {
   await initAudioHandler();
   AudioPlayerController audioPlayerController = AudioPlayerController();
   audioPlayerController.initiliaze();
+  await FlutterDownloader.initialize(debug: true);
   WidgetsFlutterBinding.ensureInitialized();
   CacheManager.logLevel = CacheManagerLogLevel.verbose;
   await Hive.initFlutter();
   Hive.registerAdapter<Products>(ProductsAdapter());
   await Hive.openBox<Products>("podcasts");
   await Hive.openBox<Products>("bought_podcasts");
+  await Hive.openBox<Products>("mood_podcasts");
+  await Hive.openBox<Products>("downloaded_podcast");
+
   runApp(const MyApp());
 }
 
@@ -44,14 +48,14 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
 
     super.dispose();
   }
@@ -90,8 +94,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             create: (_) => AudioPlayerProvider()),
         ChangeNotifierProvider<AudioDownloadProvider>(
             create: (_) => AudioDownloadProvider()),
-        // ChangeNotifierProvider<PodcastProvider>(
-        //     create: (_) => PodcastProvider()),
         ChangeNotifierProvider<ForumTagNotifier>(
             create: (_) => ForumTagNotifier()),
       ],

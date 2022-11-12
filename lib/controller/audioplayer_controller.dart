@@ -5,7 +5,6 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -182,6 +181,7 @@ Future<bool> initiliazePodcast() async {
   audioHandler.queue.value.clear();
 
   log(activeList.length.toString(), name: "lesture list");
+
   for (var item in activeList) {
     MediaItem mediaItem = MediaItem(
       id: item.id.toString(),

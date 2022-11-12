@@ -1,28 +1,23 @@
 import 'dart:async';
-import 'dart:convert';
-
-import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:goodali/Providers/audio_provider.dart';
+import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
-import 'package:goodali/controller/duration_state.dart';
-import 'package:goodali/models/audio_player_model.dart';
-import 'package:goodali/models/mood_item.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/controller/progress_notifier.dart';
+import 'package:goodali/models/products_model.dart';
 
 import 'package:iconly/iconly.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
 import 'dart:developer' as developer;
-
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MoodDetail extends StatefulWidget {
   final String moodListId;
@@ -35,25 +30,20 @@ class MoodDetail extends StatefulWidget {
 }
 
 class _MoodDetailState extends State<MoodDetail> {
-  AudioPlayerProvider _audioPlayerProvider = AudioPlayerProvider();
-  late final Future futureMoodItem = getMoodList();
   final PageController _pageController = PageController();
+  final HiveMoodDataStore dataMoodStore = HiveMoodDataStore();
   final _kDuration = const Duration(milliseconds: 300);
   final _kCurve = Curves.easeIn;
-  Stream<DurationState>? _durationState;
-  List<MoodItem> moodItem = [];
-  AudioPlayer audioPlayer = AudioPlayer();
 
-  Duration duration = Duration.zero;
-  Duration position = Duration.zero;
-  int saveddouble = 0;
-
+  List<Products> moodItem = [];
+  Products? moodItemWithAudio;
   double _current = 0;
-  bool isLoading = true;
-  bool isExited = false;
-
   String url = "";
   String imgUrl = "";
+
+  var totalDuration = Duration.zero;
+  var currentDuration = Duration.zero;
+  var savedPosition = 0;
 
   Widget rightButton = const Text(
     "Дараах",
@@ -65,13 +55,7 @@ class _MoodDetailState extends State<MoodDetail> {
   void initState() {
     super.initState();
 
-    getMoodList().then((value) {
-      moodItem = value;
-      if (value.length == 1) {
-        initForOthers(Urls.networkPath + moodItem.first.audio!,
-            moodItem[_current.toInt()].id ?? 0);
-      }
-    });
+    getMoodList();
     _pageController.addListener(() {
       setState(() {
         _current = _pageController.page!;
@@ -95,75 +79,65 @@ class _MoodDetailState extends State<MoodDetail> {
 
   @override
   void dispose() {
-    audioPlayer.dispose();
-
     _pageController.dispose();
     super.dispose();
   }
 
-  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
-      .map((state) => state.bufferedPosition)
-      .distinct();
-
-  initForOthers(String url, int id) async {
+  Future<Duration> getTotalDuration(url) async {
     try {
-      duration = await audioPlayer.setUrl(url).then((value) {
-            setState(() => isLoading = false);
-            return value;
-          }) ??
-          Duration.zero;
+      if (moodItemWithAudio?.duration == null ||
+          moodItemWithAudio?.duration == 0) {
+        totalDuration = await getFileDuration(url);
+      } else {
+        totalDuration = Duration(milliseconds: moodItemWithAudio!.duration!);
+      }
 
-      getSavedPosition(id).then((value) {
-        developer.log(value.toString());
-        setState(() {
-          position = value;
-          _durationState =
-              Rx.combineLatest3<MediaItem?, Duration, Duration, DurationState>(
-                  audioHandler.mediaItem,
-                  AudioService.position,
-                  _bufferedPositionStream,
-                  (mediaItem, position, buffered) =>
-                      DurationState(position, buffered, mediaItem?.duration));
+      totalDuration = totalDuration;
 
-          audioHandler.playbackState.listen((PlaybackState state) {
-            if (!state.playing) {}
-          });
-
-          MediaItem item = MediaItem(
-              id: url,
-              title: moodItem[_current.toInt()].title ?? "",
-              duration: duration,
-              artUri: Uri.parse(
-                  Urls.networkPath + moodItem[_current.toInt()].banner!),
-              extras: {"saved_position": position.inMilliseconds, 'url': url});
-          audioHandler.playMediaItem(item);
-        });
-      });
+      savedPosition = moodItemWithAudio?.position ?? 0;
+      developer.log(savedPosition.toString(), name: "moodItem duration");
+      return totalDuration;
     } catch (e) {
-      developer.log(e.toString(), name: "mood detail error");
+      developer.log(e.toString(), name: "mood error");
     }
+    return totalDuration;
   }
 
-  Future getSavedPosition(int moodItemID) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> decodedAudioString =
-        prefs.getStringList("mood_save_audio") ?? [];
-    List<AudioPlayerModel> decodedProduct = decodedAudioString
-        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
-        .toList();
+  Future<Duration> getFileDuration(String mediaPath) async {
+    final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
+    final mediaInfo = mediaInfoSession.getMediaInformation()!;
+    final double _duration = double.parse(mediaInfo.getDuration()!);
+    moodItemWithAudio?.duration = (_duration * 1000).toInt();
+    await moodItemWithAudio?.save();
+    return Duration(milliseconds: (_duration * 1000).toInt());
+  }
 
-    for (var item in decodedProduct) {
-      if (moodItemID == item.productID) {
-        saveddouble = decodedProduct.isNotEmpty ? item.audioPosition ?? 0 : 0;
-      }
+  Future<bool> initiliaze() async {
+    if (activeList.isNotEmpty &&
+        activeList.first.moodListId == moodItemWithAudio?.moodListId &&
+        activeList.first.id == moodItemWithAudio?.id) {
+      return true;
+    } else {
+      activeList.clear();
+      widget.moodListId;
     }
-    position = Duration(milliseconds: saveddouble);
-    return position;
+    activeList.add(moodItemWithAudio!);
+    await initiliazePodcast();
+    return true;
+  }
+
+  onPlayButtonClicked() async {
+    currentlyPlaying.value = moodItemWithAudio;
+
+    developer.log("Starts in: ${moodItemWithAudio!.position}");
+    await audioHandler.seek(
+      Duration(milliseconds: moodItemWithAudio!.position!),
+    );
+    await audioHandler.play();
   }
 
   @override
   Widget build(BuildContext context) {
-    final audioPosition = Provider.of<AudioPlayerProvider>(context);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -174,198 +148,162 @@ class _MoodDetailState extends State<MoodDetail> {
               Color(0xff84A3F7),
             ]),
       ),
-      child: WillPopScope(
-        onWillPop: () async {
-          print("onwillpop");
-          AudioPlayerModel _audio = AudioPlayerModel(
-              productID: moodItem[_current.toInt()].id,
-              audioPosition: position.inMilliseconds);
-          audioPosition.addAudioPosition(_audio);
-          return false;
-        },
-        child: Scaffold(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
           backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            centerTitle: false,
-            leading: IconButton(
-              icon: const Icon(IconlyLight.arrow_left, color: Colors.white),
-              onPressed: () {
-                print(position.inMilliseconds);
-                AudioPlayerModel _audio = AudioPlayerModel(
-                    productID: moodItem[_current.toInt()].id,
-                    audioPosition: position.inMilliseconds);
-                audioPosition
-                    .addAudioPosition(_audio)
-                    .whenComplete(() => Navigator.pop(context));
+          elevation: 0,
+          centerTitle: false,
+          leading: IconButton(
+            icon: const Icon(IconlyLight.arrow_left, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          iconTheme: const IconThemeData(color: MyColors.black),
+        ),
+        body: Stack(alignment: Alignment.bottomCenter, children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: ValueListenableBuilder(
+              valueListenable: HiveMoodDataStore.box.listenable(),
+              builder: (context, Box box, boxWidget) {
+                if (box.length > 0) {
+                  List<Products> moodList = [];
+
+                  for (int a = 0; a < box.length; a++) {
+                    Products products = box.get(a);
+                    if (products.moodListId == int.parse(widget.moodListId)) {
+                      moodList.add(products);
+
+                      if (products.audio != "Audio failed to upload") {
+                        moodItemWithAudio = products;
+                        print(moodItemWithAudio?.audio);
+                        getTotalDuration(
+                            Urls.networkPath + moodItemWithAudio!.audio!);
+                        initiliaze();
+                      }
+                    }
+                  }
+
+                  moodItem = moodList;
+                  print(moodItem.length);
+
+                  return PageView.builder(
+                      controller: _pageController,
+                      itemCount: moodItem.length,
+                      onPageChanged: (int page) {
+                        if (url != "") {}
+                      },
+                      itemBuilder: ((context, index) {
+                        imgUrl =
+                            moodItem[index].banner == "Image failed to upload"
+                                ? ""
+                                : moodItem[index].banner!;
+                        url = moodItem[index].audio == "Audio failed to upload"
+                            ? ""
+                            : Urls.networkPath + moodItem[index].audio!;
+
+                        return Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              banner(imgUrl),
+                              const SizedBox(height: 20),
+                              HtmlWidget(
+                                moodItem[index].title!,
+                                textStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20),
+                              ),
+                              const SizedBox(height: 40),
+                              HtmlWidget(
+                                moodItem[index].body!,
+                                textStyle: const TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
+                              const SizedBox(height: 20),
+                              if (url != "") audioPlayerWidget()
+                            ],
+                          ),
+                        );
+                      }));
+                } else {
+                  return const Center(
+                    child:
+                        CircularProgressIndicator(color: MyColors.primaryColor),
+                  );
+                }
               },
             ),
-            iconTheme: const IconThemeData(color: MyColors.black),
           ),
-          body: Stack(alignment: Alignment.bottomCenter, children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: FutureBuilder(
-                future: futureMoodItem,
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    moodItem = snapshot.data;
-
-                    return PageView.builder(
-                        controller: _pageController,
-                        itemCount: moodItem.length,
-                        onPageChanged: (int page) {
-                          if (url != "") {
-                            initForOthers(
-                                url, moodItem[_current.toInt() + 1].id ?? 0);
-                          }
-                        },
-                        itemBuilder: ((context, index) {
-                          imgUrl =
-                              moodItem[index].banner == "Image failed to upload"
-                                  ? ""
-                                  : moodItem[index].banner!;
-                          url =
-                              moodItem[index].audio == "Audio failed to upload"
-                                  ? ""
-                                  : Urls.networkPath + moodItem[index].audio!;
-
-                          if (moodItem[index].audio ==
-                              "Audio failed to upload") {
-                            return Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  banner(imgUrl),
-                                  const SizedBox(height: 20),
-                                  HtmlWidget(
-                                    moodItem[index].title!,
-                                    textStyle: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                  const SizedBox(height: 40),
-                                  HtmlWidget(
-                                    moodItem[index].body!,
-                                    textStyle: const TextStyle(
-                                        color: Colors.white, fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  banner(imgUrl),
-                                  const SizedBox(height: 40),
-                                  HtmlWidget(
-                                    moodItem[index].title!,
-                                    textStyle: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                  const SizedBox(height: 40),
-                                  HtmlWidget(
-                                    moodItem[index].body!,
-                                    textStyle: const TextStyle(
-                                        color: Colors.white, fontSize: 16),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  audioPlayerWidget()
-                                ],
-                              ),
-                            );
-                          }
-                        }));
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                          color: MyColors.primaryColor),
-                    );
-                  }
-                },
-              ),
-            ),
-            _current != 0
-                ? Positioned(
-                    bottom: 50,
-                    left: 35,
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12)),
-                      child: RawMaterialButton(
-                        onPressed: () {
-                          _pageController.previousPage(
-                              curve: _kCurve, duration: _kDuration);
-                        },
-                        child: const Icon(IconlyLight.arrow_left,
-                            color: MyColors.black),
-                      ),
-                    ))
-                : Container(),
-            Positioned(
-                bottom: 50,
-                right: 35,
-                child: Container(
-                  height: 50,
-                  width: 100,
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12)),
-                  child: RawMaterialButton(
-                    onPressed: () async {
-                      _pageController.nextPage(
-                          curve: _kCurve, duration: _kDuration);
-
-                      // if (url != "") {
-                      //   print("duusgah");
-                      //   playAudio(url);
-                      // }
-                      if (_current == moodItem.length - 1) {
-                        audioPlayer.dispose();
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: rightButton,
-                  ),
-                )),
-            Positioned(
-                top: 0,
-                right: 0,
-                left: 0,
-                child: Row(
-                  children: moodItem
-                      .map((entry) => (moodItem.indexOf(entry) - 1 == _current)
-                          ? Container(
-                              width: MediaQuery.of(context).size.width /
-                                  moodItem.length,
-                              height: 2.0,
-                              color: Colors.white.withOpacity(0.4),
-                            )
-                          : Container(
-                              width: MediaQuery.of(context).size.width /
-                                  moodItem.length,
-                              height: 2.0,
-                              color: (_current >= moodItem.indexOf(entry))
-                                  ? Colors.white
-                                  : Colors.white.withOpacity(0.4),
-                            ))
-                      .toList(),
-                )),
-          ]),
-        ),
+          _current != 0
+              ? Positioned(
+                  bottom: 50,
+                  left: 35,
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12)),
+                    child: RawMaterialButton(
+                      onPressed: () {
+                        _pageController.previousPage(
+                            curve: _kCurve, duration: _kDuration);
+                      },
+                      child: const Icon(IconlyLight.arrow_left,
+                          color: MyColors.black),
+                    ),
+                  ))
+              : Container(),
+          Positioned(
+              bottom: 50,
+              right: 35,
+              child: Container(
+                height: 50,
+                width: 100,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12)),
+                child: RawMaterialButton(
+                  onPressed: () async {
+                    _pageController.nextPage(
+                        curve: _kCurve, duration: _kDuration);
+                    if (_current == moodItem.length - 1) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: rightButton,
+                ),
+              )),
+          Positioned(
+              top: 0,
+              right: 0,
+              left: 0,
+              child: Row(
+                children: moodItem
+                    .map((entry) => (moodItem.indexOf(entry) - 1 == _current)
+                        ? Container(
+                            width: MediaQuery.of(context).size.width /
+                                moodItem.length,
+                            height: 2.0,
+                            color: Colors.white.withOpacity(0.4),
+                          )
+                        : Container(
+                            width: MediaQuery.of(context).size.width /
+                                moodItem.length,
+                            height: 2.0,
+                            color: (_current >= moodItem.indexOf(entry))
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.4),
+                          ))
+                    .toList(),
+              )),
+        ]),
       ),
     );
   }
@@ -374,13 +312,7 @@ class _MoodDetailState extends State<MoodDetail> {
     return Center(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
-        child:
-            // Container(
-            //   height: 260,
-            //   width: 260,
-            //   color: Colors.deepPurple[200],
-            // )
-            ImageView(
+        child: ImageView(
           imgPath: imgUrl,
           height: 260,
           width: 260,
@@ -390,50 +322,43 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   Widget audioPlayerWidget() {
-    return StreamBuilder<DurationState>(
-        stream: _durationState,
-        builder: (context, snapshot) {
-          final durationState = snapshot.data;
-          position = durationState?.progress ?? Duration.zero;
-          final buffered = durationState?.buffered ?? Duration.zero;
-          duration = durationState?.total ?? Duration.zero;
+    return ValueListenableBuilder(
+        valueListenable: progressNotifier,
+        builder: (context, ProgressBarState value, child) {
+          currentDuration = value.current;
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 ProgressBar(
-                  progress: position,
-                  buffered: buffered,
-                  total: duration,
+                  progress: currentDuration,
+                  buffered: currentDuration,
+                  total: totalDuration,
                   thumbColor: Colors.white,
                   thumbGlowColor: MyColors.primaryColor,
                   timeLabelTextStyle: const TextStyle(color: MyColors.gray),
                   progressBarColor: Colors.white,
                   bufferedBarColor: Colors.white54,
-                  baseBarColor: isExited ? Colors.white54 : Colors.white10,
+                  baseBarColor: Colors.white10,
                   onSeek: (duration) async {
-                    final position = duration;
-                    await audioHandler.seek(position);
-
-                    await audioHandler.play();
+                    await audioHandler.seek(duration);
                   },
                 ),
                 const SizedBox(height: 20),
-                playerButton(position, duration)
+                playerButton()
               ],
             ),
           );
         });
   }
 
-  Widget playerButton(Duration position, Duration duration) {
-    final audioPosition = Provider.of<AudioPlayerProvider>(context);
+  Widget playerButton() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         InkWell(
           onTap: () {
-            buttonBackWard5Seconds(position);
+            buttonBackWard5Seconds(currentDuration);
           },
           child: SvgPicture.asset("assets/images/replay_5.svg",
               color: Colors.white),
@@ -441,17 +366,19 @@ class _MoodDetailState extends State<MoodDetail> {
         CircleAvatar(
           radius: 36,
           backgroundColor: Colors.white,
-          child: StreamBuilder<bool>(
-            stream: audioHandler.playbackState
-                .map((state) => state.playing)
-                .distinct(),
-            builder: (context, snapshot) {
-              final playing = snapshot.data ?? false;
+          child: ValueListenableBuilder(
+            valueListenable: buttonNotifier,
+            builder: (BuildContext context, ButtonState? buttonValue,
+                Widget? child) {
+              bool isPlaying =
+                  buttonValue == ButtonState.playing ? true : false;
+              bool isBuffering =
+                  buttonValue == ButtonState.loading ? true : false;
 
-              if (isLoading) {
+              if (isBuffering) {
                 return const CircularProgressIndicator(
                     color: MyColors.primaryColor);
-              } else if (playing != true) {
+              } else if (isPlaying != true) {
                 return IconButton(
                   padding: EdgeInsets.zero,
                   icon: const Icon(
@@ -460,7 +387,7 @@ class _MoodDetailState extends State<MoodDetail> {
                     size: 40.0,
                   ),
                   onPressed: () {
-                    audioHandler.play();
+                    onPlayButtonClicked();
                   },
                 );
               } else {
@@ -471,13 +398,9 @@ class _MoodDetailState extends State<MoodDetail> {
                     color: MyColors.primaryColor,
                     size: 40.0,
                   ),
-                  onPressed: () {
-                    audioHandler.pause().then((value) {
-                      AudioPlayerModel _audio = AudioPlayerModel(
-                          productID: moodItem[_current.toInt()].id,
-                          audioPosition: position.inMilliseconds);
-                      audioPosition.addAudioPosition(_audio);
-                    });
+                  onPressed: () async {
+                    await updateSavedPosition();
+                    audioHandler.pause();
                   },
                 );
               }
@@ -486,7 +409,7 @@ class _MoodDetailState extends State<MoodDetail> {
         ),
         InkWell(
           onTap: () {
-            buttonForward15Seconds(position, duration);
+            buttonForward15Seconds(currentDuration, totalDuration);
           },
           child: SvgPicture.asset("assets/images/forward_15.svg",
               color: Colors.white),
@@ -505,6 +428,21 @@ class _MoodDetailState extends State<MoodDetail> {
     }
   }
 
+  Future<void> updateSavedPosition() async {
+    var item = currentlyPlaying.value;
+
+    if (item != null) {
+      if (item.title == moodItemWithAudio!.title) {
+        setState(() {
+          savedPosition = durationStateNotifier.value.progress!.inMilliseconds;
+        });
+      }
+      item.position = durationStateNotifier.value.progress!.inMilliseconds;
+      developer.log('${item.position}');
+      return item.save();
+    }
+  }
+
   buttonForward15Seconds(Duration position, Duration duration) {
     position = position + const Duration(seconds: 15);
 
@@ -515,13 +453,12 @@ class _MoodDetailState extends State<MoodDetail> {
     }
   }
 
-  Future<List<MoodItem>> getMoodList() async {
-    moodItem = await Connection.getMoodItem(
+  Future<void> getMoodList() async {
+    var listData = await Connection.getMoodItem(
         context, widget.id != null ? widget.id! : widget.moodListId);
-    setState(() {
-      moodItem = moodItem;
-    });
 
-    return moodItem;
+    for (var item in listData) {
+      dataMoodStore.addProduct(products: item);
+    }
   }
 }

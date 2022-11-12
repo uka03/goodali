@@ -3,13 +3,10 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:goodali/Utils/constans.dart';
-import 'package:goodali/Utils/global_variables.dart';
 import 'package:goodali/controller/http.dart';
 import 'package:goodali/Utils/urls.dart';
-import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:local_auth/local_auth.dart';
@@ -51,8 +48,6 @@ class Auth with ChangeNotifier {
 
   Future<Map<String, dynamic>> login(BuildContext context, dynamic data) async {
     final preferences = await SharedPreferences.getInstance();
-
-    print(data);
     try {
       final response = await Http()
           .getDio(context, headerTypeNone)
@@ -66,7 +61,7 @@ class Auth with ChangeNotifier {
           preferences.setBool("has_training", response.data['has_traing']);
 
           String mapToStr = json.encode(response.data);
-
+          checkTraining();
           var strToMap = json.decode(mapToStr);
 
           UserInfo userInfo = UserInfo.fromJson(response.data);
@@ -102,6 +97,10 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> logOut(BuildContext context) async {
+    final preferences = await SharedPreferences.getInstance();
+
+    preferences.remove("token");
+    preferences.remove("has_training");
     _isAuth = false;
     notifyListeners();
   }

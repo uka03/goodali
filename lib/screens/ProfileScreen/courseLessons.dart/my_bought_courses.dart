@@ -56,6 +56,7 @@ class _MyCoursesState extends State<MyCourses> {
       );
       await audioHandler.play();
     }
+    currentlyPlaying.value = allLectures[index];
   }
 
   @override

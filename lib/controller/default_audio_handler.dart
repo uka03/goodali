@@ -1,7 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
-import 'package:goodali/controller/duration_state.dart';
+
 import 'package:goodali/controller/progress_notifier.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
@@ -10,12 +10,15 @@ import '../Providers/local_database.dart';
 
 late AudioHandler audioHandler;
 final HiveDataStore dataStore = HiveDataStore();
+final HiveBoughtDataStore dataAlbumStore = HiveBoughtDataStore();
 Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
       builder: () => AudioPlayerHandler(),
       config: const AudioServiceConfig(
         androidNotificationChannelId: 'com.ryanheise.myapp.channel.audio',
         androidNotificationChannelName: 'Audio playback',
         androidNotificationOngoing: true,
+        androidNotificationIcon: 'mipmap/ic_launcher_round',
+        androidStopForegroundOnPause: true,
       ),
     );
 
@@ -114,6 +117,7 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> seek(Duration position) async {
+    print(position);
     return _player.seek(position);
   }
 

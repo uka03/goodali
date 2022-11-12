@@ -13,12 +13,9 @@ import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/models/course_lessons_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/courses_item.dart';
-import 'package:goodali/models/my_all_lectures.dart';
-import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/get_mood_list.dart';
-import 'package:goodali/models/mood_item.dart';
 import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/models/qpay.dart';
 import 'package:goodali/models/search_model.dart';
@@ -151,7 +148,7 @@ class Connection {
     }
   }
 
-  static Future<List<MoodItem>> getMoodItem(
+  static Future<List<Products>> getMoodItem(
       BuildContext context, String id) async {
     try {
       final response = await Http()
@@ -160,7 +157,7 @@ class Connection {
 
       if (response.data != null) {
         return (response.data as List)
-            .map((e) => MoodItem.fromJson(e))
+            .map((e) => Products.fromJson(e))
             .toList();
       } else {
         return [];

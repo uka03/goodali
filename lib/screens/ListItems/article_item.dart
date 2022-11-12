@@ -38,7 +38,7 @@ class ArtcileItem extends StatelessWidget {
                         color: MyColors.black,
                       )),
                   const SizedBox(height: 4),
-                  articleModel.createdAt == "" || articleModel.createdAt == null
+                  articleModel.createdAt != "" || articleModel.createdAt != null
                       ? Text(dateTimeFormatter(articleModel.createdAt ?? ""),
                           style: const TextStyle(
                             fontSize: 12,

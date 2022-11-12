@@ -17,6 +17,7 @@ import 'package:goodali/controller/default_audio_handler.dart';
 
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
+import 'package:goodali/controller/progress_notifier.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/screens/audioScreens.dart/player_buttons.dart';
 import 'package:miniplayer/miniplayer.dart';
@@ -241,15 +242,31 @@ class _PlayAudioState extends State<PlayAudio> {
                         ],
                       ),
                       const SizedBox(height: 30),
-                      Text(
-                        widget.products.title == ""
-                            ? widget.products.lectureTitle ?? ""
-                            : widget.products.title ?? "",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                      ValueListenableBuilder<ProgressBarState>(
+                        valueListenable: progressNotifier,
+                        builder: (context, durationValue, widget) {
+                          var totalDuration = durationStateNotifier.value.total;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: SizedBox(
+                              height: 4,
+                              width: double.infinity,
+                              child: ProgressBar(
+                                progress: durationValue.current,
+                                buffered: durationValue.buffered,
+                                total: totalDuration!,
+                                onSeek: (duration) {
+                                  audioHandler.seek(duration);
+                                },
+                                baseBarColor: MyColors.border1,
+                                progressBarColor: MyColors.primaryColor,
+                                thumbColor: MyColors.primaryColor,
+                                bufferedBarColor:
+                                    MyColors.primaryColor.withAlpha(20),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 30),
                       Row(
@@ -343,20 +360,11 @@ class _PlayAudioState extends State<PlayAudio> {
                             valueListenable: buttonNotifier,
                             builder:
                                 (context, ButtonState? buttonValue, widget) {
-                              Products? currentlyPlay = currentlyPlaying.value;
-
                               if (buttonValue?.index == 0) {
                                 return IconButton(
                                   icon: const Icon(Icons.play_arrow_rounded),
                                   onPressed: () {
                                     audioHandler.play();
-
-                                    //ENE NOHOR YAG YAGAAD BN!
-                                    AudioPlayerModel _audio = AudioPlayerModel(
-                                        title: currentlyPlay?.title,
-                                        productID: currentlyPlay?.id ?? 0,
-                                        audioPosition: position.inMilliseconds);
-                                    audioPosition.addAudioPosition(_audio);
                                   },
                                 );
                               } else if (buttonValue?.index == 1) {
@@ -380,7 +388,7 @@ class _PlayAudioState extends State<PlayAudio> {
                       IconButton(
                           icon: const Icon(Icons.close),
                           onPressed: () async {
-                            await audioHandler.stop();
+                            await audioHandler.pause();
                             currentlyPlaying.value = null;
                           }),
                     ],
@@ -411,13 +419,6 @@ class _PlayAudioState extends State<PlayAudio> {
                                   MyColors.primaryColor.withAlpha(20),
                             ),
                           );
-                          // LinearProgressIndicator(
-                          //   value:
-                          //       durationValue.progress!.inMinutes.toDouble() /
-                          //           100,
-                          //   backgroundColor: MyColors.border1,
-                          //   color: MyColors.primaryColor,
-                          // );
                         },
                       ),
                     )),

@@ -30,6 +30,7 @@ class ProductsAdapter extends TypeAdapter<Products> {
       status: fields[6] as int?,
       traingName: fields[9] as String?,
       albumTitle: fields[10] as String?,
+      moodListId: fields[20] as int?,
       lectureTitle: fields[11] as String?,
       audioCount: fields[14] as int?,
       isBought: fields[12] as bool?,
@@ -43,7 +44,7 @@ class ProductsAdapter extends TypeAdapter<Products> {
   @override
   void write(BinaryWriter writer, Products obj) {
     writer
-      ..writeByte(20)
+      ..writeByte(21)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -83,7 +84,9 @@ class ProductsAdapter extends TypeAdapter<Products> {
       ..writeByte(18)
       ..write(obj.audio)
       ..writeByte(19)
-      ..write(obj.banner);
+      ..write(obj.banner)
+      ..writeByte(20)
+      ..write(obj.moodListId);
   }
 
   @override

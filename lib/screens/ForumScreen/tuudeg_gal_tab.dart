@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
@@ -9,6 +11,7 @@ import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/ForumScreen/post_detail.dart';
+import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +28,11 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
   List<bool> isHearted = [];
   List<PostListModel> filteredList = [];
   List<PostListModel> postList = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +109,11 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                       ),
                       onPressed: () {
                         if (value.isAuth) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) =>
+                                      const CourseTabbar(isHomeScreen: false)));
                         } else {
                           showModalBottomSheet(
                               context: context,

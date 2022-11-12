@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:iconly/iconly.dart';
@@ -39,19 +40,20 @@ class _PostItemState extends State<PostItem> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            children: const [
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               Text(
-                "Nickname",
-                style: TextStyle(color: MyColors.gray),
+                widget.postItem.nickName ?? "",
+                style: const TextStyle(color: MyColors.gray),
               ),
               const SizedBox(width: 8),
               const Icon(Icons.circle, color: MyColors.gray, size: 5),
-              // SizedBox(width: 8),
-              // Text(
-              //   "2022.06.22",
-              //   style: TextStyle(color: MyColors.gray),
-              // ),
-              // Spacer(),
+              const SizedBox(width: 8),
+              Text(
+                dateTimeFormatter(widget.postItem.createdAt!),
+                style: const TextStyle(color: MyColors.gray),
+              ),
+              const Spacer(),
             ],
           ),
           const SizedBox(height: 23),
@@ -108,7 +110,7 @@ class _PostItemState extends State<PostItem> {
                               insertLike(widget.postItem.id ?? 0);
                             }
                           },
-                          child: isLiked
+                          child: isLiked || widget.postItem.selfLike!
                               ? const Icon(IconlyBold.heart,
                                   color: MyColors.primaryColor)
                               : const Icon(IconlyLight.heart,
