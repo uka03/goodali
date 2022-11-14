@@ -7,9 +7,7 @@ import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/tag_model.dart';
-import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/ForumScreen/post_detail.dart';
-import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 

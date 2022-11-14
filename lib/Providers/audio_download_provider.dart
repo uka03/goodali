@@ -86,7 +86,7 @@ class AudioDownloadProvider with ChangeNotifier {
     _podcastItem.remove(item);
     _podcastItem.removeWhere((element) => element.id == item.id);
     _setPrefPodcastItems();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
   }

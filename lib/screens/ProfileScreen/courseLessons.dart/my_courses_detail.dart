@@ -1,11 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/course_lessons_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
@@ -77,14 +76,6 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                 fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
-          const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: CustomReadMoreText(
-                text:
-                    "Чиний амьдралыг уг үндсээр нь хувиргах трансформац-хөтөлбөрийн эхний бүлгийг нээж байгаад баяр хүргэе! Удиртгал хэсгийг уншаагүй бол заавал уншихыг зөвлөж ",
-                textAlign: TextAlign.center,
-              )),
-          const SizedBox(height: 20),
           FutureBuilder(
             future: future,
             builder: (context, AsyncSnapshot snapshot) {
@@ -104,43 +95,34 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                       String tasks =
                           doneTasks.toString() + "/" + allTasks.toString();
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Card(
-                            elevation: 0,
-                            child: ListTile(
-                              iconColor: MyColors.black,
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => CourseLessonType(
-                                            title: lessons[index]?.name ?? "",
-                                            id: lessons[index]!
-                                                .id
-                                                .toString())));
-                              },
-                              subtitle: Row(children: [
-                                Text(
-                                  tasks,
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                const Spacer(),
-                                Text(lessons[index]?.expiry == null ||
-                                        lessons[index]?.expiry == ""
-                                    ? "null"
-                                    : dateTimeFormatter(
-                                        lessons[index]?.expiry ?? "")),
-                              ]),
-                              trailing: const Icon(IconlyLight.arrow_right_2,
-                                  size: 18, color: MyColors.gray),
-                              title: Text(
-                                lessons[index]?.name ?? "",
-                                style: const TextStyle(
-                                  color: MyColors.black,
-                                ),
-                              ),
-                            )),
+                      return ListTile(
+                        iconColor: MyColors.black,
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 20),
+                        onTap: () => _openLesson(
+                            lessons[index]?.name ?? "",
+                            lessons[index]!.id.toString(),
+                            lessons[index]!.opened!),
+                        subtitle: Row(children: [
+                          Text(
+                            tasks,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          // const Spacer(),
+                          // Text(lessons[index]?.expiry == null ||
+                          //         lessons[index]?.expiry == ""
+                          //     ? "null"
+                          //     : dateTimeFormatter(
+                          //         lessons[index]?.expiry ?? "")),
+                        ]),
+                        trailing: const Icon(IconlyLight.arrow_right_2,
+                            size: 18, color: MyColors.gray),
+                        title: Text(
+                          lessons[index]?.name ?? "",
+                          style: const TextStyle(
+                            color: MyColors.black,
+                          ),
+                        ),
                       );
                     },
                   );
@@ -159,6 +141,17 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
         ]),
       ),
     );
+  }
+
+  _openLesson(String name, String id, bool isOpened) {
+    if (isOpened) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => CourseLessonType(title: name, id: id)));
+    } else {
+      TopSnackBar.errorFactory(msg: "Түгжээтэй контент").show(context);
+    }
   }
 
   Future<List<Lesson?>> getCoursesLessons() async {

@@ -25,58 +25,69 @@ class _CourseDetailState extends State<CourseDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const SimpleAppBar(),
-        body: SingleChildScrollView(
-          child: widget.id != null
-              ? searchResult()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ImageView(
-                      imgPath: widget.courseProducts?.banner ?? "",
-                      height: 200,
+      appBar: const SimpleAppBar(),
+      body: widget.id != null
+          ? searchResult()
+          : Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ImageView(
+                          imgPath: widget.courseProducts?.banner ?? "",
+                          height: 200,
+                        ),
+                        Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 20),
+                                Text(widget.courseProducts?.name ?? "",
+                                    style: const TextStyle(
+                                        color: MyColors.black,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.7)),
+                                const SizedBox(height: 10),
+                                const Text("Цахим сургалт",
+                                    style: TextStyle(
+                                      color: MyColors.primaryColor,
+                                    )),
+                                const SizedBox(height: 20),
+                                HtmlWidget(widget.courseProducts?.body ?? "",
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        height: 1.8,
+                                        color: MyColors.gray)),
+                                const SizedBox(height: 30),
+                              ],
+                            )),
+                      ],
                     ),
-                    Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 20),
-                            Text(widget.courseProducts?.name ?? "",
-                                style: const TextStyle(
-                                    color: MyColors.black,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1.7)),
-                            const SizedBox(height: 10),
-                            const Text("Цахим сургалт",
-                                style: TextStyle(
-                                  color: MyColors.primaryColor,
-                                )),
-                            const SizedBox(height: 20),
-                            HtmlWidget(widget.courseProducts?.body ?? "",
-                                textStyle: const TextStyle(
-                                    fontSize: 14,
-                                    height: 1.8,
-                                    color: MyColors.gray)),
-                            const SizedBox(height: 30),
-                            CustomElevatedButton(
-                              text: "Худалдаж авах",
-                              onPress: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CourseList(
-                                            id: widget.courseProducts?.id
-                                                    .toString() ??
-                                                "")));
-                              },
-                            ),
-                            const SizedBox(height: 30),
-                          ],
-                        )),
-                  ],
+                  ),
                 ),
-        ));
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: CustomElevatedButton(
+                    text: "Худалдаж авах",
+                    onPress: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CourseList(
+                                  id: widget.courseProducts?.id.toString() ??
+                                      "")));
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+    );
   }
 
   Widget searchResult() {

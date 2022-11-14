@@ -8,10 +8,8 @@ class AudioPlayerProvider with ChangeNotifier {
   int _position = 0;
   int get position => _position;
 
-  int _duration = 0;
+  final int _duration = 0;
   int get duration => _duration;
-
-  List<int> _productsId = [];
 
   List<AudioPlayerModel> _audioItems = [];
   List<AudioPlayerModel> get audioItems => _audioItems;

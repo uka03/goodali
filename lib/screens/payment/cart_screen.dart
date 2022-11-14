@@ -4,7 +4,7 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
-import 'package:goodali/models/products_model.dart';
+
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/payment/choose_payment.dart';
 import 'package:goodali/screens/payment/payment_history.dart';

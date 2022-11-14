@@ -3,10 +3,8 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
-import 'package:goodali/Widgets/custom_textfield.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ResetPassword extends StatefulWidget {
   const ResetPassword({Key? key}) : super(key: key);
@@ -27,7 +25,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(title: "Пин код солих"),
+      appBar: const SimpleAppBar(title: "Пин код солих", noCard: true),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -58,11 +56,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                     hintText: 'Одоогийн Пин код',
                     enabledBorder: const UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
+                      borderSide: BorderSide(color: MyColors.border1),
                     ),
                     focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
+                      borderSide:
+                          BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                   validator: (value) {
@@ -95,11 +93,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                     hintText: "Шинэ Пин код",
                     enabledBorder: const UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
+                      borderSide: BorderSide(color: MyColors.border1),
                     ),
                     focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
+                      borderSide:
+                          BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                   validator: (value) {
@@ -131,11 +129,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                     hintText: "Пин код давтах",
                     enabledBorder: const UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
+                      borderSide: BorderSide(color: MyColors.border1),
                     ),
                     focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
+                      borderSide:
+                          BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                   validator: (value) {
@@ -179,11 +177,9 @@ class _ResetPasswordState extends State<ResetPassword> {
     Navigator.pop(context);
     if (data['success'] == true) {
       Navigator.pop(context);
-      showTopSnackBar(context,
-          const CustomTopSnackBar(type: 1, text: "Амжилттай шинэчлэгдлээ"));
+      TopSnackBar.successFactory(title: "Амжилттай шинэчлэгдлээ").show(context);
     } else {
-      showTopSnackBar(
-          context, CustomTopSnackBar(type: 0, text: data["message"]));
+      TopSnackBar.errorFactory(msg: data["message"]).show(context);
     }
   }
 }

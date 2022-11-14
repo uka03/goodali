@@ -19,12 +19,12 @@ class CustomReadMoreText extends StatelessWidget {
       trimCollapsedText: 'Цааш унших',
       trimExpandedText: 'Хураах',
       textAlign: textAlign,
-      style: TextStyle(fontSize: 14, height: 1.6, color: MyColors.gray),
-      moreStyle: TextStyle(
+      style: const TextStyle(fontSize: 14, height: 1.6, color: MyColors.gray),
+      moreStyle: const TextStyle(
           fontSize: 14,
           decoration: TextDecoration.underline,
           color: MyColors.black),
-      lessStyle: TextStyle(
+      lessStyle: const TextStyle(
           fontSize: 14,
           decoration: TextDecoration.underline,
           color: MyColors.black),

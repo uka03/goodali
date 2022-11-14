@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:iconly/iconly.dart';
@@ -26,7 +28,8 @@ class _PostItemState extends State<PostItem> {
   int likeCount = 0;
   @override
   void initState() {
-    isLiked = widget.isHearted;
+    isLiked = widget.postItem.selfLike!;
+
     likeCount = widget.postItem.likes ?? 0;
     comments = widget.postItem.replys ?? [];
     super.initState();
@@ -35,16 +38,25 @@ class _PostItemState extends State<PostItem> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(height: 30),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: ImageView(
+                    imgPath: widget.postItem.avatar ?? "",
+                    height: 24,
+                    width: 24),
+              ),
+              const SizedBox(width: 10),
               Text(
                 widget.postItem.nickName ?? "",
-                style: const TextStyle(color: MyColors.gray),
+                style: const TextStyle(color: MyColors.black),
               ),
               const SizedBox(width: 8),
               const Icon(Icons.circle, color: MyColors.gray, size: 5),
@@ -54,18 +66,28 @@ class _PostItemState extends State<PostItem> {
                 style: const TextStyle(color: MyColors.gray),
               ),
               const Spacer(),
+              GestureDetector(
+                  onTap: () {
+                    showModal();
+                  },
+                  child: const Icon(Icons.more_horiz,
+                      color: MyColors.gray, size: 20)),
             ],
           ),
           const SizedBox(height: 23),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.postItem.title ?? "",
-                style: const TextStyle(
-                    color: MyColors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
+              Expanded(
+                child: Text(
+                  widget.postItem.title ?? "",
+                  maxLines: 2,
+                  style: const TextStyle(
+                      color: MyColors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -83,16 +105,16 @@ class _PostItemState extends State<PostItem> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
               widget.postItem.body ?? "",
               style: const TextStyle(
-                  height: 1.35, fontSize: 17, color: MyColors.black),
+                  height: 1.35, fontSize: 16, color: MyColors.black),
             ),
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 30),
           Row(
             children: [
               widget.isMySpecial == false
@@ -102,15 +124,21 @@ class _PostItemState extends State<PostItem> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            setState(() {
-                              isLiked = !isLiked;
-                            });
-                            if (isLiked) {
-                              likeCount++;
+                            if (!widget.postItem.selfLike!) {
+                              setState(() {
+                                isLiked = true;
+                                likeCount++;
+                              });
                               insertLike(widget.postItem.id ?? 0);
+                            } else if (widget.postItem.selfLike!) {
+                              setState(() {
+                                isLiked = false;
+                                likeCount--;
+                              });
+                              postDislike(widget.postItem.id ?? 0);
                             }
                           },
-                          child: isLiked || widget.postItem.selfLike!
+                          child: isLiked
                               ? const Icon(IconlyBold.heart,
                                   color: MyColors.primaryColor)
                               : const Icon(IconlyLight.heart,
@@ -125,7 +153,7 @@ class _PostItemState extends State<PostItem> {
                       ],
                     )
                   : const SizedBox(),
-              const SizedBox(width: 15),
+              const SizedBox(width: 20),
               Wrap(
                 spacing: 8,
                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -137,18 +165,70 @@ class _PostItemState extends State<PostItem> {
                 ],
               ),
               const Spacer(),
-              IconButton(
-                  splashRadius: 20,
-                  onPressed: () {},
-                  icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
             ],
-          )
+          ),
+          const SizedBox(height: 30),
         ],
       ),
     );
   }
 
   insertLike(int id) async {
-    return Connection.insertPostLiske(context, {"post_id": id});
+    bool unliked = await Connection.insertPostLiske(context, {"post_id": id});
+  }
+
+  postDislike(int id) async {
+    bool liked = await Connection.postDislike(context, {"post_id": id});
+    if (liked) {
+      setState(() {
+        isLiked = false;
+      });
+    }
+  }
+
+  showModal() {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (_) => Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      width: 40,
+                      height: 6,
+                      decoration: BoxDecoration(
+                          color: MyColors.gray,
+                          borderRadius: BorderRadius.circular(3)),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  TextButton(
+                      onPressed: () {},
+                      child: const Text("Хуваалцах",
+                          style: TextStyle(color: MyColors.black))),
+                  TextButton(
+                      onPressed: () {},
+                      child: const Text("Линк хуулах",
+                          style: TextStyle(color: MyColors.black))),
+                  TextButton(
+                      onPressed: () {
+                        TopSnackBar.successFactory(
+                                msg:
+                                    "Постыг админд мэдэгдлээ. Зохисгүй үг агуулгатай пост байвал бид арга хэмжээ авах болно. Баярлалаа")
+                            .show(context);
+                      },
+                      child: const Text("Мэдэгдэх",
+                          style: TextStyle(color: MyColors.primaryColor)))
+                ],
+              ),
+            ));
   }
 }

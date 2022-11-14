@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
@@ -35,6 +34,22 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
               imgPath: widget.courseProducts.banner ?? "",
               height: 170,
               width: double.infinity),
+        ),
+        Container(
+          height: 130,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+            gradient: LinearGradient(
+              colors: [
+                Colors.black.withOpacity(0.5),
+                Colors.transparent,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
         ),
 
         Positioned(

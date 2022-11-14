@@ -3,7 +3,6 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
-import 'package:goodali/screens/Auth/enable_biometric.dart';
 import 'package:goodali/screens/Auth/reset_password.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
@@ -28,14 +27,15 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(20),
+      appBar: const SimpleAppBar(noCard: true),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 56,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: const Align(
+              alignment: Alignment.centerLeft,
               child: Text(
                 "Тохиргоо",
                 style: TextStyle(
@@ -44,107 +44,145 @@ class _SettingsState extends State<Settings> {
                     fontWeight: FontWeight.bold),
               ),
             ),
-            ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-              leading: const Icon(
-                Icons.fingerprint,
-                color: MyColors.black,
-                size: 28,
-              ),
-              title: const Text(
-                "Биометрик",
-                style: TextStyle(fontSize: 16, color: MyColors.black),
-              ),
-              trailing: Switch(
-                  value: biometric,
-                  onChanged: (bool newValue) {
-                    setState(() {
-                      biometric = newValue;
-                    });
-                    if (biometric == true) {
-                      Provider.of<Auth>(context, listen: false)
-                          .enableBiometric(context);
-                    } else {
-                      Provider.of<Auth>(context, listen: false)
-                          .disableBiometric();
-                    }
-                  }),
-            ),
-            ListTile(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ResetPassword()));
-                },
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                leading: const Icon(
-                  IconlyLight.lock,
-                  color: MyColors.black,
-                  size: 28,
-                ),
-                title: const Text(
-                  "Пин код солих",
-                  style: TextStyle(fontSize: 16, color: MyColors.black),
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios_rounded)),
-            ListTile(
-                onTap: () {},
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                leading: const Icon(
-                  IconlyLight.info_square,
-                  color: MyColors.black,
-                  size: 28,
-                ),
-                title: const Text(
-                  "Нийтлэг асуулт хариулт",
-                  style: TextStyle(fontSize: 16, color: MyColors.black),
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios_rounded)),
-            ListTile(
-                onTap: () {},
-                leading: const Icon(
-                  IconlyLight.paper,
-                  color: MyColors.black,
-                  size: 28,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                title: const Text(
-                  "Үйлчилгээний нөхцөл",
-                  style: TextStyle(fontSize: 16, color: MyColors.black),
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios_rounded)),
-            const Spacer(),
-            ListTile(
-                onTap: () {
-                  showLogOutDialog();
-                },
-                leading: const Icon(
-                  IconlyLight.logout,
-                  color: MyColors.black,
-                  size: 28,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                title: const Text(
-                  "Гарах",
-                  style: TextStyle(fontSize: 16, color: MyColors.black),
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios_rounded)),
-            const SizedBox(height: 40),
-            const Center(
-              child: Text(
-                "App version 2.0.1",
-                style: TextStyle(color: MyColors.gray, fontSize: 12),
+          ),
+          GestureDetector(
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ResetPassword())),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.fingerprint,
+                    color: MyColors.black,
+                  ),
+                  const SizedBox(width: 20),
+                  const Text(
+                    "Биометрик",
+                    style: TextStyle(fontSize: 16, color: MyColors.black),
+                  ),
+                  const Spacer(),
+                  Switch(
+                      value: biometric,
+                      activeColor: MyColors.primaryColor,
+                      onChanged: (bool newValue) {
+                        setState(() {
+                          biometric = newValue;
+                        });
+                        if (biometric == true) {
+                          Provider.of<Auth>(context, listen: false)
+                              .enableBiometric(context);
+                        } else {
+                          Provider.of<Auth>(context, listen: false)
+                              .disableBiometric();
+                        }
+                      })
+                ],
               ),
             ),
-            const SizedBox(height: 20)
-          ],
-        ),
+          ),
+          GestureDetector(
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ResetPassword())),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: const [
+                  Icon(
+                    IconlyLight.lock,
+                    color: MyColors.black,
+                  ),
+                  SizedBox(width: 20),
+                  Text(
+                    "Пин код солих",
+                    style: TextStyle(fontSize: 16, color: MyColors.black),
+                  ),
+                  Spacer(),
+                  Icon(Icons.arrow_forward_ios_rounded,
+                      size: 20, color: MyColors.gray),
+                ],
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ResetPassword())),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: const [
+                  Icon(
+                    IconlyLight.info_square,
+                    color: MyColors.black,
+                  ),
+                  SizedBox(width: 20),
+                  Text(
+                    "Нийтлэг асуулт хариулт",
+                    style: TextStyle(fontSize: 16, color: MyColors.black),
+                  ),
+                  Spacer(),
+                  Icon(Icons.arrow_forward_ios_rounded,
+                      size: 20, color: MyColors.gray),
+                ],
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ResetPassword())),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: const [
+                  Icon(
+                    IconlyLight.paper,
+                    color: MyColors.black,
+                  ),
+                  SizedBox(width: 20),
+                  Text(
+                    "Үйлчилгээний нөхцөл",
+                    style: TextStyle(fontSize: 16, color: MyColors.black),
+                  ),
+                  Spacer(),
+                  Icon(Icons.arrow_forward_ios_rounded,
+                      size: 20, color: MyColors.gray),
+                ],
+              ),
+            ),
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: showLogOutDialog,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: const [
+                  Icon(
+                    IconlyLight.logout,
+                    color: MyColors.black,
+                  ),
+                  SizedBox(width: 20),
+                  Text(
+                    "Гарах",
+                    style: TextStyle(fontSize: 16, color: MyColors.black),
+                  ),
+                  Spacer(),
+                  Icon(Icons.arrow_forward_ios_rounded,
+                      size: 20, color: MyColors.gray),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 40),
+          const Center(
+            child: Text(
+              "App version 2.0.1",
+              style: TextStyle(color: MyColors.gray, fontSize: 12),
+            ),
+          ),
+          const SizedBox(height: 20)
+        ],
       ),
     );
   }

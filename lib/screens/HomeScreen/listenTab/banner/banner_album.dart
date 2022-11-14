@@ -308,7 +308,7 @@ class _BannerAlbumState extends State<BannerAlbum> {
                   void Function(void Function()) setState) {
                 return IntroAudio(
                     products: albumDetail,
-                    productsList: [],
+                    productsList: const [],
                     audioPlayer: introAudioPlayer);
               },
             ));

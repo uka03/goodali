@@ -1,11 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
-import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
@@ -15,7 +13,6 @@ import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/album_intro_item.dart';
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:provider/provider.dart';
 
 class BannerLecture extends StatefulWidget {
   final int? productID;
@@ -72,7 +69,6 @@ class _BannerLectureState extends State<BannerLecture> {
 
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<CartProvider>(context);
     return Scaffold(
       appBar: const SimpleAppBar(title: "Лекц"),
       body: isLoading
@@ -292,7 +288,7 @@ class _BannerLectureState extends State<BannerLecture> {
                   void Function(void Function()) setState) {
                 return IntroAudio(
                     products: albumDetail,
-                    productsList: [],
+                    productsList: const [],
                     audioPlayer: introAudioPlayer);
               },
             ));

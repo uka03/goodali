@@ -48,7 +48,7 @@ class _MoodDetailState extends State<MoodDetail> {
   Widget rightButton = const Text(
     "Дараах",
     style: TextStyle(
-        color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
+        color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
   );
 
   @override
@@ -64,14 +64,14 @@ class _MoodDetailState extends State<MoodDetail> {
       if (_current == moodItem.length - 1) {
         rightButton = const Text("Дуусгах",
             style: TextStyle(
-                color: MyColors.black,
+                color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold));
       } else {
         rightButton = const Text(
           "Дараах",
           style: TextStyle(
-              color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
+              color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         );
       }
     });
@@ -138,173 +138,159 @@ class _MoodDetailState extends State<MoodDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xffE991FA),
-              Color(0xff84A3F7),
-            ]),
-      ),
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(252, 244, 241, 1),
+      appBar: AppBar(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: false,
-          leading: IconButton(
-            icon: const Icon(IconlyLight.arrow_left, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          iconTheme: const IconThemeData(color: MyColors.black),
-        ),
-        body: Stack(alignment: Alignment.bottomCenter, children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: ValueListenableBuilder(
-              valueListenable: HiveMoodDataStore.box.listenable(),
-              builder: (context, Box box, boxWidget) {
-                if (box.length > 0) {
-                  List<Products> moodList = [];
+        elevation: 0,
+        centerTitle: false,
+        leading: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: const Icon(IconlyLight.arrow_left, color: MyColors.black)),
+        iconTheme: const IconThemeData(color: MyColors.black),
+      ),
+      body: Stack(alignment: Alignment.bottomCenter, children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: ValueListenableBuilder(
+            valueListenable: HiveMoodDataStore.box.listenable(),
+            builder: (context, Box box, boxWidget) {
+              if (box.length > 0) {
+                List<Products> moodList = [];
 
-                  for (int a = 0; a < box.length; a++) {
-                    Products products = box.get(a);
-                    if (products.moodListId == int.parse(widget.moodListId)) {
-                      moodList.add(products);
+                for (int a = 0; a < box.length; a++) {
+                  Products products = box.get(a);
+                  if (products.moodListId == int.parse(widget.moodListId)) {
+                    moodList.add(products);
 
-                      if (products.audio != "Audio failed to upload") {
-                        moodItemWithAudio = products;
-                        print(moodItemWithAudio?.audio);
-                        getTotalDuration(
-                            Urls.networkPath + moodItemWithAudio!.audio!);
-                        initiliaze();
-                      }
+                    if (products.audio != "Audio failed to upload") {
+                      moodItemWithAudio = products;
+                      print(moodItemWithAudio?.audio);
+                      getTotalDuration(
+                          Urls.networkPath + moodItemWithAudio!.audio!);
+                      initiliaze();
                     }
                   }
-
-                  moodItem = moodList;
-                  print(moodItem.length);
-
-                  return PageView.builder(
-                      controller: _pageController,
-                      itemCount: moodItem.length,
-                      onPageChanged: (int page) {
-                        if (url != "") {}
-                      },
-                      itemBuilder: ((context, index) {
-                        imgUrl =
-                            moodItem[index].banner == "Image failed to upload"
-                                ? ""
-                                : moodItem[index].banner!;
-                        url = moodItem[index].audio == "Audio failed to upload"
-                            ? ""
-                            : Urls.networkPath + moodItem[index].audio!;
-
-                        return Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              banner(imgUrl),
-                              const SizedBox(height: 20),
-                              HtmlWidget(
-                                moodItem[index].title!,
-                                textStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                              const SizedBox(height: 40),
-                              HtmlWidget(
-                                moodItem[index].body!,
-                                textStyle: const TextStyle(
-                                    color: Colors.white, fontSize: 16),
-                              ),
-                              const SizedBox(height: 20),
-                              if (url != "") audioPlayerWidget()
-                            ],
-                          ),
-                        );
-                      }));
-                } else {
-                  return const Center(
-                    child:
-                        CircularProgressIndicator(color: MyColors.primaryColor),
-                  );
                 }
-              },
-            ),
+
+                moodItem = moodList;
+                print(moodItem.length);
+
+                return PageView.builder(
+                    controller: _pageController,
+                    itemCount: moodItem.length,
+                    onPageChanged: (int page) {
+                      if (url != "") {}
+                    },
+                    itemBuilder: ((context, index) {
+                      imgUrl =
+                          moodItem[index].banner == "Image failed to upload"
+                              ? ""
+                              : moodItem[index].banner!;
+                      url = moodItem[index].audio == "Audio failed to upload"
+                          ? ""
+                          : Urls.networkPath + moodItem[index].audio!;
+
+                      return Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            banner(imgUrl),
+                            const SizedBox(height: 20),
+                            HtmlWidget(
+                              moodItem[index].title!,
+                              textStyle: const TextStyle(
+                                  color: MyColors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                            ),
+                            const SizedBox(height: 40),
+                            HtmlWidget(
+                              moodItem[index].body!,
+                              textStyle: const TextStyle(
+                                  color: MyColors.black, fontSize: 16),
+                            ),
+                            const SizedBox(height: 20),
+                            if (url != "") audioPlayerWidget()
+                          ],
+                        ),
+                      );
+                    }));
+              } else {
+                return const Center(
+                  child:
+                      CircularProgressIndicator(color: MyColors.primaryColor),
+                );
+              }
+            },
           ),
-          _current != 0
-              ? Positioned(
-                  bottom: 50,
-                  left: 35,
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12)),
-                    child: RawMaterialButton(
-                      onPressed: () {
-                        _pageController.previousPage(
-                            curve: _kCurve, duration: _kDuration);
-                      },
-                      child: const Icon(IconlyLight.arrow_left,
-                          color: MyColors.black),
-                    ),
-                  ))
-              : Container(),
-          Positioned(
-              bottom: 50,
-              right: 35,
-              child: Container(
-                height: 50,
-                width: 100,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12)),
-                child: RawMaterialButton(
-                  onPressed: () async {
-                    _pageController.nextPage(
-                        curve: _kCurve, duration: _kDuration);
-                    if (_current == moodItem.length - 1) {
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: rightButton,
-                ),
-              )),
-          Positioned(
-              top: 0,
-              right: 0,
-              left: 0,
-              child: Row(
-                children: moodItem
-                    .map((entry) => (moodItem.indexOf(entry) - 1 == _current)
-                        ? Container(
-                            width: MediaQuery.of(context).size.width /
-                                moodItem.length,
-                            height: 2.0,
-                            color: Colors.white.withOpacity(0.4),
-                          )
-                        : Container(
-                            width: MediaQuery.of(context).size.width /
-                                moodItem.length,
-                            height: 2.0,
-                            color: (_current >= moodItem.indexOf(entry))
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.4),
-                          ))
-                    .toList(),
-              )),
-        ]),
-      ),
+        ),
+        _current != 0
+            ? Positioned(
+                bottom: 50,
+                left: 35,
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                      color: MyColors.primaryColor,
+                      borderRadius: BorderRadius.circular(12)),
+                  child: RawMaterialButton(
+                    onPressed: () {
+                      _pageController.previousPage(
+                          curve: _kCurve, duration: _kDuration);
+                    },
+                    child:
+                        const Icon(IconlyLight.arrow_left, color: Colors.white),
+                  ),
+                ))
+            : Container(),
+        Positioned(
+            bottom: 50,
+            right: 35,
+            child: Container(
+              height: 50,
+              width: 100,
+              decoration: BoxDecoration(
+                  color: MyColors.primaryColor,
+                  borderRadius: BorderRadius.circular(12)),
+              child: RawMaterialButton(
+                onPressed: () async {
+                  _pageController.nextPage(
+                      curve: _kCurve, duration: _kDuration);
+                  if (_current == moodItem.length - 1) {
+                    Navigator.pop(context);
+                  }
+                },
+                child: rightButton,
+              ),
+            )),
+        Positioned(
+            top: 0,
+            right: 0,
+            left: 0,
+            child: Row(
+              children: moodItem
+                  .map((entry) => (moodItem.indexOf(entry) - 1 == _current)
+                      ? Container(
+                          width: MediaQuery.of(context).size.width /
+                              moodItem.length,
+                          height: 2.0,
+                          color: Colors.white,
+                        )
+                      : Container(
+                          width: MediaQuery.of(context).size.width /
+                              moodItem.length,
+                          height: 2.0,
+                          color: (_current >= moodItem.indexOf(entry))
+                              ? MyColors.primaryColor
+                              : Colors.white,
+                        ))
+                  .toList(),
+            )),
+      ]),
     );
   }
 
@@ -456,6 +442,9 @@ class _MoodDetailState extends State<MoodDetail> {
   Future<void> getMoodList() async {
     var listData = await Connection.getMoodItem(
         context, widget.id != null ? widget.id! : widget.moodListId);
+    setState(() {
+      moodItem = listData;
+    });
 
     for (var item in listData) {
       dataMoodStore.addProduct(products: item);

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
-import 'package:goodali/Widgets/custom_textfield.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
@@ -11,7 +9,6 @@ import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class CreatePost extends StatefulWidget {
   const CreatePost({Key? key}) : super(key: key);
@@ -32,6 +29,8 @@ class _CreatePostState extends State<CreatePost> {
 
   List<TagModel> tagList = [];
   bool _noTabsSelected = false;
+  bool _noTyped = false;
+  bool _noTyped1 = false;
   int postType = 0;
 
   @override
@@ -75,57 +74,118 @@ class _CreatePostState extends State<CreatePost> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 30),
-                  CustomTextField(
-                      controller: titleController,
-                      hintText: "Гарчиг",
-                      maxLength: 50),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   const Text("Та юу бодож байна?",
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: MyColors.black)),
-                  const SizedBox(height: 30),
-                  CustomTextField(
-                      controller: textController,
-                      hintText: "Энд бичнэ үү",
-                      maxLines: null,
-                      maxLength: 1000),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: titleController,
+                    cursorColor: MyColors.primaryColor,
+                    onChanged: (value) {
+                      setState(() {
+                        _noTyped = true;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Гарчиг",
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: MyColors.border1, width: 1),
+                      ),
+                      suffixIcon: _noTyped
+                          ? GestureDetector(
+                              onTap: () {
+                                titleController.text = "";
+                                setState(() {
+                                  _noTyped = false;
+                                });
+                              },
+                              child: const Icon(
+                                Icons.close_rounded,
+                                color: MyColors.gray,
+                              ))
+                          : const SizedBox(),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: MyColors.primaryColor, width: 1.5),
+                      ),
+                    ),
+                    maxLength: 30,
+                  ),
+                  const SizedBox(height: 50),
+                  TextField(
+                    controller: textController,
+                    cursorColor: MyColors.primaryColor,
+                    onChanged: (value) {
+                      setState(() {
+                        _noTyped1 = true;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Үндсэн хэсэг",
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide:
+                            BorderSide(color: MyColors.border1, width: 1),
+                      ),
+                      suffixIcon: _noTyped1
+                          ? GestureDetector(
+                              onTap: () {
+                                textController.text = "";
+                                setState(() {
+                                  _noTyped1 = false;
+                                });
+                              },
+                              child: const Icon(
+                                Icons.close_rounded,
+                                color: MyColors.gray,
+                              ))
+                          : const SizedBox(),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: MyColors.primaryColor, width: 1.5),
+                      ),
+                    ),
+                    maxLength: 1200,
+                    maxLines: null,
+                  ),
                   const Spacer(),
-                  const SizedBox(height: 10),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: CustomElevatedButton(
                         text: "Нийтлэх",
-                        onPress: () {
-                          bool isAuth =
-                              Provider.of<Auth>(context, listen: false).isAuth;
-                          if (isAuth) {
-                            showModalTag();
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: const Text(
-                                    "Та нэвтэрч орон үргэлжлүүлнэ үү"),
-                                backgroundColor: MyColors.error,
-                                behavior: SnackBarBehavior.floating,
-                                action: SnackBarAction(
-                                    onPressed: () => loginWithBio
-                                        ? Provider.of<Auth>(context,
-                                                listen: false)
-                                            .authenticateWithBiometrics(context)
-                                        : showLoginModal(),
-                                    label: 'Нэвтрэх',
-                                    textColor: Colors.white)));
-                          }
-                        }),
+                        onPress: _noTyped && _noTyped1 ? _onPressed : null),
                   ),
+                  const SizedBox(height: 8),
+                  const Text("Та өдөрт 2 удаа пост оруулах эрхтэй.",
+                      style: TextStyle(fontSize: 12, color: MyColors.gray)),
                   const SizedBox(height: 30)
                 ],
               ),
             ))
       ]),
     );
+  }
+
+  _onPressed() {
+    bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
+    if (isAuth) {
+      showModalTag();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
+          backgroundColor: MyColors.error,
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+              onPressed: () => loginWithBio
+                  ? Provider.of<Auth>(context, listen: false)
+                      .authenticateWithBiometrics(context)
+                  : showLoginModal(),
+              label: 'Нэвтрэх',
+              textColor: Colors.white)));
+    }
   }
 
   showLoginModal() {
@@ -296,7 +356,7 @@ class _CreatePostState extends State<CreatePost> {
                             borderRadius: BorderRadius.circular(10)),
                       ),
                       const SizedBox(height: 20),
-                      const Text("Хаана постлох вэ",
+                      const Text("Хаана постлох вэ?",
                           style: TextStyle(
                               fontSize: 18,
                               color: MyColors.black,
@@ -359,13 +419,12 @@ class _CreatePostState extends State<CreatePost> {
     var data = await Connection.insertPost(context, body);
 
     if (data['success']) {
-      showTopSnackBar(context,
-          const CustomTopSnackBar(type: 1, text: "Амжилттай нийтлэгдлээ"));
+      TopSnackBar.successFactory(title: "Амжилттай шинэчлэгдлээ").show(context);
+
+      Navigator.popUntil(context, (route) => route.isFirst);
     } else {
-      showTopSnackBar(
-          context,
-          const CustomTopSnackBar(
-              type: 0, text: "Алдаа гарлаа дахин оролдоно уу"));
+      TopSnackBar.errorFactory(msg: "Алдаа гарлаа дахин оролдоно уу")
+          .show(context);
     }
   }
 }

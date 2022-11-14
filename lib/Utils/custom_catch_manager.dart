@@ -1,5 +1,4 @@
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:goodali/Widgets/file_system_io.dart';
 
 class CustomCacheManager {
   static const key = 'customCacheKey';

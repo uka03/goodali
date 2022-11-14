@@ -7,7 +7,6 @@ import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/qpay.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class QpayPayment extends StatefulWidget {
@@ -92,10 +91,8 @@ class _QpayPaymentState extends State<QpayPayment> {
     if (canLaunchApp) {
       await launchUrlString(url);
     } else {
-      showTopSnackBar(
-          context,
-          const CustomTopSnackBar(
-              type: 0, text: "Тухайн банкны аппликейшн олдсонгүй"));
+      TopSnackBar.errorFactory(msg: "Тухайн банкны аппликейшн олдсонгүй.")
+          .show(context);
     }
   }
 }

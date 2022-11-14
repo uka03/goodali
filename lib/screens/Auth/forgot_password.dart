@@ -6,7 +6,6 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/screens/Auth/pincode_changed_success.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
@@ -18,6 +17,7 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   TextEditingController controller = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool isTyping = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,14 +50,29 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 if (isEmailCorrect(value) == false) {
                   return "Цахим шуудан буруу байна";
                 }
+                return null;
               },
-              decoration: const InputDecoration(
+              onChanged: (value) => setState(() {
+                isTyping = true;
+              }),
+              decoration: InputDecoration(
                 hintText: "И-мэйл",
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+                suffixIcon: isTyping
+                    ? GestureDetector(
+                        onTap: () {
+                          controller.text = "";
+                          setState(() {
+                            isTyping = false;
+                          });
+                        },
+                        child: const Icon(Icons.close, color: MyColors.black))
+                    : const SizedBox(),
+                enabledBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: MyColors.border1),
                 ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: MyColors.primaryColor),
+                focusedBorder: const UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: MyColors.primaryColor, width: 1.5),
                 ),
               ),
             )
@@ -88,12 +103,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         Navigator.push(context,
             MaterialPageRoute(builder: (_) => const PinCodeChangedSuccess()));
       } else {
-        showTopSnackBar(
-            context,
-            CustomTopSnackBar(
-                type: 0,
-                text:
-                    data["message"] ?? "   Алдаа гарлаа, дахин оролдоно уу."));
+        TopSnackBar.errorFactory(
+                msg: data["message"] ?? "Алдаа гарлаа дахин оролдоно уу.")
+            .show(context);
       }
     }
     return data;

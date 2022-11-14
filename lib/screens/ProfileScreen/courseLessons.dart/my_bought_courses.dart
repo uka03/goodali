@@ -1,17 +1,13 @@
-import 'dart:developer';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/course_products_item.dart';
-import 'package:just_audio/just_audio.dart';
 
 typedef OnTap = Function(Products products);
 
@@ -82,15 +78,14 @@ class _MyCoursesState extends State<MyCourses> {
               ],
             );
           } else {
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SingleChildScrollView(
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
                     onlineCourses(myCourses),
-                    const SizedBox(height: 10),
                     allLecturesWidget(allLectures),
                   ],
                 ),
@@ -109,10 +104,12 @@ class _MyCoursesState extends State<MyCourses> {
     if (allLectures.isEmpty) {
       return Container();
     } else {
-      return ListView.builder(
+      return ListView.separated(
           itemCount: allLectures.length,
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
+          separatorBuilder: (BuildContext context, int index) =>
+              const Divider(),
           itemBuilder: (context, index) {
             String empty = "";
             if (albumName == allLectures[index].albumTitle) {
@@ -128,12 +125,13 @@ class _MyCoursesState extends State<MyCourses> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (empty != "") const SizedBox(height: 30),
                 Text(empty,
                     style: const TextStyle(
                         color: MyColors.black,
                         fontSize: 18,
                         fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
+                if (empty != "") const SizedBox(height: 20),
                 AlbumDetailItem(
                     index: index,
                     isBought: true,

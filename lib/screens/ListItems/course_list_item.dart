@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 
@@ -24,23 +25,6 @@ class _CourseListListItemState extends State<CourseListListItem> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Stack(children: [
-        // widget.trainingDetail.banner == null
-        //     ? Container()
-        //     : Positioned(
-        //         right: 26,
-        //         top: 20,
-        //         child: Container(
-        //           width: 80,
-        //           height: 23,
-        //           decoration: BoxDecoration(
-        //               borderRadius: BorderRadius.circular(4),
-        //               color: MyColors.primaryColor),
-        //           child: const Center(
-        //             child: Text("Санал болгох",
-        //                 style: TextStyle(color: Colors.white, fontSize: 10)),
-        //           ),
-        //         ),
-        //       ),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -50,17 +34,33 @@ class _CourseListListItemState extends State<CourseListListItem> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                widget.products.name ?? "" "багц",
-                style: const TextStyle(
-                    color: MyColors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.products.name ?? "" "багц",
+                      style: const TextStyle(
+                          color: MyColors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Text(
+                    widget.products.opennedDate != null ||
+                            widget.products.opennedDate != ""
+                        ? dateTimeFormatter(widget.products.opennedDate ?? "")
+                        : "",
+                    style: const TextStyle(color: MyColors.gray, fontSize: 12),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               HtmlWidget(widget.products.body ?? "",
                   textStyle: const TextStyle(
-                      fontSize: 14, height: 1.8, color: MyColors.black)),
+                      fontSize: 14,
+                      height: 1.8,
+                      color: MyColors.black,
+                      fontFamily: "Gilroy")),
               const SizedBox(height: 20),
               Row(
                 children: [

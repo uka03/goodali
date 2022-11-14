@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:goodali/models/cart_item.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

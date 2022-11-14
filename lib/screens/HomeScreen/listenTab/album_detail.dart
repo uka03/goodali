@@ -363,45 +363,45 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     productsList: product,
                     albumProducts: widget.albumProduct);
               } else {
-                return AlbumDetailItem(
-                  products: product[index],
-                  isBought: product[index].isBought!,
-                  albumName: widget.albumProduct.title ?? "",
-                  productsList: product,
-                  index: index,
-                  albumProducts: widget.albumProduct,
-                  onTap: () async {
-                    if (widget.albumProduct.isBought == true) {
-                      if (activeList.first.title == product.first.title &&
-                          activeList.first.id == product.first.id) {
-                        await audioHandler.skipToQueueItem(index);
-                        await audioHandler.seek(
-                          Duration(milliseconds: product[index].position!),
-                        );
-                        await audioHandler.play();
-                      } else if (activeList.first.title !=
-                              product.first.title ||
-                          activeList.first.id != product.first.id) {
-                        activeList = product;
-                        await initiliazePodcast();
-                        await audioHandler.skipToQueueItem(index);
-                        await audioHandler.seek(
-                          Duration(milliseconds: product[index].position!),
-                        );
-                        await audioHandler.play();
-                      }
-                      currentlyPlaying.value = product[index];
-                    } else {}
-                  },
+                return Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: AlbumDetailItem(
+                    products: product[index],
+                    isBought: product[index].isBought!,
+                    albumName: widget.albumProduct.title ?? "",
+                    productsList: product,
+                    index: index,
+                    albumProducts: widget.albumProduct,
+                    onTap: () async {
+                      if (widget.albumProduct.isBought == true) {
+                        if (activeList.first.title == product.first.title &&
+                            activeList.first.id == product.first.id) {
+                          await audioHandler.skipToQueueItem(index);
+                          await audioHandler.seek(
+                            Duration(milliseconds: product[index].position!),
+                          );
+                          await audioHandler.play();
+                        } else if (activeList.first.title !=
+                                product.first.title ||
+                            activeList.first.id != product.first.id) {
+                          activeList = product;
+                          await initiliazePodcast();
+                          await audioHandler.skipToQueueItem(index);
+                          await audioHandler.seek(
+                            Duration(milliseconds: product[index].position!),
+                          );
+                          await audioHandler.play();
+                        }
+                        currentlyPlaying.value = product[index];
+                      } else {}
+                    },
+                  ),
                 );
               }
             },
             itemCount: product.length,
             separatorBuilder: (BuildContext context, int index) =>
-                const Divider(
-              endIndent: 18,
-              indent: 18,
-            ),
+                const Divider(),
           ),
         ],
       ),
@@ -423,7 +423,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   void Function(void Function()) setState) {
                 return IntroAudio(
                     products: widget.albumProduct,
-                    productsList: [],
+                    productsList: const [],
                     audioPlayer: introAudioPlayer);
               },
             ));

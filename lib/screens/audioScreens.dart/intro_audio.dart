@@ -20,7 +20,6 @@ import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class IntroAudio extends StatefulWidget {
   final Products products;
@@ -352,15 +351,13 @@ class _IntroAudioState extends State<IntroAudio> {
                       cart.addProducts(widget.products);
                       cart.addTotalPrice(
                           widget.products.price?.toDouble() ?? 0.0);
-                      showTopSnackBar(
-                          context,
-                          const CustomTopSnackBar(
-                              type: 1, text: "Сагсанд амжилттай нэмэгдлээ"));
+                      TopSnackBar.successFactory(
+                              msg: "Сагсанд амжилттай нэмэгдлээ")
+                          .show(context);
                     } else {
-                      showTopSnackBar(
-                          context,
-                          const CustomTopSnackBar(
-                              type: 0, text: "Сагсанд бүтээгдэхүүн байна"));
+                      TopSnackBar.errorFactory(
+                              msg: "Сагсанд бүтээгдэхүүн байна")
+                          .show(context);
                     }
                   },
                   child: Container(

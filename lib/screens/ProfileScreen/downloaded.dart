@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
-import 'package:goodali/screens/ListItems/downloaded_lecture_item.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 typedef OnTap = Function(Products audioObject);
@@ -43,11 +42,16 @@ class _DownloadedState extends State<Downloaded> {
                   );
                 });
           } else {
-            return const Center(
-              child: Text(
-                "Хоосон",
-                style: TextStyle(color: MyColors.gray),
-              ),
+            return Column(
+              children: [
+                const SizedBox(height: 80),
+                SvgPicture.asset("assets/images/empty_bought.svg"),
+                const SizedBox(height: 20),
+                const Text(
+                  "Хоосон байна.",
+                  style: TextStyle(fontSize: 14, color: MyColors.gray),
+                ),
+              ],
             );
           }
         },

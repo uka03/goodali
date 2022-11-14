@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/Utils/circle_tab_indicator.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
@@ -60,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Би',
-        actionButton2: Consumer<Auth>(
+        actionButton1: Consumer<Auth>(
           builder: (context, value, child) => value.isAuth
               ? IconButton(
                   onPressed: () {
@@ -71,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       size: 28, color: MyColors.black))
               : Container(),
         ),
-        actionButton1: null,
+        actionButton2: null,
         isCartButton: false,
       ),
       body: Consumer<Auth>(
@@ -94,13 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
-                                  child:
-                                      // Container(
-                                      //   width: 70,
-                                      //   height: 70,
-                                      //   color: Colors.pink,
-                                      // )
-                                      ImageView(
+                                  child: ImageView(
                                     imgPath: userInfo.avatarPath ?? "",
                                     width: 70,
                                     height: 70,
@@ -111,7 +107,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 spacing: 8,
                                 children: [
                                   Text(
-                                    userInfo.nickname ?? "",
+                                    changedName != null
+                                        ? changedName!
+                                        : userInfo.nickname ?? "",
                                     style: const TextStyle(
                                         fontSize: 20,
                                         color: MyColors.black,
@@ -138,6 +136,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           changedName = value['name'];
                                           avatarPath = value["avatar"];
                                         });
+                                        log(changedName ?? "dd",
+                                            name: "changedName");
                                       }
                                     });
                                   },
@@ -156,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               border: Border(
                                   bottom: BorderSide(
                                       color: MyColors.border1, width: 0.8))),
-                          height: 50,
+                          height: 51,
                           child: AppBar(
                             backgroundColor: Colors.white,
                             elevation: 0,
@@ -167,9 +167,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(width: 70, child: Tab(text: "Авсан")),
                                 SizedBox(width: 70, child: Tab(text: "Татсан"))
                               ],
-                              indicatorWeight: 3,
+                              indicatorWeight: 4,
+                              indicator: CustomTabIndicator(
+                                  color: MyColors.primaryColor),
                               labelColor: MyColors.primaryColor,
-                              unselectedLabelColor: MyColors.black,
+                              labelStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Gilroy'),
+                              unselectedLabelStyle: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontFamily: 'Gilroy'),
+                              unselectedLabelColor: MyColors.gray,
                               indicatorColor: MyColors.primaryColor,
                             ),
                           ),

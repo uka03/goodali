@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/circle_tab_indicator.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -12,7 +9,6 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podca
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/unlistened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../../Providers/local_database.dart';
 

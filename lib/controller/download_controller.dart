@@ -1,12 +1,17 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:android_path_provider/android_path_provider.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:goodali/controller/download_state.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+final downloadProgressNotifier = ValueNotifier<int>(0);
+final currentIndexNotifier = ValueNotifier<int>(0);
+final downloadTaskIDNotifier = ValueNotifier<String>("0");
+final downloadStatusNotifier =
+    ValueNotifier<DownloadState>(DownloadState.undefined);
 
 class DownloadController {
   String _localPath = "";

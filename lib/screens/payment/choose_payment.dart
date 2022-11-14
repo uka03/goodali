@@ -8,7 +8,6 @@ import 'package:goodali/models/qpay.dart';
 import 'package:goodali/screens/payment/card_payment.dart';
 import 'package:goodali/screens/payment/qpay_payment.dart';
 import 'package:iconly/iconly.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ChoosePayment extends StatefulWidget {
   final List<int> productIDs;
@@ -123,8 +122,7 @@ class _ChoosePaymentState extends State<ChoosePayment> {
                 builder: (context) => CardPayment(url: data['data'])));
       }
     } else {
-      showTopSnackBar(
-          context, const CustomTopSnackBar(type: 0, text: "Алдаа гарлаа"));
+      TopSnackBar.errorFactory(msg: "Дахин оролдоно уу.").show(context);
     }
   }
 }

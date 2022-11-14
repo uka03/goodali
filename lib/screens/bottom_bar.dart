@@ -12,7 +12,6 @@ import 'package:goodali/screens/ForumScreen/forum_screen.dart';
 import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
 import 'package:goodali/screens/audioScreens.dart/play_audio.dart';
 import 'package:iconly/iconly.dart';
-import 'package:miniplayer/miniplayer.dart';
 import 'package:provider/provider.dart';
 
 class BottomTabbar extends StatefulWidget {
@@ -24,17 +23,6 @@ class BottomTabbar extends StatefulWidget {
 
 class _BottomTabbarState extends State<BottomTabbar> {
   int selectedIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void goToFirstTab() {
-    setState(() {
-      selectedIndex = 0;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,39 +58,40 @@ class _BottomTabbarState extends State<BottomTabbar> {
           );
         },
         child: BottomNavigationBar(
+          key: _navigationKey,
           unselectedFontSize: 10,
           unselectedItemColor: MyColors.gray,
           elevation: 0,
           items: <BottomNavigationBarItem>[
             const BottomNavigationBarItem(
                 activeIcon: Padding(
-                  padding: EdgeInsets.only(bottom: 6.0),
+                  padding: EdgeInsets.only(bottom: 3.0),
                   child: Icon(Icons.circle_outlined),
                 ),
                 icon: Padding(
-                  padding: EdgeInsets.only(bottom: 6.0),
+                  padding: EdgeInsets.only(bottom: 3.0),
                   child: Icon(Icons.circle_outlined, color: MyColors.gray),
                 ),
                 label: 'Сэтгэл'),
             BottomNavigationBarItem(
                 activeIcon: Padding(
-                  padding: const EdgeInsets.only(bottom: 6.0),
+                  padding: const EdgeInsets.only(bottom: 3.0),
                   child: Image.asset("assets/images/tuudeg_gal_icon.png",
                       height: 27, width: 27, color: MyColors.primaryColor),
                 ),
                 icon: Padding(
-                  padding: const EdgeInsets.only(bottom: 6.0),
+                  padding: const EdgeInsets.only(bottom: 3.0),
                   child: Image.asset("assets/images/tuudeg_gal_icon.png",
                       height: 27, width: 27, color: MyColors.gray),
                 ),
                 label: "Түүдэг гал"),
             const BottomNavigationBarItem(
                 activeIcon: Padding(
-                  padding: EdgeInsets.only(bottom: 6.0),
+                  padding: EdgeInsets.only(bottom: 3.0),
                   child: Icon(IconlyLight.profile),
                 ),
                 icon: Padding(
-                  padding: EdgeInsets.only(bottom: 6.0),
+                  padding: EdgeInsets.only(bottom: 3.0),
                   child: Icon(IconlyLight.profile, color: MyColors.gray),
                 ),
                 label: "Би")
@@ -116,7 +105,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
       ),
       body: Stack(
         children: [
-          _widgetOptions[selectedIndex],
+          _widgetOptions.elementAt(selectedIndex),
           ValueListenableBuilder(
               valueListenable: currentlyPlaying,
               builder:
@@ -133,10 +122,10 @@ class _BottomTabbarState extends State<BottomTabbar> {
     );
   }
 
-  final List<Widget> _widgetOptions = [
-    HomeScreen(key: HomeScreen.tabbedPageKey),
-    const ForumScreen(),
-    const ProfileScreen(),
+  final List<Widget> _widgetOptions = const <Widget>[
+    HomeScreen(),
+    ForumScreen(),
+    ProfileScreen(),
   ];
 
   void onTabTapped(int index) {
@@ -147,11 +136,6 @@ class _BottomTabbarState extends State<BottomTabbar> {
       selectedIndex = index;
     });
   }
-
-  Widget renderView(int tabIndex, Widget view) {
-    return IgnorePointer(
-      ignoring: selectedIndex != tabIndex,
-      child: Opacity(opacity: selectedIndex == tabIndex ? 1 : 0, child: view),
-    );
-  }
 }
+
+final _navigationKey = GlobalKey<NavigatorState>();

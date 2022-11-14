@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/models/video_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_detail.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class VideoItem extends StatefulWidget {
   final VideoModel videoModel;
@@ -29,7 +29,7 @@ class _VideoItemState extends State<VideoItem> {
               height: 180,
               width: MediaQuery.of(context).size.width),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.only(top: 12, left: 20, right: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -37,7 +37,12 @@ class _VideoItemState extends State<VideoItem> {
                   widget.videoModel.title ?? "",
                   style: const TextStyle(color: MyColors.black, fontSize: 16),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 8),
+                Text(
+                  dateTimeFormatter(widget.videoModel.createdAt ?? ""),
+                  style: const TextStyle(color: MyColors.gray, fontSize: 12),
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

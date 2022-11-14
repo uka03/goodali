@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
-import 'package:goodali/Providers/forum_tag_notifier.dart';
+
 import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:goodali/screens/ForumScreen/human_nature_tab.dart';
 import 'package:goodali/screens/ForumScreen/my_friend_tab.dart';
 import 'package:goodali/screens/ForumScreen/tuudeg_gal_tab.dart';
 import 'package:iconly/iconly.dart';
-import 'package:provider/provider.dart';
+
+import '../../Utils/circle_tab_indicator.dart';
 
 class ForumScreen extends StatefulWidget {
   const ForumScreen({Key? key}) : super(key: key);
@@ -52,7 +53,8 @@ class _ForumScreenState extends State<ForumScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(IconlyLight.edit),
+                      const SizedBox(width: 13),
+                      const Icon(IconlyLight.edit, color: MyColors.gray),
                       const SizedBox(width: 14),
                       SizedBox(
                         width: 200,
@@ -62,8 +64,9 @@ class _ForumScreenState extends State<ForumScreen> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const CreatePost()));
+                                    builder: (context) => const CreatePost()));
                           },
+                          readOnly: true,
                           cursorColor: MyColors.primaryColor,
                           decoration: const InputDecoration(
                               border: InputBorder.none, hintText: "Пост нэмэх"),
@@ -86,8 +89,16 @@ class _ForumScreenState extends State<ForumScreen> {
                           SizedBox(width: 110, child: Tab(text: "Нууц бүлгэм")),
                           SizedBox(width: 110, child: Tab(text: "Миний нандин"))
                         ],
+                        indicatorWeight: 4,
+                        indicator:
+                            CustomTabIndicator(color: MyColors.primaryColor),
                         labelColor: MyColors.primaryColor,
-                        unselectedLabelColor: MyColors.black,
+                        labelStyle: TextStyle(
+                            fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                        unselectedLabelStyle: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontFamily: 'Gilroy'),
+                        unselectedLabelColor: MyColors.gray,
                         indicatorColor: MyColors.primaryColor,
                       ),
                       container:
@@ -135,8 +146,8 @@ class _ForumScreenState extends State<ForumScreen> {
                       ))
             ];
           },
-          body: TabBarView(
-              children: const [NatureOfHuman(), NuutsBulgem(), MyFriendTab()]),
+          body: const TabBarView(
+              children: [NatureOfHuman(), NuutsBulgem(), MyFriendTab()]),
         ),
       ),
     );

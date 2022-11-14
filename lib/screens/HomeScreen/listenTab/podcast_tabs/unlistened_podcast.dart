@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/local_database.dart';
-import 'package:goodali/Providers/podcast_provider.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:provider/provider.dart';
 
 typedef OnTap = Function(Products audioObject);
 

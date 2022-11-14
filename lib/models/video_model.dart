@@ -7,6 +7,7 @@ class VideoModel {
   int? status;
   String? title;
   String? videoUrl;
+  String? createdAt;
   List<Tags>? tags;
 
   VideoModel(
@@ -16,6 +17,7 @@ class VideoModel {
       this.status,
       this.title,
       this.tags,
+      this.createdAt,
       this.videoUrl});
 
   VideoModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class VideoModel {
     body = json['body'];
     id = json['id'];
     status = json['status'];
+    createdAt = json['created_at'];
     title = json['title'];
     if (json['tags'] != null) {
       tags = <Tags>[];
@@ -41,6 +44,7 @@ class VideoModel {
     data['status'] = status;
     data['title'] = title;
     data['video_url'] = videoUrl;
+    data['created_at'] = createdAt;
     if (tags != null) {
       data['tags'] = tags!.map((v) => v.toJson()).toList();
     }

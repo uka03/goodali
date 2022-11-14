@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:audio_service/audio_service.dart';
+
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -18,7 +17,6 @@ import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/controller/progress_notifier.dart';
-import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/screens/audioScreens.dart/player_buttons.dart';
 import 'package:miniplayer/miniplayer.dart';
 
@@ -27,8 +25,6 @@ import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
 import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
 
 void onTap() {}
 
@@ -68,19 +64,6 @@ class _PlayAudioState extends State<PlayAudio> {
   String audioURL = "";
   String introURL = "";
 
-  Stream<Duration> get _bufferedPositionStream => audioHandler.playbackState
-      .map((state) => state.bufferedPosition)
-      .distinct();
-  Stream<Duration?> get _durationStream =>
-      audioHandler.mediaItem.map((item) => item?.duration).distinct();
-  Stream<DurationState> get _positionDataStream =>
-      Rx.combineLatest3<Duration, Duration, Duration?, DurationState>(
-          AudioService.position,
-          _bufferedPositionStream,
-          _durationStream,
-          (position, bufferedPosition, duration) => DurationState(
-              position, bufferedPosition, duration ?? Duration.zero));
-
   @override
   void initState() {
     super.initState();
@@ -105,8 +88,6 @@ class _PlayAudioState extends State<PlayAudio> {
   }
 
   Widget playAudio() {
-    final audioPosition =
-        Provider.of<AudioPlayerProvider>(context, listen: false);
     return Miniplayer(
         valueNotifier: playerExpandProgress,
         minHeight: playerMinHeight,

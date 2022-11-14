@@ -12,7 +12,6 @@ import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class EditProfile extends StatefulWidget {
   final UserInfo? userInfo;
@@ -24,7 +23,6 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   TextEditingController emailController = TextEditingController();
-
   TextEditingController nicknameController = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
@@ -34,12 +32,13 @@ class _EditProfileState extends State<EditProfile> {
 
   bool isChanged = false;
   bool isImageChanged = false;
+  bool isTyping = false;
 
   @override
   void initState() {
     emailController.text = widget.userInfo?.email ?? "";
     nicknameController.text = widget.userInfo?.nickname ?? "";
-    print(widget.userInfo?.avatarPath);
+
     super.initState();
   }
 
@@ -103,11 +102,11 @@ class _EditProfileState extends State<EditProfile> {
                   readOnly: true,
                   decoration: const InputDecoration(
                     enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
+                      borderSide: BorderSide(color: MyColors.border1),
                     ),
                     focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
+                      borderSide:
+                          BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   )),
               const SizedBox(height: 24),
@@ -121,15 +120,27 @@ class _EditProfileState extends State<EditProfile> {
                   onChanged: (value) {
                     setState(() {
                       isChanged = true;
+                      isTyping = true;
                     });
                   },
-                  decoration: const InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
+                  decoration: InputDecoration(
+                    hintText: "Нууц нэр",
+                    suffixIcon: isTyping
+                        ? GestureDetector(
+                            onTap: () => setState(() {
+                              nicknameController.text = "";
+                              isTyping = false;
+                            }),
+                            child:
+                                const Icon(Icons.close, color: MyColors.black),
+                          )
+                        : const SizedBox(),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: MyColors.border1),
                     ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   )),
               const SizedBox(height: 10),
@@ -269,33 +280,25 @@ class _EditProfileState extends State<EditProfile> {
 
     if (stream["success"]) {
       if (!mounted) return;
-      showTopSnackBar(context,
-          const CustomTopSnackBar(type: 1, text: "Амжилттай солигдлоо"));
+      TopSnackBar.successFactory(title: "Амжилттай солигдлоо").show(context);
     } else {
       if (!mounted) return;
-      showTopSnackBar(
-          context,
-          const CustomTopSnackBar(
-              type: 0, text: "Алдаа гарлаа дахин оролдоно уу"));
+      TopSnackBar.errorFactory(msg: "Дахин оролдоно уу").show(context);
     }
   }
 
   editUserData() async {
     var data = await Connection.editUserData(context, nicknameController.text);
     Navigator.pop(context);
-    if (data['succes'] == true) {
-      showTopSnackBar(context,
-          const CustomTopSnackBar(type: 1, text: "Амжилттай солигдлоо"));
+    if (data['success'] == true) {
       Map<String, dynamic> map = {
         "name": data["name"],
         "avatar": data['avatar']
       };
       Navigator.pop(context, map);
+      TopSnackBar.successFactory(title: "Амжилттай солигдлоо").show(context);
     } else {
-      showTopSnackBar(
-          context,
-          const CustomTopSnackBar(
-              type: 0, text: "Алдаа гарлаа дахин оролдоно уу"));
+      TopSnackBar.errorFactory(msg: "Дахин оролдоно уу").show(context);
     }
   }
 }

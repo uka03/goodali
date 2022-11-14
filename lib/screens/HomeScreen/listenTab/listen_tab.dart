@@ -38,99 +38,103 @@ class _ListenTabbarState extends State<ListenTabbar>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return SingleChildScrollView(
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: SingleChildScrollView(
         child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding:
-              const EdgeInsets.only(top: 20.0, bottom: 20, left: 20, right: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Цомог лекц",
-                  style: TextStyle(
-                      color: MyColors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold)),
-              IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const AlbumLecture()));
-                  },
-                  icon: const Icon(IconlyLight.arrow_right))
-            ],
-          ),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Цомог лекц",
+                      style: TextStyle(
+                          color: MyColors.black,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold)),
+                  GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AlbumLecture()));
+                      },
+                      child: const Icon(IconlyLight.arrow_right))
+                ],
+              ),
+            ),
+            albumLecture(),
+            Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Подкаст",
+                        style: TextStyle(
+                            color: MyColors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold)),
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => Podcast(
+                                        dataStore: dataStore,
+                                      )));
+                        },
+                        child: const Icon(IconlyLight.arrow_right))
+                  ],
+                )),
+            ValueListenableBuilder(
+              valueListenable: HiveDataStore.box.listenable(),
+              builder: (context, Box box, widget) {
+                if (box.length > 0) {
+                  List<Products> data = [];
+                  for (int a = 0; a < box.length; a++) {
+                    data.add(box.getAt(a));
+                  }
+                  return PodcastAll(
+                    isHomeScreen: true,
+                    podcastList: data,
+                  );
+                } else {
+                  return const Center(
+                    child:
+                        CircularProgressIndicator(color: MyColors.primaryColor),
+                  );
+                }
+              },
+            ),
+            Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Видео",
+                        style: TextStyle(
+                            color: MyColors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold)),
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const VideoList()));
+                        },
+                        child: const Icon(IconlyLight.arrow_right))
+                  ],
+                )),
+            videoList()
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: albumLecture(),
-        ),
-        Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Подкаст",
-                    style: TextStyle(
-                        color: MyColors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold)),
-                IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => Podcast(
-                                    dataStore: dataStore,
-                                  )));
-                    },
-                    icon: const Icon(IconlyLight.arrow_right))
-              ],
-            )),
-        ValueListenableBuilder(
-          valueListenable: HiveDataStore.box.listenable(),
-          builder: (context, Box box, widget) {
-            if (box.length > 0) {
-              List<Products> data = [];
-              for (int a = 0; a < box.length; a++) {
-                data.add(box.getAt(a));
-              }
-              return PodcastAll(
-                isHomeScreen: true,
-                podcastList: data,
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(color: MyColors.primaryColor),
-              );
-            }
-          },
-        ),
-        Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Видео",
-                    style: TextStyle(
-                        color: MyColors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold)),
-                IconButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => const VideoList()));
-                    },
-                    icon: const Icon(IconlyLight.arrow_right))
-              ],
-            )),
-        videoList()
-      ],
-    ));
+      ),
+    );
   }
 
   Widget albumLecture() {
@@ -141,16 +145,17 @@ class _ListenTabbarState extends State<ListenTabbar>
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
             List<Products> albumList = snapshot.data;
-            return SizedBox(
-              height: 250,
-              child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: albumList.length,
-                  itemBuilder: (BuildContext context, int index) => SizedBox(
-                      width: MediaQuery.of(context).size.width / 2 - 20,
-                      child: AlbumItem(albumData: albumList[index]))),
-            );
+            return GridView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: 4,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 15,
+                    childAspectRatio: 1 / 1.6,
+                    crossAxisCount: 2),
+                itemBuilder: (BuildContext context, int index) =>
+                    AlbumItem(albumData: albumList[index]));
           } else {
             return const Center(
               child: CircularProgressIndicator(color: MyColors.primaryColor),
@@ -181,6 +186,15 @@ class _ListenTabbarState extends State<ListenTabbar>
         }
       },
     );
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      getProducts();
+      getVideoList();
+
+      getPodcastList();
+    });
   }
 
   Future<List<Products>> getProducts() {

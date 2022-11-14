@@ -1,14 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/controller/download_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:provider/provider.dart';
 
 typedef OnTap = Function(Products audioObject);
 
@@ -20,7 +17,7 @@ class DownloadedPodcast extends StatefulWidget {
 }
 
 class _DownloadedPodcastState extends State<DownloadedPodcast> {
-  HiveDownloadedPodcast downloadedPodcast = HiveDownloadedPodcast();
+  HiveDataStore downloadedPodcast = HiveDataStore();
   DownloadController downloadController = DownloadController();
   List<Products> downloadedList = [];
   String audioPath = "";
@@ -50,14 +47,18 @@ class _DownloadedPodcastState extends State<DownloadedPodcast> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: HiveDownloadedPodcast.box.listenable(),
+      valueListenable: HiveDataStore.box.listenable(),
       builder: ((context, Box box, child) {
-        Products podcast = Products();
+        List<Products> downloadedPodcast = [];
+
         if (box.length > 0) {
-          for (var i = 0; i < box.length; i++) {
-            podcast = box.getAt(i);
-            downloadedList.add(podcast);
+          for (int a = 0; a < box.length; a++) {
+            Products products = box.getAt(a);
+            if (products.isDownloaded == true) {
+              downloadedPodcast.add(products);
+            }
           }
+          downloadedList = downloadedPodcast;
           return ListView.builder(
               padding: EdgeInsets.zero,
               itemCount: downloadedList.length,

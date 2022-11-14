@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 
 class MyDelegate extends SliverPersistentHeaderDelegate {
   MyDelegate(this.tabbar, {this.container});
@@ -16,13 +15,11 @@ class MyDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  // TODO: implement maxExtent
   double get maxExtent => container == null
       ? tabbar.preferredSize.height + 1
       : tabbar.preferredSize.height + 40;
 
   @override
-  // TODO: implement minExtent
   double get minExtent => container == null
       ? tabbar.preferredSize.height + 1
       : tabbar.preferredSize.height + 40;

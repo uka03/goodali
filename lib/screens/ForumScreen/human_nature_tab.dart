@@ -9,7 +9,6 @@ import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/screens/ForumScreen/post_detail.dart';
 import 'package:goodali/screens/ListItems/post_item.dart';
-import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
 class NatureOfHuman extends StatefulWidget {
@@ -54,7 +53,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                             : postList.length,
                         itemBuilder: (BuildContext context, int index) {
                           isHearted.add(false);
-                          return GestureDetector(
+                          return InkWell(
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -73,8 +72,8 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                         },
                         separatorBuilder: (BuildContext context, int index) =>
                             const Divider(
-                              endIndent: 18,
-                              indent: 18,
+                              endIndent: 20,
+                              indent: 20,
                             ));
                   } else {
                     return Container();
@@ -106,92 +105,101 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
     List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height - 80,
+          minHeight: MediaQuery.of(context).size.height / 2 + 80,
+        ),
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => SizedBox(
-              height: MediaQuery.of(context).size.height - 100,
-              child: StatefulBuilder(
-                builder: (BuildContext context,
-                    void Function(void Function()) setState) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 38,
-                          height: 6,
-                          decoration: BoxDecoration(
-                              color: MyColors.gray,
-                              borderRadius: BorderRadius.circular(10)),
+        builder: (_) => StatefulBuilder(
+              builder: (BuildContext context,
+                  void Function(void Function()) setState) {
+                return Container(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 6,
+                        decoration: BoxDecoration(
+                            color: MyColors.gray,
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text("Шүүлтүүр",
+                          style: TextStyle(
+                              fontSize: 22,
+                              color: MyColors.black,
+                              fontWeight: FontWeight.bold)),
+                      Expanded(
+                        child: FutureBuilder(
+                          future: tagFuture,
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData &&
+                                ConnectionState.done ==
+                                    snapshot.connectionState) {
+                              tagList = snapshot.data;
+                              return ListView.builder(
+                                  itemCount: tagList.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return CheckboxListTile(
+                                        activeColor: MyColors.primaryColor,
+                                        checkColor: MyColors.primaryColor,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(4)),
+                                        side: const BorderSide(
+                                            color: MyColors.border1),
+                                        title: Text(
+                                          tagList[index].name ?? "",
+                                          style: const TextStyle(
+                                              color: MyColors.black),
+                                        ),
+                                        onChanged: (bool? value) {
+                                          if (value == true) {
+                                            setState(() {
+                                              if (!checkedTag.contains(
+                                                  tagList[index].id)) {
+                                                checkedTag.add(
+                                                    tagList[index].id ?? 0);
+                                              }
+                                            });
+                                          } else {
+                                            setState(() {
+                                              checkedTag
+                                                  .remove(tagList[index].id);
+                                            });
+                                          }
+                                        },
+                                        value: checkedTag
+                                            .contains(tagList[index].id));
+                                  });
+                            } else {
+                              return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: MyColors.primaryColor,
+                                      strokeWidth: 2));
+                            }
+                          },
                         ),
-                        const SizedBox(height: 20),
-                        const Text("Шүүлтүүр",
-                            style: TextStyle(
-                                fontSize: 22,
-                                color: MyColors.black,
-                                fontWeight: FontWeight.bold)),
-                        Expanded(
-                          child: FutureBuilder(
-                            future: tagFuture,
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData &&
-                                  ConnectionState.done ==
-                                      snapshot.connectionState) {
-                                tagList = snapshot.data;
-                                return ListView.builder(
-                                    itemCount: tagList.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return CheckboxListTile(
-                                          title:
-                                              Text(tagList[index].name ?? ""),
-                                          activeColor: MyColors.primaryColor,
-                                          onChanged: (bool? value) {
-                                            if (value == true) {
-                                              setState(() {
-                                                if (!checkedTag.contains(
-                                                    tagList[index].id)) {
-                                                  checkedTag.add(
-                                                      tagList[index].id ?? 0);
-                                                }
-                                              });
-                                            } else {
-                                              setState(() {
-                                                checkedTag
-                                                    .remove(tagList[index].id);
-                                              });
-                                            }
-                                          },
-                                          value: checkedTag
-                                              .contains(tagList[index].id));
-                                    });
-                              } else {
-                                return const Center(
-                                    child: CircularProgressIndicator(
-                                        color: MyColors.primaryColor,
-                                        strokeWidth: 2));
-                              }
-                            },
-                          ),
-                        ),
-                        CustomElevatedButton(
-                            text: "Шүүх",
-                            onPress: () {
-                              filterPost(tagList);
+                      ),
+                      CustomElevatedButton(
+                          text: "Шүүх",
+                          onPress: () {
+                            filterPost(tagList);
 
-                              Navigator.pop(context, checkedTag);
-                            }),
-                        const SizedBox(height: 20),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                            Navigator.pop(context, checkedTag);
+                          }),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                );
+              },
             ));
   }
 

@@ -7,7 +7,6 @@ import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
-import 'package:goodali/screens/HomeScreen/courseTab/course_list.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_album.dart';
@@ -19,8 +18,6 @@ import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
 import 'package:goodali/Widgets/search_bar.dart';
 
 class HomeScreen extends StatefulWidget {
-  static final tabbedPageKey = GlobalKey<_HomeScreenState>();
-
   const HomeScreen({Key? key}) : super(key: key);
 
   @override

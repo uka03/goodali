@@ -10,7 +10,6 @@ import 'package:goodali/screens/Auth/forgot_password.dart';
 import 'package:goodali/screens/Auth/pincode_changed_success.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class LoginBottomSheet extends StatefulWidget {
   final bool isRegistered;
@@ -27,13 +26,29 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   TextEditingController nicknameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  bool isTyping = false;
+  bool isTyping1 = false;
+  bool isTyping2 = false;
+  bool toRemind = false;
+
   Color textFieldColor = MyColors.primaryColor;
   bool isRegistered = true;
 
   @override
   void initState() {
+    _checkIsReminded();
     isRegistered = widget.isRegistered;
     super.initState();
+  }
+
+  Future<void> _checkIsReminded() async {
+    var data = await Provider.of<Auth>(context, listen: false).getUserInfo();
+    if (data["to_remind"]) {
+      setState(() {
+        toRemind = data["to_remind"];
+        emailController.text = data["email"];
+      });
+    }
   }
 
   @override
@@ -48,31 +63,42 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
           height: MediaQuery.of(context).size.height - 80,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  padding: const EdgeInsets.all(0),
-                  icon: const Icon(Icons.close),
-                  color: MyColors.black,
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  iconSize: 28,
+                alignment: Alignment.topCenter,
+                child: Container(
+                  width: 40,
+                  height: 6,
+                  decoration: BoxDecoration(
+                      color: MyColors.gray,
+                      borderRadius: BorderRadius.circular(3)),
                 ),
               ),
               const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  child: const Icon(
+                    Icons.close,
+                    color: MyColors.black,
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              const SizedBox(height: 30),
               const Text("Нэвтрэх",
                   style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: MyColors.black)),
-              const SizedBox(height: 50),
+              const SizedBox(height: 40),
               TextFormField(
                 controller: emailController,
                 cursorColor: MyColors.primaryColor,
@@ -82,20 +108,54 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   });
                   focus.nextFocus();
                 },
+                onChanged: (value) => setState(() => isTyping = true),
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
                 style: TextStyle(color: textFieldColor),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: "И-мэйл",
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+                  suffixIcon: isTyping
+                      ? GestureDetector(
+                          onTap: () {
+                            emailController.text = "";
+                            setState(() {
+                              isTyping = false;
+                            });
+                          },
+                          child: const Icon(Icons.close, color: MyColors.black))
+                      : const SizedBox(),
+                  enabledBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.border1),
                   ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: MyColors.primaryColor),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide:
+                        BorderSide(color: MyColors.primaryColor, width: 1.5),
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
+              Row(children: [
+                SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: Checkbox(
+                      value: toRemind,
+                      fillColor: MaterialStateProperty.all<Color>(
+                          MyColors.primaryColor),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4)),
+                      side: const BorderSide(color: MyColors.border1),
+                      splashRadius: 5,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          toRemind = value!;
+                        });
+                      }),
+                ),
+                const SizedBox(width: 15),
+                const Text("Сануулах", style: TextStyle(color: MyColors.black))
+              ]),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: passwordController,
                 cursorColor: MyColors.primaryColor,
@@ -105,18 +165,30 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                     textFieldColor = MyColors.black;
                   });
                 },
+                onChanged: (value) => setState(() => isTyping1 = true),
                 obscureText: true,
                 maxLength: 4,
                 textInputAction: TextInputAction.done,
                 keyboardType: TextInputType.number,
                 style: TextStyle(color: textFieldColor),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: "Пин код",
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+                  suffixIcon: isTyping1
+                      ? GestureDetector(
+                          onTap: () {
+                            passwordController.text = "";
+                            setState(() {
+                              isTyping1 = false;
+                            });
+                          },
+                          child: const Icon(Icons.close, color: MyColors.black))
+                      : const SizedBox(),
+                  enabledBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: MyColors.border1),
                   ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: MyColors.primaryColor),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide:
+                        BorderSide(color: MyColors.primaryColor, width: 1.5),
                   ),
                 ),
               ),
@@ -139,7 +211,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                           style: const TextStyle(color: MyColors.gray),
                           children: <TextSpan>[
                             TextSpan(
-                                text: ' Бүртгүүлэх',
+                                text: '  Бүртгүүлэх',
                                 style: const TextStyle(
                                     color: MyColors.primaryColor,
                                     fontWeight: FontWeight.bold),
@@ -196,18 +268,29 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    padding: const EdgeInsets.all(0),
-                    icon: const Icon(Icons.close),
-                    color: MyColors.black,
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    iconSize: 28,
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    width: 40,
+                    height: 6,
+                    decoration: BoxDecoration(
+                        color: MyColors.gray,
+                        borderRadius: BorderRadius.circular(3)),
                   ),
                 ),
                 const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: GestureDetector(
+                    child: const Icon(
+                      Icons.close,
+                      color: MyColors.black,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                const SizedBox(height: 30),
                 const Text("Бүртгүүлэх",
                     style: TextStyle(
                         fontSize: 32,
@@ -225,6 +308,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                     });
                     focus.nextFocus();
                   },
+                  onChanged: (value) => setState(() => isTyping = true),
                   style: TextStyle(color: textFieldColor),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -233,15 +317,27 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                     if (isEmailCorrect(value) == false) {
                       return "Цахим шуудан буруу байна";
                     }
+                    return null;
                   },
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "И-мэйл",
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
+                    suffixIcon: isTyping
+                        ? GestureDetector(
+                            onTap: () {
+                              emailController.text = "";
+                              setState(() {
+                                isTyping = false;
+                              });
+                            },
+                            child:
+                                const Icon(Icons.close, color: MyColors.black))
+                        : const SizedBox(),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: MyColors.border1),
                     ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                 ),
@@ -255,16 +351,28 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                     });
                     focus.nextFocus();
                   },
+                  onChanged: (value) => setState(() => isTyping2 = true),
                   textInputAction: TextInputAction.next,
                   style: TextStyle(color: textFieldColor),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "Нууц нэр",
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
+                    suffixIcon: isTyping2
+                        ? GestureDetector(
+                            onTap: () {
+                              nicknameController.text = "";
+                              setState(() {
+                                isTyping2 = false;
+                              });
+                            },
+                            child:
+                                const Icon(Icons.close, color: MyColors.black))
+                        : const SizedBox(),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: MyColors.border1),
                     ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                 ),
@@ -278,6 +386,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   obscureText: true,
                   controller: passwordController,
                   cursorColor: MyColors.primaryColor,
+                  onChanged: (value) => setState(() => isTyping1 = true),
                   onEditingComplete: () {
                     setState(() {
                       FocusManager.instance.primaryFocus?.unfocus();
@@ -297,14 +406,25 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.done,
                   style: TextStyle(color: textFieldColor),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "Пин код",
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.border1, width: 0.5),
+                    suffixIcon: isTyping1
+                        ? GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isTyping1 = false;
+                              });
+                              passwordController.text = "";
+                            },
+                            child:
+                                const Icon(Icons.close, color: MyColors.black))
+                        : const SizedBox(),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: MyColors.border1),
                     ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.primaryColor),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                 ),
@@ -327,7 +447,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                           style: const TextStyle(color: MyColors.gray),
                           children: <TextSpan>[
                             TextSpan(
-                                text: ' Нэвтрэх',
+                                text: '  Нэвтрэх',
                                 style: const TextStyle(
                                     color: MyColors.primaryColor,
                                     fontWeight: FontWeight.bold),
@@ -372,8 +492,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   )));
       return true;
     } else {
-      showTopSnackBar(
-          context, CustomTopSnackBar(type: 0, text: data["message"] ?? ""));
+      TopSnackBar.errorFactory(msg: data["message"]).show(context);
       return false;
     }
   }
@@ -385,7 +504,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
       "password": passwordController.text
     };
     var data = await Provider.of<Auth>(context, listen: false)
-        .login(context, sendData);
+        .login(context, sendData, toRemind: toRemind);
     Navigator.pop(context);
 
     if (data['success'] == true) {
@@ -395,8 +514,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
       }
       Navigator.pop(context, data['userInfo']);
     } else {
-      showTopSnackBar(
-          context, CustomTopSnackBar(type: 0, text: data['message']));
+      TopSnackBar.errorFactory(msg: data["message"]).show(context);
     }
   }
 }

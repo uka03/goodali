@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
@@ -21,12 +21,9 @@ import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 
 import 'package:goodali/models/task_answer.dart';
-import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
@@ -43,7 +40,7 @@ class CourseTasks extends StatefulWidget {
 }
 
 class _CourseTasksState extends State<CourseTasks> {
-  List<TextEditingController> _controllers = [];
+  final List<TextEditingController> _controllers = [];
   late final AudioPlayer audioPlayer = AudioPlayer();
   YoutubePlayerController? _ytbPlayerController;
   List<TaskAnswers> taskAnswerList = [];
@@ -51,11 +48,12 @@ class _CourseTasksState extends State<CourseTasks> {
   late final PageController _pageController =
       PageController(initialPage: widget.initialPage?.toInt() ?? 0);
 
-  List<bool> _checkboxValue = [];
+  final List<bool> _checkboxValue = [];
   final _kDuration = const Duration(milliseconds: 300);
   final _kCurve = Curves.easeIn;
   bool isPlaying = false;
   bool isLoading = true;
+  bool isTyping = false;
   double _current = 0;
   Stream<DurationState>? _durationState;
 
@@ -173,10 +171,10 @@ class _CourseTasksState extends State<CourseTasks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: SimpleAppBar(
-          title: widget.title ?? "",
-          backFunction: () {
-            Navigator.pop(context, _current);
-          }),
+        title: widget.title ?? "",
+        data: _current,
+        noCard: true,
+      ),
       body: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Padding(
@@ -193,7 +191,7 @@ class _CourseTasksState extends State<CourseTasks> {
                     case 0:
                     case 1:
                       return Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 90),
                         child: type0(widget.courseTasks[index], index),
                       );
                     // case 1:
@@ -255,17 +253,20 @@ class _CourseTasksState extends State<CourseTasks> {
                     style: const TextStyle(
                         color: MyColors.black,
                         fontSize: 16,
+                        fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.bold),
                   ),
                   const Text("/",
                       style: TextStyle(
                         color: MyColors.black,
+                        fontStyle: FontStyle.italic,
                         fontSize: 16,
                       )),
                   Text(widget.courseTasks.length.toString(),
                       style: const TextStyle(
                           color: MyColors.black,
                           fontSize: 16,
+                          fontStyle: FontStyle.italic,
                           fontWeight: FontWeight.bold)),
                 ]),
               ),
@@ -274,28 +275,7 @@ class _CourseTasksState extends State<CourseTasks> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20.0),
                 child: CustomElevatedButton(
-                    onPress: () async {
-                      _pageController.nextPage(
-                          curve: _kCurve, duration: _kDuration);
-
-                      if (_controllers[_current.toInt()].text != "" ||
-                          _checkboxValue[_current.toInt()] == true) {
-                        saveAnswer(
-                                widget.courseTasks[_current.toInt()].id
-                                    .toString(),
-                                _controllers[_current.toInt()].text,
-                                1)
-                            .whenComplete(() => showTopSnackBar(
-                                context,
-                                const CustomTopSnackBar(
-                                  type: 1,
-                                  text: "Амжилттай хадгалагдлаа",
-                                )));
-                      }
-                      if (_current + 1 == widget.courseTasks.length) {
-                        Navigator.pop(context, _current);
-                      }
-                    },
+                    onPress: _onPressed,
                     text: _current + 1 == widget.courseTasks.length
                         ? "Дуусгах"
                         : "Дараах"),
@@ -308,6 +288,21 @@ class _CourseTasksState extends State<CourseTasks> {
     );
   }
 
+  _onPressed() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    _pageController.nextPage(curve: _kCurve, duration: _kDuration);
+
+    if (_controllers[_current.toInt()].text != "" ||
+        _checkboxValue[_current.toInt()] == true) {
+      await saveAnswer(widget.courseTasks[_current.toInt()].id.toString(),
+          _controllers[_current.toInt()].text, 1);
+      TopSnackBar.successFactory(msg: "Амжилттай хадгалагдлаа").show(context);
+    }
+    if (_current + 1 == widget.courseTasks.length) {
+      Navigator.pop(context, _current);
+    }
+  }
+
   Widget type0(CourseLessonsTasksModel courseTask, int index) {
     _controllers[index].text = courseTask.answerData == ""
         ? _controllers[index].text
@@ -318,12 +313,16 @@ class _CourseTasksState extends State<CourseTasks> {
       children: [
         const SizedBox(height: 10),
         if (courseTask.body != "" || courseTask.body!.isNotEmpty)
-          HtmlWidget(courseTask.body ?? ""),
+          Text(
+            parseHtmlString(courseTask.body ?? ""),
+            style: const TextStyle(fontFamily: "Gilroy", height: 1.6),
+          ),
         Text(courseTask.question ?? "",
             style: const TextStyle(
                 color: MyColors.black,
                 fontWeight: FontWeight.bold,
                 fontSize: 20)),
+        const SizedBox(height: 20),
         if (courseTask.isAnswer == 1)
           Padding(
             padding: const EdgeInsets.only(bottom: 70),
@@ -332,12 +331,26 @@ class _CourseTasksState extends State<CourseTasks> {
                 cursorColor: MyColors.primaryColor,
                 maxLength: 2000,
                 maxLines: null,
-                decoration: const InputDecoration(
+                onChanged: (value) => setState(() {
+                      isTyping = true;
+                    }),
+                decoration: InputDecoration(
                   hintText: "Хариулт",
-                  enabledBorder: UnderlineInputBorder(
+                  suffixIcon: isTyping
+                      ? GestureDetector(
+                          onTap: () {
+                            _controllers[index].text = "";
+                            setState(() {
+                              isTyping = false;
+                            });
+                          },
+                          child: const Icon(Icons.close, color: MyColors.black),
+                        )
+                      : const SizedBox(),
+                  enabledBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: MyColors.border1, width: 0.5),
                   ),
-                  focusedBorder: UnderlineInputBorder(
+                  focusedBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: MyColors.primaryColor),
                   ),
                 )),
@@ -350,7 +363,10 @@ class _CourseTasksState extends State<CourseTasks> {
     return Column(
       children: [
         if (courseTask.body != "" || courseTask.body!.isNotEmpty)
-          HtmlWidget(courseTask.body ?? ""),
+          Text(
+            parseHtmlString(courseTask.body ?? ""),
+            style: const TextStyle(fontFamily: "Gilroy", height: 1.6),
+          ),
         Text(courseTask.question ?? ""),
         TextField(
             controller: _controllers[index],
@@ -434,8 +450,6 @@ class _CourseTasksState extends State<CourseTasks> {
   }
 
   Widget audioPlayerWidget() {
-    final audioPosition =
-        Provider.of<AudioPlayerProvider>(context, listen: false);
     return StreamBuilder<DurationState>(
         stream: _durationState,
         builder: (context, snapshot) {
@@ -472,7 +486,6 @@ class _CourseTasksState extends State<CourseTasks> {
   }
 
   Widget playerButton(Duration position, Duration duration) {
-    final audioPosition = Provider.of<AudioPlayerProvider>(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [

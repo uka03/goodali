@@ -27,8 +27,6 @@ import 'package:goodali/controller/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
-
 class Connection {
   static Future<Map<String, dynamic>> userRegister(
       BuildContext context, dynamic data) async {
@@ -45,15 +43,11 @@ class Connection {
     } on DioError catch (e) {
       print(e.type);
       if (e.type == DioErrorType.other) {
-        showTopSnackBar(
-            context,
-            const CustomTopSnackBar(
-                type: 0, text: "Интернет холболтоо шалгана уу."));
+        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
+            .show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
-        showTopSnackBar(
-            context,
-            const CustomTopSnackBar(
-                type: 0, text: "Сервертэй холбогдоход алдаа гарлаа"));
+        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа")
+            .show(context);
       }
       return {};
     }
@@ -76,15 +70,11 @@ class Connection {
     } on DioError catch (e) {
       print(e.type);
       if (e.type == DioErrorType.other) {
-        showTopSnackBar(
-            context,
-            const CustomTopSnackBar(
-                type: 0, text: "Интернет холболтоо шалгана уу."));
+        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
+            .show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
-        showTopSnackBar(
-            context,
-            const CustomTopSnackBar(
-                type: 0, text: "Сервертэй холбогдоход алдаа гарлаа"));
+        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа")
+            .show(context);
       }
       return [];
     }
@@ -247,12 +237,11 @@ class Connection {
 
       if (response.data['status'] == 1) {
         return {
-          'succes': true,
+          'success': true,
           'name': response.data['name']['data'],
           'avatar': response.data['name']["avatar"]
         };
       } else {
-        print("error");
         return {'succes': false};
       }
     } catch (error) {
@@ -288,8 +277,6 @@ class Connection {
       BuildContext context, File imageFile) async {
     try {
       String imagePath = imageFile.path.split('/').last;
-      print("imagePath $imagePath");
-
       FormData data = FormData.fromMap({
         "image":
             await MultipartFile.fromFile(imageFile.path, filename: imagePath)
@@ -297,13 +284,12 @@ class Connection {
       final response = await Http()
           .getDio(context, headerTypebearer)
           .post(Urls.uploadUserAvatar, data: data);
-      print(response.data);
+      print("upload user avatar ${response.data}");
       if (response.data['status'] == 1) {
         return {
           'success': true,
         };
       } else {
-        print("error");
         return {'success': false};
       }
     } catch (error) {
@@ -378,10 +364,8 @@ class Connection {
       }
     } on DioError catch (e) {
       if (e.type == DioErrorType.other) {
-        showTopSnackBar(
-            context,
-            const CustomTopSnackBar(
-                type: 0, text: "Интернет холболтоо шалгана уу."));
+        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
+            .show(context);
       }
       return {};
     }
@@ -586,7 +570,6 @@ class Connection {
     try {
       final response =
           await Http().getDio(context, headerTypeNone).post(Urls.podcastList);
-      log(response.data.toString());
 
       if (response.statusCode == 200) {
         return (response.data as List)
@@ -825,6 +808,28 @@ class Connection {
     } catch (error) {
       developer.log("search error $error");
       return [];
+    }
+  }
+
+  static Future<bool> postDislike(BuildContext context, dynamic data) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.postDislike, data: data);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] == 1) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        developer.log("error");
+        return false;
+      }
+    } catch (error) {
+      developer.log("search error $error");
+      return false;
     }
   }
 }

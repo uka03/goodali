@@ -6,7 +6,6 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class CardPayment extends StatefulWidget {
@@ -67,8 +66,9 @@ class _CardPaymentState extends State<CardPayment> {
             }
           },
           onWebResourceError: (onWebResourceError) {
-            showTopSnackBar(context,
-                const CustomTopSnackBar(type: 0, text: "Алдаа гарлаа"));
+            TopSnackBar.errorFactory(
+                    title: "Алдаа гарлаа", msg: "Дахин оролдоно уу.")
+                .show(context);
           },
           onProgress: (int progress) {
             print('Webview is loading $progress');

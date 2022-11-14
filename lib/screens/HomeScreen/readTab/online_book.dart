@@ -1,8 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/info.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:iconly/iconly.dart';
@@ -79,7 +76,7 @@ class _OnlineBookState extends State<OnlineBook> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           elevation: 0,
-                          primary: MyColors.primaryColor)),
+                          backgroundColor: MyColors.primaryColor)),
                 ),
                 Container(
                   padding: const EdgeInsets.all(3),

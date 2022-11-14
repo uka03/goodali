@@ -11,8 +11,6 @@ import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/blank.dart';
 
-import 'package:flutter/material.dart';
-
 typedef OnSearchChanged = Future<List<String>> Function(String);
 
 class SearchScreen extends SearchDelegate<String> {
@@ -171,7 +169,7 @@ class SearchScreen extends SearchDelegate<String> {
           itemBuilder: (context, index) {
             return ListTile(
               leading: const Icon(Icons.restore),
-              title: Text("${_oldFilters[index]}"),
+              title: Text(_oldFilters[index]),
               onTap: () {
                 query = _oldFilters[index];
 

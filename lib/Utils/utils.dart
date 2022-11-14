@@ -34,6 +34,7 @@ double percentageFromValueInRange({required final double min, max, value}) {
 }
 
 String dateTimeFormatter(String date) {
+  print(date);
   final f = DateFormat('yyyy.MM.dd');
   DateTime parsedDate = HttpDate.parse(date);
   return f.format(parsedDate);

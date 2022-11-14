@@ -21,23 +21,33 @@ class CourseLesson {
 
 class Lesson {
   String? banner;
-  String? expiry;
+  bool? expiry;
   int? id;
   int? isBought;
   String? name;
   int? allTask;
   int? done;
+  bool? opened;
 
-  Lesson({this.banner, this.expiry, this.id, this.isBought, this.name});
+  Lesson(
+      {this.banner,
+      this.expiry,
+      this.id,
+      this.isBought,
+      this.name,
+      this.opened,
+      this.allTask,
+      this.done});
 
   Lesson.fromJson(Map<String, dynamic> json) {
     banner = json['banner'] ?? "";
-    expiry = json['expiry'] ?? "";
+    expiry = json['expiry'] ?? false;
     id = json['id'] ?? 0;
     isBought = json['is_bought'] ?? 0;
     name = json['name'] ?? "";
     allTask = json['all_task'] ?? "";
     done = json['done'] ?? "";
+    opened = json['opened'] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -49,6 +59,7 @@ class Lesson {
     data['name'] = name;
     data['all_task'] = allTask;
     data['done'] = done;
+    data['opened'] = opened;
     return data;
   }
 }

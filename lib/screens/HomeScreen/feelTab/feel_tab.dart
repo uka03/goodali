@@ -33,19 +33,20 @@ class _FeelTabbarState extends State<FeelTabbar>
               List<GetMoodList> moodList = snapshot.data[0];
               List<MoodMain> moodMain = snapshot.data[1];
               if (moodList.isNotEmpty) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 30.0, bottom: 20),
-                        child: Text("Мүүд",
-                            style: TextStyle(
-                                color: MyColors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold)),
-                      ),
-                      Row(
+                return Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(
+                          top: 30.0, bottom: 20, right: 20, left: 20),
+                      child: Text("Мүүд",
+                          style: TextStyle(
+                              color: MyColors.black,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20, left: 20),
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ClipRRect(
@@ -74,22 +75,23 @@ class _FeelTabbarState extends State<FeelTabbar>
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: moodList.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 15),
-                        itemBuilder: (BuildContext context, int index) {
-                          return MoodListItem(getMoodList: moodList[index]);
-                        },
-                      )
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 20),
+                    GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: moodList.length,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              childAspectRatio: 1 / 1.4,
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 15),
+                      itemBuilder: (BuildContext context, int index) {
+                        return MoodListItem(getMoodList: moodList[index]);
+                      },
+                    )
+                  ],
                 );
               } else {
                 return Container();

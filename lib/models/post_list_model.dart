@@ -11,6 +11,7 @@ class PostListModel {
   String? createdAt;
   String? nickName;
   bool? selfLike;
+  String? avatar;
 
   PostListModel(
       {this.title,
@@ -22,6 +23,7 @@ class PostListModel {
       this.tags,
       this.createdAt,
       this.nickName,
+      this.avatar,
       this.selfLike});
 
   PostListModel.fromJson(Map<String, dynamic> json) {
@@ -47,6 +49,7 @@ class PostListModel {
     createdAt = json['created_at'];
     nickName = json['nick_name'];
     selfLike = json['self_like'];
+    avatar = json['avatar'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -66,6 +69,7 @@ class PostListModel {
     data["created_at"] = createdAt;
     data["nick_name"] = nickName;
     data["self_like"] = selfLike;
+    data["avatar"] = avatar;
 
     return data;
   }

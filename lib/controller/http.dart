@@ -2,12 +2,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Http {
   late Dio _dio;
@@ -61,17 +58,12 @@ class Http {
         }
       }, onError: (e, handler) async {
         if (e.type == DioErrorType.connectTimeout) {
-          showTopSnackBar(
-              context,
-              const CustomTopSnackBar(
-                  type: 0,
-                  text: "Интернэт холболтоо шалгаад, дахин оролдоно уу "));
+          TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
+              .show(context);
         } else if (e.type == DioErrorType.receiveTimeout) {
           print("DIO RECEIVE TIME OUT");
-          showTopSnackBar(
-              context,
-              const CustomTopSnackBar(
-                  type: 0, text: "Сервертэй холбогдоход алдаа гарлаа."));
+          TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа")
+              .show(context);
         }
 
         if (e.response?.statusCode == 401) {

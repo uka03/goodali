@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Auth with ChangeNotifier {
   final LocalAuthentication localAuth = LocalAuthentication();
@@ -46,7 +44,8 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>> login(BuildContext context, dynamic data) async {
+  Future<Map<String, dynamic>> login(BuildContext context, dynamic data,
+      {bool? toRemind}) async {
     final preferences = await SharedPreferences.getInstance();
     try {
       final response = await Http()
@@ -59,6 +58,12 @@ class Auth with ChangeNotifier {
           preferences.setString("password", data['password']);
           preferences.setString("token", response.data['token']);
           preferences.setBool("has_training", response.data['has_traing']);
+
+          if (toRemind == true) {
+            _saveLoginInfo(toRemind ?? false);
+          } else {
+            preferences.remove("toRemind");
+          }
 
           String mapToStr = json.encode(response.data);
           checkTraining();
@@ -82,18 +87,29 @@ class Auth with ChangeNotifier {
     } on DioError catch (e) {
       print(e.type);
       if (e.type == DioErrorType.other) {
-        showTopSnackBar(
-            context,
-            const CustomTopSnackBar(
-                type: 0, text: "Интернет холболтоо шалгана уу."));
+        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
+            .show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
-        showTopSnackBar(
-            context,
-            const CustomTopSnackBar(
-                type: 0, text: "Сервертэй холбогдоход алдаа гарлаа"));
+        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа.")
+            .show(context);
       }
       return {};
     }
+  }
+
+  Future<void> _saveLoginInfo(bool toRemind) async {
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setBool("toRemind", toRemind);
+  }
+
+  Future<Map<String, dynamic>> getUserInfo() async {
+    String nickname = "";
+    final preferences = await SharedPreferences.getInstance();
+    bool isRemembered = preferences.getBool("toRemind") ?? false;
+    if (isRemembered == true) {
+      nickname = preferences.getString("email") ?? "";
+    }
+    return {"to_remind": isRemembered, "email": nickname};
   }
 
   Future<void> logOut(BuildContext context) async {

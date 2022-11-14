@@ -17,17 +17,14 @@ import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/download_controller.dart';
+import 'package:goodali/controller/download_state.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/models/task_info.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 
 import 'dart:developer' as developer;
-
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class PodcastItem extends StatefulWidget {
   final Products podcastItem;
@@ -48,7 +45,7 @@ class PodcastItem extends StatefulWidget {
 }
 
 class _PodcastItemState extends State<PodcastItem> {
-  HiveDownloadedPodcast downloadedPodcast = HiveDownloadedPodcast();
+  HiveDataStore downloadedPodcast = HiveDataStore();
   AudioPlayerController audioPlayerController = AudioPlayerController();
   DownloadController downloadController = DownloadController();
   AudioPlayer audioPlayer = AudioPlayer();
@@ -60,20 +57,59 @@ class _PodcastItemState extends State<PodcastItem> {
   var progressMax = Duration.zero;
   var savedDuration = 0;
   final ReceivePort _port = ReceivePort();
+  DownloadTaskStatus? downloadTaskStatus;
   int downloadProgress = 0;
-  DownloadTaskStatus downloadTaskStatus = DownloadTaskStatus.undefined;
 
   @override
   void initState() {
     if (widget.podcastItem.audio != "Audio failed to upload") {
       audioUrl = Urls.networkPath + (widget.podcastItem.audio ?? "");
     }
-
+    log(widget.podcastItem.isDownloaded.toString(), name: "downloaded");
     if (audioUrl != '') {
       getTotalDuration();
     }
 
-    _bindBackgroundIsolate();
+    final isSuccess = IsolateNameServer.registerPortWithName(
+      _port.sendPort,
+      'downloader_send_port',
+    );
+    if (!isSuccess) {
+      _unbindBackgroundIsolate();
+      return;
+    }
+    _port.listen((dynamic data) async {
+      var status = data[1] as DownloadTaskStatus;
+      var progress = data[2] as int;
+      setState(() {
+        downloadProgress = progress;
+        downloadTaskStatus = status;
+      });
+      downloadTaskIDNotifier.value = (data as List<dynamic>)[0] as String;
+
+      if (status == DownloadTaskStatus.undefined) {
+        downloadStatusNotifier.value = DownloadState.undefined;
+      } else if (status == DownloadTaskStatus.complete) {
+        downloadStatusNotifier.value = DownloadState.undefined;
+      } else if (status == DownloadTaskStatus.enqueued) {
+        downloadStatusNotifier.value = DownloadState.enqueued;
+      } else if (status == DownloadTaskStatus.running) {
+        downloadStatusNotifier.value = DownloadState.running;
+      } else if (status == DownloadTaskStatus.failed) {
+        TopSnackBar.errorFactory(
+                title: "Алдаа гарлаа", msg: "Дахин оролдоно уу")
+            .show(context);
+      }
+      downloadProgressNotifier.value = downloadProgress;
+
+      if (status == DownloadTaskStatus.complete) {
+        print("podcast nemegdlee");
+        setState(() {
+          widget.podcastItem.isDownloaded = true;
+        });
+        await widget.podcastItem.save();
+      }
+    });
 
     FlutterDownloader.registerCallback(downloadCallback, step: 1);
 
@@ -157,34 +193,16 @@ class _PodcastItemState extends State<PodcastItem> {
         ?.send([id, status, progress]);
   }
 
-  void _bindBackgroundIsolate() async {
-    final isSuccess = IsolateNameServer.registerPortWithName(
-      _port.sendPort,
-      'downloader_send_port',
-    );
-    if (!isSuccess) {
-      _unbindBackgroundIsolate();
-      _bindBackgroundIsolate();
-      return;
-    }
-    _port.listen((dynamic data) {
-      final taskId = (data as List<dynamic>)[0] as String;
-      final status = data[1] as DownloadTaskStatus;
-      final progress = data[2] as int;
-
-      print(
-        'Callback on UI isolate: '
-        'task ($taskId) is in status ($status) and process ($progress)',
-      );
-
-      setState(() {
-        downloadTaskStatus = status;
-        downloadProgress = progress;
-      });
-    });
-    if (downloadTaskStatus == DownloadTaskStatus.complete) {
-      print("podcast nemegdlee");
-      downloadedPodcast.addProduct(products: widget.podcastItem);
+  downloadButtonTapped() async {
+    hasGranted = await downloadController.checkPermission();
+    currentIndexNotifier.value = widget.index;
+    if (hasGranted) {
+      downloadController.download(Urls.networkPath + widget.podcastItem.audio!);
+    } else {
+      TopSnackBar.errorFactory(
+              title: "Алдаа гарлаа",
+              msg: "Grant storage permission to continue")
+          .show(context);
     }
   }
 
@@ -282,7 +300,49 @@ class _PodcastItemState extends State<PodcastItem> {
                           ],
                         ),
                   const Spacer(),
-                  downloadButton(),
+                  ValueListenableBuilder<DownloadState>(
+                      valueListenable: downloadStatusNotifier,
+                      builder: (context, value, child) {
+                        print(value);
+                        var progress = downloadProgressNotifier.value;
+                        if (value == DownloadState.undefined) {
+                          return IconButton(
+                            onPressed: () async {
+                              downloadButtonTapped();
+                            },
+                            icon: const Icon(IconlyLight.arrow_down,
+                                size: 20, color: MyColors.gray),
+                            splashRadius: 1,
+                          );
+                        } else if (value == DownloadState.running &&
+                            widget.index == currentIndexNotifier.value) {
+                          return Text(
+                            progress.toString() + "%",
+                            style:
+                                const TextStyle(color: MyColors.primaryColor),
+                          );
+                        } else if (value == DownloadState.complete ||
+                            widget.podcastItem.isDownloaded == true) {
+                          return IconButton(
+                            onPressed: () {},
+                            icon: const Icon(IconlyLight.arrow_down,
+                                size: 20, color: MyColors.primaryColor),
+                            splashRadius: 1,
+                          );
+                        } else if (value == DownloadState.enqueued) {
+                          return const CircularProgressIndicator(
+                              strokeWidth: 2, color: MyColors.primaryColor);
+                        } else {
+                          return IconButton(
+                            onPressed: () async {
+                              downloadButtonTapped();
+                            },
+                            icon: const Icon(IconlyLight.arrow_down,
+                                size: 20, color: MyColors.gray),
+                            splashRadius: 1,
+                          );
+                        }
+                      }),
                   IconButton(
                       splashRadius: 20,
                       onPressed: () {},
@@ -293,51 +353,5 @@ class _PodcastItemState extends State<PodcastItem> {
         const SizedBox(height: 12)
       ],
     );
-  }
-
-  Widget downloadButton() {
-    print(downloadTaskStatus);
-    if (downloadTaskStatus == DownloadTaskStatus.undefined) {
-      return IconButton(
-        onPressed: () async {
-          hasGranted = await downloadController.checkPermission();
-          if (hasGranted) {
-            downloadController
-                .download(Urls.networkPath + widget.podcastItem.audio!);
-          } else {
-            showTopSnackBar(
-                context,
-                const CustomTopSnackBar(
-                    type: 0, text: "Grant storage permission to continue"));
-          }
-        },
-        icon:
-            const Icon(IconlyLight.arrow_down, size: 20, color: MyColors.gray),
-        splashRadius: 1,
-      );
-    } else if (downloadTaskStatus == DownloadTaskStatus.running) {
-      return Row(
-        children: [
-          Text(downloadProgress.toString() + "%"),
-          IconButton(
-            onPressed: () {},
-            constraints: const BoxConstraints(minHeight: 32, minWidth: 32),
-            icon: const Icon(Icons.pause, color: Colors.yellow),
-            tooltip: 'Pause',
-          ),
-        ],
-      );
-    } else if (downloadTaskStatus == DownloadTaskStatus.complete) {
-      return IconButton(
-        onPressed: () {},
-        icon: const Icon(IconlyLight.arrow_down,
-            size: 20, color: MyColors.primaryColor),
-        splashRadius: 1,
-      );
-    } else if (downloadTaskStatus == DownloadTaskStatus.enqueued) {
-      return CircularPercentIndicator(radius: 16);
-    } else {
-      return Container();
-    }
   }
 }

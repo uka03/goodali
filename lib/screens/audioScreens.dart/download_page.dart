@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/models/podcast_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';

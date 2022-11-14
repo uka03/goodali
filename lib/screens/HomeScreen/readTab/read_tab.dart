@@ -6,7 +6,6 @@ import 'package:goodali/screens/HomeScreen/readTab/article_detail.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/HomeScreen/readTab/online_book.dart';
 import 'package:goodali/screens/ListItems/article_item.dart';
-import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_bought_courses.dart';
 import 'package:iconly/iconly.dart';
 
 class ReadTabbar extends StatefulWidget {
@@ -58,14 +57,14 @@ class _ReadTabbarState extends State<ReadTabbar>
                                 color: MyColors.black,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold)),
-                        IconButton(
-                            onPressed: () {
+                        GestureDetector(
+                            onTap: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (_) => const ArticleScreen()));
                             },
-                            icon: const Icon(IconlyLight.arrow_right))
+                            child: const Icon(IconlyLight.arrow_right))
                       ],
                     )),
                 article(context, articleList)

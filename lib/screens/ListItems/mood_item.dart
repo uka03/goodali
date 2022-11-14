@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/models/get_mood_list.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/mood_detail.dart';
 
@@ -15,31 +16,25 @@ class MoodListItem extends StatelessWidget {
           MaterialPageRoute(
               builder: (context) =>
                   MoodDetail(moodListId: getMoodList!.id.toString()))),
-      child: Container(
-        height: 80,
-        width: 80,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  getRandomColors(),
-                  getRandomColors().withOpacity(0.5),
-                ]),
-            borderRadius: BorderRadius.circular(60)),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.zero,
-            child: Text(
-              getMoodList?.title ?? "",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                // fontSize: 12,
-                color: Colors.white,
-              ),
+      child: Column(
+        children: [
+          ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: ImageView(
+                imgPath: getMoodList!.banner!,
+                width: MediaQuery.of(context).size.width / 3 - 30,
+                height: MediaQuery.of(context).size.width / 3 - 30,
+              )),
+          const SizedBox(height: 10),
+          Text(
+            getMoodList?.title ?? "",
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: MyColors.black,
             ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
@@ -12,7 +13,6 @@ import 'package:goodali/screens/ListItems/reply_item.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class PostDetail extends StatefulWidget {
   final PostListModel postItem;
@@ -56,20 +56,27 @@ class _PostDetailState extends State<PostDetail> {
       body: SingleChildScrollView(
         child: Column(children: [
           PostItem(postItem: widget.postItem, isHearted: widget.isHearted),
-          Container(
-            margin: const EdgeInsets.all(18),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-              color: MyColors.input,
-            ),
-            child: Row(
-              children: [
-                const Icon(IconlyLight.edit),
-                const SizedBox(width: 14),
-                SizedBox(
-                  width: 200,
+          Row(
+            children: [
+              const SizedBox(width: 20),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: ImageView(
+                    imgPath: widget.postItem.avatar ?? "",
+                    height: 32,
+                    width: 32),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    color: MyColors.input,
+                  ),
                   child: TextField(
+                    readOnly: true,
                     onTap: () {
                       bool isAuth =
                           Provider.of<Auth>(context, listen: false).isAuth;
@@ -95,14 +102,27 @@ class _PostDetailState extends State<PostDetail> {
                         border: InputBorder.none, hintText: "Сэтгэгдэл бичих"),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+          const SizedBox(height: 30),
           const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
           comments.isEmpty
-              ? Center(
-                  child: SvgPicture.asset("assets/images/no_chat_history.svg",
-                      semanticsLabel: 'Acme Logo'),
+              ? Column(
+                  children: [
+                    const SizedBox(height: 60),
+                    Center(
+                      child: SvgPicture.asset(
+                          "assets/images/no_chat_history.svg",
+                          semanticsLabel: 'Acme Logo'),
+                    ),
+                    const SizedBox(height: 15),
+                    const Text(
+                      "Сэтгэгдэл байхгүй байна",
+                      style: TextStyle(color: MyColors.gray),
+                    ),
+                    const SizedBox(height: 40),
+                  ],
                 )
               : ListView.builder(
                   itemCount: comments.length,
@@ -151,13 +171,11 @@ class _PostDetailState extends State<PostDetail> {
                         color: MyColors.primaryColor),
                     onPressed: () {
                       if (_commentController.text.length < 30) {
-                        showTopSnackBar(
-                            context,
-                            const CustomTopSnackBar(
-                              type: 0,
-                              text:
-                                  "Таны сэтгэгдэл хамгийн багадаа 30 тэмдэгт ашигласан байх шаардлагатай.",
-                            ));
+                        TopSnackBar.errorFactory(
+                                title: "Анхаарна уу",
+                                msg:
+                                    "Таны сэтгэгдэл хамгийн багадаа 30 тэмдэгт ашигласан байх шаардлагатай.")
+                            .show(context);
                       } else {
                         writeComment();
                         Navigator.pop(context);
@@ -193,12 +211,11 @@ class _PostDetailState extends State<PostDetail> {
     bool isCommented = await Connection.insertPostReply(context, commentData);
 
     if (isCommented) {
-      showTopSnackBar(context,
-          const CustomTopSnackBar(type: 1, text: "Сэтгэгдэл илгээгдлээ"));
+      TopSnackBar.successFactory(title: "Сэтгэгдэл илгээгдлээ").show(context);
       widget.onRefresh();
     } else {
-      showTopSnackBar(
-          context, const CustomTopSnackBar(type: 0, text: "Дахин оролдоно уу"));
+      TopSnackBar.errorFactory(title: "Алдаа гарлаа", msg: "Дахин оролдоно уу")
+          .show(context);
     }
     return isCommented;
   }

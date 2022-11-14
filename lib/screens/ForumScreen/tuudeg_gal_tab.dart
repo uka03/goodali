@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
@@ -135,7 +133,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                           padding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 24),
                           elevation: 0,
-                          primary: MyColors.primaryColor)),
+                          backgroundColor: MyColors.primaryColor)),
                 ],
               ));
             } else {

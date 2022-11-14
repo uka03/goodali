@@ -136,7 +136,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(height: 12),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
