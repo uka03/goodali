@@ -29,6 +29,7 @@ class _EditProfileState extends State<EditProfile> {
   XFile? image;
   XFile? camerPhoto;
   File? fileImage;
+  Map<String, dynamic> map = {};
 
   bool isChanged = false;
   bool isImageChanged = false;
@@ -45,7 +46,7 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(noCard: true),
+      appBar: SimpleAppBar(noCard: true, data: map),
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height - 100,
@@ -292,7 +293,9 @@ class _EditProfileState extends State<EditProfile> {
     var data = await Connection.editUserData(context, nicknameController.text);
     Navigator.pop(context);
     if (data['success'] == true) {
-      Map<String, dynamic> map = {"name": data["name"], "avatar": avatar};
+      setState(() {
+        map = {"name": data["name"], "avatar": avatar};
+      });
       print(map["avatar"]);
       Navigator.pop(context, map);
       TopSnackBar.successFactory(title: "Амжилттай солигдлоо").show(context);
