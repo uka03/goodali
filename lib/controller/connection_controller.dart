@@ -286,9 +286,7 @@ class Connection {
           .post(Urls.uploadUserAvatar, data: data);
       print("upload user avatar ${response.data}");
       if (response.data['status'] == 1) {
-        return {
-          'success': true,
-        };
+        return {'success': true, 'avatar': response.data["resp"]};
       } else {
         return {'success': false};
       }

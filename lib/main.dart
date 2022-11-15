@@ -10,6 +10,8 @@ import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
+import 'package:goodali/controller/download_controller.dart';
+import 'package:goodali/controller/download_state.dart';
 import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/Auth/enable_biometric.dart';
@@ -95,6 +97,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             create: (_) => AudioDownloadProvider()),
         ChangeNotifierProvider<ForumTagNotifier>(
             create: (_) => ForumTagNotifier()),
+        ChangeNotifierProvider<DownloadController>(
+          lazy: false,
+          create: (_) => DownloadController(),
+        )
       ],
       child: Consumer<Auth>(
         builder: (context, value, child) {

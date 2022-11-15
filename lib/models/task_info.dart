@@ -1,12 +1,18 @@
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:goodali/models/products_model.dart';
 
 class TaskInfo {
-  TaskInfo({this.name, this.link});
+  final String? taskId;
+  final Products? products;
+  int? progress;
+  DownloadTaskStatus? status;
 
-  final String? name;
-  final String? link;
+  TaskInfo(this.products, this.taskId,
+      {this.progress = 0, this.status = DownloadTaskStatus.undefined});
 
-  String? taskId;
-  int? progress = 0;
-  DownloadTaskStatus? status = DownloadTaskStatus.undefined;
+  TaskInfo copyWith(
+      {String? taskId, int? progress, DownloadTaskStatus? status}) {
+    return TaskInfo(products, taskId ?? this.taskId,
+        progress: progress ?? this.progress, status: status ?? this.status);
+  }
 }

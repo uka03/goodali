@@ -97,7 +97,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
                                   child: ImageView(
-                                    imgPath: userInfo.avatarPath ?? "",
+                                    imgPath: avatarPath != null
+                                        ? avatarPath!
+                                        : userInfo.avatarPath ?? "",
                                     width: 70,
                                     height: 70,
                                   )),

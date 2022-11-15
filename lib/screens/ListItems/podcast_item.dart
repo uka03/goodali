@@ -1,10 +1,7 @@
 import 'dart:developer';
-import 'dart:isolate';
-import 'dart:ui';
 
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -12,6 +9,7 @@ import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/audio_progressbar.dart';
 import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
+import 'package:goodali/Widgets/download_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -47,7 +45,7 @@ class PodcastItem extends StatefulWidget {
 class _PodcastItemState extends State<PodcastItem> {
   HiveDataStore downloadedPodcast = HiveDataStore();
   AudioPlayerController audioPlayerController = AudioPlayerController();
-  DownloadController downloadController = DownloadController();
+
   AudioPlayer audioPlayer = AudioPlayer();
   String audioUrl = '';
   Duration duration = Duration.zero;
@@ -120,19 +118,6 @@ class _PodcastItemState extends State<PodcastItem> {
     widget.podcastItem.duration = (duration * 1000).toInt();
     await widget.podcastItem.save();
     return Duration(milliseconds: (duration * 1000).toInt());
-  }
-
-  _downloadButtonTapped(TargetPlatform platform) async {
-    hasGranted = await downloadController.checkPermission();
-    currentIndexNotifier.value = widget.index;
-    if (hasGranted) {
-      downloadController.download(Urls.networkPath + widget.podcastItem.audio!);
-    } else {
-      TopSnackBar.errorFactory(
-              title: "Алдаа гарлаа",
-              msg: "Grant storage permission to continue")
-          .show(context);
-    }
   }
 
   @override
@@ -231,51 +216,7 @@ class _PodcastItemState extends State<PodcastItem> {
                           ],
                         ),
                   const Spacer(),
-                  ValueListenableBuilder<DownloadState>(
-                      valueListenable: downloadStatusNotifier,
-                      builder: (context, value, child) {
-                        if (value == DownloadState.complete) {
-                          print("podcast nemegdlee");
-                          widget.podcastItem.isDownloaded = true;
-                          widget.podcastItem.save();
-                        }
-                        var progress = downloadProgressNotifier.value;
-                        print(progress);
-                        print(value);
-                        if (value == DownloadState.undefined) {
-                          return IconButton(
-                            onPressed: () => _downloadButtonTapped(platform),
-                            icon: const Icon(IconlyLight.arrow_down,
-                                size: 20, color: MyColors.gray),
-                            splashRadius: 1,
-                          );
-                        } else if (value == DownloadState.running &&
-                            widget.index == currentIndexNotifier.value) {
-                          return Text(
-                            progress.toString() + "%",
-                            style:
-                                const TextStyle(color: MyColors.primaryColor),
-                          );
-                        } else if (value == DownloadState.complete ||
-                            widget.podcastItem.isDownloaded == true) {
-                          return IconButton(
-                            onPressed: () {},
-                            icon: const Icon(IconlyLight.arrow_down,
-                                size: 20, color: MyColors.primaryColor),
-                            splashRadius: 1,
-                          );
-                        } else if (value == DownloadState.enqueued) {
-                          return const CircularProgressIndicator(
-                              strokeWidth: 2, color: MyColors.primaryColor);
-                        } else {
-                          return IconButton(
-                            onPressed: () => _downloadButtonTapped(platform),
-                            icon: const Icon(IconlyLight.arrow_down,
-                                size: 20, color: MyColors.gray),
-                            splashRadius: 1,
-                          );
-                        }
-                      }),
+                  DownloadButton(products: widget.podcastItem),
                   IconButton(
                       splashRadius: 20,
                       onPressed: () {},

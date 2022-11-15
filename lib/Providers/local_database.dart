@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:developer' as developer;
 
 import 'package:goodali/models/products_model.dart';
 import 'package:hive/hive.dart';
@@ -22,8 +22,35 @@ class HiveDataStore {
   }
 
   /// show user list
-  Future<void> getProducts({required String id}) async {
-    box.get(id);
+  Future<Products?> getProducts({required Products id}) async {
+    return box.get(id);
+  }
+
+  Future<Products> getProductsFromUrl({required String url}) async {
+    Products products = Products();
+    var datas = box.values;
+    for (var element in datas) {
+      if (element.audio == url) {
+        products = element;
+      }
+    }
+    return products;
+  }
+
+  Future<bool> isDownloaded({required String title}) async {
+    Products? products;
+    for (var element in box.values) {
+      if (element.title == title) {
+        products = element;
+      }
+    }
+
+    developer.log(products!.title!, name: "downloaded podcast");
+    if (products.isDownloaded == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /// update user data
@@ -122,7 +149,7 @@ class HiveMoodDataStore {
     for (var i = 0; i < box.length; i++) {
       list.add(box.get(i)!);
     }
-    log(list.length.toString(), name: "name");
+    developer.log(list.length.toString(), name: "name");
     return list;
   }
 

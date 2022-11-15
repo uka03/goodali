@@ -154,10 +154,7 @@ class _EditProfileState extends State<EditProfile> {
                   onPress: isChanged
                       ? () {
                           Utils.showLoaderDialog(context);
-                          editUserData();
-                          if (fileImage != null) {
-                            uploadImage(fileImage!);
-                          }
+                          editUserData(fileImage);
                         }
                       : null),
               const SizedBox(height: 30),
@@ -275,26 +272,28 @@ class _EditProfileState extends State<EditProfile> {
         });
   }
 
-  uploadImage(File imageFile) async {
+  Future<String> uploadImage(File imageFile) async {
     var stream = await Connection.uploadUserAvatar(context, imageFile);
 
     if (stream["success"]) {
-      if (!mounted) return;
       TopSnackBar.successFactory(title: "Амжилттай солигдлоо").show(context);
     } else {
-      if (!mounted) return;
       TopSnackBar.errorFactory(msg: "Дахин оролдоно уу").show(context);
     }
+
+    return stream["avatar"];
   }
 
-  editUserData() async {
+  editUserData(File? imageFile) async {
+    String avatar = "";
+    if (fileImage != null) {
+      avatar = await uploadImage(fileImage!);
+    }
     var data = await Connection.editUserData(context, nicknameController.text);
     Navigator.pop(context);
     if (data['success'] == true) {
-      Map<String, dynamic> map = {
-        "name": data["name"],
-        "avatar": data['avatar']
-      };
+      Map<String, dynamic> map = {"name": data["name"], "avatar": avatar};
+      print(map["avatar"]);
       Navigator.pop(context, map);
       TopSnackBar.successFactory(title: "Амжилттай солигдлоо").show(context);
     } else {
