@@ -69,6 +69,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                                     postItem: filteredList.isNotEmpty
                                         ? filteredList[index]
                                         : postList[index],
+                                    onRefresh: getPostList,
                                     isHearted: isHearted[index]),
                               );
                             },

@@ -20,6 +20,7 @@ class DownloadController {
     await FlutterDownloader.enqueue(
         url: url,
         savedDir: _localPath,
+        fileName: url,
         showNotification: true,
         openFileFromNotification: false);
   }

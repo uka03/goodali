@@ -64,6 +64,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                                         postItem: postList[index],
                                         isHearted: isHearted[index]))),
                             child: PostItem(
+                                onRefresh: getPostList,
                                 postItem: filteredList.isNotEmpty
                                     ? filteredList[index]
                                     : postList[index],

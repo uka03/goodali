@@ -94,7 +94,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
       if (widget.products.duration == null || widget.products.duration == 0) {
         _totalduration = await getFileDuration(url);
       } else {
-        developer.log(widget.products.isBought.toString(), name: "is Bought");
         _totalduration = Duration(milliseconds: widget.products.duration!);
       }
 

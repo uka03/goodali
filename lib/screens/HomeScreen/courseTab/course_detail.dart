@@ -38,6 +38,7 @@ class _CourseDetailState extends State<CourseDetail> {
                         ImageView(
                           imgPath: widget.courseProducts?.banner ?? "",
                           height: 200,
+                          width: double.infinity,
                         ),
                         Padding(
                             padding:
@@ -61,6 +62,7 @@ class _CourseDetailState extends State<CourseDetail> {
                                     textStyle: const TextStyle(
                                         fontSize: 14,
                                         height: 1.8,
+                                        fontFamily: "Gilroy",
                                         color: MyColors.gray)),
                                 const SizedBox(height: 30),
                               ],
@@ -84,7 +86,7 @@ class _CourseDetailState extends State<CourseDetail> {
                     },
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
               ],
             ),
     );

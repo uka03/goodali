@@ -11,11 +11,13 @@ class PostItem extends StatefulWidget {
   final PostListModel postItem;
   final bool isHearted;
   final bool? isMySpecial;
+  final VoidCallback? onRefresh;
   const PostItem(
       {Key? key,
       required this.postItem,
       required this.isHearted,
-      this.isMySpecial = false})
+      this.isMySpecial = false,
+      this.onRefresh})
       : super(key: key);
 
   @override
@@ -124,17 +126,15 @@ class _PostItemState extends State<PostItem> {
                       children: [
                         GestureDetector(
                           onTap: () {
+                            setState(() {
+                              isLiked = !isLiked;
+                            });
                             if (!widget.postItem.selfLike!) {
-                              setState(() {
-                                isLiked = true;
-                                likeCount++;
-                              });
+                              likeCount = likeCount + 1;
                               insertLike(widget.postItem.id ?? 0);
-                            } else if (widget.postItem.selfLike!) {
-                              setState(() {
-                                isLiked = false;
-                                likeCount--;
-                              });
+                            } else if (widget.postItem.selfLike! || isLiked) {
+                              likeCount = likeCount - 1;
+
                               postDislike(widget.postItem.id ?? 0);
                             }
                           },
@@ -175,6 +175,9 @@ class _PostItemState extends State<PostItem> {
 
   insertLike(int id) async {
     bool unliked = await Connection.insertPostLiske(context, {"post_id": id});
+    setState(() {
+      widget.onRefresh!();
+    });
   }
 
   postDislike(int id) async {
@@ -182,6 +185,7 @@ class _PostItemState extends State<PostItem> {
     if (liked) {
       setState(() {
         isLiked = false;
+        widget.onRefresh!();
       });
     }
   }

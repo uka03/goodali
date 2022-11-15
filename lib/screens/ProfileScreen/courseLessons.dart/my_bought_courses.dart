@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
@@ -8,6 +9,7 @@ import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:goodali/screens/ListItems/course_products_item.dart';
+import 'package:hive_flutter/adapters.dart';
 
 typedef OnTap = Function(Products products);
 
@@ -20,8 +22,11 @@ class MyCourses extends StatefulWidget {
 }
 
 class _MyCoursesState extends State<MyCourses> {
+  final HiveProfileBoughtLecture dataStore = HiveProfileBoughtLecture();
   AudioPlayerController audioPlayerController = AudioPlayerController();
   List<Products> allLectures = [];
+  List<Products> allListProducts = [];
+  List<Products> myCourses = [];
   List<MediaItem> mediaItems = [];
   String albumName = "";
   int currentIndex = 0;
@@ -44,7 +49,9 @@ class _MyCoursesState extends State<MyCourses> {
       currentlyPlaying.value = allLectures[index];
     } else if (activeList.first.title != allLectures.first.title ||
         activeList.first.id != allLectures.first.id) {
+      print("iisheee orj irj  bnu");
       activeList = allLectures;
+
       await initiliazePodcast();
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
@@ -58,12 +65,11 @@ class _MyCoursesState extends State<MyCourses> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.wait([getAllLectures(), getBoughtCourses()]),
+      future: getBoughtCourses(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
-          allLectures = snapshot.data[0];
-          List<Products> myCourses = snapshot.data[1];
-          List<Products> allListProducts = [...allLectures, ...myCourses];
+          myCourses = snapshot.data;
+          allListProducts = [...allLectures, ...myCourses];
 
           if (allListProducts.isEmpty) {
             return Column(
@@ -86,7 +92,7 @@ class _MyCoursesState extends State<MyCourses> {
                   children: [
                     const SizedBox(height: 10),
                     onlineCourses(myCourses),
-                    allLecturesWidget(allLectures),
+                    allLecturesWidget(),
                   ],
                 ),
               ),
@@ -100,51 +106,63 @@ class _MyCoursesState extends State<MyCourses> {
     );
   }
 
-  Widget allLecturesWidget(List<Products> allLectures) {
-    if (allLectures.isEmpty) {
-      return Container();
-    } else {
-      return ListView.separated(
-          itemCount: allLectures.length,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          separatorBuilder: (BuildContext context, int index) =>
-              const Divider(),
-          itemBuilder: (context, index) {
-            String empty = "";
-            if (albumName == allLectures[index].albumTitle) {
-              empty = "";
-            } else {
-              empty = albumName;
-            }
-            if (albumName != allLectures[index].albumTitle) {
-              albumName = allLectures[index].albumTitle ?? "";
-              empty = albumName;
-            }
+  Widget allLecturesWidget() {
+    return ValueListenableBuilder(
+      valueListenable: HiveProfileBoughtLecture.box.listenable(),
+      builder: (context, Box box, child) {
+        List<Products> allboughtLectures = [];
+        if (box.isNotEmpty) {
+          for (var i = 0; i < box.length; i++) {
+            Products products = box.getAt(i);
+            allboughtLectures.add(products);
+          }
+          allLectures = allboughtLectures;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (empty != "") const SizedBox(height: 30),
-                Text(empty,
-                    style: const TextStyle(
-                        color: MyColors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold)),
-                if (empty != "") const SizedBox(height: 20),
-                AlbumDetailItem(
-                    index: index,
-                    isBought: true,
-                    products: allLectures[index],
-                    albumName: albumName,
-                    productsList: allLectures,
-                    onTap: () {
-                      onPlayButtonClicked(index);
-                    }),
-              ],
-            );
-          });
-    }
+          return ListView.separated(
+              itemCount: allLectures.length,
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(),
+              itemBuilder: (context, index) {
+                String empty = "";
+                if (albumName == allLectures[index].albumTitle) {
+                  empty = "";
+                } else {
+                  empty = albumName;
+                }
+                if (albumName != allLectures[index].albumTitle) {
+                  albumName = allLectures[index].albumTitle ?? "";
+                  empty = albumName;
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (empty != "") const SizedBox(height: 30),
+                    Text(empty,
+                        style: const TextStyle(
+                            color: MyColors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
+                    if (empty != "") const SizedBox(height: 20),
+                    AlbumDetailItem(
+                        index: index,
+                        isBought: true,
+                        products: allLectures[index],
+                        albumName: albumName,
+                        productsList: allLectures,
+                        onTap: () {
+                          onPlayButtonClicked(index);
+                        }),
+                  ],
+                );
+              });
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 
   Widget onlineCourses(List<Products> myCourses) {
@@ -176,10 +194,13 @@ class _MyCoursesState extends State<MyCourses> {
     }
   }
 
-  Future<List<Products>> getAllLectures() async {
-    allLectures = await Connection.getAllLectures(context);
-    // _initiliazeLecture(allLectures);
-    return allLectures;
+  Future<void> getAllLectures() async {
+    var data = await Connection.getAllLectures(context);
+
+    for (var item in data) {
+      item.title = item.lectureTitle;
+      await dataStore.addProduct(products: item);
+    }
   }
 
   Future<List<Products>> getBoughtCourses() async {

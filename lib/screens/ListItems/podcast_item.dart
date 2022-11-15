@@ -56,9 +56,6 @@ class _PodcastItemState extends State<PodcastItem> {
   var _totalduration = Duration.zero;
   var progressMax = Duration.zero;
   var savedDuration = 0;
-  final ReceivePort _port = ReceivePort();
-  DownloadTaskStatus? downloadTaskStatus;
-  int downloadProgress = 0;
 
   @override
   void initState() {
@@ -69,49 +66,6 @@ class _PodcastItemState extends State<PodcastItem> {
     if (audioUrl != '') {
       getTotalDuration();
     }
-
-    final isSuccess = IsolateNameServer.registerPortWithName(
-      _port.sendPort,
-      'downloader_send_port',
-    );
-    if (!isSuccess) {
-      _unbindBackgroundIsolate();
-      return;
-    }
-    _port.listen((dynamic data) async {
-      var status = data[1] as DownloadTaskStatus;
-      var progress = data[2] as int;
-      setState(() {
-        downloadProgress = progress;
-        downloadTaskStatus = status;
-      });
-      downloadTaskIDNotifier.value = (data as List<dynamic>)[0] as String;
-
-      if (status == DownloadTaskStatus.undefined) {
-        downloadStatusNotifier.value = DownloadState.undefined;
-      } else if (status == DownloadTaskStatus.complete) {
-        downloadStatusNotifier.value = DownloadState.undefined;
-      } else if (status == DownloadTaskStatus.enqueued) {
-        downloadStatusNotifier.value = DownloadState.enqueued;
-      } else if (status == DownloadTaskStatus.running) {
-        downloadStatusNotifier.value = DownloadState.running;
-      } else if (status == DownloadTaskStatus.failed) {
-        TopSnackBar.errorFactory(
-                title: "Алдаа гарлаа", msg: "Дахин оролдоно уу")
-            .show(context);
-      }
-      downloadProgressNotifier.value = downloadProgress;
-
-      if (status == DownloadTaskStatus.complete) {
-        print("podcast nemegdlee");
-        setState(() {
-          widget.podcastItem.isDownloaded = true;
-        });
-        await widget.podcastItem.save();
-      }
-    });
-
-    FlutterDownloader.registerCallback(downloadCallback, step: 1);
 
     super.initState();
   }
@@ -168,32 +122,7 @@ class _PodcastItemState extends State<PodcastItem> {
     return Duration(milliseconds: (duration * 1000).toInt());
   }
 
-  @override
-  void dispose() {
-    _unbindBackgroundIsolate();
-    super.dispose();
-  }
-
-  void _unbindBackgroundIsolate() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-  }
-
-  @pragma('vm:entry-point')
-  static void downloadCallback(
-    String id,
-    DownloadTaskStatus status,
-    int progress,
-  ) {
-    print(
-      'Callback on background isolate: '
-      'task ($id) is in status ($status) and process ($progress)',
-    );
-
-    IsolateNameServer.lookupPortByName('downloader_send_port')
-        ?.send([id, status, progress]);
-  }
-
-  downloadButtonTapped() async {
+  _downloadButtonTapped(TargetPlatform platform) async {
     hasGranted = await downloadController.checkPermission();
     currentIndexNotifier.value = widget.index;
     if (hasGranted) {
@@ -208,6 +137,8 @@ class _PodcastItemState extends State<PodcastItem> {
 
   @override
   Widget build(BuildContext context) {
+    final platform = Theme.of(context).platform;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -303,13 +234,17 @@ class _PodcastItemState extends State<PodcastItem> {
                   ValueListenableBuilder<DownloadState>(
                       valueListenable: downloadStatusNotifier,
                       builder: (context, value, child) {
-                        print(value);
+                        if (value == DownloadState.complete) {
+                          print("podcast nemegdlee");
+                          widget.podcastItem.isDownloaded = true;
+                          widget.podcastItem.save();
+                        }
                         var progress = downloadProgressNotifier.value;
+                        print(progress);
+                        print(value);
                         if (value == DownloadState.undefined) {
                           return IconButton(
-                            onPressed: () async {
-                              downloadButtonTapped();
-                            },
+                            onPressed: () => _downloadButtonTapped(platform),
                             icon: const Icon(IconlyLight.arrow_down,
                                 size: 20, color: MyColors.gray),
                             splashRadius: 1,
@@ -334,9 +269,7 @@ class _PodcastItemState extends State<PodcastItem> {
                               strokeWidth: 2, color: MyColors.primaryColor);
                         } else {
                           return IconButton(
-                            onPressed: () async {
-                              downloadButtonTapped();
-                            },
+                            onPressed: () => _downloadButtonTapped(platform),
                             icon: const Icon(IconlyLight.arrow_down,
                                 size: 20, color: MyColors.gray),
                             splashRadius: 1,

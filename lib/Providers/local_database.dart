@@ -137,3 +137,43 @@ class HiveMoodDataStore {
     await box.deleteAt(index);
   }
 }
+
+class HiveProfileBoughtLecture {
+  static const boxName = "profile_bought_podcasts";
+
+  // Get reference to an already opened box
+  static Box<Products> box = Hive.box<Products>(boxName);
+
+  /// Add new user
+  Future<void> addProduct({required Products products}) async {
+    var datas = box.values
+        .where((c) =>
+            c.lectureTitle == products.lectureTitle && c.id == products.id)
+        .toList();
+
+    if (datas.isEmpty) {
+      await box.add(products);
+    } else {
+      var item = box.get(datas.first.key);
+      item!.audio = products.audio;
+      item.title = products.lectureTitle;
+      await item.save();
+    }
+  }
+
+  /// show user list
+  Future<void> getProducts({required String id}) async {
+    box.get(id);
+  }
+
+  /// update user data
+  Future<void> updateProducts(
+      {required int index, required Products userModel}) async {
+    await box.putAt(index, userModel);
+  }
+
+  /// delete user
+  Future<void> deleteProducts({required int index}) async {
+    await box.deleteAt(index);
+  }
+}

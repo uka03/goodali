@@ -33,7 +33,7 @@ Future<void> main() async {
   await Hive.openBox<Products>("podcasts");
   await Hive.openBox<Products>("bought_podcasts");
   await Hive.openBox<Products>("mood_podcasts");
-
+  await Hive.openBox<Products>("profile_bought_podcasts");
   runApp(const MyApp());
 }
 

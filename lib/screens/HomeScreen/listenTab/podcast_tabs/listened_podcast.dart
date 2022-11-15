@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/local_database.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/podcast_item.dart';
@@ -50,6 +52,28 @@ class _ListenedPodcastState extends State<ListenedPodcast>
                     index: index,
                     podcastList: data,
                     podcastItem: data[index],
+                    onTap: () async {
+                      if (activeList.first.title == data.first.title &&
+                          activeList.first.id == data.first.id) {
+                        await audioHandler.skipToQueueItem(index);
+                        await audioHandler.seek(
+                          Duration(milliseconds: data[index].position!),
+                        );
+                        await audioHandler.play();
+                        currentlyPlaying.value = data[index];
+                      } else if (activeList.first.title != data.first.title ||
+                          activeList.first.id != data.first.id) {
+                        activeList = data;
+
+                        await initiliazePodcast();
+                        await audioHandler.skipToQueueItem(index);
+                        await audioHandler.seek(
+                          Duration(milliseconds: data[index].position!),
+                        );
+                        await audioHandler.play();
+                      }
+                      currentlyPlaying.value = data[index];
+                    },
                   ),
                 );
               });

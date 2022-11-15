@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/image_view.dart';
@@ -55,7 +56,11 @@ class _PostDetailState extends State<PostDetail> {
       ),
       body: SingleChildScrollView(
         child: Column(children: [
-          PostItem(postItem: widget.postItem, isHearted: widget.isHearted),
+          PostItem(
+            postItem: widget.postItem,
+            isHearted: widget.isHearted,
+            onRefresh: widget.onRefresh,
+          ),
           Row(
             children: [
               const SizedBox(width: 20),

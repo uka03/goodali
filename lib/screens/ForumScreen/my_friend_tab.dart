@@ -59,6 +59,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
                                             isHearted: isHearted[index]))),
                                 child: PostItem(
                                     isMySpecial: true,
+                                    onRefresh: getPostList,
                                     postItem: filteredList.isNotEmpty
                                         ? filteredList[index]
                                         : postList[index],

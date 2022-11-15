@@ -1,8 +1,15 @@
+import 'dart:isolate';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:goodali/Utils/circle_tab_indicator.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
+import 'package:goodali/controller/download_controller.dart';
+import 'package:goodali/controller/download_state.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/downloaded_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
@@ -23,10 +30,78 @@ class Podcast extends StatefulWidget {
 
 class _PodcastState extends State<Podcast> {
   final HiveDataStore dataStore = HiveDataStore();
+  final ReceivePort _port = ReceivePort();
+  DownloadTaskStatus? downloadTaskStatus;
+  int downloadProgress = 0;
 
   @override
   void initState() {
+    _bindBackgroundIsolate();
+
+    FlutterDownloader.registerCallback(downloadCallback, step: 1);
     super.initState();
+  }
+
+  void _bindBackgroundIsolate() {
+    final isSuccess = IsolateNameServer.registerPortWithName(
+      _port.sendPort,
+      'downloader_send_port',
+    );
+    if (!isSuccess) {
+      _unbindBackgroundIsolate();
+      _bindBackgroundIsolate();
+      return;
+    }
+    _port.listen((dynamic data) async {
+      var status = data[1] as DownloadTaskStatus;
+      var progress = data[2] as int;
+      setState(() {
+        downloadProgress = progress;
+        downloadTaskStatus = status;
+      });
+      downloadTaskIDNotifier.value = (data as List<dynamic>)[0] as String;
+
+      if (status == DownloadTaskStatus.undefined) {
+        downloadStatusNotifier.value = DownloadState.undefined;
+      } else if (status == DownloadTaskStatus.complete) {
+        downloadStatusNotifier.value = DownloadState.undefined;
+      } else if (status == DownloadTaskStatus.enqueued) {
+        downloadStatusNotifier.value = DownloadState.enqueued;
+      } else if (status == DownloadTaskStatus.running) {
+        downloadStatusNotifier.value = DownloadState.running;
+      } else if (status == DownloadTaskStatus.failed) {
+        TopSnackBar.errorFactory(
+                title: "Алдаа гарлаа", msg: "Дахин оролдоно уу")
+            .show(context);
+      }
+      downloadProgressNotifier.value = downloadProgress;
+      print("downloadProgressNotifier.value${downloadProgressNotifier.value}");
+    });
+  }
+
+  @override
+  void dispose() {
+    _unbindBackgroundIsolate();
+    super.dispose();
+  }
+
+  void _unbindBackgroundIsolate() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
+  }
+
+  @pragma('vm:entry-point')
+  static void downloadCallback(
+    String id,
+    DownloadTaskStatus status,
+    int progress,
+  ) {
+    print(
+      'Callback on background isolate: '
+      'task ($id) is in status ($status) and process ($progress)',
+    );
+
+    IsolateNameServer.lookupPortByName('downloader_send_port')
+        ?.send([id, status, progress]);
   }
 
   @override
@@ -41,7 +116,7 @@ class _PodcastState extends State<Podcast> {
                 return [
                   SliverToBoxAdapter(
                     child: SizedBox(
-                        height: 50,
+                        height: 56,
                         child: Container(
                           padding: const EdgeInsets.only(left: 20),
                           alignment: Alignment.topLeft,
@@ -86,7 +161,6 @@ class _PodcastState extends State<Podcast> {
                     for (int a = 0; a < box.length; a++) {
                       data.add(box.getAt(a));
                     }
-
                     return Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: TabBarView(children: [
