@@ -193,9 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 },
                               ),
                               Downloaded(
-                                onTap: (audioObject) {
-                                  currentlyPlaying.value = audioObject;
-                                },
+                                onTap: (audioObject) {},
                               )
                             ],
                           ),

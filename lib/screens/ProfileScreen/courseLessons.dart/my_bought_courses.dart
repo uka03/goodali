@@ -22,7 +22,7 @@ class MyCourses extends StatefulWidget {
 }
 
 class _MyCoursesState extends State<MyCourses> {
-  final HiveProfileBoughtLecture dataStore = HiveProfileBoughtLecture();
+  final HiveBoughtDataStore dataStore = HiveBoughtDataStore();
   AudioPlayerController audioPlayerController = AudioPlayerController();
   List<Products> allLectures = [];
   List<Products> allListProducts = [];
@@ -45,7 +45,7 @@ class _MyCoursesState extends State<MyCourses> {
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
       );
-      await audioHandler.play();
+      audioHandler.play();
       currentlyPlaying.value = allLectures[index];
     } else if (activeList.first.title != allLectures.first.title ||
         activeList.first.id != allLectures.first.id) {
@@ -57,7 +57,7 @@ class _MyCoursesState extends State<MyCourses> {
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
       );
-      await audioHandler.play();
+      audioHandler.play();
     }
     currentlyPlaying.value = allLectures[index];
   }
@@ -93,7 +93,7 @@ class _MyCoursesState extends State<MyCourses> {
 
   Widget allLecturesWidget() {
     return ValueListenableBuilder(
-      valueListenable: HiveProfileBoughtLecture.box.listenable(),
+      valueListenable: HiveBoughtDataStore.box.listenable(),
       builder: (context, Box box, child) {
         List<Products> allboughtLectures = [];
 
@@ -121,7 +121,7 @@ class _MyCoursesState extends State<MyCourses> {
                               color: MyColors.black,
                               fontSize: 18,
                               fontWeight: FontWeight.bold)),
-                    if (index == 0) const SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     AlbumDetailItem(
                         index: index,
                         isBought: true,

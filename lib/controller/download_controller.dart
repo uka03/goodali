@@ -11,7 +11,7 @@ import 'package:goodali/controller/download_state.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/task_info.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:path/path.dart' as path;
 
 final downloadProgressNotifier = ValueNotifier<int>(0);
 final currentIndexNotifier = ValueNotifier<int>(0);
@@ -26,7 +26,8 @@ void downloadCallback(String id, DownloadTaskStatus status, int progress) {
 }
 
 class DownloadController with ChangeNotifier {
-  final HiveDataStore _dataStore = HiveDataStore();
+  final HiveBoughtDataStore _dataStore = HiveBoughtDataStore();
+
   String _localPath = "";
   List<TaskInfo> _episodeTasks = [];
   List<TaskInfo> get episodeTasks => _episodeTasks;
@@ -75,16 +76,10 @@ class DownloadController with ChangeNotifier {
 
   Future _saveMediaId(TaskInfo episodeTask) async {
     episodeTask.status = DownloadTaskStatus.complete;
-    // final completeTask = await FlutterDownloader.loadTasksWithRawQuery(
-    //     query: "SELECT * FROM task WHERE task_id = '${episodeTask.taskId}'");
-    // final filePath =
-    //     'file://${path.join(completeTask!.first.savedDir, Uri.encodeComponent(completeTask.first.filename!))}';
-    // final fileStat = await File(
-    //         path.join(completeTask.first.savedDir, completeTask.first.filename))
-    //     .stat();
-    final episodePodcast =
-        await _dataStore.getProductsFromUrl(url: episodeTask.products!.audio!);
-    episodePodcast.isDownloaded = true;
+
+    final episodePodcast = await _dataStore.getProductsFromUrl(
+        url: Urls.networkPath + episodeTask.products!.audio!);
+    episodePodcast!.isDownloaded = true;
     await episodePodcast.save();
     log(episodePodcast.isDownloaded.toString(), name: "podcast downloaded");
     _episodeTasks.add(TaskInfo(episodePodcast, episodeTask.taskId,
@@ -97,8 +92,9 @@ class DownloadController with ChangeNotifier {
   }
 
   TaskInfo episodeToTask(Products? products) {
-    return _episodeTasks.firstWhere(
-        (task) => task.products!.audio == products!.audio, orElse: () {
+    return _episodeTasks.firstWhere((task) {
+      return task.products!.title == products!.title;
+    }, orElse: () {
       return TaskInfo(
         products,
         '',
@@ -107,21 +103,49 @@ class DownloadController with ChangeNotifier {
   }
 
   Future<void> _loadTasks() async {
+    print("_loadTasks");
     _episodeTasks = [];
-    var dbHelper = HiveDataStore();
+    var dbHelper = HiveBoughtDataStore();
     var tasks = await FlutterDownloader.loadTasks();
+
+    print("task length ${tasks?.length}");
     if (tasks != null && tasks.isNotEmpty) {
       for (var task in tasks) {
         var episode = await dbHelper.getProductsFromUrl(url: task.url);
-
-        if (task.status == DownloadTaskStatus.complete) {
-          _episodeTasks.add(TaskInfo(episode, task.taskId,
-              progress: task.progress, status: task.status));
+        if (episode == null) {
+          await FlutterDownloader.remove(
+              taskId: task.taskId, shouldDeleteContent: true);
         } else {
-          _episodeTasks.add(TaskInfo(episode, task.taskId,
-              progress: task.progress, status: task.status));
+          if (task.status == DownloadTaskStatus.complete) {
+            var exist =
+                await File(path.join(task.savedDir, task.filename)).exists();
+            if (!exist) {
+              await FlutterDownloader.remove(
+                  taskId: task.taskId, shouldDeleteContent: true);
+            } else {
+              var filePath =
+                  'file://${path.join(task.savedDir, Uri.encodeComponent(task.filename!))}';
+
+              episode.downloadedPath = filePath;
+              episode.save();
+
+              _episodeTasks.add(TaskInfo(episode, task.taskId,
+                  progress: task.progress, status: task.status));
+            }
+          } else {
+            _episodeTasks.add(TaskInfo(episode, task.taskId,
+                progress: task.progress, status: task.status));
+          }
         }
+        // if (task.status == DownloadTaskStatus.complete) {
+        //   _episodeTasks.add(TaskInfo(episode, task.taskId,
+        //       progress: task.progress, status: task.status));
+        // } else {
+        //   _episodeTasks.add(TaskInfo(episode, task.taskId,
+        //       progress: task.progress, status: task.status));
+        // }
       }
+      print("_episodeTasks.length ${_episodeTasks.length}");
     }
     notifyListeners();
   }

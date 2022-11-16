@@ -50,8 +50,12 @@ class Products extends HiveObject {
   int? moodListId;
   @HiveField(21)
   bool? isDownloaded;
+  @HiveField(22)
   String? opennedDate;
+  @HiveField(23)
   int? isSpecial;
+  @HiveField(24)
+  String? downloadedPath;
 
   Products(
       {this.audio,
@@ -74,6 +78,7 @@ class Products extends HiveObject {
       this.trainingBanner,
       this.opennedDate,
       this.isSpecial,
+      this.downloadedPath,
       this.isDownloaded = false});
 
   Products.fromJson(Map<String, dynamic> json) {
@@ -101,6 +106,7 @@ class Products extends HiveObject {
     isDownloaded = json['is_downloaded'] ?? false;
     opennedDate = json['openned_date'] ?? "";
     isSpecial = json['is_special'] ?? 0;
+    downloadedPath = json['downloaded_ath'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -129,7 +135,7 @@ class Products extends HiveObject {
     data['is_downloaded'] = isDownloaded;
     data['openned_date'] = opennedDate;
     data['is_special'] = isSpecial;
-
+    data['downloaded_ath'] = downloadedPath;
     return data;
   }
 

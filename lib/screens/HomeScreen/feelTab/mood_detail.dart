@@ -15,6 +15,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/controller/progress_notifier.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:http/http.dart';
 
 import 'package:iconly/iconly.dart';
 import 'dart:developer' as developer;
@@ -96,11 +97,12 @@ class _MoodDetailState extends State<MoodDetail> {
         totalDuration = Duration(milliseconds: moodItemWithAudio!.duration!);
       }
 
-      print("box lenght ${box.values.length}");
-      if (box.values.isNotEmpty) {
-        for (var element in box.values) {
+      print("box lenght ${boxList.length}");
+      if (boxList.isNotEmpty) {
+        for (var element in boxList) {
           if (moodItemWithAudio!.id == element.id) {
             print("iiisheee orj irjiinuuuu");
+
             savedPosition = moodItemWithAudio?.position ?? 0;
           }
         }
@@ -139,9 +141,9 @@ class _MoodDetailState extends State<MoodDetail> {
   onPlayButtonClicked() async {
     currentlyPlaying.value = moodItemWithAudio;
 
-    developer.log("Starts in: ${moodItemWithAudio!.position}");
+    developer.log("Starts in: $savedPosition");
     await audioHandler.seek(
-      Duration(milliseconds: moodItemWithAudio!.position!),
+      Duration(milliseconds: savedPosition),
     );
     await audioHandler.play();
   }
@@ -314,12 +316,12 @@ class _MoodDetailState extends State<MoodDetail> {
                   progress: currentDuration,
                   buffered: currentDuration,
                   total: totalDuration,
-                  thumbColor: Colors.white,
                   thumbGlowColor: MyColors.primaryColor,
                   timeLabelTextStyle: const TextStyle(color: MyColors.gray),
-                  progressBarColor: Colors.white,
-                  bufferedBarColor: Colors.white54,
-                  baseBarColor: Colors.white10,
+                  baseBarColor: MyColors.border1,
+                  progressBarColor: MyColors.primaryColor,
+                  thumbColor: MyColors.primaryColor,
+                  bufferedBarColor: MyColors.primaryColor.withAlpha(20),
                   onSeek: (duration) async {
                     await audioHandler.seek(duration);
                   },
@@ -341,11 +343,11 @@ class _MoodDetailState extends State<MoodDetail> {
             buttonBackWard5Seconds(currentDuration);
           },
           child: SvgPicture.asset("assets/images/replay_5.svg",
-              color: Colors.white),
+              color: MyColors.primaryColor),
         ),
         CircleAvatar(
           radius: 36,
-          backgroundColor: Colors.white,
+          backgroundColor: MyColors.primaryColor,
           child: ValueListenableBuilder(
             valueListenable: buttonNotifier,
             builder: (BuildContext context, ButtonState? buttonValue,
@@ -356,14 +358,13 @@ class _MoodDetailState extends State<MoodDetail> {
                   buttonValue == ButtonState.loading ? true : false;
 
               if (isBuffering) {
-                return const CircularProgressIndicator(
-                    color: MyColors.primaryColor);
+                return const CircularProgressIndicator(color: Colors.white);
               } else if (isPlaying != true) {
                 return IconButton(
                   padding: EdgeInsets.zero,
                   icon: const Icon(
                     Icons.play_arrow_rounded,
-                    color: MyColors.primaryColor,
+                    color: Colors.white,
                     size: 40.0,
                   ),
                   onPressed: () {
@@ -375,7 +376,7 @@ class _MoodDetailState extends State<MoodDetail> {
                   padding: EdgeInsets.zero,
                   icon: const Icon(
                     Icons.pause_rounded,
-                    color: MyColors.primaryColor,
+                    color: Colors.white,
                     size: 40.0,
                   ),
                   onPressed: () async {
@@ -392,7 +393,7 @@ class _MoodDetailState extends State<MoodDetail> {
             buttonForward15Seconds(currentDuration, totalDuration);
           },
           child: SvgPicture.asset("assets/images/forward_15.svg",
-              color: Colors.white),
+              color: MyColors.primaryColor),
         ),
       ],
     );
@@ -439,6 +440,7 @@ class _MoodDetailState extends State<MoodDetail> {
     setState(() {
       moodItem = listData;
     });
+
     developer.log("get mood list");
     for (var item in listData) {
       if (item.audio != "Audio failed to upload") {
@@ -450,22 +452,18 @@ class _MoodDetailState extends State<MoodDetail> {
     print("fhfh ${boxList.length}");
 
     if (boxList.isNotEmpty) {
-      developer.log(boxList.length.toString(), name: "audio bain");
+      developer.log(boxList.length.toString(), name: "box length");
       for (var i = 0; i < boxList.length; i++) {
         print("elemnt id ${boxList[i].id}");
         if (boxList[i].id != moodItemWithAudio!.id) {
-          print("id tentsii bish bla");
-          // box.add(moodItemWithAudio!);
+          await box.add(moodItemWithAudio!);
         }
       }
     } else {
-      //     itemBox.values.where((item) => item.value == 1)
-      //  .forEach((item) => print('All First Value Data Showing Result'));
       print("else orloo");
-      box.add(moodItemWithAudio!);
+      await box.add(moodItemWithAudio!);
     }
 
-    // await dataMoodStore.addProduct(products: item);
     await getTotalDuration(Urls.networkPath + moodItemWithAudio!.audio!);
     await initiliaze();
 

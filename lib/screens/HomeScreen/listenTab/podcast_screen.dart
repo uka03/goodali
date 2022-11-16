@@ -29,7 +29,7 @@ class _PodcastState extends State<Podcast> {
     return Scaffold(
       appBar: const SimpleAppBar(noCard: true),
       body: DefaultTabController(
-          length: 4,
+          length: 3,
           child: NestedScrollView(
               physics: const NeverScrollableScrollPhysics(),
               headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -56,7 +56,6 @@ class _PodcastState extends State<Podcast> {
                         tabs: [
                           SizedBox(width: 78, child: Tab(text: "Бүгд")),
                           SizedBox(width: 78, child: Tab(text: "Сонсоогүй")),
-                          SizedBox(width: 78, child: Tab(text: "Татсан")),
                           SizedBox(width: 78, child: Tab(text: "Сонссон"))
                         ],
                         indicatorWeight: 4,

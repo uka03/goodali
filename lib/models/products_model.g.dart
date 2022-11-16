@@ -35,6 +35,8 @@ class ProductsAdapter extends TypeAdapter<Products> {
       audioCount: fields[14] as int?,
       isBought: fields[12] as bool?,
       trainingBanner: fields[17] as String?,
+      opennedDate: fields[22] as String?,
+      isSpecial: fields[23] as int?,
       isDownloaded: fields[21] as bool?,
     )
       ..played = fields[13] as bool?
@@ -45,7 +47,7 @@ class ProductsAdapter extends TypeAdapter<Products> {
   @override
   void write(BinaryWriter writer, Products obj) {
     writer
-      ..writeByte(22)
+      ..writeByte(24)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -89,7 +91,11 @@ class ProductsAdapter extends TypeAdapter<Products> {
       ..writeByte(20)
       ..write(obj.moodListId)
       ..writeByte(21)
-      ..write(obj.isDownloaded);
+      ..write(obj.isDownloaded)
+      ..writeByte(22)
+      ..write(obj.opennedDate)
+      ..writeByte(23)
+      ..write(obj.isSpecial);
   }
 
   @override

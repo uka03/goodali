@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
+import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -103,6 +104,36 @@ class HiveBoughtDataStore {
     }
   }
 
+  Future<Products?> getProductsFromUrl({required String url}) async {
+    Products products = Products();
+    print(url);
+    var datas = box.values;
+    developer.log(datas.length.toString());
+    for (var element in datas) {
+      if ((Urls.networkPath + element.audio!) == url) {
+        developer.log(element.title!);
+        products = element;
+      }
+    }
+    return products;
+  }
+
+  Future<bool> isDownloaded({required String title}) async {
+    Products? products;
+    for (var element in box.values) {
+      if (element.title == title) {
+        products = element;
+      }
+    }
+
+    developer.log(products?.title ?? "", name: "downloaded podcast");
+    if (products!.isDownloaded == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /// show user list
   Future<void> getProducts({required String id}) async {
     box.get(id);
@@ -120,7 +151,7 @@ class HiveBoughtDataStore {
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
-
+      developer.log(item.title!, name: "bought");
       await item.save();
     }
   }
@@ -140,11 +171,12 @@ class HiveMoodDataStore {
   /// Add new user
   Future<void> addProduct({required Products products}) async {
     print("box lenght ${box.values.length}");
-    for (var element in box.values) {
-      if (element.id != products.id) {
-        box.add(products);
-        print("box lenght ${box.values.length}");
-      }
+    var datas = box.values.where((c) => c.id == products.id).toList();
+
+    print("datas lenght ${datas.length}");
+
+    if (datas.isEmpty) {
+      await box.add(products);
     }
   }
 
@@ -155,7 +187,7 @@ class HiveMoodDataStore {
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
-
+      developer.log(item.title!);
       await item.save();
     }
   }

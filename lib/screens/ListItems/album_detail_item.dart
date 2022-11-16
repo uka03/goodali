@@ -12,6 +12,7 @@ import 'package:goodali/Widgets/audio_progressbar.dart';
 import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
+import 'package:goodali/Widgets/download_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
@@ -220,12 +221,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                           ],
                         ),
                   const Spacer(),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(IconlyLight.arrow_down,
-                        size: 20, color: MyColors.gray),
-                    splashRadius: 1,
-                  ),
+                  DownloadButton(products: widget.products),
                   IconButton(
                       splashRadius: 20,
                       onPressed: () {},
