@@ -28,7 +28,7 @@ class _MyCoursesState extends State<MyCourses> {
   List<Products> allListProducts = [];
   List<Products> myCourses = [];
   List<MediaItem> mediaItems = [];
-  String albumName = "";
+
   int currentIndex = 0;
   List<int> savedPos = [];
 
@@ -69,35 +69,20 @@ class _MyCoursesState extends State<MyCourses> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
           myCourses = snapshot.data;
-          allListProducts = [...allLectures, ...myCourses];
 
-          if (allListProducts.isEmpty) {
-            return Column(
-              children: [
-                const SizedBox(height: 80),
-                SvgPicture.asset("assets/images/empty_bought.svg"),
-                const SizedBox(height: 20),
-                const Text(
-                  "Авсан бүтээгдэхүүн байхгүй...",
-                  style: TextStyle(fontSize: 14, color: MyColors.gray),
-                ),
-              ],
-            );
-          } else {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    onlineCourses(myCourses),
-                    allLecturesWidget(),
-                  ],
-                ),
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  onlineCourses(myCourses),
+                  allLecturesWidget(),
+                ],
               ),
-            );
-          }
+            ),
+          );
         } else {
           return const Center(
               child: CircularProgressIndicator(color: MyColors.primaryColor));
@@ -111,13 +96,14 @@ class _MyCoursesState extends State<MyCourses> {
       valueListenable: HiveProfileBoughtLecture.box.listenable(),
       builder: (context, Box box, child) {
         List<Products> allboughtLectures = [];
+
         if (box.isNotEmpty) {
           for (var i = 0; i < box.length; i++) {
             Products products = box.getAt(i);
             allboughtLectures.add(products);
           }
           allLectures = allboughtLectures;
-
+          allListProducts = [...allLectures, ...myCourses];
           return ListView.separated(
               itemCount: allLectures.length,
               physics: const NeverScrollableScrollPhysics(),
@@ -125,32 +111,22 @@ class _MyCoursesState extends State<MyCourses> {
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(),
               itemBuilder: (context, index) {
-                String empty = "";
-                if (albumName == allLectures[index].albumTitle) {
-                  empty = "";
-                } else {
-                  empty = albumName;
-                }
-                if (albumName != allLectures[index].albumTitle) {
-                  albumName = allLectures[index].albumTitle ?? "";
-                  empty = albumName;
-                }
-
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (empty != "") const SizedBox(height: 30),
-                    Text(empty,
-                        style: const TextStyle(
-                            color: MyColors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold)),
-                    if (empty != "") const SizedBox(height: 20),
+                    if (index == 0) const SizedBox(height: 30),
+                    if (index == 0)
+                      Text(allLectures[index].albumTitle ?? "",
+                          style: const TextStyle(
+                              color: MyColors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
+                    if (index == 0) const SizedBox(height: 20),
                     AlbumDetailItem(
                         index: index,
                         isBought: true,
                         products: allLectures[index],
-                        albumName: albumName,
+                        albumName: allLectures[index].albumTitle ?? "a",
                         productsList: allLectures,
                         onTap: () {
                           onPlayButtonClicked(index);
@@ -158,6 +134,18 @@ class _MyCoursesState extends State<MyCourses> {
                   ],
                 );
               });
+        } else if (allListProducts.isEmpty) {
+          return Column(
+            children: [
+              const SizedBox(height: 80),
+              SvgPicture.asset("assets/images/empty_bought.svg"),
+              const SizedBox(height: 20),
+              const Text(
+                "Авсан бүтээгдэхүүн байхгүй...",
+                style: TextStyle(fontSize: 14, color: MyColors.gray),
+              ),
+            ],
+          );
         } else {
           return Container();
         }

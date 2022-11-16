@@ -368,9 +368,10 @@ class _PlayAudioState extends State<PlayAudio> {
                       ),
                       IconButton(
                           icon: const Icon(Icons.close),
-                          onPressed: () async {
-                            await audioHandler.pause();
+                          onPressed: () {
+                            audioHandler.pause();
                             currentlyPlaying.value = null;
+                            buttonNotifier.value = ButtonState.paused;
                           }),
                     ],
                   ),

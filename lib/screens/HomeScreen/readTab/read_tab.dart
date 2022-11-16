@@ -33,20 +33,19 @@ class _ReadTabbarState extends State<ReadTabbar>
               children: [
                 for (var item in articleList)
                   if (item.isSpecial == 1)
-                    Column(children: [
-                      const Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Text("Онцлох",
-                            style: TextStyle(
-                                color: MyColors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        child: ArtcileItem(articleModel: item),
-                      ),
-                    ]),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20, left: 20),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text("Онцлох",
+                                style: TextStyle(
+                                    color: MyColors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold)),
+                            ArtcileItem(articleModel: item),
+                          ]),
+                    ),
                 Padding(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                     child: Row(

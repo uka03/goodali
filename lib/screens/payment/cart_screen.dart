@@ -4,6 +4,7 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
+import 'package:goodali/Widgets/simple_appbar.dart';
 
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/payment/choose_payment.dart';
@@ -13,7 +14,8 @@ import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  final bool? isBought;
+  const CartScreen({Key? key, this.isBought = false}) : super(key: key);
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -21,81 +23,63 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   List<int> productIds = [];
+  @override
+  void initState() {
+    print(widget.isBought);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     bool isAuth = context.watch<Auth>().isAuth;
 
     return Scaffold(
-      body: NestedScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                pinned: true,
-                floating: true,
-                // snap: true,
-                elevation: 0,
-                iconTheme: const IconThemeData(color: MyColors.black),
-                backgroundColor: Colors.white,
-                bottom: PreferredSize(
-                    preferredSize:
-                        const Size(double.infinity, kToolbarHeight - 10),
-                    child: Container(
-                      padding: const EdgeInsets.only(left: 20),
-                      alignment: Alignment.topLeft,
-                      child: const Text("Таны сагс",
-                          style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: MyColors.black)),
-                    )),
-                actions: [
-                  Padding(
-                      padding: const EdgeInsets.only(right: 10.0),
-                      child: CircleAvatar(
-                          radius: 22,
-                          backgroundColor: MyColors.input,
-                          child: IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) =>
-                                            const PaymentHistory()));
-                              },
-                              splashRadius: 10,
-                              icon: const Icon(IconlyLight.time_circle,
-                                  size: 28, color: MyColors.black))))
+      appBar: const SimpleAppBar(noCard: true),
+      body: Consumer<CartProvider>(
+        builder: (context, value, child) {
+          if (value.cartItem.isEmpty) {
+            return SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 100),
+                  SvgPicture.asset("assets/images/empty_cart.svg",
+                      semanticsLabel: 'Acme Logo'),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Таны сагс хоосон байна...",
+                    style: TextStyle(fontSize: 14, color: MyColors.gray),
+                  )
                 ],
               ),
-            ];
-          },
-          body: Consumer<CartProvider>(
-            builder: (context, value, child) {
-              if (value.cartItem.isEmpty) {
-                return Column(
-                  children: [
-                    const SizedBox(height: 100),
-                    SvgPicture.asset("assets/images/empty_cart.svg",
-                        semanticsLabel: 'Acme Logo'),
-                    const SizedBox(height: 20),
-                    const Text(
-                      "Таны сагс хоосон байна...",
-                      style: TextStyle(fontSize: 14, color: MyColors.gray),
-                    )
-                  ],
-                );
-              } else {
-                productIds = value.cartItemId;
-                return ListView.builder(
-                    itemCount: value.cartItem.length,
-                    itemBuilder: (context, index) {
-                      return CartProductItem(products: value.cartItem[index]);
-                    });
-              }
-            },
-          )),
+            );
+          } else {
+            productIds = value.cartItemId;
+            return Column(
+              children: [
+                Container(
+                  height: 56,
+                  padding: const EdgeInsets.only(left: 20),
+                  alignment: Alignment.centerLeft,
+                  child: const Text("Таны сагс",
+                      style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: MyColors.black)),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                      itemCount: value.cartItem.length,
+                      itemBuilder: (context, index) {
+                        return CartProductItem(products: value.cartItem[index]);
+                      }),
+                ),
+              ],
+            );
+          }
+        },
+      ),
       floatingActionButton: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Column(
@@ -123,7 +107,7 @@ class _CartScreenState extends State<CartScreen> {
                 onPress: context.watch<CartProvider>().cartItem.isEmpty
                     ? null
                     : () {
-                        if (isAuth == true) {
+                        if (isAuth == true && widget.isBought == false) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(

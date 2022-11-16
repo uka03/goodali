@@ -11,15 +11,11 @@ import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/download_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
-import 'package:goodali/controller/download_controller.dart';
-import 'package:goodali/controller/download_state.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'dart:developer' as developer;
@@ -96,11 +92,6 @@ class _PodcastItemState extends State<PodcastItem> {
         savedDuration = widget.podcastItem.position!;
       }
       progressMax = _totalduration;
-
-      // if (widget.podcastItem.position != null) {
-      //   _totalduration = _totalduration - Duration(milliseconds: savedDuration);
-      // }
-
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -122,8 +113,6 @@ class _PodcastItemState extends State<PodcastItem> {
 
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -175,53 +164,50 @@ class _PodcastItemState extends State<PodcastItem> {
                   ? true
                   : false;
 
-              return Row(
-                children: [
-                  AudioPlayerButton(
-                    onPlay: () async {
-                      await updateSavedPosition();
-                      widget.onTap!.call();
-                    },
-                    onPause: () async {
-                      await updateSavedPosition();
-                      audioHandler.pause();
-                    },
-                    title: widget.podcastItem.title ?? "",
-                  ),
-                  const SizedBox(width: 10),
-                  isLoading
-                      ? const SizedBox(
-                          width: 30,
-                          child: LinearProgressIndicator(
-                              backgroundColor: Colors.transparent,
-                              minHeight: 2,
-                              color: MyColors.black))
-                      : Row(
-                          children: [
-                            (savedDuration > 0 || isPlaying)
-                                ? AudioProgressBar(
-                                    totalDuration: progressMax,
-                                    title: widget.podcastItem.title ?? "",
-                                    savedPostion:
-                                        Duration(milliseconds: savedDuration),
-                                  )
-                                : Container(),
-                            const SizedBox(width: 10),
-                            AudioplayerTimer(
-                              title: widget.podcastItem.title ?? "",
-                              totalDuration: _totalduration,
-                              savedDuration:
-                                  Duration(milliseconds: savedDuration),
-                            ),
-                          ],
-                        ),
-                  const Spacer(),
-                  DownloadButton(products: widget.podcastItem),
-                  IconButton(
-                      splashRadius: 20,
-                      onPressed: () {},
-                      icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
-                ],
+              return GestureDetector(
+                onTap: () {},
+                child: Row(
+                  children: [
+                    AudioPlayerButton(
+                      onPlay: () async {
+                        await updateSavedPosition();
+                        widget.onTap!.call();
+                      },
+                      onPause: () async {
+                        await updateSavedPosition();
+                        audioHandler.pause();
+                      },
+                      title: widget.podcastItem.title ?? "",
+                    ),
+                    const SizedBox(width: 10),
+                    isLoading
+                        ? const SizedBox(
+                            width: 30,
+                            child: LinearProgressIndicator(
+                                backgroundColor: Colors.transparent,
+                                minHeight: 2,
+                                color: MyColors.black))
+                        : Row(
+                            children: [
+                              (savedDuration > 0 || isPlaying)
+                                  ? AudioProgressBar(
+                                      totalDuration: progressMax,
+                                      title: widget.podcastItem.title ?? "",
+                                      savedPostion:
+                                          Duration(milliseconds: savedDuration),
+                                    )
+                                  : Container(),
+                              const SizedBox(width: 10),
+                              AudioplayerTimer(
+                                title: widget.podcastItem.title ?? "",
+                                totalDuration: _totalduration,
+                                savedDuration:
+                                    Duration(milliseconds: savedDuration),
+                              ),
+                            ],
+                          ),
+                  ],
+                ),
               );
             }),
         const SizedBox(height: 12)

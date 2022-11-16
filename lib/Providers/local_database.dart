@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -113,6 +114,17 @@ class HiveBoughtDataStore {
     await box.putAt(index, userModel);
   }
 
+  Future<void> updatePosition(String title, int id, int position) async {
+    var datas =
+        box.values.where((c) => c.title == title && c.id == id).toList();
+    if (datas.isNotEmpty) {
+      var item = box.get(datas.first.key);
+      item!.position = position;
+
+      await item.save();
+    }
+  }
+
   /// delete user
   Future<void> deleteProducts({required int index}) async {
     await box.deleteAt(index);
@@ -127,18 +139,23 @@ class HiveMoodDataStore {
 
   /// Add new user
   Future<void> addProduct({required Products products}) async {
-    var datas = box.values
-        .where(
-            (c) => c.moodListId == products.moodListId && c.id == products.id)
-        .toList();
+    print("box lenght ${box.values.length}");
+    for (var element in box.values) {
+      if (element.id != products.id) {
+        box.add(products);
+        print("box lenght ${box.values.length}");
+      }
+    }
+  }
 
-    if (datas.isEmpty) {
-      await box.add(products);
-    } else {
+  List<Map<dynamic, int>> moodAudioList = [];
+
+  Future<void> updatePosition(String title, int id, int position) async {
+    var datas = box.values.where((c) => c.id == id).toList();
+    if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
-      item!.moodListId = products.moodListId;
-      item.audio = products.audio;
-      item.title = products.title;
+      item!.position = position;
+
       await item.save();
     }
   }
@@ -184,6 +201,16 @@ class HiveProfileBoughtLecture {
       var item = box.get(datas.first.key);
       item!.audio = products.audio;
       item.title = products.lectureTitle;
+      await item.save();
+    }
+  }
+
+  Future<void> updatePosition(String title, int id, int position) async {
+    var datas =
+        box.values.where((c) => c.title == title && c.id == id).toList();
+    if (datas.isNotEmpty) {
+      var item = box.get(datas.first.key);
+      item!.position = position;
       await item.save();
     }
   }

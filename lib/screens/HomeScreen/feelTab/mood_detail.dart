@@ -30,6 +30,9 @@ class MoodDetail extends StatefulWidget {
 }
 
 class _MoodDetailState extends State<MoodDetail> {
+  late final tagFuture = getMoodList();
+  Box<Products> box = Hive.box<Products>("mood_podcasts");
+
   final PageController _pageController = PageController();
   final HiveMoodDataStore dataMoodStore = HiveMoodDataStore();
   final _kDuration = const Duration(milliseconds: 300);
@@ -44,6 +47,7 @@ class _MoodDetailState extends State<MoodDetail> {
   var totalDuration = Duration.zero;
   var currentDuration = Duration.zero;
   var savedPosition = 0;
+  var boxList = [];
 
   Widget rightButton = const Text(
     "Дараах",
@@ -55,7 +59,7 @@ class _MoodDetailState extends State<MoodDetail> {
   void initState() {
     super.initState();
 
-    getMoodList();
+    boxList = box.values.toList();
     _pageController.addListener(() {
       setState(() {
         _current = _pageController.page!;
@@ -92,9 +96,16 @@ class _MoodDetailState extends State<MoodDetail> {
         totalDuration = Duration(milliseconds: moodItemWithAudio!.duration!);
       }
 
-      totalDuration = totalDuration;
+      print("box lenght ${box.values.length}");
+      if (box.values.isNotEmpty) {
+        for (var element in box.values) {
+          if (moodItemWithAudio!.id == element.id) {
+            print("iiisheee orj irjiinuuuu");
+            savedPosition = moodItemWithAudio?.position ?? 0;
+          }
+        }
+      }
 
-      savedPosition = moodItemWithAudio?.position ?? 0;
       developer.log(savedPosition.toString(), name: "moodItem duration");
       return totalDuration;
     } catch (e) {
@@ -119,7 +130,6 @@ class _MoodDetailState extends State<MoodDetail> {
       return true;
     } else {
       activeList.clear();
-      widget.moodListId;
     }
     activeList.add(moodItemWithAudio!);
     await initiliazePodcast();
@@ -153,29 +163,13 @@ class _MoodDetailState extends State<MoodDetail> {
         SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: ValueListenableBuilder(
-            valueListenable: HiveMoodDataStore.box.listenable(),
-            builder: (context, Box box, boxWidget) {
-              if (box.length > 0) {
-                List<Products> moodList = [];
-
-                for (int a = 0; a < box.length; a++) {
-                  Products products = box.get(a);
-                  if (products.moodListId == int.parse(widget.moodListId)) {
-                    moodList.add(products);
-
-                    if (products.audio != "Audio failed to upload") {
-                      moodItemWithAudio = products;
-                      print(moodItemWithAudio?.audio);
-                      getTotalDuration(
-                          Urls.networkPath + moodItemWithAudio!.audio!);
-                      initiliaze();
-                    }
-                  }
-                }
+          child: FutureBuilder(
+            future: tagFuture,
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                List<Products> moodList = snapshot.data;
 
                 moodItem = moodList;
-                print(moodItem.length);
 
                 return PageView.builder(
                     controller: _pageController,
@@ -439,15 +433,42 @@ class _MoodDetailState extends State<MoodDetail> {
     }
   }
 
-  Future<void> getMoodList() async {
+  Future<List<Products>> getMoodList() async {
     var listData = await Connection.getMoodItem(
         context, widget.id != null ? widget.id! : widget.moodListId);
     setState(() {
       moodItem = listData;
     });
-
+    developer.log("get mood list");
     for (var item in listData) {
-      dataMoodStore.addProduct(products: item);
+      if (item.audio != "Audio failed to upload") {
+        moodItemWithAudio = item;
+        developer.log(moodItemWithAudio!.id.toString(), name: "audio bain");
+      }
     }
+
+    print("fhfh ${boxList.length}");
+
+    if (boxList.isNotEmpty) {
+      developer.log(boxList.length.toString(), name: "audio bain");
+      for (var i = 0; i < boxList.length; i++) {
+        print("elemnt id ${boxList[i].id}");
+        if (boxList[i].id != moodItemWithAudio!.id) {
+          print("id tentsii bish bla");
+          // box.add(moodItemWithAudio!);
+        }
+      }
+    } else {
+      //     itemBox.values.where((item) => item.value == 1)
+      //  .forEach((item) => print('All First Value Data Showing Result'));
+      print("else orloo");
+      box.add(moodItemWithAudio!);
+    }
+
+    // await dataMoodStore.addProduct(products: item);
+    await getTotalDuration(Urls.networkPath + moodItemWithAudio!.audio!);
+    await initiliaze();
+
+    return listData;
   }
 }

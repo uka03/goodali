@@ -375,10 +375,6 @@ class Connection {
           await Http().getDio(context, headerTypebearer).get(Urls.getCourses);
 
       print("getBoughtCourses ${response.data}");
-      print((response.data as List)
-          .map((e) => Products.fromJson(e))
-          .toList()
-          .length);
 
       if (response.statusCode == 200) {
         return (response.data as List)

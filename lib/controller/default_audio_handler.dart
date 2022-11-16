@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -11,6 +13,9 @@ import '../Providers/local_database.dart';
 late AudioHandler audioHandler;
 final HiveDataStore dataStore = HiveDataStore();
 final HiveBoughtDataStore dataAlbumStore = HiveBoughtDataStore();
+final HiveProfileBoughtLecture dataBoughtAlbumStore =
+    HiveProfileBoughtLecture();
+final HiveMoodDataStore dataMoodStore = HiveMoodDataStore();
 Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
       builder: () => AudioPlayerHandler(),
       config: const AudioServiceConfig(
@@ -81,6 +86,17 @@ class AudioPlayerHandler extends BaseAudioHandler
           currentlyPlaying.value?.title! ?? "",
           currentlyPlaying.value?.id! ?? 0,
           durationStateNotifier.value.progress?.inMilliseconds ?? 0);
+
+      dataAlbumStore.updatePosition(
+          currentlyPlaying.value?.title! ?? "",
+          currentlyPlaying.value?.id! ?? 0,
+          durationStateNotifier.value.progress?.inMilliseconds ?? 0);
+
+      dataBoughtAlbumStore.updatePosition(currentlyPlaying.value?.title! ?? "",
+          currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
+
+      dataMoodStore.updatePosition(currentlyPlaying.value?.title! ?? "",
+          currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
     });
     try {
       // After a cold restart (on Android), _player.load jumps straight from

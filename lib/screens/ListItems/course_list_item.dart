@@ -20,6 +20,13 @@ class CourseListListItem extends StatefulWidget {
 
 class _CourseListListItemState extends State<CourseListListItem> {
   @override
+  void initState() {
+    print(widget.products.opennedDate.runtimeType);
+    print(widget.products.opennedDate == "");
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     return Padding(
@@ -46,10 +53,9 @@ class _CourseListListItemState extends State<CourseListListItem> {
                     ),
                   ),
                   Text(
-                    widget.products.opennedDate != null ||
-                            widget.products.opennedDate != ""
-                        ? dateTimeFormatter(widget.products.opennedDate ?? "")
-                        : "",
+                    widget.products.opennedDate == ""
+                        ? ""
+                        : dateTimeFormatter(widget.products.opennedDate ?? ""),
                     style: const TextStyle(color: MyColors.gray, fontSize: 12),
                   ),
                 ],

@@ -120,6 +120,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
+    final isAuth = Provider.of<Auth>(context).isAuth;
     return WillPopScope(
       onWillPop: () async {
         return true;
@@ -141,80 +142,103 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   }
                   buyList = lectureList;
                   // });
-                  return Stack(children: [
-                    Container(
-                        height: containerHeight,
-                        width: MediaQuery.of(context).size.width,
-                        alignment: Alignment.center,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Opacity(
-                              opacity: imageOpacity.clamp(0, 1),
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(14),
-                                  child: CachedNetworkImage(
-                                    imageUrl:
-                                        "${Urls.networkPath}${widget.albumProduct.banner}",
-                                    width: imageSize,
-                                    height: imageSize,
-                                    progressIndicatorBuilder:
-                                        (context, url, downloadProgress) {
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          color: MyColors.primaryColor,
-                                          strokeWidth: 2,
-                                          value: downloadProgress.progress,
-                                        ),
-                                      );
-                                    },
-                                    fit: BoxFit.cover,
-                                    errorWidget: (context, url, error) {
-                                      if (error is NetworkImageLoadException &&
-                                          error.statusCode == 404) {
-                                        return const Text("404");
-                                      }
-
-                                      return SizedBox(
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: Stack(children: [
+                          Container(
+                              height: containerHeight,
+                              width: MediaQuery.of(context).size.width,
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Opacity(
+                                    opacity: imageOpacity.clamp(0, 1),
+                                    child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(14),
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              "${Urls.networkPath}${widget.albumProduct.banner}",
                                           width: imageSize,
                                           height: imageSize,
-                                          child: const Text(
-                                            "No Image",
-                                            style: TextStyle(fontSize: 12),
-                                          ));
-                                    },
+                                          progressIndicatorBuilder:
+                                              (context, url, downloadProgress) {
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                color: MyColors.primaryColor,
+                                                strokeWidth: 2,
+                                                value:
+                                                    downloadProgress.progress,
+                                              ),
+                                            );
+                                          },
+                                          fit: BoxFit.cover,
+                                          errorWidget: (context, url, error) {
+                                            if (error
+                                                    is NetworkImageLoadException &&
+                                                error.statusCode == 404) {
+                                              return const Text("404");
+                                            }
+
+                                            return SizedBox(
+                                                width: imageSize,
+                                                height: imageSize,
+                                                child: const Text(
+                                                  "No Image",
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ));
+                                          },
+                                        )),
+                                  ),
+                                  const SizedBox(height: 80)
+                                ],
+                              )),
+                          SingleChildScrollView(
+                            controller: _controller,
+                            physics: const BouncingScrollPhysics(),
+                            child: Column(children: [
+                              SizedBox(height: initialSize + 32),
+                              Text(
+                                widget.albumProduct.title ?? "" "",
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    color: MyColors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 20),
+                              Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0),
+                                  child: CustomReadMoreText(
+                                    text: widget.albumProduct.body ?? "",
+                                    textAlign: TextAlign.center,
                                   )),
+                              const SizedBox(height: 20),
+                              const Divider(endIndent: 20, indent: 20),
+                              lecture(context, lectureList),
+                              const SizedBox(height: 70),
+                            ]),
+                          ),
+                        ]),
+                      ),
+                      widget.albumProduct.isBought == true
+                          ? Container()
+                          : Container(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                                child: CustomElevatedButton(
+                                    text: "Худалдаж авах",
+                                    onPress: () {
+                                      _onBuyClicked(cart, isAuth);
+                                    }),
+                              ),
                             ),
-                            const SizedBox(height: 80)
-                          ],
-                        )),
-                    SingleChildScrollView(
-                      controller: _controller,
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(children: [
-                        SizedBox(height: initialSize + 32),
-                        Text(
-                          widget.albumProduct.title ?? "" "",
-                          style: const TextStyle(
-                              fontSize: 20,
-                              color: MyColors.black,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 20),
-                        Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20.0),
-                            child: CustomReadMoreText(
-                              text: widget.albumProduct.body ?? "",
-                              textAlign: TextAlign.center,
-                            )),
-                        const SizedBox(height: 20),
-                        const Divider(endIndent: 20, indent: 20),
-                        lecture(context, lectureList),
-                        const SizedBox(height: 70),
-                      ]),
-                    ),
-                  ]);
+                    ],
+                  );
                 } else {
                   return const Center(
                       child: CircularProgressIndicator(
@@ -224,43 +248,6 @@ class _AlbumDetailState extends State<AlbumDetail> {
             );
           },
         ),
-        floatingActionButton: widget.albumProduct.isBought == true
-            ? Container()
-            : Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                  child: CustomElevatedButton(
-                      text: "Худалдаж авах",
-                      onPress: () {
-                        for (var item in buyList) {
-                          if (item.isBought == false) {
-                            albumProductsList.add(item.productId!);
-                          }
-                        }
-                        cart.addItemsIndex(
-                            (widget.albumProduct.productId ??
-                                widget.albumProduct.id ??
-                                0),
-                            albumProductIDs: albumProductsList);
-                        if (!cart.sameItemCheck) {
-                          cart.addProducts(widget.albumProduct);
-                          cart.addTotalPrice(
-                              widget.albumProduct.price?.toDouble() ?? 0.0);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const CartScreen()));
-                        } else {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const CartScreen()));
-                        }
-                      }),
-                ),
-              ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
@@ -406,6 +393,33 @@ class _AlbumDetailState extends State<AlbumDetail> {
         ],
       ),
     );
+  }
+
+  _onBuyClicked(cart, bool isAuth) {
+    for (var item in buyList) {
+      if (item.isBought == false) {
+        albumProductsList.add(item.productId!);
+      }
+    }
+    cart.addItemsIndex(
+        (widget.albumProduct.productId ?? widget.albumProduct.id ?? 0),
+        albumProductIDs: albumProductsList);
+    if (!cart.sameItemCheck) {
+      cart.addProducts(widget.albumProduct);
+      cart.addTotalPrice(widget.albumProduct.price?.toDouble() ?? 0.0);
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  CartScreen(isBought: widget.albumProduct.isBought)));
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  CartScreen(isBought: widget.albumProduct.isBought)));
+    }
   }
 
   showIntroAudioModal() {

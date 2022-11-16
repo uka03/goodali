@@ -45,7 +45,7 @@ class _SettingsState extends State<Settings> {
               ),
             ),
           ),
-          GestureDetector(
+          InkWell(
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const ResetPassword())),
             child: Padding(
@@ -82,7 +82,7 @@ class _SettingsState extends State<Settings> {
               ),
             ),
           ),
-          GestureDetector(
+          InkWell(
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const ResetPassword())),
             child: Padding(
@@ -105,7 +105,7 @@ class _SettingsState extends State<Settings> {
               ),
             ),
           ),
-          GestureDetector(
+          InkWell(
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const ResetPassword())),
             child: Padding(
@@ -128,7 +128,7 @@ class _SettingsState extends State<Settings> {
               ),
             ),
           ),
-          GestureDetector(
+          InkWell(
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const ResetPassword())),
             child: Padding(
@@ -152,7 +152,7 @@ class _SettingsState extends State<Settings> {
             ),
           ),
           const Spacer(),
-          GestureDetector(
+          InkWell(
             onTap: showLogOutDialog,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
