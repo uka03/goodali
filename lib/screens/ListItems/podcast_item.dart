@@ -9,7 +9,6 @@ import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/audio_progressbar.dart';
 import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
-import 'package:goodali/Widgets/download_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
@@ -12,7 +10,10 @@ import 'package:provider/provider.dart';
 
 class DownloadButton extends StatefulWidget {
   final Products products;
-  const DownloadButton({Key? key, required this.products}) : super(key: key);
+  final bool? isModalPlayer;
+  const DownloadButton(
+      {Key? key, required this.products, this.isModalPlayer = false})
+      : super(key: key);
 
   @override
   State<DownloadButton> createState() => _DownloadButtonState();
@@ -21,7 +22,6 @@ class DownloadButton extends StatefulWidget {
 class _DownloadButtonState extends State<DownloadButton> {
   Future<void> _requestDownload(Products? episode) async {
     final hasGranted = await _checkPermission();
-    print(hasGranted.toString());
 
     if (hasGranted) {
       Provider.of<DownloadController>(context, listen: false)
@@ -40,7 +40,15 @@ class _DownloadButtonState extends State<DownloadButton> {
       builder: (context, value, child) {
         var _task = Provider.of<DownloadController>(context, listen: false)
             .episodeToTask(widget.products);
-        return _downloadButton(_task, context);
+        return Column(
+          children: [
+            _downloadButton(_task, context),
+            widget.isModalPlayer == true
+                ? const Text("Татсан",
+                    style: TextStyle(fontSize: 12, color: MyColors.gray))
+                : const SizedBox()
+          ],
+        );
       },
     );
   }
@@ -50,8 +58,9 @@ class _DownloadButtonState extends State<DownloadButton> {
       case 0:
         return IconButton(
           onPressed: () => _requestDownload(widget.products),
-          icon: const Icon(IconlyLight.arrow_down,
-              size: 20, color: MyColors.gray),
+          icon: Icon(IconlyLight.arrow_down,
+              size: widget.isModalPlayer == true ? 20 : 24,
+              color: MyColors.gray),
           splashRadius: 1,
         );
       case 2:
@@ -62,13 +71,14 @@ class _DownloadButtonState extends State<DownloadButton> {
       case 3:
         return IconButton(
           onPressed: () {},
-          icon: const Icon(IconlyLight.arrow_down,
-              size: 20, color: MyColors.primaryColor),
+          icon: Icon(IconlyLight.arrow_down,
+              size: widget.isModalPlayer == true ? 20 : 24,
+              color: MyColors.primaryColor),
           splashRadius: 1,
         );
 
       default:
-        return Center();
+        return const Center();
     }
   }
 

@@ -36,10 +36,18 @@ class _CreatePostState extends State<CreatePost> {
   @override
   void initState() {
     checkLoginWithBio();
-    Provider.of<Auth>(context, listen: false)
-        .checkTraining()
-        .then((value) => hasTraining = value);
+    checkUserHasTraining();
+    super.initState();
+  }
 
+  checkLoginWithBio() async {
+    final prefs = await SharedPreferences.getInstance();
+    loginWithBio = prefs.getBool("login_biometric") ?? false;
+  }
+
+  Future<void> checkUserHasTraining() async {
+    hasTraining =
+        await Provider.of<Auth>(context, listen: false).checkTraining();
     if (hasTraining) {
       postTypes = [
         'Хүний байгаль',
@@ -49,13 +57,6 @@ class _CreatePostState extends State<CreatePost> {
     } else {
       postTypes = ['Хүний байгаль', 'Миний нандин (Зөвхөн танд)'];
     }
-
-    super.initState();
-  }
-
-  checkLoginWithBio() async {
-    final prefs = await SharedPreferences.getInstance();
-    loginWithBio = prefs.getBool("login_biometric") ?? false;
   }
 
   @override

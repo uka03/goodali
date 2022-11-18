@@ -19,6 +19,7 @@ final downloadTaskIDNotifier = ValueNotifier<String>("0");
 final downloadStatusNotifier =
     ValueNotifier<DownloadState>(DownloadState.undefined);
 
+@pragma('vm:entry-point')
 void downloadCallback(String id, DownloadTaskStatus status, int progress) {
   log('Homepage callback task in $id  status ($status) $progress');
   final send = IsolateNameServer.lookupPortByName('downloader_send_port')!;

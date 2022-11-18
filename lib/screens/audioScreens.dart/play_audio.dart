@@ -10,6 +10,7 @@ import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 
 import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Widgets/download_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
@@ -176,25 +177,8 @@ class _PlayAudioState extends State<PlayAudio> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          fileInfo != null
-                              ? Column(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(IconlyLight.arrow_down,
-                                          color: MyColors.primaryColor),
-                                      splashRadius: 1,
-                                    ),
-                                    const Text("Татсан",
-                                        style: TextStyle(
-                                            fontSize: 12, color: MyColors.gray))
-                                  ],
-                                )
-                              : DownloadPage(
-                                  isPodcast: false,
-                                  fileStream: fileStream,
-                                  downloadFile: _downloadFile,
-                                  products: widget.products),
+                          DownloadButton(
+                              products: widget.products, isModalPlayer: true),
                           Column(
                             children: [
                               IconButton(

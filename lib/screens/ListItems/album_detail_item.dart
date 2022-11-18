@@ -20,9 +20,8 @@ import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 
 import 'package:goodali/models/products_model.dart';
-import 'package:iconly/iconly.dart';
+
 import 'package:just_audio/just_audio.dart';
-import 'dart:developer' as developer;
 
 typedef OnTap = Function(Products audioObject);
 
@@ -124,13 +123,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
     fileInfo = await audioPlayerController.checkCachefor(url);
   }
 
-  void _downloadFile() {
-    setState(() {
-      fileStream =
-          CustomCacheManager.instance.getFileStream(url, withProgress: true);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -186,7 +178,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                 children: [
                   AudioPlayerButton(
                     onPlay: () {
-                      widget.onTap.call();
+                      widget.onTap();
                     },
                     onPause: () {
                       audioHandler.pause();

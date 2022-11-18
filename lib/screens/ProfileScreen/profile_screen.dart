@@ -40,8 +40,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   checkLoginWithBio() async {
-    final prefs = await SharedPreferences.getInstance();
-    loginWithBio = prefs.getBool("login_biometric") ?? false;
+    loginWithBio = Provider.of<Auth>(context, listen: false).loginWithBio;
+
+    log(loginWithBio.toString(), name: "login bio");
   }
 
   Future<UserInfo?> userData() async {
@@ -104,27 +105,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     height: 70,
                                   )),
                               const SizedBox(width: 16),
-                              Wrap(
-                                direction: Axis.vertical,
-                                spacing: 8,
-                                children: [
-                                  Text(
-                                    changedName != null
-                                        ? changedName!
-                                        : userInfo.nickname ?? "",
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        color: MyColors.black,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    userInfo.email ?? "",
-                                    style:
-                                        const TextStyle(color: MyColors.gray),
-                                  ),
-                                ],
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      changedName != null
+                                          ? changedName!
+                                          : userInfo.nickname ?? "",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          color: MyColors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      userInfo.email ?? "",
+                                      style:
+                                          const TextStyle(color: MyColors.gray),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const Spacer(),
                               TextButton(
                                   onPressed: () {
                                     Navigator.push(
@@ -229,6 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: CustomElevatedButton(
                     text: "Нэвтрэх",
                     onPress: () {
+                      log(loginWithBio.toString(), name: "loginwith bio");
                       loginWithBio
                           ? value.authenticateWithBiometrics(context)
                           : showLoginModal(true);

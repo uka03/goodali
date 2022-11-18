@@ -37,17 +37,19 @@ class ProductsAdapter extends TypeAdapter<Products> {
       trainingBanner: fields[17] as String?,
       opennedDate: fields[22] as String?,
       isSpecial: fields[23] as int?,
+      downloadedPath: fields[24] as String?,
       isDownloaded: fields[21] as bool?,
     )
       ..played = fields[13] as bool?
       ..position = fields[15] as int?
-      ..duration = fields[16] as int?;
+      ..duration = fields[16] as int?
+      ..introDuration = fields[25] as int?;
   }
 
   @override
   void write(BinaryWriter writer, Products obj) {
     writer
-      ..writeByte(24)
+      ..writeByte(26)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -95,7 +97,11 @@ class ProductsAdapter extends TypeAdapter<Products> {
       ..writeByte(22)
       ..write(obj.opennedDate)
       ..writeByte(23)
-      ..write(obj.isSpecial);
+      ..write(obj.isSpecial)
+      ..writeByte(24)
+      ..write(obj.downloadedPath)
+      ..writeByte(25)
+      ..write(obj.introDuration);
   }
 
   @override

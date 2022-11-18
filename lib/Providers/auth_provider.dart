@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -27,20 +28,42 @@ class Auth with ChangeNotifier {
   bool _loginWithBio = false;
   bool get loginWithBio => _loginWithBio;
 
+  bool _isFirstTime = false;
+  bool get isFirstTime => _isFirstTime;
+
+  bool _isBiometricEnabled = false;
+  bool get isBiometricEnabled => _isBiometricEnabled;
+
   void changeStatus(bool status) {
-    print("change status");
     _isAuth = status;
     notifyListeners();
   }
 
   Auth() {
     print("ene ehend bnuu");
+    checkIntroScreen();
+    checkBiometric();
+  }
+
+  Future<void> checkIntroScreen() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    _isFirstTime = prefs.getBool("isFirstTime") ?? true;
+    notifyListeners();
+  }
+
+  Future<void> checkBiometric() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    _loginWithBio = prefs.getBool("login_biometric") ?? false;
+
+    notifyListeners();
   }
 
   Future<void> removeIntroScreen(BuildContext context) async {
-    print("removeIntroScreen");
     final prefs = await SharedPreferences.getInstance();
-    prefs.setBool("isFirstTime", true);
+    prefs.setBool("isFirstTime", false);
+    _isFirstTime = false;
     notifyListeners();
   }
 
@@ -133,7 +156,7 @@ class Auth with ChangeNotifier {
     try {
       final preferences = await SharedPreferences.getInstance();
       _canBiometric = await localAuth.canCheckBiometrics;
-      preferences.setBool("first_biometric", true);
+      _isBiometricEnabled = await preferences.setBool("first_biometric", true);
 
       notifyListeners();
     } on PlatformException catch (e) {
@@ -145,8 +168,9 @@ class Auth with ChangeNotifier {
 
   Future<void> enableBiometric(BuildContext context) async {
     final preferences = await SharedPreferences.getInstance();
-    _loginWithBio = true;
-    preferences.setBool("first_biometric", false);
+
+    _isBiometricEnabled = await preferences.setBool("first_biometric", false);
+
     authenticate(context);
     notifyListeners();
   }
@@ -154,6 +178,7 @@ class Auth with ChangeNotifier {
   Future<void> noNeedBiometric() async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setBool("first_biometric", false);
+    _isBiometricEnabled = false;
     notifyListeners();
   }
 
@@ -169,9 +194,11 @@ class Auth with ChangeNotifier {
         ),
       );
       if (_authenticated) {
+        _loginWithBio = true;
+        _isBiometricEnabled = false;
         prefs.setBool("login_biometric", _authenticated);
         _canBiometric = false;
-      }
+      } else {}
       notifyListeners();
     } on PlatformException catch (e) {
       print(e);

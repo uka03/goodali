@@ -344,11 +344,34 @@ class _AlbumDetailState extends State<AlbumDetail> {
               if (widget.albumProduct.isBought == false &&
                   product[index].isBought == false) {
                 return AlbumIntroItem(
-                    albumName: '',
-                    audioPlayer: audioPlayer,
-                    products: product[index],
-                    productsList: product,
-                    albumProducts: widget.albumProduct);
+                  albumName: '',
+                  audioPlayer: audioPlayer,
+                  products: product[index],
+                  albumProducts: widget.albumProduct,
+                  onTap: () async {
+                    if (widget.albumProduct.isBought == false) {
+                      currentlyPlaying.value = product[index];
+                      if (activeList.first.title == product.first.title &&
+                          activeList.first.id == product.first.id) {
+                        await audioHandler.skipToQueueItem(index);
+                        await audioHandler.seek(
+                          Duration(milliseconds: product[index].position!),
+                        );
+                        await audioHandler.play();
+                      } else if (activeList.first.title !=
+                              product.first.title ||
+                          activeList.first.id != product.first.id) {
+                        activeList = product;
+                        await initiliazePodcast();
+                        await audioHandler.skipToQueueItem(index);
+                        await audioHandler.seek(
+                          Duration(milliseconds: product[index].position!),
+                        );
+                        await audioHandler.play();
+                      }
+                    } else {}
+                  },
+                );
               } else {
                 return Padding(
                   padding: const EdgeInsets.only(top: 12),
@@ -367,7 +390,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                           await audioHandler.seek(
                             Duration(milliseconds: product[index].position!),
                           );
-                          audioHandler.play();
+                          await audioHandler.play();
                         } else if (activeList.first.title !=
                                 product.first.title ||
                             activeList.first.id != product.first.id) {
@@ -377,7 +400,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                           await audioHandler.seek(
                             Duration(milliseconds: product[index].position!),
                           );
-                          audioHandler.play();
+                          await audioHandler.play();
                         }
                         currentlyPlaying.value = product[index];
                       } else {}
@@ -436,9 +459,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
               builder: (BuildContext context,
                   void Function(void Function()) setState) {
                 return IntroAudio(
-                    products: widget.albumProduct,
-                    productsList: const [],
-                    audioPlayer: introAudioPlayer);
+                    products: widget.albumProduct, productsList: const []);
               },
             ));
   }

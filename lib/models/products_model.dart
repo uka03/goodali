@@ -56,6 +56,8 @@ class Products extends HiveObject {
   int? isSpecial;
   @HiveField(24)
   String? downloadedPath;
+  @HiveField(25)
+  int? introDuration;
 
   Products(
       {this.audio,
@@ -100,6 +102,7 @@ class Products extends HiveObject {
     audioCount = json['audio_count'] ?? 0;
     trainingBanner = json['t_banner'] ?? "";
     duration = json['duration'] ?? 0;
+    introDuration = json['intro_duration'] ?? 0;
     position = json['position'] ?? 0;
     moodListId = json['mood_list_id'] ?? 0;
     played = json['played'] ?? false;
@@ -136,6 +139,7 @@ class Products extends HiveObject {
     data['openned_date'] = opennedDate;
     data['is_special'] = isSpecial;
     data['downloaded_ath'] = downloadedPath;
+    data['intro_duration'] = introDuration;
     return data;
   }
 

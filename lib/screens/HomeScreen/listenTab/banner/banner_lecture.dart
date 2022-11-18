@@ -229,7 +229,7 @@ class _BannerLectureState extends State<BannerLecture> {
                               albumName: '',
                               audioPlayer: audioPlayer,
                               products: bannerLecture[index],
-                              productsList: bannerLecture,
+                              onTap: () {},
                               albumProducts: albumDetail,
                             );
                           } else {
@@ -287,9 +287,7 @@ class _BannerLectureState extends State<BannerLecture> {
               builder: (BuildContext context,
                   void Function(void Function()) setState) {
                 return IntroAudio(
-                    products: albumDetail,
-                    productsList: const [],
-                    audioPlayer: introAudioPlayer);
+                    products: albumDetail, productsList: const []);
               },
             ));
   }

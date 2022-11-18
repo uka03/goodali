@@ -122,35 +122,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                           TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
                       selectedLabelStyle: TextStyle(
                           fontSize: 10, fontWeight: FontWeight.w300))),
-              home: FutureBuilder<SharedPreferences>(
-                  future: SharedPreferences.getInstance(),
-                  builder:
-                      (context, AsyncSnapshot<SharedPreferences> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                        print("Connection none");
-                        return const Blank();
-                      case ConnectionState.waiting:
-                        return const Blank();
-                      case ConnectionState.done:
-                        if (!snapshot.hasError) {
-                          developer.log(
-                              "biometric ${snapshot.data?.getBool("first_biometric")}");
-                          developer.log(
-                              "intro ${snapshot.data?.getBool("isFirstTime")}");
-                          return snapshot.data?.getBool("isFirstTime") == null
-                              ? const IntroScreen()
-                              : snapshot.data?.getBool("first_biometric") ==
-                                      true
-                                  ? const EnableBiometric()
-                                  : const BottomTabbar();
-                        } else {
-                          return const BottomTabbar();
-                        }
-                      case ConnectionState.active:
-                        return const Blank();
-                    }
-                  }));
+              home: Consumer<Auth>(builder: (context, value, _) {
+                developer.log("biometric ${value.isBiometricEnabled}");
+                developer.log("intro ${value.isFirstTime}");
+                if (value.isFirstTime) {
+                  return const IntroScreen();
+                } else if (value.isBiometricEnabled) {
+                  return const EnableBiometric();
+                } else {
+                  return const BottomTabbar();
+                }
+              }));
         },
       ),
     );

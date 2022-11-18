@@ -111,7 +111,6 @@ class HiveBoughtDataStore {
     developer.log(datas.length.toString());
     for (var element in datas) {
       if ((Urls.networkPath + element.audio!) == url) {
-        developer.log(element.title!);
         products = element;
       }
     }
@@ -151,7 +150,7 @@ class HiveBoughtDataStore {
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
-      developer.log(item.title!, name: "bought");
+
       await item.save();
     }
   }
@@ -171,7 +170,10 @@ class HiveMoodDataStore {
   /// Add new user
   Future<void> addProduct({required Products products}) async {
     print("box lenght ${box.values.length}");
-    var datas = box.values.where((c) => c.id == products.id).toList();
+    var datas = box.values
+        .where(
+            (c) => c.id == products.id && c.moodListId == products.moodListId)
+        .toList();
 
     print("datas lenght ${datas.length}");
 
@@ -187,7 +189,7 @@ class HiveMoodDataStore {
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
-      developer.log(item.title!);
+
       await item.save();
     }
   }
@@ -198,7 +200,7 @@ class HiveMoodDataStore {
     for (var i = 0; i < box.length; i++) {
       list.add(box.get(i)!);
     }
-    developer.log(list.length.toString(), name: "name");
+
     return list;
   }
 

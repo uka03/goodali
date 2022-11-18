@@ -1,13 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:goodali/Providers/audio_download_provider.dart';
-import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
+import 'package:goodali/controller/download_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:provider/provider.dart';
 
 typedef OnTap = Function(Products audioObject);
 
@@ -24,37 +27,39 @@ class _DownloadedState extends State<Downloaded> {
 
   @override
   void initState() {
-    getDownloadedData();
+    // getDownloadedData();
     super.initState();
   }
 
-  Future<void> getDownloadedData() async {
-    List<Products> downloaded = [];
-    Box<Products> box = Hive.box<Products>("bought_podcasts");
-    if (box.values.isNotEmpty) {
-      for (var i = 0; i < box.values.length; i++) {
-        Products? products = box.getAt(i);
-        if (products?.isDownloaded == true) {
-          downloaded.add(products!);
-        }
-      }
-    }
-    setState(() {
-      downloadedList = downloaded;
-    });
-  }
+  // Future<void> getDownloadedData() async {
+  //   List<Products> downloaded = [];
+  //   Box<Products> box = Hive.box<Products>("bought_podcasts");
+  //   if (box.values.isNotEmpty) {
+  //     for (var i = 0; i < box.values.length; i++) {
+  //       Products? products = box.getAt(i);
+  //       if (products?.isDownloaded == true) {
+  //         downloaded.add(products!);
+  //       }
+  //     }
+  //   }
+  //   setState(() {
+  //     downloadedList = downloaded;
+  //   });
+  // }
 
   _onPlayButtonTapped(int index) async {
-    if (activeList.first.title == downloadedList.first.title &&
+    if (activeList.first.lectureTitle == downloadedList.first.lectureTitle &&
         activeList.first.id == downloadedList.first.id) {
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: downloadedList[index].position!),
       );
       await audioHandler.play();
-    } else if (activeList.first.title != downloadedList.first.title ||
+    } else if (activeList.first.lectureTitle !=
+            downloadedList.first.lectureTitle ||
         activeList.first.id != downloadedList.first.id) {
       activeList = downloadedList;
+
       await initiliazePodcast();
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
@@ -69,22 +74,13 @@ class _DownloadedState extends State<Downloaded> {
   Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.all(20),
-        child: downloadedList.isNotEmpty
-            ? ListView.builder(
-                itemCount: downloadedList.length,
-                itemBuilder: (context, index) {
-                  return AlbumDetailItem(
-                    index: index,
-                    products: downloadedList[index],
-                    albumName: downloadedList[index].albumTitle ?? "",
-                    isBought: downloadedList[index].isBought ?? true,
-                    onTap: () {
-                      _onPlayButtonTapped(index);
-                    },
-                    productsList: downloadedList,
-                  );
-                })
-            : Column(
+        child: Consumer<DownloadController>(
+          builder: (context, value, child) {
+            for (var element in value.episodeTasks) {
+              downloadedList.add(element.products!);
+            }
+            if (value.episodeTasks.isEmpty) {
+              return Column(
                 children: [
                   const SizedBox(height: 80),
                   SvgPicture.asset("assets/images/empty_bought.svg"),
@@ -94,6 +90,26 @@ class _DownloadedState extends State<Downloaded> {
                     style: TextStyle(fontSize: 14, color: MyColors.gray),
                   ),
                 ],
-              ));
+              );
+            } else {
+              return ListView.builder(
+                  itemCount: value.episodeTasks.length,
+                  itemBuilder: (context, index) {
+                    return AlbumDetailItem(
+                      index: index,
+                      products: value.episodeTasks[index].products!,
+                      albumName:
+                          value.episodeTasks[index].products!.albumTitle ?? "",
+                      isBought:
+                          value.episodeTasks[index].products!.isBought ?? true,
+                      onTap: () {
+                        _onPlayButtonTapped(index);
+                      },
+                      productsList: const [],
+                    );
+                  });
+            }
+          },
+        ));
   }
 }

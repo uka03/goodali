@@ -31,9 +31,6 @@ class MoodDetail extends StatefulWidget {
 }
 
 class _MoodDetailState extends State<MoodDetail> {
-  late final tagFuture = getMoodList();
-  Box<Products> box = Hive.box<Products>("mood_podcasts");
-
   final PageController _pageController = PageController();
   final HiveMoodDataStore dataMoodStore = HiveMoodDataStore();
   final _kDuration = const Duration(milliseconds: 300);
@@ -59,8 +56,7 @@ class _MoodDetailState extends State<MoodDetail> {
   @override
   void initState() {
     super.initState();
-
-    boxList = box.values.toList();
+    getMoodList();
     _pageController.addListener(() {
       setState(() {
         _current = _pageController.page!;
@@ -97,17 +93,7 @@ class _MoodDetailState extends State<MoodDetail> {
         totalDuration = Duration(milliseconds: moodItemWithAudio!.duration!);
       }
 
-      print("box lenght ${boxList.length}");
-      if (boxList.isNotEmpty) {
-        for (var element in boxList) {
-          if (moodItemWithAudio!.id == element.id) {
-            print("iiisheee orj irjiinuuuu");
-
-            savedPosition = moodItemWithAudio?.position ?? 0;
-          }
-        }
-      }
-
+      savedPosition = moodItemWithAudio?.position ?? 0;
       developer.log(savedPosition.toString(), name: "moodItem duration");
       return totalDuration;
     } catch (e) {
@@ -120,8 +106,8 @@ class _MoodDetailState extends State<MoodDetail> {
     final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
     final mediaInfo = mediaInfoSession.getMediaInformation()!;
     final double _duration = double.parse(mediaInfo.getDuration()!);
-    moodItemWithAudio?.duration = (_duration * 1000).toInt();
-    await moodItemWithAudio?.save();
+    moodItemWithAudio!.duration = (_duration * 1000).toInt();
+    await moodItemWithAudio!.save();
     return Duration(milliseconds: (_duration * 1000).toInt());
   }
 
@@ -165,11 +151,17 @@ class _MoodDetailState extends State<MoodDetail> {
         SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: FutureBuilder(
-            future: tagFuture,
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData) {
-                List<Products> moodList = snapshot.data;
+          child: ValueListenableBuilder(
+            valueListenable: HiveMoodDataStore.box.listenable(),
+            builder: (context, Box box, _) {
+              if (box.length > 0) {
+                List<Products> moodList = [];
+                for (var i = 0; i < box.length; i++) {
+                  Products products = box.get(i);
+                  if (products.moodListId == int.parse(widget.moodListId)) {
+                    moodList.add(products);
+                  }
+                }
 
                 moodItem = moodList;
 
@@ -440,32 +432,18 @@ class _MoodDetailState extends State<MoodDetail> {
     setState(() {
       moodItem = listData;
     });
-
-    developer.log("get mood list");
+    String url = "";
     for (var item in listData) {
       if (item.audio != "Audio failed to upload") {
         moodItemWithAudio = item;
-        developer.log(moodItemWithAudio!.id.toString(), name: "audio bain");
+        url = Urls.networkPath + moodItemWithAudio!.audio!;
       }
+      await dataMoodStore.addProduct(products: item);
     }
-
-    print("fhfh ${boxList.length}");
-
-    if (boxList.isNotEmpty) {
-      developer.log(boxList.length.toString(), name: "box length");
-      for (var i = 0; i < boxList.length; i++) {
-        print("elemnt id ${boxList[i].id}");
-        if (boxList[i].id != moodItemWithAudio!.id) {
-          await box.add(moodItemWithAudio!);
-        }
-      }
-    } else {
-      print("else orloo");
-      await box.add(moodItemWithAudio!);
+    if (url != "") {
+      await getTotalDuration(url);
+      await initiliaze();
     }
-
-    await getTotalDuration(Urls.networkPath + moodItemWithAudio!.audio!);
-    await initiliaze();
 
     return listData;
   }
