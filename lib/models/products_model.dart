@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/rendering.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:hive/hive.dart';
 
@@ -76,7 +77,7 @@ class Products extends HiveObject {
       this.moodListId,
       this.lectureTitle,
       this.audioCount,
-      this.isBought,
+      this.isBought = false,
       this.trainingBanner,
       this.opennedDate,
       this.isSpecial,

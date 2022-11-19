@@ -183,6 +183,12 @@ Future<bool> initiliazePodcast() async {
   log(activeList.length.toString(), name: "lesture list");
 
   for (var item in activeList) {
+    var url = "";
+    if (item.isBought == true) {
+      url = Urls.networkPath + item.audio!;
+    } else {
+      url = Urls.networkPath + item.intro!;
+    }
     MediaItem mediaItem = MediaItem(
       id: item.id.toString(),
       artUri: Uri.parse(Urls.networkPath + item.banner!),
@@ -191,7 +197,7 @@ Future<bool> initiliazePodcast() async {
           ? Duration(milliseconds: item.duration!)
           : null,
       extras: {
-        'url': Urls.networkPath + item.audio!,
+        'url': url,
       },
     );
     mediaItems.add(mediaItem);
