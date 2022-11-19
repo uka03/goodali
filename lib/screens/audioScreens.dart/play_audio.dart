@@ -243,10 +243,11 @@ class _PlayAudioState extends State<PlayAudio> {
                               "assets/images/replay_5.svg",
                             ),
                           ),
-                          const CircleAvatar(
+                          CircleAvatar(
                               radius: 36,
                               backgroundColor: MyColors.primaryColor,
-                              child: PlayerButtons()),
+                              child:
+                                  PlayerButtons(title: widget.products.title!)),
                           InkWell(
                             onTap: buttonForward15Seconds,
                             child: SvgPicture.asset(

@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
-import 'package:goodali/models/audio_player_model.dart';
-import 'package:goodali/models/products_model.dart';
-import 'package:provider/provider.dart';
 
 class PlayerButtons extends StatelessWidget {
-  const PlayerButtons({Key? key}) : super(key: key);
+  final String title;
+  const PlayerButtons({Key? key, required this.title}) : super(key: key);
+
+  Future<void> updateSavedPosition() async {
+    var item = currentlyPlaying.value;
+
+    if (item != null) {
+      if (item.title == title) {}
+      item.position = durationStateNotifier.value.progress!.inMilliseconds;
+
+      return item.save();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final audioPosition =
-        Provider.of<AudioPlayerProvider>(context, listen: false);
     return ValueListenableBuilder(
       valueListenable: buttonNotifier,
       builder:
           (BuildContext context, ButtonState? buttonValue, Widget? widget) {
-        Products? currentlyPlay = currentlyPlaying.value;
-        final position = durationStateNotifier.value.progress;
         switch (buttonValue) {
           case ButtonState.loading:
             return const CircularProgressIndicator(color: Colors.white);
@@ -43,11 +47,8 @@ class PlayerButtons extends StatelessWidget {
                 color: Colors.white,
                 size: 40.0,
               ),
-              onPressed: () {
-                AudioPlayerModel _audio = AudioPlayerModel(
-                    productID: currentlyPlay?.id ?? 0,
-                    audioPosition: position?.inMilliseconds ?? 0);
-                audioPosition.addAudioPosition(_audio);
+              onPressed: () async {
+                await updateSavedPosition();
                 audioHandler.pause();
               },
             );

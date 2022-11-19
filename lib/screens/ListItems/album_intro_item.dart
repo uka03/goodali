@@ -63,9 +63,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
 
   @override
   void initState() {
-    String introURL = Urls.networkPath + widget.products.intro!;
-    url = introURL;
-    getTotalDuration(url);
+    getTotalDuration(Urls.networkPath + widget.products.audio!);
     super.initState();
   }
 
@@ -76,17 +74,20 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
 
   Future<Duration> getTotalDuration(String url) async {
     try {
-      if (widget.products.introDuration == null ||
-          widget.products.introDuration == 0) {
+      if (widget.products.duration == null || widget.products.duration == 0) {
         _totalduration = await getFileDuration(url);
       } else {
-        _totalduration = Duration(milliseconds: widget.products.introDuration!);
+        _totalduration = Duration(milliseconds: widget.products.duration!);
       }
 
-      setState(() {
-        duration = _totalduration;
-        isLoading = false;
-      });
+      log(_totalduration.toString(), name: "intro duration");
+
+      if (mounted) {
+        setState(() {
+          duration = _totalduration;
+          isLoading = false;
+        });
+      }
 
       savedPosition = widget.products.position!;
       return duration;
@@ -100,7 +101,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
     final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
     final mediaInfo = mediaInfoSession.getMediaInformation()!;
     final double duration = double.parse(mediaInfo.getDuration()!);
-    widget.products.introDuration = (duration * 1000).toInt();
+    widget.products.duration = (duration * 1000).toInt();
     await widget.products.save();
     return Duration(milliseconds: (duration * 1000).toInt());
   }

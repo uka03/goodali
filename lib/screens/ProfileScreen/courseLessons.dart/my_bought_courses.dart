@@ -22,7 +22,7 @@ class MyCourses extends StatefulWidget {
 }
 
 class _MyCoursesState extends State<MyCourses> {
-  final HiveBoughtDataStore dataStore = HiveBoughtDataStore();
+  final HiveProfileBoughtLecture dataStore = HiveProfileBoughtLecture();
   AudioPlayerController audioPlayerController = AudioPlayerController();
   List<Products> allLectures = [];
   List<Products> allListProducts = [];
@@ -40,21 +40,23 @@ class _MyCoursesState extends State<MyCourses> {
 
   onPlayButtonClicked(int index) async {
     if (activeList.first.title == allLectures.first.title &&
-        activeList.first.id == allLectures.first.id) {
+        activeList.first.id == allLectures.first.id &&
+        allLectures.first.isBought == false) {
       await audioHandler.skipToQueueItem(index);
-      await audioHandler.seek(
+      audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
       );
+      print("eswel iiisheeeeee orj irj  bnu MyCourses");
       audioHandler.play();
       currentlyPlaying.value = allLectures[index];
     } else if (activeList.first.title != allLectures.first.title ||
         activeList.first.id != allLectures.first.id) {
-      print("iisheee orj irj  bnu");
+      print("iisheee orj irj  bnu MyCourses");
       activeList = allLectures;
 
       await initiliazePodcast();
       await audioHandler.skipToQueueItem(index);
-      await audioHandler.seek(
+      audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
       );
       audioHandler.play();
@@ -93,7 +95,7 @@ class _MyCoursesState extends State<MyCourses> {
 
   Widget allLecturesWidget() {
     return ValueListenableBuilder(
-      valueListenable: HiveBoughtDataStore.box.listenable(),
+      valueListenable: HiveProfileBoughtLecture.box.listenable(),
       builder: (context, Box box, child) {
         List<Products> allboughtLectures = [];
 

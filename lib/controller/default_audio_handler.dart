@@ -118,6 +118,7 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> skipToQueueItem(int index) async {
     // Then default implementations of skipToNext and skipToPrevious provided by
     // the [QueueHandler] mixin will delegate to this method.
+    queue.value[index].extras!["duration"];
     if (index < 0 || index >= queue.value.length) return;
     // This jumps to the beginning of the queue item at newIndex.
     _player.seek(Duration.zero, index: index);

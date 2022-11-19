@@ -27,25 +27,8 @@ class _DownloadedState extends State<Downloaded> {
 
   @override
   void initState() {
-    // getDownloadedData();
     super.initState();
   }
-
-  // Future<void> getDownloadedData() async {
-  //   List<Products> downloaded = [];
-  //   Box<Products> box = Hive.box<Products>("bought_podcasts");
-  //   if (box.values.isNotEmpty) {
-  //     for (var i = 0; i < box.values.length; i++) {
-  //       Products? products = box.getAt(i);
-  //       if (products?.isDownloaded == true) {
-  //         downloaded.add(products!);
-  //       }
-  //     }
-  //   }
-  //   setState(() {
-  //     downloadedList = downloaded;
-  //   });
-  // }
 
   _onPlayButtonTapped(int index) async {
     if (activeList.first.lectureTitle == downloadedList.first.lectureTitle &&

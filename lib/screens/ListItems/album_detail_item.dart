@@ -178,6 +178,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                 children: [
                   AudioPlayerButton(
                     onPlay: () {
+                      print("ene daragdhguu bgamu");
                       widget.onTap();
                     },
                     onPause: () {

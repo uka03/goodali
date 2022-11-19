@@ -383,6 +383,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     index: index,
                     albumProducts: widget.albumProduct,
                     onTap: () async {
+                      print(widget.albumProduct.isBought == true);
                       if (widget.albumProduct.isBought == true) {
                         if (activeList.first.title == product.first.title &&
                             activeList.first.id == product.first.id) {

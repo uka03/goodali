@@ -89,7 +89,6 @@ class _PodcastState extends State<Podcast> {
                         NotListenedPodcast(
                           dataStore: dataStore,
                         ),
-                        const DownloadedPodcast(),
                         ListenedPodcast(
                           dataStore: dataStore,
                         )

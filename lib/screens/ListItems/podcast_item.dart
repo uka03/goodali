@@ -55,7 +55,7 @@ class _PodcastItemState extends State<PodcastItem> {
     if (widget.podcastItem.audio != "Audio failed to upload") {
       audioUrl = Urls.networkPath + (widget.podcastItem.audio ?? "");
     }
-    log(widget.podcastItem.isDownloaded.toString(), name: "downloaded");
+
     if (audioUrl != '') {
       getTotalDuration();
     }

@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:goodali/Providers/audio_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -70,7 +66,6 @@ class _IntroAudioState extends State<IntroAudio> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
-
     return SizedBox(
       height: MediaQuery.of(context).size.height / 2 + 120,
       width: MediaQuery.of(context).size.width,
@@ -196,10 +191,10 @@ class _IntroAudioState extends State<IntroAudio> {
                     "assets/images/replay_5.svg",
                   ),
                 ),
-                const CircleAvatar(
+                CircleAvatar(
                     radius: 36,
                     backgroundColor: MyColors.primaryColor,
-                    child: PlayerButtons()),
+                    child: PlayerButtons(title: widget.products.title ?? "")),
                 InkWell(
                   onTap: () {
                     buttonForward15Seconds();
