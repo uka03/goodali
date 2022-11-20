@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
@@ -8,6 +9,7 @@ import 'package:goodali/screens/ForumScreen/human_nature_tab.dart';
 import 'package:goodali/screens/ForumScreen/my_friend_tab.dart';
 import 'package:goodali/screens/ForumScreen/tuudeg_gal_tab.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
 
 import '../../Utils/circle_tab_indicator.dart';
 
@@ -101,49 +103,47 @@ class _ForumScreenState extends State<ForumScreen> {
                         unselectedLabelColor: MyColors.gray,
                         indicatorColor: MyColors.primaryColor,
                       ),
-                      container:
-                          // context
-                          //         .watch<ForumTagNotifier>()
-                          //         .selectedForumNames
-                          //         .isEmpty?
-                          null
-                      // : Consumer<ForumTagNotifier>(
-                      //     builder:
-                      //         (BuildContext context, value, Widget? child) {
-                      //       return SizedBox(
-                      //         height: 40,
-                      //         width: MediaQuery.of(context).size.width,
-                      //         child: ListView(
-                      //             scrollDirection: Axis.horizontal,
-                      //             children: value.selectedForumNames
-                      //                 .map((e) => Padding(
-                      //                       padding: const EdgeInsets.only(
-                      //                           left: 8.0),
-                      //                       child: Chip(
-                      //                         padding:
-                      //                             const EdgeInsets.all(2.0),
-                      //                         side: const BorderSide(
-                      //                             color: MyColors.border2,
-                      //                             width: 0.5),
-                      //                         backgroundColor: Colors.white,
-                      //                         label: Text(
-                      //                           e,
-                      //                           style: const TextStyle(
-                      //                               color: MyColors.black),
-                      //                         ),
-                      //                         deleteIcon: const Icon(
-                      //                             Icons.close,
-                      //                             size: 20),
-                      //                         onDeleted: () {
-                      //                           value.removeTags(e);
-                      //                         },
-                      //                       ),
-                      //                     ))
-                      //                 .toList()),
-                      //       );
-                      //     },
-                      //   )
-                      ))
+                      container: context
+                              .watch<ForumTagNotifier>()
+                              .selectedForumNames
+                              .isEmpty
+                          ? null
+                          : Consumer<ForumTagNotifier>(
+                              builder:
+                                  (BuildContext context, value, Widget? child) {
+                                return SizedBox(
+                                  height: 40,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: value.selectedForumNames
+                                          .map((e) => Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8.0),
+                                                child: Chip(
+                                                  padding:
+                                                      const EdgeInsets.all(2.0),
+                                                  side: const BorderSide(
+                                                      color: MyColors.border2,
+                                                      width: 0.5),
+                                                  backgroundColor: Colors.white,
+                                                  label: Text(
+                                                    e,
+                                                    style: const TextStyle(
+                                                        color: MyColors.black),
+                                                  ),
+                                                  deleteIcon: const Icon(
+                                                      Icons.close,
+                                                      size: 20),
+                                                  onDeleted: () {
+                                                    value.removeTags(e);
+                                                  },
+                                                ),
+                                              ))
+                                          .toList()),
+                                );
+                              },
+                            )))
             ];
           },
           body: const TabBarView(

@@ -3,11 +3,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 
 class ForumTagNotifier with ChangeNotifier {
-  List<String> _selectedForumNames = [];
-  List<String> get selectedForumNames => _selectedForumNames;
+  List<Map<String, dynamic>> _selectedForumNames = [];
+  List<Map<String, dynamic>> get selectedForumNames => _selectedForumNames;
 
-  void setTags(List<String> tagName) {
-    List<String> tagList = [
+  void setTags(List<Map<String, dynamic>> tagName) {
+    List<Map<String, dynamic>> tagList = [
       ...{...tagName}
     ];
 
@@ -16,7 +16,7 @@ class ForumTagNotifier with ChangeNotifier {
     notifyListeners();
   }
 
-  void removeTags(String tagName) {
+  void removeTags(Map<String, dynamic> tagName) {
     _selectedForumNames.remove(tagName);
 
     log(_selectedForumNames.length.toString(), name: 'removetags');

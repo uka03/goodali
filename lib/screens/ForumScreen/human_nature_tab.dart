@@ -3,6 +3,7 @@ import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
+import 'package:goodali/Widgets/filter_modal.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/models/post_list_model.dart';
@@ -114,94 +115,10 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return Container(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 38,
-                        height: 6,
-                        decoration: BoxDecoration(
-                            color: MyColors.gray,
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text("Шүүлтүүр",
-                          style: TextStyle(
-                              fontSize: 22,
-                              color: MyColors.black,
-                              fontWeight: FontWeight.bold)),
-                      Expanded(
-                        child: FutureBuilder(
-                          future: tagFuture,
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.hasData &&
-                                ConnectionState.done ==
-                                    snapshot.connectionState) {
-                              tagList = snapshot.data;
-                              return ListView.builder(
-                                  itemCount: tagList.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return CheckboxListTile(
-                                        activeColor: MyColors.primaryColor,
-                                        checkColor: MyColors.primaryColor,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(4)),
-                                        side: const BorderSide(
-                                            color: MyColors.border1),
-                                        title: Text(
-                                          tagList[index].name ?? "",
-                                          style: const TextStyle(
-                                              color: MyColors.black),
-                                        ),
-                                        onChanged: (bool? value) {
-                                          if (value == true) {
-                                            setState(() {
-                                              if (!checkedTag.contains(
-                                                  tagList[index].id)) {
-                                                checkedTag.add(
-                                                    tagList[index].id ?? 0);
-                                              }
-                                            });
-                                          } else {
-                                            setState(() {
-                                              checkedTag
-                                                  .remove(tagList[index].id);
-                                            });
-                                          }
-                                        },
-                                        value: checkedTag
-                                            .contains(tagList[index].id));
-                                  });
-                            } else {
-                              return const Center(
-                                  child: CircularProgressIndicator(
-                                      color: MyColors.primaryColor,
-                                      strokeWidth: 2));
-                            }
-                          },
-                        ),
-                      ),
-                      CustomElevatedButton(
-                          text: "Шүүх",
-                          onPress: () {
-                            filterPost(tagList);
-
-                            Navigator.pop(context, checkedTag);
-                          }),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                );
-              },
-            ));
+        builder: (_) => FilterModal(onFilter: () {
+              filterPost(tagList);
+              Navigator.pop(context, filteredList);
+            }));
   }
 
   Future<List<TagModel>> getTagList() async {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
@@ -43,8 +45,10 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
   late final AudioPlayer introAudioPlayer = AudioPlayer();
   List<int> albumProductsList = [];
+  bool isLoading = true;
 
   final HiveBoughtDataStore dataStore = HiveBoughtDataStore();
+  final HiveIntroDataStore dataIntroStore = HiveIntroDataStore();
 
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
@@ -58,6 +62,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   bool isPlaying = false;
 
   List<Products> buyList = [];
+  List<Products> introList = [];
   AudioPlayer audioPlayer = AudioPlayer();
   @override
   void initState() {
@@ -130,7 +135,9 @@ class _AlbumDetailState extends State<AlbumDetail> {
         body: Consumer<Auth>(
           builder: (context, value, child) {
             return ValueListenableBuilder(
-              valueListenable: HiveBoughtDataStore.box.listenable(),
+              valueListenable: value.isAuth
+                  ? HiveBoughtDataStore.box.listenable()
+                  : HiveIntroDataStore.box.listenable(),
               builder: (context, Box box, boxWidgets) {
                 if (box.length > 0) {
                   List<Products> lectureList = [];
@@ -141,6 +148,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     }
                   }
                   buyList = lectureList;
+
                   // });
                   return Column(
                     children: [
@@ -217,7 +225,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                                   )),
                               const SizedBox(height: 20),
                               const Divider(endIndent: 20, indent: 20),
-                              lecture(context, lectureList),
+                              lecture(context, lectureList, isAuth),
                               const SizedBox(height: 70),
                             ]),
                           ),
@@ -252,7 +260,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
     );
   }
 
-  Widget lecture(BuildContext context, List<Products> product) {
+  Widget lecture(BuildContext context, List<Products> product, bool isAuth) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -354,10 +362,12 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       if (activeList.first.title == product.first.title &&
                           activeList.first.id == product.first.id) {
                         await audioHandler.skipToQueueItem(index);
+                        log("Starts in: ${product[index].position}");
+
                         await audioHandler.seek(
                           Duration(milliseconds: product[index].position!),
                         );
-                        await audioHandler.play();
+                        audioHandler.play();
                       } else if (activeList.first.title !=
                               product.first.title ||
                           activeList.first.id != product.first.id) {
@@ -386,7 +396,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       print(widget.albumProduct.isBought == true);
                       if (widget.albumProduct.isBought == true) {
                         if (activeList.first.title == product.first.title &&
-                            activeList.first.id == product.first.id) {
+                            activeList.first.id == product.first.id &&
+                            !isAuth) {
                           await audioHandler.skipToQueueItem(index);
                           await audioHandler.seek(
                             Duration(milliseconds: product[index].position!),
@@ -468,10 +479,15 @@ class _AlbumDetailState extends State<AlbumDetail> {
   Future<void> getAlbumLectures() async {
     var data = await Connection.getAlbumLectures(
         context, widget.albumProduct.id.toString());
+
+    setState(() {
+      introList = data;
+      isLoading = false;
+    });
     // _initiliazePodcast(lectureList);
     for (var item in data) {
       item.albumTitle = widget.albumProduct.title;
-      dataStore.addProduct(products: item);
+      dataIntroStore.addProduct(products: item);
     }
   }
 

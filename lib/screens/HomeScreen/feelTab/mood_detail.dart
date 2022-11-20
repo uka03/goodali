@@ -131,7 +131,7 @@ class _MoodDetailState extends State<MoodDetail> {
     await audioHandler.seek(
       Duration(milliseconds: savedPosition),
     );
-    await audioHandler.play();
+    audioHandler.play();
   }
 
   @override

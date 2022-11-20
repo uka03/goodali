@@ -36,6 +36,7 @@ Future<void> main() async {
   await Hive.openBox<Products>("bought_podcasts");
   await Hive.openBox<Products>("mood_podcasts");
   await Hive.openBox<Products>("profile_bought_podcasts");
+  await Hive.openBox<Products>("intro_lecture");
   runApp(const MyApp());
 }
 
