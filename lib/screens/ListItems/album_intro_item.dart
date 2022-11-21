@@ -92,7 +92,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
       savedPosition = widget.products.position!;
       return duration;
     } catch (e) {
-      log(e.toString());
+      log(e.toString(), name: "intro item");
     }
     return duration;
   }
@@ -111,6 +111,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
     final cart = Provider.of<CartProvider>(context);
     return GestureDetector(
         onTap: () {
+          widget.onTap();
           showIntroAudioModal();
         },
         child: Column(

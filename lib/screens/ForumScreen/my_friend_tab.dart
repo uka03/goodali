@@ -4,6 +4,7 @@ import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
+import 'package:goodali/Widgets/filter_modal.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/tag_model.dart';
@@ -12,7 +13,8 @@ import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 
 class MyFriendTab extends StatefulWidget {
-  const MyFriendTab({Key? key}) : super(key: key);
+  final List<TagModel> tagList;
+  const MyFriendTab({Key? key, required this.tagList}) : super(key: key);
 
   @override
   State<MyFriendTab> createState() => _MyFriendTabState();
@@ -20,7 +22,7 @@ class MyFriendTab extends StatefulWidget {
 
 class _MyFriendTabState extends State<MyFriendTab> {
   List<bool> isHearted = [];
-  late final tagFuture = getTagList();
+
   List<int> checkedTag = [];
   List<PostListModel> filteredList = [];
   List<PostListModel> postList = [];
@@ -92,7 +94,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
         ),
       ),
       floatingActionButton: FilterButton(onPress: () {
-        showModalTag(context, tagFuture, checkedTag);
+        showModalTag(context, checkedTag);
       }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -112,7 +114,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
     return Connection.getPostList(context, {"post_type": 2});
   }
 
-  showModalTag(BuildContext context, Future tagFuture, List<int> checkedTag) {
+  showModalTag(BuildContext context, List<int> checkedTag) {
     List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
@@ -120,89 +122,17 @@ class _MyFriendTabState extends State<MyFriendTab> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => SizedBox(
-              height: MediaQuery.of(context).size.height - 100,
-              child: StatefulBuilder(
-                builder: (BuildContext context,
-                    void Function(void Function()) setState) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 38,
-                          height: 6,
-                          decoration: BoxDecoration(
-                              color: MyColors.gray,
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text("Шүүлтүүр",
-                            style: TextStyle(
-                                fontSize: 22,
-                                color: MyColors.black,
-                                fontWeight: FontWeight.bold)),
-                        Expanded(
-                          child: FutureBuilder(
-                            future: tagFuture,
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData &&
-                                  ConnectionState.done ==
-                                      snapshot.connectionState) {
-                                tagList = snapshot.data;
-                                return ListView.builder(
-                                    itemCount: tagList.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return CheckboxListTile(
-                                          title:
-                                              Text(tagList[index].name ?? ""),
-                                          activeColor: MyColors.primaryColor,
-                                          onChanged: (bool? value) {
-                                            if (value == true) {
-                                              setState(() {
-                                                checkedTag.add(
-                                                    tagList[index].id ?? 0);
-                                              });
-                                            } else {
-                                              setState(() {
-                                                checkedTag
-                                                    .remove(tagList[index].id);
-                                              });
-                                            }
-                                          },
-                                          value: checkedTag
-                                              .contains(tagList[index].id));
-                                    });
-                              } else {
-                                return const Center(
-                                    child: CircularProgressIndicator(
-                                        color: MyColors.primaryColor,
-                                        strokeWidth: 2));
-                              }
-                            },
-                          ),
-                        ),
-                        CustomElevatedButton(
-                            text: "Шүүх",
-                            onPress: () {
-                              filterPost(tagList);
-                              Navigator.pop(context, checkedTag);
-                            }),
-                        const SizedBox(height: 20),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  );
-                },
-              ),
+        builder: (_) => FilterModal(
+              onFilter: () {
+                filterPost(tagList);
+                Navigator.pop(context, filteredList);
+              },
+              tagList: tagList,
             ));
   }
 
   filterPost(List<TagModel> tagList) {
-    List<String> selectedTagsName = [];
+    List<Map<String, dynamic>> selectedTagsName = [];
     setState(() {
       for (var item in postList) {
         for (var id in checkedTag) {
@@ -214,7 +144,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
           }
           for (var name in tagList) {
             if (name.id == id) {
-              selectedTagsName.add(name.name ?? "");
+              selectedTagsName.add({"name": name.name, "id": name.id});
               Provider.of<ForumTagNotifier>(context, listen: false)
                   .setTags(selectedTagsName);
             }

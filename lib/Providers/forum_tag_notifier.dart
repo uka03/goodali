@@ -22,4 +22,6 @@ class ForumTagNotifier with ChangeNotifier {
     log(_selectedForumNames.length.toString(), name: 'removetags');
     notifyListeners();
   }
+
+  void checkedTag(Map<String, dynamic> tagName) {}
 }

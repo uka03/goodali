@@ -8,14 +8,11 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 
 import 'package:goodali/screens/Auth/login.dart';
 import 'package:goodali/screens/payment/choose_payment.dart';
-import 'package:goodali/screens/payment/payment_history.dart';
 import 'package:goodali/screens/ListItems/cart_product_item.dart';
-import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
 class CartScreen extends StatefulWidget {
-  final bool? isBought;
-  const CartScreen({Key? key, this.isBought = false}) : super(key: key);
+  const CartScreen({Key? key}) : super(key: key);
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -25,7 +22,6 @@ class _CartScreenState extends State<CartScreen> {
   List<int> productIds = [];
   @override
   void initState() {
-    print(widget.isBought);
     super.initState();
   }
 
@@ -107,7 +103,7 @@ class _CartScreenState extends State<CartScreen> {
                 onPress: context.watch<CartProvider>().cartItem.isEmpty
                     ? null
                     : () {
-                        if (isAuth == true && widget.isBought == false) {
+                        if (isAuth == true) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(

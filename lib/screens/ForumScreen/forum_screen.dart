@@ -3,6 +3,8 @@ import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
+import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/models/tag_model.dart';
 
 import 'package:goodali/screens/ForumScreen/create_post_screen.dart';
 import 'package:goodali/screens/ForumScreen/human_nature_tab.dart';
@@ -21,6 +23,14 @@ class ForumScreen extends StatefulWidget {
 }
 
 class _ForumScreenState extends State<ForumScreen> {
+  List<TagModel> tagList = [];
+
+  @override
+  void initState() {
+    getTagList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,7 +138,7 @@ class _ForumScreenState extends State<ForumScreen> {
                                                       width: 0.5),
                                                   backgroundColor: Colors.white,
                                                   label: Text(
-                                                    e,
+                                                    e['name'],
                                                     style: const TextStyle(
                                                         color: MyColors.black),
                                                   ),
@@ -146,10 +156,17 @@ class _ForumScreenState extends State<ForumScreen> {
                             )))
             ];
           },
-          body: const TabBarView(
-              children: [NatureOfHuman(), NuutsBulgem(), MyFriendTab()]),
+          body: TabBarView(children: [
+            NatureOfHuman(tagList: tagList),
+            NuutsBulgem(tagList: tagList),
+            MyFriendTab(tagList: tagList)
+          ]),
         ),
       ),
     );
+  }
+
+  Future<void> getTagList() async {
+    tagList = await Connection.getTagList(context);
   }
 }

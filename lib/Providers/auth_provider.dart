@@ -5,9 +5,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:goodali/Utils/constans.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/http.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -86,6 +89,11 @@ class Auth with ChangeNotifier {
             _saveLoginInfo(toRemind ?? false);
           } else {
             preferences.remove("toRemind");
+          }
+
+          if (buttonNotifier.value == ButtonState.playing) {
+            currentlyPlaying.value = null;
+            audioHandler.pause();
           }
 
           String mapToStr = json.encode(response.data);

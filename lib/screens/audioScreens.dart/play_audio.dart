@@ -26,6 +26,7 @@ import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
 import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 void onTap() {}
 
@@ -177,8 +178,9 @@ class _PlayAudioState extends State<PlayAudio> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          DownloadButton(
-                              products: widget.products, isModalPlayer: true),
+                          if (widget.products.isBought == true)
+                            DownloadButton(
+                                products: widget.products, isModalPlayer: true),
                           Column(
                             children: [
                               IconButton(
@@ -214,14 +216,17 @@ class _PlayAudioState extends State<PlayAudio> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: SizedBox(
-                              height: 4,
-                              width: double.infinity,
+                              height: 50,
+                              width: 300,
                               child: ProgressBar(
                                 progress: durationValue.current,
                                 buffered: durationValue.buffered,
                                 total: totalDuration!,
-                                onSeek: (duration) {
-                                  audioHandler.seek(duration);
+                                onSeek: (Duration duration) async {
+                                  print("onSeek");
+                                  print(duration);
+
+                                  await audioHandler.seek(duration);
                                 },
                                 baseBarColor: MyColors.border1,
                                 progressBarColor: MyColors.primaryColor,
@@ -229,6 +234,35 @@ class _PlayAudioState extends State<PlayAudio> {
                                 bufferedBarColor:
                                     MyColors.primaryColor.withAlpha(20),
                               ),
+                              // SfLinearGauge(
+                              //   maximum:
+                              //       totalDuration!.inMilliseconds.toDouble(),
+                              //   showLabels: false,
+                              //   showTicks: false,
+                              //   markerPointers: [
+                              //     LinearShapePointer(
+                              //       value: durationValue.current.inMilliseconds
+                              //           .toDouble(),
+                              //       position: LinearElementPosition.cross,
+                              //       color: MyColors.primaryColor,
+                              //       borderColor: MyColors.border1,
+                              //       shapeType: LinearShapePointerType.circle,
+                              //       onChanged: (value) {
+                              //         print(value);
+                              //         audioHandler.seek(Duration(
+                              //             milliseconds:
+                              //                 (value * 1000).toInt()));
+                              //       },
+                              //     ),
+                              //   ],
+                              //   barPointers: [
+                              //     LinearBarPointer(
+                              //         color: MyColors.primaryColor,
+                              //         value: durationValue
+                              //             .current.inMilliseconds
+                              //             .toDouble())
+                              //   ],
+                              // ),
                             ),
                           );
                         },

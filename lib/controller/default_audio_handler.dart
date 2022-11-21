@@ -13,8 +13,6 @@ import '../Providers/local_database.dart';
 late AudioHandler audioHandler;
 final HiveDataStore dataStore = HiveDataStore();
 final HiveBoughtDataStore dataAlbumStore = HiveBoughtDataStore();
-final HiveProfileBoughtLecture dataBoughtAlbumStore =
-    HiveProfileBoughtLecture();
 final HiveMoodDataStore dataMoodStore = HiveMoodDataStore();
 Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
       builder: () => AudioPlayerHandler(),
@@ -92,9 +90,6 @@ class AudioPlayerHandler extends BaseAudioHandler
           currentlyPlaying.value?.id! ?? 0,
           durationStateNotifier.value.progress?.inMilliseconds ?? 0);
 
-      dataBoughtAlbumStore.updatePosition(currentlyPlaying.value?.title! ?? "",
-          currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
-
       dataMoodStore.updatePosition(currentlyPlaying.value?.title! ?? "",
           currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
     });
@@ -118,7 +113,7 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> skipToQueueItem(int index) async {
     // Then default implementations of skipToNext and skipToPrevious provided by
     // the [QueueHandler] mixin will delegate to this method.
-    queue.value[index].extras!["duration"];
+
     if (index < 0 || index >= queue.value.length) return;
     // This jumps to the beginning of the queue item at newIndex.
     _player.seek(Duration.zero, index: index);
@@ -152,8 +147,6 @@ class AudioPlayerHandler extends BaseAudioHandler
       ],
       systemActions: const {
         MediaAction.seek,
-        MediaAction.seekForward,
-        MediaAction.seekBackward,
       },
       androidCompactActionIndices: const [0, 1, 3],
       processingState: const {

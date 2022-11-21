@@ -49,20 +49,12 @@ class _CardPaymentState extends State<CardPayment> {
           gestureNavigationEnabled: true,
           onPageFinished: (String value) {
             card.removeAllProducts();
-            print("onPageFinished $value");
+
             if (value.contains("status_code=000")) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(const SnackBar(
-                    content: Text("Амжилттай"),
-                    backgroundColor: MyColors.success,
-                    duration: Duration(seconds: 1),
-                    behavior: SnackBarBehavior.floating,
-                  ))
-                  .closed
-                  .then((value) {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              });
+              TopSnackBar.successFactory().show(context);
+
+              Navigator.pop(context);
+              Navigator.pop(context);
             }
           },
           onWebResourceError: (onWebResourceError) {
@@ -85,14 +77,10 @@ class _CardPaymentState extends State<CardPayment> {
     Map<String, dynamic> data =
         Map<String, dynamic>.from(json.decode(response ?? ""));
 
-    // var status = data["status"];
     String message = data["message"];
-    // print("status $status");
+
     if (message.contains("ok")) {
-      print("etsesttsts neg ym bollooooo");
       Navigator.pop(context);
-    } else {
-      print("sfondfndnf errorrdolooo");
-    }
+    } else {}
   }
 }

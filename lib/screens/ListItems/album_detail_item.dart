@@ -5,7 +5,7 @@ import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:goodali/Utils/custom_catch_manager.dart';
+
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/audio_progressbar.dart';
@@ -178,7 +178,6 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                 children: [
                   AudioPlayerButton(
                     onPlay: () {
-                      print("ene daragdhguu bgamu");
                       widget.onTap();
                     },
                     onPause: () {

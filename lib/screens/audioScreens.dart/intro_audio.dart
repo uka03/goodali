@@ -166,8 +166,8 @@ class _IntroAudioState extends State<IntroAudio> {
                         progress: durationValue.current,
                         buffered: durationValue.buffered,
                         total: totalDuration,
-                        onSeek: (duration) {
-                          audioHandler.seek(duration);
+                        onSeek: (duration) async {
+                          await audioHandler.seek(duration);
                         },
                         timeLabelTextStyle:
                             const TextStyle(color: MyColors.gray),

@@ -126,6 +126,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               home: Consumer<Auth>(builder: (context, value, _) {
                 developer.log("biometric ${value.isBiometricEnabled}");
                 developer.log("intro ${value.isFirstTime}");
+
                 if (value.isFirstTime) {
                   return const IntroScreen();
                 } else if (value.isBiometricEnabled) {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/models/tag_model.dart';
+import 'package:provider/provider.dart';
 
 class FilterModal extends StatefulWidget {
   final VoidCallback onFilter;
@@ -17,6 +19,7 @@ class FilterModal extends StatefulWidget {
 class _FilterModalState extends State<FilterModal> {
   @override
   Widget build(BuildContext context) {
+    final tag = Provider.of<ForumTagNotifier>(context);
     return StatefulBuilder(
       builder: (BuildContext context, void Function(void Function()) setState) {
         return Container(
@@ -39,7 +42,7 @@ class _FilterModalState extends State<FilterModal> {
                       fontWeight: FontWeight.bold)),
               Expanded(
                   child: ListView.builder(
-                      itemCount: tagList.length,
+                      itemCount: widget.tagList.length,
                       itemBuilder: (BuildContext context, int index) {
                         return CheckboxListTile(
                             activeColor: MyColors.primaryColor,
@@ -48,23 +51,30 @@ class _FilterModalState extends State<FilterModal> {
                                 borderRadius: BorderRadius.circular(4)),
                             side: const BorderSide(color: MyColors.border1),
                             title: Text(
-                              tagList[index].name ?? "",
+                              widget.tagList[index].name ?? "",
                               style: const TextStyle(color: MyColors.black),
                             ),
                             onChanged: (bool? value) {
+                              var map = {
+                                "name": widget.tagList[index].name,
+                                "id": widget.tagList[index].id
+                              };
                               if (value == true) {
                                 setState(() {
-                                  if (!checkedTag.contains(tagList[index].id)) {
-                                    checkedTag.add(tagList[index].id ?? 0);
+                                  if (!tag.selectedForumNames.contains(map)) {
+                                    tag.selectedForumNames.add(map);
                                   }
                                 });
                               } else {
                                 setState(() {
-                                  checkedTag.remove(tagList[index].id);
+                                  tag.selectedForumNames.remove(map);
                                 });
                               }
                             },
-                            value: checkedTag.contains(tagList[index].id));
+                            value: tag.selectedForumNames.contains({
+                              "name": widget.tagList[index].name,
+                              "id": widget.tagList[index].id
+                            }));
                       })),
               CustomElevatedButton(text: "Шүүх", onPress: widget.onFilter),
               const SizedBox(height: 20),

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/local_database.dart';
@@ -41,9 +42,6 @@ class AlbumDetail extends StatefulWidget {
 }
 
 class _AlbumDetailState extends State<AlbumDetail> {
-  AudioPlayerController audioPlayerController = AudioPlayerController();
-
-  late final AudioPlayer introAudioPlayer = AudioPlayer();
   List<int> albumProductsList = [];
   bool isLoading = true;
 
@@ -69,9 +67,12 @@ class _AlbumDetailState extends State<AlbumDetail> {
     super.initState();
     audioPlayer.setLoopMode(LoopMode.off);
     bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
-    widget.albumProduct.isBought == true || isAuth
-        ? getLectureListLogged()
-        : getAlbumLectures();
+    if (widget.albumProduct.isBought == true || isAuth) {
+      getLectureListLogged();
+    } else {
+      getAlbumLectures();
+    }
+
     imageSize = initialSize;
 
     _controller = ScrollController()
@@ -89,37 +90,12 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
         setState(() {});
       });
-
-    introAudioPlayer.positionStream.listen((event) {
-      position = event;
-    });
-    introAudioPlayer.durationStream.listen((event) {
-      duration = event ?? Duration.zero;
-    });
-
-    introAudioPlayer.playingStream.listen((event) {
-      isPlaying = event;
-    });
-    setAlbumIntroAudio();
   }
 
   @override
   void dispose() {
-    introAudioPlayer.dispose();
     audioPlayer.dispose();
     super.dispose();
-  }
-
-  setAlbumIntroAudio() {
-    try {
-      introAudioPlayer
-          .setUrl(Urls.networkPath + (widget.albumProduct.audio ?? ""))
-          .then((value) {
-        duration = value ?? Duration.zero;
-      });
-    } catch (e) {
-      debugPrint(e.toString());
-    }
   }
 
   @override
@@ -135,14 +111,17 @@ class _AlbumDetailState extends State<AlbumDetail> {
         body: Consumer<Auth>(
           builder: (context, value, child) {
             return ValueListenableBuilder(
-              valueListenable: value.isAuth
-                  ? HiveBoughtDataStore.box.listenable()
-                  : HiveIntroDataStore.box.listenable(),
+              valueListenable:
+                  value.isAuth || widget.albumProduct.isBought == true
+                      ? HiveBoughtDataStore.box.listenable()
+                      : HiveIntroDataStore.box.listenable(),
               builder: (context, Box box, boxWidgets) {
                 if (box.length > 0) {
                   List<Products> lectureList = [];
+
                   for (int a = 0; a < box.length; a++) {
                     Products products = box.getAt(a);
+
                     if (products.albumTitle == widget.albumProduct.title) {
                       lectureList.add(products);
                     }
@@ -263,169 +242,82 @@ class _AlbumDetailState extends State<AlbumDetail> {
   Widget lecture(BuildContext context, List<Products> product, bool isAuth) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {
-              showIntroAudioModal();
-            },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 12),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: ImageView(
-                            imgPath: widget.albumProduct.banner ?? "",
-                            width: 40,
-                            height: 40)),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Танилцуулга".toUpperCase(),
-                            maxLines: 1,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                color: MyColors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 10),
-                          // CustomReadMoreText(text: widget.products.body ?? "")
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: MyColors.input,
-                      child: IconButton(
-                        splashRadius: 20,
-                        padding: EdgeInsets.zero,
-                        onPressed: () async {
-                          if (isPlaying) {
-                            introAudioPlayer.pause();
-                          } else {
-                            introAudioPlayer.play();
-                          }
-                        },
-                        icon: Icon(
-                          isPlaying
-                              ? Icons.pause_rounded
-                              : Icons.play_arrow_rounded,
-                          size: 30,
-                          color: MyColors.black,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(formatTime(duration - position) + "мин",
-                        style: const TextStyle(
-                            fontSize: 12, color: MyColors.black)),
-                    const Spacer(),
-                    IconButton(
-                        splashRadius: 20,
-                        onPressed: () {},
-                        icon:
-                            const Icon(Icons.more_horiz, color: MyColors.gray)),
-                  ],
-                ),
-                const SizedBox(height: 12)
-              ],
-            ),
-          ),
-          ListView.separated(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            padding: const EdgeInsets.only(bottom: 15),
-            itemBuilder: (BuildContext context, int index) {
-              if (widget.albumProduct.isBought == false &&
-                  product[index].isBought == false) {
-                return AlbumIntroItem(
-                  albumName: '',
-                  audioPlayer: audioPlayer,
-                  products: product[index],
-                  albumProducts: widget.albumProduct,
-                  onTap: () async {
-                    if (widget.albumProduct.isBought == false) {
-                      currentlyPlaying.value = product[index];
-                      if (activeList.first.title == product.first.title &&
-                          activeList.first.id == product.first.id) {
-                        await audioHandler.skipToQueueItem(index);
-                        log("Starts in: ${product[index].position}");
+      child: ListView.separated(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        padding: const EdgeInsets.only(bottom: 15),
+        itemBuilder: (BuildContext context, int index) {
+          if (widget.albumProduct.isBought == false &&
+              product[index].isBought == false) {
+            return AlbumIntroItem(
+              albumName: '',
+              audioPlayer: audioPlayer,
+              products: product[index],
+              albumProducts: widget.albumProduct,
+              onTap: () async {
+                if (widget.albumProduct.isBought == false) {
+                  currentlyPlaying.value = product[index];
+                  if (activeList.first.title == product.first.title &&
+                      activeList.first.id == product.first.id) {
+                    await audioHandler.skipToQueueItem(index);
+                    log("Starts in: ${product[index].position}");
 
-                        await audioHandler.seek(
-                          Duration(milliseconds: product[index].position!),
-                        );
-                        audioHandler.play();
-                      } else if (activeList.first.title !=
-                              product.first.title ||
-                          activeList.first.id != product.first.id) {
-                        activeList = product;
-                        await initiliazePodcast();
-                        await audioHandler.skipToQueueItem(index);
-                        await audioHandler.seek(
-                          Duration(milliseconds: product[index].position!),
-                        );
-                        await audioHandler.play();
-                      }
-                    } else {}
-                  },
-                );
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: AlbumDetailItem(
-                    products: product[index],
-                    isBought: product[index].isBought!,
-                    albumName: widget.albumProduct.title ?? "",
-                    productsList: product,
-                    index: index,
-                    albumProducts: widget.albumProduct,
-                    onTap: () async {
-                      print(widget.albumProduct.isBought == true);
-                      if (widget.albumProduct.isBought == true) {
-                        if (activeList.first.title == product.first.title &&
-                            activeList.first.id == product.first.id &&
-                            !isAuth) {
-                          await audioHandler.skipToQueueItem(index);
-                          await audioHandler.seek(
-                            Duration(milliseconds: product[index].position!),
-                          );
-                          await audioHandler.play();
-                        } else if (activeList.first.title !=
-                                product.first.title ||
-                            activeList.first.id != product.first.id) {
-                          activeList = product;
-                          await initiliazePodcast();
-                          await audioHandler.skipToQueueItem(index);
-                          await audioHandler.seek(
-                            Duration(milliseconds: product[index].position!),
-                          );
-                          await audioHandler.play();
-                        }
-                        currentlyPlaying.value = product[index];
-                      } else {}
-                    },
-                  ),
-                );
-              }
-            },
-            itemCount: product.length,
-            separatorBuilder: (BuildContext context, int index) =>
-                const Divider(),
-          ),
-        ],
+                    await audioHandler.seek(
+                      Duration(milliseconds: product[index].position!),
+                    );
+                    audioHandler.play();
+                  } else if (activeList.first.title != product.first.title ||
+                      activeList.first.id != product.first.id) {
+                    activeList = product;
+                    await initiliazePodcast();
+                    await audioHandler.skipToQueueItem(index);
+                    await audioHandler.seek(
+                      Duration(milliseconds: product[index].position!),
+                    );
+                    await audioHandler.play();
+                  }
+                } else {}
+              },
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: AlbumDetailItem(
+                products: product[index],
+                isBought: product[index].isBought!,
+                albumName: widget.albumProduct.title ?? "",
+                productsList: product,
+                index: index,
+                albumProducts: widget.albumProduct,
+                onTap: () async {
+                  if (widget.albumProduct.isBought == true) {
+                    if (activeList.first.title == product.first.title &&
+                        activeList.first.id == product.first.id &&
+                        !isAuth) {
+                      await audioHandler.skipToQueueItem(index);
+                      await audioHandler.seek(
+                        Duration(milliseconds: product[index].position!),
+                      );
+                      await audioHandler.play();
+                    } else if (activeList.first.title != product.first.title ||
+                        activeList.first.id != product.first.id) {
+                      activeList = product;
+                      await initiliazePodcast();
+                      await audioHandler.skipToQueueItem(index);
+                      await audioHandler.seek(
+                        Duration(milliseconds: product[index].position!),
+                      );
+                      await audioHandler.play();
+                    }
+                    currentlyPlaying.value = product[index];
+                  } else {}
+                },
+              ),
+            );
+          }
+        },
+        itemCount: product.length,
+        separatorBuilder: (BuildContext context, int index) => const Divider(),
       ),
     );
   }
@@ -444,16 +336,10 @@ class _AlbumDetailState extends State<AlbumDetail> {
       cart.addTotalPrice(widget.albumProduct.price?.toDouble() ?? 0.0);
 
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  CartScreen(isBought: widget.albumProduct.isBought)));
+          context, MaterialPageRoute(builder: (context) => const CartScreen()));
     } else {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  CartScreen(isBought: widget.albumProduct.isBought)));
+          context, MaterialPageRoute(builder: (context) => const CartScreen()));
     }
   }
 
@@ -480,6 +366,15 @@ class _AlbumDetailState extends State<AlbumDetail> {
     var data = await Connection.getAlbumLectures(
         context, widget.albumProduct.id.toString());
 
+    Products introduction = Products(
+        title: "Танилцуулга",
+        id: widget.albumProduct.id,
+        albumTitle: widget.albumProduct.title,
+        audio: widget.albumProduct.audio,
+        isBought: widget.albumProduct.isBought,
+        banner: widget.albumProduct.banner);
+    await dataIntroStore.addProduct(products: introduction);
+
     setState(() {
       introList = data;
       isLoading = false;
@@ -487,13 +382,21 @@ class _AlbumDetailState extends State<AlbumDetail> {
     // _initiliazePodcast(lectureList);
     for (var item in data) {
       item.albumTitle = widget.albumProduct.title;
-      dataIntroStore.addProduct(products: item);
+      await dataIntroStore.addProduct(products: item);
     }
   }
 
   Future<void> getLectureListLogged() async {
     var data = await Connection.getLectureListLogged(
         context, widget.albumProduct.id.toString());
+    Products introduction = Products(
+        title: "Танилцуулга",
+        id: widget.albumProduct.id,
+        albumTitle: widget.albumProduct.title,
+        audio: widget.albumProduct.audio,
+        isBought: widget.albumProduct.isBought,
+        banner: widget.albumProduct.banner);
+    await dataStore.addProduct(products: introduction);
 
     for (var item in data) {
       item.albumTitle = widget.albumProduct.title;

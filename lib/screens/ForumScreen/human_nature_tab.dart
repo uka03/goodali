@@ -13,15 +13,16 @@ import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 
 class NatureOfHuman extends StatefulWidget {
-  const NatureOfHuman({Key? key}) : super(key: key);
+  final List<TagModel> tagList;
+  const NatureOfHuman({Key? key, required this.tagList}) : super(key: key);
 
   @override
   State<NatureOfHuman> createState() => _NatureOfHumanState();
 }
 
 class _NatureOfHumanState extends State<NatureOfHuman> {
-  late final tagFuture = getTagList();
   List<int> checkedTag = [];
+
   List<PostListModel> filteredList = [];
   List<PostListModel> postList = [];
 
@@ -97,13 +98,13 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
         }),
       ),
       floatingActionButton: FilterButton(onPress: () {
-        showModalTag(context, tagFuture, checkedTag);
+        showModalTag(context, checkedTag);
       }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  showModalTag(BuildContext context, Future tagFuture, List<int> checkedTag) {
+  showModalTag(BuildContext context, List<int> checkedTag) {
     List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
@@ -115,14 +116,13 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => FilterModal(onFilter: () {
-              filterPost(tagList);
-              Navigator.pop(context, filteredList);
-            }));
-  }
-
-  Future<List<TagModel>> getTagList() async {
-    return await Connection.getTagList(context);
+        builder: (_) => FilterModal(
+              onFilter: () {
+                filterPost(tagList);
+                Navigator.pop(context, filteredList);
+              },
+              tagList: tagList,
+            ));
   }
 
   Future<void> _refresh() async {
@@ -132,7 +132,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
   }
 
   filterPost(List<TagModel> tagList) {
-    List<String> selectedTagsName = [];
+    List<Map<String, dynamic>> selectedTagsName = [];
     setState(() {
       for (var item in postList) {
         for (var id in checkedTag) {
@@ -144,7 +144,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
           }
           for (var name in tagList) {
             if (name.id == id) {
-              selectedTagsName.add(name.name ?? "");
+              selectedTagsName.add({"name ": name.name, "id": name.id});
               Provider.of<ForumTagNotifier>(context, listen: false)
                   .setTags(selectedTagsName);
             }

@@ -21,7 +21,6 @@ class _ChoosePaymentState extends State<ChoosePayment> {
   List<QpayURLS> urls = [];
   @override
   Widget build(BuildContext context) {
-    print(widget.productIDs);
     return Scaffold(
       appBar: const SimpleAppBar(noCard: true),
       body: SizedBox(
@@ -104,8 +103,6 @@ class _ChoosePaymentState extends State<ChoosePayment> {
   }
 
   createOrderRequest(BuildContext context, int invoiceType) async {
-    print(widget.productIDs);
-
     var data = await Connection.createOrderRequest(
         context, invoiceType, widget.productIDs);
     Navigator.pop(context);
