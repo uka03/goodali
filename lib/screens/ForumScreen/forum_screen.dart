@@ -34,16 +34,9 @@ class _ForumScreenState extends State<ForumScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         title: 'Түүдэг гал',
-        actionButton2: IconButton(
-            onPressed: () {},
-            icon: const Icon(IconlyLight.bookmark,
-                size: 28, color: MyColors.black)),
-        actionButton1: IconButton(
-            onPressed: () {},
-            icon:
-                const Icon(IconlyLight.heart, size: 28, color: MyColors.black)),
+        actionButton2: null,
         isCartButton: false,
       ),
       body: DefaultTabController(

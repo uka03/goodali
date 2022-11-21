@@ -40,15 +40,7 @@ class _DownloadButtonState extends State<DownloadButton> {
       builder: (context, value, child) {
         var _task = Provider.of<DownloadController>(context, listen: false)
             .episodeToTask(widget.products);
-        return Column(
-          children: [
-            _downloadButton(_task, context),
-            widget.isModalPlayer == true
-                ? const Text("Татсан",
-                    style: TextStyle(fontSize: 12, color: MyColors.gray))
-                : const SizedBox()
-          ],
-        );
+        return _downloadButton(_task, context);
       },
     );
   }
@@ -56,25 +48,44 @@ class _DownloadButtonState extends State<DownloadButton> {
   Widget _downloadButton(TaskInfo task, BuildContext context) {
     switch (task.status!.value) {
       case 0:
-        return IconButton(
-          onPressed: () => _requestDownload(widget.products),
-          icon: Icon(IconlyLight.arrow_down,
-              size: widget.isModalPlayer == true ? 20 : 24,
-              color: MyColors.gray),
-          splashRadius: 1,
+        return Column(
+          children: [
+            IconButton(
+              onPressed: () => _requestDownload(widget.products),
+              icon: Icon(IconlyLight.arrow_down,
+                  size: widget.isModalPlayer == true ? 20 : 24,
+                  color: MyColors.gray),
+              splashRadius: 1,
+            ),
+            widget.isModalPlayer == true
+                ? const Text("Татах",
+                    style: TextStyle(fontSize: 12, color: MyColors.gray))
+                : const SizedBox()
+          ],
         );
       case 2:
         return Text(
           task.progress.toString() + "%",
-          style: const TextStyle(color: MyColors.primaryColor),
+          style: TextStyle(
+            color: MyColors.primaryColor,
+            fontSize: widget.isModalPlayer == true ? 18 : 14,
+          ),
         );
       case 3:
-        return IconButton(
-          onPressed: () {},
-          icon: Icon(IconlyLight.arrow_down,
-              size: widget.isModalPlayer == true ? 20 : 24,
-              color: MyColors.primaryColor),
-          splashRadius: 1,
+        return Column(
+          children: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(IconlyLight.arrow_down,
+                  size: widget.isModalPlayer == true ? 24 : 20,
+                  color: MyColors.primaryColor),
+              splashRadius: 1,
+            ),
+            widget.isModalPlayer == true
+                ? const Text("Татсан",
+                    style: TextStyle(fontSize: 12, color: MyColors.gray))
+                : const SizedBox()
+          ],
         );
 
       default:

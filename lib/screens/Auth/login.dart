@@ -38,17 +38,22 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   void initState() {
     _checkIsReminded();
     isRegistered = widget.isRegistered;
+
     super.initState();
   }
 
   Future<void> _checkIsReminded() async {
     var data = await Provider.of<Auth>(context, listen: false).getUserInfo();
-    if (data["to_remind"]) {
-      setState(() {
+
+    setState(() {
+      if (!isRegistered) {
+        toRemind = false;
+        emailController.text = "";
+      } else if (data["to_remind"]) {
         toRemind = data["to_remind"];
         emailController.text = data["email"];
-      });
-    }
+      }
+    });
   }
 
   @override
@@ -482,6 +487,8 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
     var data = await Connection.userRegister(context, sendData);
     Navigator.pop(context);
     if (data['success'] == true) {
+      final pref = await SharedPreferences.getInstance();
+      pref.remove("toRemind");
       Navigator.push(
           context,
           MaterialPageRoute(

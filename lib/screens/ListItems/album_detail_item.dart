@@ -103,9 +103,10 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
       });
 
       savedPosition = widget.products.position!;
+
       return duration;
     } catch (e) {
-      log(e.toString());
+      log(e.toString(), name: "detail item");
     }
     return duration;
   }

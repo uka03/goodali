@@ -22,8 +22,7 @@ class MyFriendTab extends StatefulWidget {
 
 class _MyFriendTabState extends State<MyFriendTab> {
   List<bool> isHearted = [];
-
-  List<int> checkedTag = [];
+  List<Map<String, dynamic>> checkedTag = [];
   List<PostListModel> filteredList = [];
   List<PostListModel> postList = [];
   @override
@@ -114,7 +113,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
     return Connection.getPostList(context, {"post_type": 2});
   }
 
-  showModalTag(BuildContext context, List<int> checkedTag) {
+  showModalTag(BuildContext context, List<Map<String, dynamic>> checkedTag) {
     List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
@@ -123,7 +122,10 @@ class _MyFriendTabState extends State<MyFriendTab> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => FilterModal(
-              onFilter: () {
+              onTap: (checkList) {
+                setState(() {
+                  checkedTag = checkList;
+                });
                 filterPost(tagList);
                 Navigator.pop(context, filteredList);
               },
@@ -137,13 +139,13 @@ class _MyFriendTabState extends State<MyFriendTab> {
       for (var item in postList) {
         for (var id in checkedTag) {
           if (item.tags!.isNotEmpty) {
-            if (item.tags?.first.id == id &&
+            if (item.tags?.first.id == id["id"] &&
                 !filteredList.any((element) => element.id == item.id)) {
               filteredList.add(item);
             }
           }
           for (var name in tagList) {
-            if (name.id == id) {
+            if (name.id == id["id"]) {
               selectedTagsName.add({"name": name.name, "id": name.id});
               Provider.of<ForumTagNotifier>(context, listen: false)
                   .setTags(selectedTagsName);

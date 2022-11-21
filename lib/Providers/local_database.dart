@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:developer' as developer;
+import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 class HiveDataStore {
   static const boxName = "podcasts";
@@ -101,6 +104,12 @@ class HiveBoughtDataStore {
 
       item.title = products.title;
       await item.save();
+    }
+  }
+
+  void deleteBoxes() async {
+    if (box.values.isNotEmpty) {
+      box.clear();
     }
   }
 
@@ -262,10 +271,5 @@ class HiveIntroDataStore {
 
       await item.save();
     }
-  }
-
-  /// delete user
-  Future<void> deleteProducts({required int index}) async {
-    await box.deleteAt(index);
   }
 }

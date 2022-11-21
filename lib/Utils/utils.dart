@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 
@@ -64,6 +65,16 @@ String formatTime(Duration duration) {
   final minutes = twoDigits(duration.inMinutes.remainder(60));
   final seconds = twoDigits(duration.inSeconds.remainder(60));
   return [if (duration.inHours > 0) hours, minutes, seconds].join(':');
+}
+
+List<Products> removeDuplicates(List<Products> items) {
+  List<Products> uniqueItems = []; // uniqueList
+  var uniqueIDs =
+      items.map((e) => e.title).toSet(); //list if UniqueID to remove duplicates
+  for (var e in uniqueIDs) {
+    uniqueItems.add(items.firstWhere((i) => i.title == e));
+  } // populate uniqueItems with equivalent original Batch items
+  return uniqueItems; //send back the unique items list
 }
 
 class Utils {

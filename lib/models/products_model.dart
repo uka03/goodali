@@ -79,6 +79,9 @@ class Products extends HiveObject {
       this.opennedDate,
       this.isSpecial,
       this.downloadedPath,
+      this.duration,
+      this.position,
+      this.played,
       this.isDownloaded = false});
 
   Products.fromJson(Map<String, dynamic> json) {

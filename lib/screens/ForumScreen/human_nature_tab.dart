@@ -21,15 +21,16 @@ class NatureOfHuman extends StatefulWidget {
 }
 
 class _NatureOfHumanState extends State<NatureOfHuman> {
-  List<int> checkedTag = [];
+  List<Map<String, dynamic>> checkedTag = [];
 
   List<PostListModel> filteredList = [];
   List<PostListModel> postList = [];
-
+  List<TagModel> tagList = [];
   List<bool> isHearted = [];
 
   @override
   void initState() {
+    getTagList();
     super.initState();
   }
 
@@ -104,8 +105,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
     );
   }
 
-  showModalTag(BuildContext context, List<int> checkedTag) {
-    List<TagModel> tagList = [];
+  showModalTag(BuildContext context, List<Map<String, dynamic>> checkedTag) {
     showModalBottomSheet(
         context: context,
         constraints: BoxConstraints(
@@ -117,7 +117,10 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => FilterModal(
-              onFilter: () {
+              onTap: (checked) {
+                setState(() {
+                  checkedTag = checked;
+                });
                 filterPost(tagList);
                 Navigator.pop(context, filteredList);
               },
@@ -140,6 +143,8 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
             if (item.tags?.first.id == id &&
                 !filteredList.any((element) => element.id == item.id)) {
               filteredList.add(item);
+            } else {
+              filteredList = [];
             }
           }
           for (var name in tagList) {
@@ -151,7 +156,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
           }
         }
       }
-
+      print(filteredList);
       if (checkedTag.isEmpty) {
         filteredList.clear();
       }
@@ -160,5 +165,12 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
 
   Future getPostList() {
     return Connection.getPostList(context, {"post_type": 0});
+  }
+
+  Future<void> getTagList() async {
+    var data = await Connection.getTagList(context);
+    setState(() {
+      tagList = data;
+    });
   }
 }

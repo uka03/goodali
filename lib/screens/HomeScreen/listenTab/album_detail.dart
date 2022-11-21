@@ -126,7 +126,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       lectureList.add(products);
                     }
                   }
-                  buyList = lectureList;
+                  buyList = removeDuplicates(lectureList);
 
                   // });
                   return Column(
@@ -204,7 +204,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                                   )),
                               const SizedBox(height: 20),
                               const Divider(endIndent: 20, indent: 20),
-                              lecture(context, lectureList, isAuth),
+                              lecture(context, buyList, isAuth),
                               const SizedBox(height: 70),
                             ]),
                           ),
@@ -372,6 +372,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
         albumTitle: widget.albumProduct.title,
         audio: widget.albumProduct.audio,
         isBought: widget.albumProduct.isBought,
+        duration: 0,
+        position: 0,
         banner: widget.albumProduct.banner);
     await dataIntroStore.addProduct(products: introduction);
 
@@ -389,19 +391,21 @@ class _AlbumDetailState extends State<AlbumDetail> {
   Future<void> getLectureListLogged() async {
     var data = await Connection.getLectureListLogged(
         context, widget.albumProduct.id.toString());
-    Products introduction = Products(
-        title: "Танилцуулга",
-        id: widget.albumProduct.id,
-        albumTitle: widget.albumProduct.title,
-        audio: widget.albumProduct.audio,
-        isBought: widget.albumProduct.isBought,
-        banner: widget.albumProduct.banner);
-    await dataStore.addProduct(products: introduction);
+    // Products introduction = Products(
+    //     title: "Танилцуулга",
+    //     id: widget.albumProduct.id,
+    //     albumTitle: widget.albumProduct.title,
+    //     audio: widget.albumProduct.audio,
+    //     isBought: widget.albumProduct.isBought,
+    //     duration: 0,
+    //     position: 0,
+    //     banner: widget.albumProduct.banner);
+    // await dataStore.addProduct(products: introduction);
 
+    setState(() {});
     for (var item in data) {
       item.albumTitle = widget.albumProduct.title;
       await dataStore.addProduct(products: item);
     }
-    setState(() {});
   }
 }

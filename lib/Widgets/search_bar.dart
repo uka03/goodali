@@ -28,6 +28,7 @@ class SearchBar extends StatelessWidget {
                 FocusManager.instance.primaryFocus?.unfocus();
                 _showSearch(context);
               },
+              readOnly: true,
               cursorColor: MyColors.primaryColor,
               decoration: InputDecoration(
                   border: InputBorder.none, hintText: title ?? "Хайх..."),

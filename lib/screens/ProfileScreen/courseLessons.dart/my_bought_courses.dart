@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
@@ -39,9 +40,10 @@ class _MyCoursesState extends State<MyCourses> {
   }
 
   onPlayButtonClicked(int index) async {
+    print("onPlayButtonClicked");
+    currentlyPlaying.value = allLectures[index];
     if (activeList.first.title == allLectures.first.title &&
-        activeList.first.id == allLectures.first.id &&
-        allLectures.first.isBought == false) {
+        activeList.first.id == allLectures.first.id) {
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
@@ -61,7 +63,6 @@ class _MyCoursesState extends State<MyCourses> {
       );
       audioHandler.play();
     }
-    currentlyPlaying.value = allLectures[index];
   }
 
   @override
@@ -102,9 +103,14 @@ class _MyCoursesState extends State<MyCourses> {
         if (box.isNotEmpty) {
           for (var i = 0; i < box.length; i++) {
             Products products = box.getAt(i);
-            allboughtLectures.add(products);
+            if (products.title != "Танилцуулга") {
+              allboughtLectures.add(products);
+            }
           }
-          allLectures = allboughtLectures;
+
+          allLectures = removeDuplicates(allboughtLectures);
+
+          print(allLectures.length);
           allListProducts = [...allLectures, ...myCourses];
           return ListView.separated(
               itemCount: allLectures.length,
@@ -123,30 +129,33 @@ class _MyCoursesState extends State<MyCourses> {
                               color: MyColors.black,
                               fontSize: 18,
                               fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
                     AlbumDetailItem(
                         index: index,
                         isBought: true,
                         products: allLectures[index],
                         albumName: allLectures[index].albumTitle ?? "a",
                         productsList: allLectures,
-                        onTap: () {
+                        onTap: () async {
+                          print("ene odoo yu bolood bn");
                           onPlayButtonClicked(index);
                         }),
                   ],
                 );
               });
         } else if (allListProducts.isEmpty) {
-          return Column(
-            children: [
-              const SizedBox(height: 80),
-              SvgPicture.asset("assets/images/empty_bought.svg"),
-              const SizedBox(height: 20),
-              const Text(
-                "Авсан бүтээгдэхүүн байхгүй...",
-                style: TextStyle(fontSize: 14, color: MyColors.gray),
-              ),
-            ],
+          return Center(
+            child: Column(
+              children: [
+                const SizedBox(height: 80),
+                SvgPicture.asset("assets/images/empty_bought.svg"),
+                const SizedBox(height: 20),
+                const Text(
+                  "Авсан бүтээгдэхүүн байхгүй...",
+                  style: TextStyle(fontSize: 14, color: MyColors.gray),
+                ),
+              ],
+            ),
           );
         } else {
           return Container();

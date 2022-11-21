@@ -141,6 +141,7 @@ class SearchScreen extends SearchDelegate<String> {
                     },
                     title: Text(
                       searchResult[index].title!,
+                      maxLines: 2,
                       style: const TextStyle(color: MyColors.black),
                     ),
                     subtitle: Text(searchResult[index].module!),

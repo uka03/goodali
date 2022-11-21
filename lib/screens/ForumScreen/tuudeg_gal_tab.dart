@@ -24,7 +24,7 @@ class NuutsBulgem extends StatefulWidget {
 
 class _NuutsBulgemState extends State<NuutsBulgem> {
   late final tagFuture = getTagList();
-  List<int> checkedTag = [];
+  List<Map<String, dynamic>> checkedTag = [];
   List<bool> isHearted = [];
   List<PostListModel> filteredList = [];
   List<PostListModel> postList = [];
@@ -150,7 +150,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
         ),
       ),
       floatingActionButton: FilterButton(onPress: () {
-        showModalTag(context, tagFuture, checkedTag);
+        showModalTag(context, tagFuture);
       }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -170,7 +170,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
     return Connection.getPostList(context, {"post_type": 1});
   }
 
-  showModalTag(BuildContext context, Future tagFuture, List<int> checkedTag) {
+  showModalTag(BuildContext context, Future tagFutureg) {
     List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
@@ -179,7 +179,10 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => FilterModal(
-              onFilter: () {
+              onTap: (list) {
+                setState(() {
+                  checkedTag = list;
+                });
                 filterPost(tagList);
                 Navigator.pop(context, filteredList);
               },
@@ -193,13 +196,14 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
       for (var item in postList) {
         for (var id in checkedTag) {
           if (item.tags!.isNotEmpty) {
-            if (item.tags?.first.id == id &&
+            if (item.tags?.first.id == id["id"] &&
                 !filteredList.any((element) => element.id == item.id)) {
               filteredList.add(item);
             }
           }
+          print(filteredList.length);
           for (var name in tagList) {
-            if (name.id == id) {
+            if (name.id == id["id"]) {
               selectedTagsName.add({"name": name.name, "id": name.id});
               Provider.of<ForumTagNotifier>(context, listen: false)
                   .setTags(selectedTagsName);

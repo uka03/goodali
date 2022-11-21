@@ -43,39 +43,42 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
                     child: actionButton2),
               )
             : Container(),
-        Padding(
-          padding: const EdgeInsets.only(right: 10.0),
-          child: CircleAvatar(
-              radius: 22,
-              backgroundColor: MyColors.input,
-              child: isCartButton
-                  ? Consumer<CartProvider>(
-                      builder: (context, value, child) => Badge(
-                            showBadge: value.getCounter() < 0 ||
-                                    value.getCounter() == 0
-                                ? false
-                                : true,
-                            badgeContent: Text(
-                              value.getCounter() < 0
-                                  ? "0"
-                                  : value.getCounter().toString(),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            animationDuration:
-                                const Duration(milliseconds: 600),
-                            child: IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) => const CartScreen()));
-                                },
-                                splashRadius: 10,
-                                icon: const Icon(IconlyLight.buy,
-                                    size: 28, color: MyColors.black)),
-                          ))
-                  : actionButton1),
-        )
+        actionButton1 != null
+            ? Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: CircleAvatar(
+                    radius: 22,
+                    backgroundColor: MyColors.input,
+                    child: isCartButton
+                        ? Consumer<CartProvider>(
+                            builder: (context, value, child) => Badge(
+                                  showBadge: value.getCounter() < 0 ||
+                                          value.getCounter() == 0
+                                      ? false
+                                      : true,
+                                  badgeContent: Text(
+                                    value.getCounter() < 0
+                                        ? "0"
+                                        : value.getCounter().toString(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  animationDuration:
+                                      const Duration(milliseconds: 600),
+                                  child: IconButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const CartScreen()));
+                                      },
+                                      splashRadius: 10,
+                                      icon: const Icon(IconlyLight.buy,
+                                          size: 28, color: MyColors.black)),
+                                ))
+                        : actionButton1),
+              )
+            : Container(),
       ],
     );
   }

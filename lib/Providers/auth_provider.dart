@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
@@ -17,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
   final LocalAuthentication localAuth = LocalAuthentication();
+  final HiveBoughtDataStore _dataStore = HiveBoughtDataStore();
   bool _isAuth = false;
   bool get isAuth => _isAuth;
 
@@ -80,6 +82,7 @@ class Auth with ChangeNotifier {
 
       if (response.statusCode == 200) {
         if (response.data['token'] != null) {
+          await checkUserIsChanged(data["email"]);
           preferences.setString("email", data['email']);
           preferences.setString("password", data['password']);
           preferences.setString("token", response.data['token']);
@@ -91,7 +94,8 @@ class Auth with ChangeNotifier {
             preferences.remove("toRemind");
           }
 
-          if (buttonNotifier.value == ButtonState.playing) {
+          if (buttonNotifier.value == ButtonState.playing ||
+              currentlyPlaying.value != null) {
             currentlyPlaying.value = null;
             audioHandler.pause();
           }
@@ -128,6 +132,19 @@ class Auth with ChangeNotifier {
     }
   }
 
+  Future<void> checkUserIsChanged(String username) async {
+    final pref = await SharedPreferences.getInstance();
+    String email = pref.getString("email") ?? "";
+    print("username $username");
+    print("email $email");
+    if (username != email) {
+      print("user changed so box is deleted");
+      _dataStore.deleteBoxes();
+    } else {
+      print("ijil user");
+    }
+  }
+
   Future<void> _saveLoginInfo(bool toRemind) async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setBool("toRemind", toRemind);
@@ -145,7 +162,11 @@ class Auth with ChangeNotifier {
 
   Future<void> logOut(BuildContext context) async {
     final preferences = await SharedPreferences.getInstance();
-
+    if (buttonNotifier.value == ButtonState.playing ||
+        currentlyPlaying.value != null) {
+      currentlyPlaying.value = null;
+      audioHandler.pause();
+    }
     preferences.remove("token");
     preferences.remove("has_training");
     _isAuth = false;

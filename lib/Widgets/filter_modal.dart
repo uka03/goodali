@@ -5,11 +5,13 @@ import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:provider/provider.dart';
 
-class FilterModal extends StatefulWidget {
-  final VoidCallback onFilter;
-  final List<TagModel> tagList;
+typedef OnTap = Function(List<Map<String, dynamic>> checkTag);
 
-  const FilterModal({Key? key, required this.onFilter, required this.tagList})
+class FilterModal extends StatefulWidget {
+  final List<TagModel> tagList;
+  final OnTap? onTap;
+
+  const FilterModal({Key? key, required this.tagList, this.onTap})
       : super(key: key);
 
   @override
@@ -59,24 +61,26 @@ class _FilterModalState extends State<FilterModal> {
                                 "name": widget.tagList[index].name,
                                 "id": widget.tagList[index].id
                               };
+                              print(map);
                               if (value == true) {
-                                setState(() {
-                                  if (!tag.selectedForumNames.contains(map)) {
-                                    tag.selectedForumNames.add(map);
-                                  }
-                                });
+                                if (!tag.selectedForumNames.contains(map)) {
+                                  tag.selectedForumNames.add(map);
+                                }
                               } else {
-                                setState(() {
-                                  tag.selectedForumNames.remove(map);
-                                });
+                                tag.selectedForumNames.remove(map);
                               }
+                              print(tag.selectedForumNames);
                             },
                             value: tag.selectedForumNames.contains({
                               "name": widget.tagList[index].name,
                               "id": widget.tagList[index].id
                             }));
                       })),
-              CustomElevatedButton(text: "Шүүх", onPress: widget.onFilter),
+              CustomElevatedButton(
+                  text: "Шүүх",
+                  onPress: () {
+                    widget.onTap!(tag.selectedForumNames);
+                  }),
               const SizedBox(height: 20),
             ],
           ),

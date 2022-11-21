@@ -283,16 +283,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
         builder: (BuildContext context) =>
             LoginBottomSheet(isRegistered: isRegistered));
   }
-
-  showPincodeField() {
-    showModalBottomSheet(
-        context: context,
-        isDismissible: false,
-        enableDrag: true,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) => const PincodeField());
-  }
 }

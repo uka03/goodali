@@ -126,15 +126,9 @@ class _PostItemState extends State<PostItem> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            setState(() {
-                              isLiked = !isLiked;
-                            });
                             if (!widget.postItem.selfLike!) {
-                              likeCount = likeCount + 1;
                               insertLike(widget.postItem.id ?? 0);
-                            } else if (widget.postItem.selfLike! || isLiked) {
-                              likeCount = likeCount - 1;
-
+                            } else if (widget.postItem.selfLike!) {
                               postDislike(widget.postItem.id ?? 0);
                             }
                           },
@@ -176,7 +170,8 @@ class _PostItemState extends State<PostItem> {
   insertLike(int id) async {
     bool unliked = await Connection.insertPostLiske(context, {"post_id": id});
     setState(() {
-      widget.onRefresh!();
+      isLiked = true;
+      widget.onRefresh!.call();
     });
   }
 
@@ -185,7 +180,7 @@ class _PostItemState extends State<PostItem> {
     if (liked) {
       setState(() {
         isLiked = false;
-        widget.onRefresh!();
+        widget.onRefresh!.call();
       });
     }
   }

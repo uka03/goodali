@@ -13,6 +13,7 @@ import 'package:goodali/Widgets/audio_progressbar.dart';
 import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
@@ -89,7 +90,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
         });
       }
 
-      savedPosition = widget.products.position!;
+      savedPosition = widget.products.position ?? 0;
       return duration;
     } catch (e) {
       log(e.toString(), name: "intro item");
@@ -111,7 +112,6 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
     final cart = Provider.of<CartProvider>(context);
     return GestureDetector(
         onTap: () {
-          widget.onTap();
           showIntroAudioModal();
         },
         child: Column(
@@ -228,7 +228,6 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
   }
 
   showIntroAudioModal() {
-    widget.audioPlayer.pause();
     showModalBottomSheet(
         context: context,
         isDismissible: false,
@@ -254,19 +253,10 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
     if (!cart.sameItemCheck) {
       cart.addProducts(widget.products);
       cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Сагсанд амжилттай нэмэгдлээ"),
-        backgroundColor: MyColors.success,
-        duration: Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ));
+      TopSnackBar.successFactory(msg: "Сагсанд амжилттай нэмэгдлээ")
+          .show(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Сагсанд байна"),
-        backgroundColor: MyColors.error,
-        duration: Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ));
+      TopSnackBar.errorFactory(msg: "Сагсанд байна").show(context);
     }
   }
 }
