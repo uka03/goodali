@@ -19,9 +19,9 @@ class FilterModal extends StatefulWidget {
 }
 
 class _FilterModalState extends State<FilterModal> {
+  List<Map<String, dynamic>> checkedTagList = [];
   @override
   Widget build(BuildContext context) {
-    final tag = Provider.of<ForumTagNotifier>(context);
     return StatefulBuilder(
       builder: (BuildContext context, void Function(void Function()) setState) {
         return Container(
@@ -42,44 +42,69 @@ class _FilterModalState extends State<FilterModal> {
                       fontSize: 22,
                       color: MyColors.black,
                       fontWeight: FontWeight.bold)),
-              Expanded(
-                  child: ListView.builder(
-                      itemCount: widget.tagList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return CheckboxListTile(
-                            activeColor: MyColors.primaryColor,
-                            checkColor: MyColors.primaryColor,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4)),
-                            side: const BorderSide(color: MyColors.border1),
-                            title: Text(
-                              widget.tagList[index].name ?? "",
-                              style: const TextStyle(color: MyColors.black),
-                            ),
-                            onChanged: (bool? value) {
-                              var map = {
-                                "name": widget.tagList[index].name,
-                                "id": widget.tagList[index].id
-                              };
-                              print(map);
-                              if (value == true) {
-                                if (!tag.selectedForumNames.contains(map)) {
-                                  tag.selectedForumNames.add(map);
-                                }
-                              } else {
-                                tag.selectedForumNames.remove(map);
-                              }
-                              print(tag.selectedForumNames);
-                            },
-                            value: tag.selectedForumNames.contains({
-                              "name": widget.tagList[index].name,
-                              "id": widget.tagList[index].id
-                            }));
-                      })),
+              const SizedBox(height: 20),
+              Consumer<ForumTagNotifier>(
+                builder: (context, value, child) {
+                  checkedTagList = value.selectedForumNames;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Wrap(
+                        children: widget.tagList
+                            .map(
+                              (e) => InkWell(
+                                onTap: () {
+                                  var map = {"name": e.name, "id": e.id};
+
+                                  if (!value.selectedTagId.contains(e.id)) {
+                                    checkedTagList.add(map);
+                                    value.setTags(map);
+                                  } else {
+                                    value.removeTags(map);
+                                  }
+                                },
+                                child: SizedBox(
+                                  height: 45,
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(e.name ?? "",
+                                            style: const TextStyle(
+                                                color: MyColors.black)),
+                                        const SizedBox(width: 15),
+                                        SizedBox(
+                                          height: 24,
+                                          width: 24,
+                                          child: IgnorePointer(
+                                            child: Checkbox(
+                                                fillColor: MaterialStateProperty
+                                                    .all<Color>(
+                                                        MyColors.primaryColor),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4)),
+                                                side: const BorderSide(
+                                                    color: MyColors.border1),
+                                                splashRadius: 5,
+                                                onChanged: (_) {},
+                                                value: value.selectedTagId
+                                                    .contains(e.id)),
+                                          ),
+                                        ),
+                                      ]),
+                                ),
+                              ),
+                            )
+                            .toList()),
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
               CustomElevatedButton(
                   text: "Шүүх",
                   onPress: () {
-                    widget.onTap!(tag.selectedForumNames);
+                    widget.onTap!(checkedTagList);
                   }),
               const SizedBox(height: 20),
             ],
@@ -89,3 +114,15 @@ class _FilterModalState extends State<FilterModal> {
     );
   }
 }
+// CheckboxListTile(
+//                               contentPadding: EdgeInsets.zero,
+//                               activeColor: MyColors.primaryColor,
+//                               checkColor: MyColors.primaryColor,
+//                               shape: RoundedRectangleBorder(
+//                                   borderRadius: BorderRadius.circular(4)),
+//                               side: const BorderSide(color: MyColors.border1),
+//                               title: Text(
+//                                 e.name ?? "",
+//                                 style: const TextStyle(color: MyColors.black),
+//                               ),
+                      

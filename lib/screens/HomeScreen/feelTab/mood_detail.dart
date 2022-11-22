@@ -35,9 +35,9 @@ class _MoodDetailState extends State<MoodDetail> {
   final HiveMoodDataStore dataMoodStore = HiveMoodDataStore();
   final _kDuration = const Duration(milliseconds: 300);
   final _kCurve = Curves.easeIn;
-
+  Products? products;
   List<Products> moodItem = [];
-  Products? moodItemWithAudio;
+
   double _current = 0;
   String url = "";
   String imgUrl = "";
@@ -55,8 +55,8 @@ class _MoodDetailState extends State<MoodDetail> {
 
   @override
   void initState() {
-    super.initState();
     getMoodList();
+    super.initState();
     _pageController.addListener(() {
       setState(() {
         _current = _pageController.page!;
@@ -84,17 +84,16 @@ class _MoodDetailState extends State<MoodDetail> {
     super.dispose();
   }
 
-  Future<Duration> getTotalDuration(url) async {
+  Future<Duration> getTotalDuration(url, Products products) async {
     try {
-      if (moodItemWithAudio?.duration == null ||
-          moodItemWithAudio?.duration == 0) {
-        totalDuration = await getFileDuration(url);
+      print("2 dahi function");
+      print(products.title);
+      if (products.duration == null || products.duration == 0) {
+        totalDuration = await getFileDuration(url, products);
       } else {
-        totalDuration = Duration(milliseconds: moodItemWithAudio!.duration!);
+        totalDuration = Duration(milliseconds: products.duration!);
       }
 
-      savedPosition = moodItemWithAudio?.position ?? 0;
-      developer.log(savedPosition.toString(), name: "moodItem duration");
       return totalDuration;
     } catch (e) {
       developer.log(e.toString(), name: "mood error");
@@ -102,30 +101,29 @@ class _MoodDetailState extends State<MoodDetail> {
     return totalDuration;
   }
 
-  Future<Duration> getFileDuration(String mediaPath) async {
+  Future<Duration> getFileDuration(String mediaPath, Products products) async {
     final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
     final mediaInfo = mediaInfoSession.getMediaInformation()!;
     final double _duration = double.parse(mediaInfo.getDuration()!);
-    moodItemWithAudio!.duration = (_duration * 1000).toInt();
-    await moodItemWithAudio!.save();
+    products.duration = (_duration * 1000).toInt();
+    await products.save();
     return Duration(milliseconds: (_duration * 1000).toInt());
   }
 
-  Future<bool> initiliaze() async {
-    if (activeList.isNotEmpty &&
-        activeList.first.moodListId == moodItemWithAudio?.moodListId &&
-        activeList.first.id == moodItemWithAudio?.id) {
+  Future<bool> initiliaze(Products products) async {
+    print("3 dahi function");
+    if (activeList.isNotEmpty && activeList.first.id == products.id) {
       return true;
     } else {
       activeList.clear();
     }
-    activeList.add(moodItemWithAudio!);
+    activeList.add(products);
     await initiliazePodcast();
     return true;
   }
 
-  onPlayButtonClicked() async {
-    currentlyPlaying.value = moodItemWithAudio;
+  onPlayButtonClicked(Products products) async {
+    currentlyPlaying.value = products;
 
     developer.log("Starts in: $savedPosition");
     await audioHandler.seek(
@@ -201,7 +199,7 @@ class _MoodDetailState extends State<MoodDetail> {
                                   color: MyColors.black, fontSize: 16),
                             ),
                             const SizedBox(height: 20),
-                            if (url != "") audioPlayerWidget()
+                            if (url != "") audioPlayerWidget(index)
                           ],
                         ),
                       );
@@ -295,7 +293,7 @@ class _MoodDetailState extends State<MoodDetail> {
     );
   }
 
-  Widget audioPlayerWidget() {
+  Widget audioPlayerWidget(int index) {
     return ValueListenableBuilder(
         valueListenable: progressNotifier,
         builder: (context, ProgressBarState value, child) {
@@ -319,14 +317,14 @@ class _MoodDetailState extends State<MoodDetail> {
                   },
                 ),
                 const SizedBox(height: 20),
-                playerButton()
+                playerButton(index)
               ],
             ),
           );
         });
   }
 
-  Widget playerButton() {
+  Widget playerButton(int index) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -360,7 +358,7 @@ class _MoodDetailState extends State<MoodDetail> {
                     size: 40.0,
                   ),
                   onPressed: () {
-                    onPlayButtonClicked();
+                    onPlayButtonClicked(products!);
                   },
                 );
               } else {
@@ -372,7 +370,7 @@ class _MoodDetailState extends State<MoodDetail> {
                     size: 40.0,
                   ),
                   onPressed: () async {
-                    await updateSavedPosition();
+                    // await updateSavedPosition();
                     audioHandler.pause();
                   },
                 );
@@ -401,21 +399,6 @@ class _MoodDetailState extends State<MoodDetail> {
     }
   }
 
-  Future<void> updateSavedPosition() async {
-    var item = currentlyPlaying.value;
-
-    if (item != null) {
-      if (item.title == moodItemWithAudio!.title) {
-        setState(() {
-          savedPosition = durationStateNotifier.value.progress!.inMilliseconds;
-        });
-      }
-      item.position = durationStateNotifier.value.progress!.inMilliseconds;
-      developer.log('${item.position}');
-      return item.save();
-    }
-  }
-
   buttonForward15Seconds(Duration position, Duration duration) {
     position = position + const Duration(seconds: 15);
 
@@ -433,18 +416,25 @@ class _MoodDetailState extends State<MoodDetail> {
       moodItem = listData;
     });
     String url = "";
-    for (var item in listData) {
+
+    for (var item in moodItem) {
       if (item.audio != "Audio failed to upload") {
-        moodItemWithAudio = item;
-        url = Urls.networkPath + moodItemWithAudio!.audio!;
+        url = Urls.networkPath + item.audio!;
       }
       await dataMoodStore.addProduct(products: item);
+      var list = await dataMoodStore.getMoodListfromBox();
+      for (var element in list) {
+        if (element.id == item.id) {
+          products = element;
+          savedPosition = element.position ?? 0;
+        }
+      }
     }
+    developer.log(savedPosition.toString(), name: "moodItem duration");
     if (url != "") {
-      await getTotalDuration(url);
-      await initiliaze();
+      await getTotalDuration(url, products!);
+      await initiliaze(products!);
     }
-
     return listData;
   }
 }

@@ -11,11 +11,9 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/download_controller.dart';
-import 'package:goodali/controller/download_state.dart';
 import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/Auth/enable_biometric.dart';
-import 'package:goodali/screens/blank.dart';
 import 'package:goodali/screens/bottom_bar.dart';
 import 'package:goodali/screens/intro_screen.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -35,7 +33,6 @@ Future<void> main() async {
   await Hive.openBox<Products>("podcasts");
   await Hive.openBox<Products>("bought_podcasts");
   await Hive.openBox<Products>("mood_podcasts");
-  await Hive.openBox<Products>("profile_bought_podcasts");
   await Hive.openBox<Products>("intro_lecture");
   runApp(const MyApp());
 }

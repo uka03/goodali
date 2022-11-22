@@ -76,9 +76,7 @@ class _PodcastAllState extends State<PodcastAll>
                 return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: PodcastItem(
-                      onTap: () {
-                        onPlayButtonClicked(index);
-                      },
+                      onTap: () => onPlayButtonClicked(index),
                       index: index,
                       podcastList: widget.podcastList,
                       podcastItem: widget.podcastList[index],

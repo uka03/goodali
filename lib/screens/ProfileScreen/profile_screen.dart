@@ -35,14 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    checkLoginWithBio();
     super.initState();
-  }
-
-  checkLoginWithBio() async {
-    loginWithBio = Provider.of<Auth>(context, listen: false).loginWithBio;
-
-    log(loginWithBio.toString(), name: "login bio");
   }
 
   Future<UserInfo?> userData() async {
@@ -79,6 +72,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Consumer<Auth>(
         builder: (BuildContext context, value, Widget? child) {
+          loginWithBio = Provider.of<Auth>(context).loginWithBio;
+
           if (value.isAuth == true) {
             return DefaultTabController(
               length: 2,

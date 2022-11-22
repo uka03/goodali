@@ -23,31 +23,50 @@ class NuutsBulgem extends StatefulWidget {
 }
 
 class _NuutsBulgemState extends State<NuutsBulgem> {
-  late final tagFuture = getTagList();
   List<Map<String, dynamic>> checkedTag = [];
   List<bool> isHearted = [];
   List<PostListModel> filteredList = [];
   List<PostListModel> postList = [];
+  List<TagModel> tagList = [];
+  bool isAuth = false;
+  bool hasTraining = false;
+  bool loginWithBio = false;
 
   @override
   void initState() {
+    isAuth = Provider.of<Auth>(context, listen: false).isAuth;
+    hasTraining = Provider.of<Auth>(context, listen: false).hasTraining;
+    tagList = widget.tagList;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    var login = Provider.of<Auth>(context, listen: false);
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refresh,
-        child: Consumer<Auth>(
+        child: Consumer<ForumTagNotifier>(
           builder: (BuildContext context, value, Widget? child) {
-            if (value.isAuth && value.hasTraining) {
+            checkedTag = value.selectedForumNames;
+
+            if (isAuth && hasTraining) {
               return FutureBuilder(
                   future: getPostList(),
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData &&
                         ConnectionState.done == snapshot.connectionState) {
                       postList = snapshot.data;
+                      if (checkedTag.isNotEmpty) {
+                        for (var item in checkedTag) {
+                          filteredList = postList
+                              .where((element) =>
+                                  element.tags!.first.id == item["id"])
+                              .toList();
+                        }
+                      } else {
+                        filteredList.clear();
+                      }
                       if (postList.isNotEmpty) {
                         return ListView.separated(
                             itemCount: filteredList.isNotEmpty
@@ -90,7 +109,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                               color: MyColors.primaryColor));
                     }
                   });
-            } else if (value.isAuth && !value.hasTraining) {
+            } else if (isAuth && !hasTraining) {
               return Center(
                   child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -109,24 +128,27 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                         "Сургалт харах",
                       ),
                       onPressed: () {
-                        if (value.isAuth) {
+                        if (isAuth) {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (_) =>
                                       const CourseTabbar(isHomeScreen: false)));
                         } else {
-                          showModalBottomSheet(
-                              context: context,
-                              isDismissible: false,
-                              enableDrag: true,
-                              isScrollControlled: true,
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(12),
-                                      topRight: Radius.circular(12))),
-                              builder: (BuildContext context) =>
-                                  const LoginBottomSheet(isRegistered: true));
+                          login.loginWithBio
+                              ? login.authenticateWithBiometrics(context)
+                              : showModalBottomSheet(
+                                  context: context,
+                                  isDismissible: false,
+                                  enableDrag: true,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(12),
+                                          topRight: Radius.circular(12))),
+                                  builder: (BuildContext context) =>
+                                      const LoginBottomSheet(
+                                          isRegistered: true));
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -150,14 +172,10 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
         ),
       ),
       floatingActionButton: FilterButton(onPress: () {
-        showModalTag(context, tagFuture);
+        showModalTag(context, checkedTag);
       }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
-  }
-
-  Future<List<TagModel>> getTagList() async {
-    return await Connection.getTagList(context);
   }
 
   Future<void> _refresh() async {
@@ -170,51 +188,23 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
     return Connection.getPostList(context, {"post_type": 1});
   }
 
-  showModalTag(BuildContext context, Future tagFutureg) {
-    List<TagModel> tagList = [];
+  showModalTag(BuildContext context, List<Map<String, dynamic>> checkedTag) {
     showModalBottomSheet(
         context: context,
+        isScrollControlled: true,
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => FilterModal(
-              onTap: (list) {
+              onTap: (checked) {
                 setState(() {
-                  checkedTag = list;
+                  checkedTag = checked;
                 });
-                filterPost(tagList);
-                Navigator.pop(context, filteredList);
+
+                Navigator.pop(context);
               },
               tagList: tagList,
             ));
-  }
-
-  filterPost(List<TagModel> tagList) {
-    List<Map<String, dynamic>> selectedTagsName = [];
-    setState(() {
-      for (var item in postList) {
-        for (var id in checkedTag) {
-          if (item.tags!.isNotEmpty) {
-            if (item.tags?.first.id == id["id"] &&
-                !filteredList.any((element) => element.id == item.id)) {
-              filteredList.add(item);
-            }
-          }
-          print(filteredList.length);
-          for (var name in tagList) {
-            if (name.id == id["id"]) {
-              selectedTagsName.add({"name": name.name, "id": name.id});
-              Provider.of<ForumTagNotifier>(context, listen: false)
-                  .setTags(selectedTagsName);
-            }
-          }
-        }
-      }
-
-      if (checkedTag.isEmpty) {
-        filteredList.clear();
-      }
-    });
   }
 }

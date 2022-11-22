@@ -20,10 +20,19 @@ class ArticleScreen extends StatefulWidget {
 }
 
 class _ArticleScreenState extends State<ArticleScreen> {
-  late final tagFuture = getTagList();
+  bool isLoading = true;
+  List<TagModel> tagList = [];
+
   List<int> checkedTag = [];
   List<ArticleModel> filteredList = [];
   List<ArticleModel> artcileList = [];
+
+  @override
+  void initState() {
+    getTagList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,15 +107,16 @@ class _ArticleScreenState extends State<ArticleScreen> {
         },
       )),
       floatingActionButton: FilterButton(onPress: () {
-        showModalTag(context, tagFuture, checkedTag);
+        showModalTag(context, checkedTag);
       }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  showModalTag(BuildContext context, Future tagFuture, List<int> checkedTag) {
+  showModalTag(BuildContext context, List<int> checkedTag) {
     showModalBottomSheet(
         context: context,
+        isScrollControlled: true,
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -134,51 +144,63 @@ class _ArticleScreenState extends State<ArticleScreen> {
                                 fontSize: 22,
                                 color: MyColors.black,
                                 fontWeight: FontWeight.bold)),
-                        Expanded(
-                          child: FutureBuilder(
-                            future: tagFuture,
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData &&
-                                  ConnectionState.done ==
-                                      snapshot.connectionState) {
-                                List<TagModel> tagList = snapshot.data;
-                                return ListView.builder(
-                                    itemCount: tagList.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return CheckboxListTile(
-                                          title:
-                                              Text(tagList[index].name ?? ""),
-                                          activeColor: MyColors.primaryColor,
-                                          onChanged: (bool? value) {
-                                            if (value == true) {
-                                              setState(() {
-                                                if (!checkedTag.contains(
-                                                    tagList[index].id)) {
-                                                  checkedTag.add(
-                                                      tagList[index].id ?? 0);
-                                                }
-                                              });
-                                            } else {
-                                              setState(() {
-                                                checkedTag
-                                                    .remove(tagList[index].id);
-                                              });
-                                            }
-                                          },
-                                          value: checkedTag
-                                              .contains(tagList[index].id));
-                                    });
-                              } else {
-                                return const Center(
-                                    child: CircularProgressIndicator(
-                                        color: MyColors.primaryColor,
-                                        strokeWidth: 2));
-                              }
-                            },
-                          ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Wrap(
+                              children: tagList
+                                  .map(
+                                    (e) => InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          if (!checkedTag.contains(e.id)) {
+                                            checkedTag.add(e.id!);
+                                          } else {
+                                            checkedTag.remove(e.id);
+                                          }
+                                        });
+                                      },
+                                      child: SizedBox(
+                                        height: 45,
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(e.name ?? "",
+                                                  style: const TextStyle(
+                                                      color: MyColors.black)),
+                                              const SizedBox(width: 15),
+                                              SizedBox(
+                                                height: 24,
+                                                width: 24,
+                                                child: IgnorePointer(
+                                                  child: Checkbox(
+                                                      fillColor:
+                                                          MaterialStateProperty
+                                                              .all<Color>(MyColors
+                                                                  .primaryColor),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4)),
+                                                      side: const BorderSide(
+                                                          color:
+                                                              MyColors.border1),
+                                                      splashRadius: 5,
+                                                      onChanged: (_) {},
+                                                      value: checkedTag
+                                                          .contains(e.id)),
+                                                ),
+                                              ),
+                                            ]),
+                                      ),
+                                    ),
+                                  )
+                                  .toList()),
                         ),
+                        const SizedBox(height: 10),
                         CustomElevatedButton(
                             text: "Шүүх",
                             onPress: () {
@@ -187,7 +209,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
                               filterPost();
                               Navigator.pop(context, checkedTag);
                             }),
-                        const SizedBox(height: 20),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -213,11 +234,46 @@ class _ArticleScreenState extends State<ArticleScreen> {
     });
   }
 
-  Future<List<TagModel>> getTagList() async {
-    return await Connection.getTagList(context);
+  Future<void> getTagList() async {
+    tagList = await Connection.getTagList(context);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<List<ArticleModel>> getArticle() {
     return Connection.getArticle(context);
   }
 }
+  // Expanded(
+  //                         child: FutureBuilder(
+  //                           future: tagFuture,
+  //                           builder:
+  //                               (BuildContext context, AsyncSnapshot snapshot) {
+  //                             if (snapshot.hasData &&
+  //                                 ConnectionState.done ==
+  //                                     snapshot.connectionState) {
+  //                               List<TagModel> tagList = snapshot.data;
+  //                               return ListView.builder(
+  //                                   itemCount: tagList.length,
+  //                                   itemBuilder:
+  //                                       (BuildContext context, int index) {
+  //                                     return CheckboxListTile(
+  //                                         title:
+  //                                             Text(tagList[index].name ?? ""),
+  //                                         activeColor: MyColors.primaryColor,
+  //                                         onChanged: (bool? value) {
+                                           
+  //                                         },
+  //                                         value: checkedTag
+  //                                             .contains(tagList[index].id));
+  //                                   });
+  //                             } else {
+  //                               return const Center(
+  //                                   child: CircularProgressIndicator(
+  //                                       color: MyColors.primaryColor,
+  //                                       strokeWidth: 2));
+  //                             }
+  //                           },
+  //                         ),
+  //                       ),

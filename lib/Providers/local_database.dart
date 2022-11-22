@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 
 class HiveDataStore {
   static const boxName = "podcasts";
@@ -178,13 +175,11 @@ class HiveMoodDataStore {
 
   /// Add new user
   Future<void> addProduct({required Products products}) async {
-    print("box lenght ${box.values.length}");
+    print("box length ${box.values.length}");
     var datas = box.values
         .where(
             (c) => c.id == products.id && c.moodListId == products.moodListId)
         .toList();
-
-    print("datas lenght ${datas.length}");
 
     if (datas.isEmpty) {
       await box.add(products);
@@ -195,6 +190,7 @@ class HiveMoodDataStore {
 
   Future<void> updatePosition(String title, int id, int position) async {
     var datas = box.values.where((c) => c.id == id).toList();
+
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
@@ -204,7 +200,7 @@ class HiveMoodDataStore {
   }
 
   /// show user list
-  Future<List<Products>> getMoodList() async {
+  Future<List<Products>> getMoodListfromBox() async {
     List<Products> list = [];
     for (var i = 0; i < box.length; i++) {
       list.add(box.get(i)!);

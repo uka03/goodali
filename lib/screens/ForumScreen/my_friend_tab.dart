@@ -22,23 +22,44 @@ class MyFriendTab extends StatefulWidget {
 
 class _MyFriendTabState extends State<MyFriendTab> {
   List<bool> isHearted = [];
+  List<TagModel> tagList = [];
+
   List<Map<String, dynamic>> checkedTag = [];
   List<PostListModel> filteredList = [];
   List<PostListModel> postList = [];
+
+  bool isAuth = false;
+  @override
+  void initState() {
+    isAuth = Provider.of<Auth>(context, listen: false).isAuth;
+    tagList = widget.tagList;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refresh,
-        child: Consumer<Auth>(
+        child: Consumer<ForumTagNotifier>(
           builder: (BuildContext context, value, Widget? child) {
-            if (value.isAuth) {
+            if (isAuth) {
               return FutureBuilder(
                   future: getPostList(),
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData &&
                         ConnectionState.done == snapshot.connectionState) {
                       postList = snapshot.data;
+                      if (checkedTag.isNotEmpty) {
+                        for (var item in checkedTag) {
+                          filteredList = postList
+                              .where((element) =>
+                                  element.tags!.first.id == item["id"])
+                              .toList();
+                        }
+                      } else {
+                        filteredList.clear();
+                      }
                       if (postList.isNotEmpty) {
                         return ListView.separated(
                             itemCount: filteredList.isNotEmpty
@@ -99,10 +120,6 @@ class _MyFriendTabState extends State<MyFriendTab> {
     );
   }
 
-  Future<List<TagModel>> getTagList() async {
-    return await Connection.getTagList(context);
-  }
-
   Future<void> _refresh() async {
     setState(() {
       getPostList();
@@ -114,49 +131,27 @@ class _MyFriendTabState extends State<MyFriendTab> {
   }
 
   showModalTag(BuildContext context, List<Map<String, dynamic>> checkedTag) {
-    List<TagModel> tagList = [];
     showModalBottomSheet(
         context: context,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height - 80,
+          minHeight: MediaQuery.of(context).size.height / 2 + 80,
+        ),
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => FilterModal(
-              onTap: (checkList) {
+              onTap: (checked) {
                 setState(() {
-                  checkedTag = checkList;
+                  checkedTag = checked;
                 });
-                filterPost(tagList);
-                Navigator.pop(context, filteredList);
+                if (checkedTag.isEmpty) {
+                  filteredList.clear();
+                }
+                Navigator.pop(context);
               },
               tagList: tagList,
             ));
-  }
-
-  filterPost(List<TagModel> tagList) {
-    List<Map<String, dynamic>> selectedTagsName = [];
-    setState(() {
-      for (var item in postList) {
-        for (var id in checkedTag) {
-          if (item.tags!.isNotEmpty) {
-            if (item.tags?.first.id == id["id"] &&
-                !filteredList.any((element) => element.id == item.id)) {
-              filteredList.add(item);
-            }
-          }
-          for (var name in tagList) {
-            if (name.id == id["id"]) {
-              selectedTagsName.add({"name": name.name, "id": name.id});
-              Provider.of<ForumTagNotifier>(context, listen: false)
-                  .setTags(selectedTagsName);
-            }
-          }
-        }
-      }
-
-      if (checkedTag.isEmpty) {
-        filteredList.clear();
-      }
-    });
   }
 }

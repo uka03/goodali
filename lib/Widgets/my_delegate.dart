@@ -17,12 +17,12 @@ class MyDelegate extends SliverPersistentHeaderDelegate {
   @override
   double get maxExtent => container == null
       ? tabbar.preferredSize.height + 1
-      : tabbar.preferredSize.height + 40;
+      : tabbar.preferredSize.height + 41;
 
   @override
   double get minExtent => container == null
       ? tabbar.preferredSize.height + 1
-      : tabbar.preferredSize.height + 40;
+      : tabbar.preferredSize.height + 41;
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
     return false;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/Widgets/filter_modal.dart';
 import 'package:goodali/controller/connection_controller.dart';
@@ -27,10 +26,12 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
   List<PostListModel> postList = [];
   List<TagModel> tagList = [];
   List<bool> isHearted = [];
+  bool isAuth = false;
 
   @override
   void initState() {
-    getTagList();
+    isAuth = Provider.of<Auth>(context, listen: false).isAuth;
+    tagList = widget.tagList;
     super.initState();
   }
 
@@ -40,15 +41,26 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
       body: RefreshIndicator(
         color: MyColors.primaryColor,
         onRefresh: _refresh,
-        child: Consumer<Auth>(
+        child: Consumer<ForumTagNotifier>(
             builder: (BuildContext context, value, Widget? child) {
-          if (value.isAuth) {
+          checkedTag = value.selectedForumNames;
+          if (isAuth) {
             return FutureBuilder(
               future: getPostList(),
               builder: (context, AsyncSnapshot snapshot) {
                 if (snapshot.hasData &&
                     ConnectionState.done == snapshot.connectionState) {
                   postList = snapshot.data;
+                  if (checkedTag.isNotEmpty) {
+                    for (var item in checkedTag) {
+                      filteredList = postList
+                          .where(
+                              (element) => element.tags!.first.id == item["id"])
+                          .toList();
+                    }
+                  } else {
+                    filteredList.clear();
+                  }
                   if (postList.isNotEmpty) {
                     return ListView.separated(
                         itemCount: filteredList.isNotEmpty
@@ -108,10 +120,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
   showModalTag(BuildContext context, List<Map<String, dynamic>> checkedTag) {
     showModalBottomSheet(
         context: context,
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height - 80,
-          minHeight: MediaQuery.of(context).size.height / 2 + 80,
-        ),
+        isScrollControlled: true,
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -121,8 +130,8 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                 setState(() {
                   checkedTag = checked;
                 });
-                filterPost(tagList);
-                Navigator.pop(context, filteredList);
+
+                Navigator.pop(context);
               },
               tagList: tagList,
             ));
@@ -131,35 +140,6 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
   Future<void> _refresh() async {
     setState(() {
       getPostList();
-    });
-  }
-
-  filterPost(List<TagModel> tagList) {
-    List<Map<String, dynamic>> selectedTagsName = [];
-    setState(() {
-      for (var item in postList) {
-        for (var id in checkedTag) {
-          if (item.tags!.isNotEmpty) {
-            if (item.tags?.first.id == id &&
-                !filteredList.any((element) => element.id == item.id)) {
-              filteredList.add(item);
-            } else {
-              filteredList = [];
-            }
-          }
-          for (var name in tagList) {
-            if (name.id == id) {
-              selectedTagsName.add({"name ": name.name, "id": name.id});
-              Provider.of<ForumTagNotifier>(context, listen: false)
-                  .setTags(selectedTagsName);
-            }
-          }
-        }
-      }
-      print(filteredList);
-      if (checkedTag.isEmpty) {
-        filteredList.clear();
-      }
     });
   }
 
