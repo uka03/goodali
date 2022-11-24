@@ -70,11 +70,11 @@ class AudioPlayerController with ChangeNotifier {
       if ((processingState == AudioProcessingState.idle ||
               processingState == AudioProcessingState.error) &&
           !isPlaying) {
-        var item = currentlyPlaying.value;
-        if (item != null) {
-          item.position = durationStateNotifier.value.progress!.inMilliseconds;
-          item.save();
-        }
+        // var item = currentlyPlaying.value;
+        // if (item != null) {
+        //   item.position = durationStateNotifier.value.progress!.inMilliseconds;
+        //   item.save();
+        // }
       }
       if (processingState == AudioProcessingState.ready && isPlaying == true) {
         buttonNotifier.value = ButtonState.playing;

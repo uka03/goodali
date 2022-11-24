@@ -180,7 +180,6 @@ class HiveMoodDataStore {
         .where(
             (c) => c.id == products.id && c.moodListId == products.moodListId)
         .toList();
-
     if (datas.isEmpty) {
       await box.add(products);
     }
@@ -200,12 +199,14 @@ class HiveMoodDataStore {
   }
 
   /// show user list
-  Future<List<Products>> getMoodListfromBox() async {
+  Future<List<Products>> getMoodListfromBox(int moodListID) async {
     List<Products> list = [];
     for (var i = 0; i < box.length; i++) {
-      list.add(box.get(i)!);
+      final item = box.get(i);
+      if (item!.moodListId == moodListID) {
+        list.add(box.get(i)!);
+      }
     }
-
     return list;
   }
 
@@ -264,7 +265,6 @@ class HiveIntroDataStore {
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
-
       await item.save();
     }
   }
