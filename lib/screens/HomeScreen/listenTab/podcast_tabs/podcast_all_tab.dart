@@ -53,9 +53,9 @@ class _PodcastAllState extends State<PodcastAll>
       Duration(milliseconds: widget.podcastList[index].position!),
     );
     await audioHandler.play();
-    await audioHandler.seek(
-      Duration(milliseconds: widget.podcastList[index].position!),
-    );
+    // await audioHandler.seek(
+    //   Duration(milliseconds: widget.podcastList[index].position!),
+    // );
   }
 
   @override

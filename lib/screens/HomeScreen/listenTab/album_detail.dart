@@ -292,8 +292,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
                 onTap: () async {
                   if (widget.albumProduct.isBought == true) {
                     if (activeList.first.title == product.first.title &&
-                        activeList.first.id == product.first.id &&
-                        !isAuth) {
+                        activeList.first.id == product.first.id) {
+                      currentlyPlaying.value = product[index];
                       await audioHandler.skipToQueueItem(index);
                       await audioHandler.seek(
                         Duration(milliseconds: product[index].position!),

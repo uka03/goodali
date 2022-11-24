@@ -75,7 +75,7 @@ class _MoodDetailState extends State<MoodDetail> {
       } else {
         totalDuration = Duration(milliseconds: products.duration!);
       }
-      await initiliaze();
+
       setState(() {});
     } catch (e) {
       developer.log(e.toString(), name: "mood error");
@@ -108,6 +108,7 @@ class _MoodDetailState extends State<MoodDetail> {
   }
 
   onPlayButtonClicked(Products products) async {
+    await initiliaze();
     currentlyPlaying.value = products;
     developer.log("Starts in: ${products.position}");
     audioHandler.play();
