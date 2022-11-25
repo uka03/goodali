@@ -176,7 +176,7 @@ class _ListenTabbarState extends State<ListenTabbar>
               builder: (context, Box box, widget) {
                 if (box.length > 0) {
                   List<Products> data = [];
-                  for (int a = 0; a < box.length; a++) {
+                  for (int a = 0; a < 2; a++) {
                     data.add(box.getAt(a));
                   }
                   return PodcastAll(
@@ -285,9 +285,11 @@ class _ListenTabbarState extends State<ListenTabbar>
         specialList.add(element);
       }
     }
-    setState(() {
-      specialList;
-    });
+    if (mounted) {
+      setState(() {
+        specialList;
+      });
+    }
     return data;
   }
 

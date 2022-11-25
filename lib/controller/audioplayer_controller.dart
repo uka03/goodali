@@ -206,6 +206,8 @@ Future<bool> initiliazePodcast() async {
       identical(firstItem, mediaItems.first) == true) {
     log("initiliaze add queue lecture", name: mediaItems.length.toString());
     await audioHandler.addQueueItems(mediaItems);
+    print("audioHandler.queue.value.first.extras!['url']");
+    print(audioHandler.queue.value.first.extras!['url']);
     return true;
   }
   return false;
