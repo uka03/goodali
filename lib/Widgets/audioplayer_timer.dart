@@ -9,11 +9,13 @@ class AudioplayerTimer extends StatelessWidget {
   final String title;
   final Duration totalDuration;
   final Duration savedDuration;
+  final int id;
   const AudioplayerTimer(
       {Key? key,
       required this.title,
       required this.totalDuration,
-      required this.savedDuration})
+      required this.savedDuration,
+      required this.id})
       : super(key: key);
 
   @override
@@ -27,10 +29,11 @@ class AudioplayerTimer extends StatelessWidget {
         Duration duration = savedDuration;
         Duration position = value.current;
 
-        bool isPlaying =
-            currently?.title == title && buttonState == ButtonState.playing
-                ? true
-                : false;
+        bool isPlaying = currently?.id == id &&
+                currently?.title == title &&
+                buttonState == ButtonState.playing
+            ? true
+            : false;
 
         if (isPlaying) {
           return Text(formatTime(totalDuration - position) + "мин",

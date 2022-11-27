@@ -81,6 +81,7 @@ class DownloadController with ChangeNotifier {
     final episodePodcast = await _dataStore.getProductsFromUrl(
         url: Urls.networkPath + episodeTask.products!.audio!);
     episodePodcast!.isDownloaded = true;
+    episodePodcast.downloadedPath = _localPath;
     await episodePodcast.save();
     log(episodePodcast.isDownloaded.toString(), name: "podcast downloaded");
     _episodeTasks.add(TaskInfo(episodePodcast, episodeTask.taskId,
@@ -120,16 +121,11 @@ class DownloadController with ChangeNotifier {
           if (task.status == DownloadTaskStatus.complete) {
             var exist =
                 await File(path.join(task.savedDir, task.filename)).exists();
+
             if (!exist) {
               await FlutterDownloader.remove(
                   taskId: task.taskId, shouldDeleteContent: true);
             } else {
-              var filePath =
-                  'file://${path.join(task.savedDir, Uri.encodeComponent(task.filename!))}';
-
-              episode.downloadedPath = filePath;
-              episode.save();
-
               _episodeTasks.add(TaskInfo(episode, task.taskId,
                   progress: task.progress, status: task.status));
             }

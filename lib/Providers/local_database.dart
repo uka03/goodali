@@ -98,7 +98,7 @@ class HiveBoughtDataStore {
       var item = box.get(datas.first.key);
       item!.isBought = products.isBought;
       item.audio = products.audio;
-
+      item.productId = products.productId;
       item.title = products.title;
       await item.save();
     }
@@ -244,6 +244,7 @@ class HiveIntroDataStore {
       item!.isBought = products.isBought;
       item.audio = products.audio;
       item.title = products.title;
+      item.productId = products.productId;
       await item.save();
     }
   }

@@ -29,6 +29,7 @@ class _MyCoursesState extends State<MyCourses> {
   List<Products> allListProducts = [];
   List<Products> myCourses = [];
   List<MediaItem> mediaItems = [];
+  String albumName = "";
 
   int currentIndex = 0;
   List<int> savedPos = [];
@@ -48,6 +49,7 @@ class _MyCoursesState extends State<MyCourses> {
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
       );
+      print(allLectures[index].audio);
       print("eswel iiisheeeeee orj irj  bnu MyCourses");
       audioHandler.play();
       currentlyPlaying.value = allLectures[index];
@@ -55,7 +57,7 @@ class _MyCoursesState extends State<MyCourses> {
         activeList.first.id != allLectures.first.id) {
       print("iisheee orj irj  bnu MyCourses");
       activeList = allLectures;
-
+      print(allLectures[index].audio);
       await initiliazePodcast();
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
@@ -119,17 +121,26 @@ class _MyCoursesState extends State<MyCourses> {
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(),
               itemBuilder: (context, index) {
+                String empty = "";
+                if (albumName == allLectures[index].albumTitle) {
+                  empty = "";
+                } else {
+                  empty = albumName;
+                }
+                if (albumName != allLectures[index].albumTitle) {
+                  albumName = allLectures[index].albumTitle ?? "";
+                  empty = albumName;
+                }
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (index == 0) const SizedBox(height: 30),
-                    if (index == 0)
-                      Text(allLectures[index].albumTitle ?? "",
-                          style: const TextStyle(
-                              color: MyColors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 30),
+                    if (empty != "") const SizedBox(height: 30),
+                    Text(empty,
+                        style: const TextStyle(
+                            color: MyColors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
+                    if (empty != "") const SizedBox(height: 30),
                     AlbumDetailItem(
                         index: index,
                         isBought: true,

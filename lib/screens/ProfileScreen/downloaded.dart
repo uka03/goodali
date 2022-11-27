@@ -26,15 +26,13 @@ class Downloaded extends StatefulWidget {
 class _DownloadedState extends State<Downloaded> {
   List<Products> downloadedList = [];
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   _onPlayButtonTapped(int index) async {
     currentlyPlaying.value = downloadedList[index];
     if (activeList.first.lectureTitle == downloadedList.first.lectureTitle &&
         activeList.first.id == downloadedList.first.id) {
+      print("init hiigdsen");
+      print(activeList.first.downloadedPath);
+      print("downloadedList.length ${downloadedList.length}");
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: downloadedList[index].position!),
@@ -44,6 +42,8 @@ class _DownloadedState extends State<Downloaded> {
             downloadedList.first.lectureTitle ||
         activeList.first.id != downloadedList.first.id) {
       activeList = downloadedList;
+      print(activeList.first.lectureTitle);
+      print("downloadedList.length ${downloadedList.length}");
 
       await initiliazePodcast();
       await audioHandler.skipToQueueItem(index);
@@ -62,9 +62,9 @@ class _DownloadedState extends State<Downloaded> {
           builder: (context, value, child) {
             List<Products> list = [];
             for (var element in value.episodeTasks) {
-              downloadedList.add(element.products!);
+              list.add(element.products!);
             }
-            list = removeDuplicates(downloadedList);
+            downloadedList = removeDuplicates(list);
             if (list.isEmpty) {
               return Column(
                 children: [
@@ -79,13 +79,14 @@ class _DownloadedState extends State<Downloaded> {
               );
             } else {
               return ListView.builder(
-                  itemCount: list.length,
+                  itemCount: downloadedList.length,
+                  padding: const EdgeInsets.only(bottom: 30),
                   itemBuilder: (context, index) {
                     return AlbumDetailItem(
                       index: index,
-                      products: list[index],
-                      albumName: list[index].albumTitle ?? "",
-                      isBought: list[index].isBought ?? true,
+                      products: downloadedList[index],
+                      albumName: downloadedList[index].albumTitle ?? "",
+                      isBought: downloadedList[index].isBought ?? true,
                       onTap: () async {
                         _onPlayButtonTapped(index);
                       },

@@ -9,13 +9,15 @@ import 'package:goodali/models/products_model.dart';
 
 class AudioPlayerButton extends StatelessWidget {
   final String title;
+  final int id;
   final VoidCallback onPlay;
   final VoidCallback onPause;
   const AudioPlayerButton(
       {Key? key,
       required this.title,
       required this.onPlay,
-      required this.onPause})
+      required this.onPause,
+      required this.id})
       : super(key: key);
 
   @override
@@ -26,10 +28,12 @@ class AudioPlayerButton extends StatelessWidget {
         Products? currentlyPlay = currentlyPlaying.value;
         var currentTitle =
             currentlyPlay?.title ?? currentlyPlay?.lectureTitle ?? "";
-        bool isPlaying =
-            currentTitle == title && buttonValue == ButtonState.playing
-                ? true
-                : false;
+        var currentID = currentlyPlay?.id ?? currentlyPlay?.id ?? "";
+        bool isPlaying = currentID == id &&
+                currentTitle == title &&
+                buttonValue == ButtonState.playing
+            ? true
+            : false;
         bool isBuffering =
             currentTitle == title && buttonValue == ButtonState.loading
                 ? true
@@ -55,7 +59,7 @@ class AudioPlayerButton extends StatelessWidget {
                     color: Colors.black,
                     size: 30.0,
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (currentTitle == title &&
                         buttonValue == ButtonState.paused) {
                       audioHandler.play();

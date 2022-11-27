@@ -51,10 +51,10 @@ class _CardPaymentState extends State<CardPayment> {
             card.removeAllProducts();
 
             if (value.contains("status_code=000")) {
-              TopSnackBar.successFactory().show(context);
-
-              Navigator.pop(context);
-              Navigator.pop(context);
+              TopSnackBar.successFactory().show(context).then((value) {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              });
             }
           },
           onWebResourceError: (onWebResourceError) {

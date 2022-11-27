@@ -168,6 +168,7 @@ class _PodcastItemState extends State<PodcastItem> {
                 child: Row(
                   children: [
                     AudioPlayerButton(
+                      id: widget.podcastItem.id!,
                       onPlay: () async {
                         await updateSavedPosition();
                         widget.onTap!.call();
@@ -198,6 +199,7 @@ class _PodcastItemState extends State<PodcastItem> {
                                   : Container(),
                               const SizedBox(width: 10),
                               AudioplayerTimer(
+                                id: widget.podcastItem.id!,
                                 title: widget.podcastItem.title ?? "",
                                 totalDuration: _totalduration,
                                 savedDuration:

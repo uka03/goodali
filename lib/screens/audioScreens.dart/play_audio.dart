@@ -23,10 +23,8 @@ import 'package:miniplayer/miniplayer.dart';
 
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
-import 'package:goodali/screens/audioScreens.dart/download_page.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 void onTap() {}
 
@@ -35,16 +33,14 @@ final MiniplayerController controller = MiniplayerController();
 class PlayAudio extends StatefulWidget {
   final Products products;
   final String albumName;
-  final bool? isDownloaded;
+
   final String? downloadedAudioPath;
-  final bool? mini;
+
   const PlayAudio({
     Key? key,
     required this.products,
     required this.albumName,
-    this.isDownloaded = false,
     this.downloadedAudioPath,
-    this.mini = true,
   }) : super(key: key);
 
   @override
@@ -69,19 +65,6 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   void initState() {
     super.initState();
-
-    getCachedFile(url);
-  }
-
-  getCachedFile(String url) async {
-    fileInfo = await audioPlayerController.checkCachefor(url);
-  }
-
-  void _downloadFile() {
-    setState(() {
-      fileStream =
-          CustomCacheManager.instance.getFileStream(url, withProgress: true);
-    });
   }
 
   @override
@@ -178,7 +161,8 @@ class _PlayAudioState extends State<PlayAudio> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          if (widget.products.isBought == true)
+                          if (widget.products.isBought == true ||
+                              widget.products.moodListId == 0)
                             DownloadButton(
                                 products: widget.products, isModalPlayer: true),
                           Column(
@@ -234,35 +218,6 @@ class _PlayAudioState extends State<PlayAudio> {
                                 bufferedBarColor:
                                     MyColors.primaryColor.withAlpha(20),
                               ),
-                              // SfLinearGauge(
-                              //   maximum:
-                              //       totalDuration!.inMilliseconds.toDouble(),
-                              //   showLabels: false,
-                              //   showTicks: false,
-                              //   markerPointers: [
-                              //     LinearShapePointer(
-                              //       value: durationValue.current.inMilliseconds
-                              //           .toDouble(),
-                              //       position: LinearElementPosition.cross,
-                              //       color: MyColors.primaryColor,
-                              //       borderColor: MyColors.border1,
-                              //       shapeType: LinearShapePointerType.circle,
-                              //       onChanged: (value) {
-                              //         print(value);
-                              //         audioHandler.seek(Duration(
-                              //             milliseconds:
-                              //                 (value * 1000).toInt()));
-                              //       },
-                              //     ),
-                              //   ],
-                              //   barPointers: [
-                              //     LinearBarPointer(
-                              //         color: MyColors.primaryColor,
-                              //         value: durationValue
-                              //             .current.inMilliseconds
-                              //             .toDouble())
-                              //   ],
-                              // ),
                             ),
                           );
                         },
@@ -431,7 +386,6 @@ class _PlayAudioState extends State<PlayAudio> {
 
   buttonForward15Seconds() {
     position = position + const Duration(seconds: 15);
-
     if (duration > position) {
       audioHandler.seek(position);
     } else if (duration < position) {
@@ -441,7 +395,6 @@ class _PlayAudioState extends State<PlayAudio> {
 
   buttonBackWard5Seconds() {
     position = position - const Duration(seconds: 5);
-
     if (position < const Duration(seconds: 0)) {
       audioHandler.seek(const Duration(seconds: 0));
     } else {

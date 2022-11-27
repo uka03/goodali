@@ -169,13 +169,14 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
                   return Row(
                     children: [
                       AudioPlayerButton(
-                        onPlay: () {
+                        onPlay: () async {
                           widget.onTap();
                         },
                         onPause: () {
                           audioHandler.pause();
                         },
                         title: widget.products.title ?? "",
+                        id: widget.products.id!,
                       ),
                       const SizedBox(width: 10),
                       isLoading
@@ -197,6 +198,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
                                     : Container(),
                                 const SizedBox(width: 10),
                                 AudioplayerTimer(
+                                  id: widget.products.id!,
                                   title: widget.products.title ?? "",
                                   totalDuration: _totalduration,
                                   savedDuration:
@@ -205,7 +207,8 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
                               ],
                             ),
                       const Spacer(),
-                      widget.products.isBought == false
+                      widget.products.isBought == false &&
+                              widget.products.title != "Танилцуулга"
                           ? IconButton(
                               splashRadius: 20,
                               onPressed: () {

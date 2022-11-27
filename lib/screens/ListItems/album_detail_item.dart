@@ -178,6 +178,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
               return Row(
                 children: [
                   AudioPlayerButton(
+                    id: widget.products.id!,
                     onPlay: () {
                       widget.onTap();
                     },
@@ -206,6 +207,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                                 : Container(),
                             const SizedBox(width: 10),
                             AudioplayerTimer(
+                              id: widget.products.id!,
                               title: widget.products.title ?? "",
                               totalDuration: _totalduration,
                               savedDuration:

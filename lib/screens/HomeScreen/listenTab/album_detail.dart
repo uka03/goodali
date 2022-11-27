@@ -255,28 +255,28 @@ class _AlbumDetailState extends State<AlbumDetail> {
               products: product[index],
               albumProducts: widget.albumProduct,
               onTap: () async {
-                if (widget.albumProduct.isBought == false) {
-                  currentlyPlaying.value = product[index];
-                  if (activeList.first.title == product.first.title &&
-                      activeList.first.id == product.first.id) {
-                    await audioHandler.skipToQueueItem(index);
-                    log("Starts in: ${product[index].position}");
+                currentlyPlaying.value = product[index];
+                if (activeList.first.title == product.first.title &&
+                    activeList.first.id == product.first.id) {
+                  await audioHandler.skipToQueueItem(index);
+                  log("Starts in: ${product[index].position}");
 
-                    await audioHandler.seek(
-                      Duration(milliseconds: product[index].position!),
-                    );
-                    audioHandler.play();
-                  } else if (activeList.first.title != product.first.title ||
-                      activeList.first.id != product.first.id) {
-                    activeList = product;
-                    await initiliazePodcast();
-                    await audioHandler.skipToQueueItem(index);
-                    await audioHandler.seek(
-                      Duration(milliseconds: product[index].position!),
-                    );
-                    await audioHandler.play();
-                  }
-                } else {}
+                  await audioHandler.seek(
+                    Duration(milliseconds: product[index].position!),
+                  );
+
+                  audioHandler.play();
+                } else if (activeList.first.title != product.first.title ||
+                    activeList.first.id != product.first.id) {
+                  activeList = product;
+                  log("Starts in: ${product[index].position}");
+                  await initiliazePodcast();
+                  await audioHandler.skipToQueueItem(index);
+                  await audioHandler.seek(
+                    Duration(milliseconds: product[index].position!),
+                  );
+                  await audioHandler.play();
+                }
               },
             );
           } else {
@@ -323,6 +323,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   _onBuyClicked(cart, bool isAuth) {
+    print("buyList.length ${buyList.length}");
+    print("product id ${buyList[0].productId}");
     for (var item in buyList) {
       if (item.isBought == false) {
         albumProductsList.add(item.productId!);
@@ -372,6 +374,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
         albumTitle: widget.albumProduct.title,
         audio: widget.albumProduct.audio,
         isBought: widget.albumProduct.isBought,
+        productId: widget.albumProduct.productId,
         duration: 0,
         position: 0,
         banner: widget.albumProduct.banner);
@@ -397,6 +400,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
         albumTitle: widget.albumProduct.title,
         audio: widget.albumProduct.audio,
         isBought: widget.albumProduct.isBought,
+        productId: widget.albumProduct.productId,
         duration: 0,
         position: 0,
         banner: widget.albumProduct.banner);

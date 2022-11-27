@@ -14,6 +14,7 @@ late AudioHandler audioHandler;
 final HiveDataStore dataStore = HiveDataStore();
 final HiveBoughtDataStore dataAlbumStore = HiveBoughtDataStore();
 final HiveMoodDataStore dataMoodStore = HiveMoodDataStore();
+final HiveIntroDataStore dataIntroStore = HiveIntroDataStore();
 Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
       builder: () => AudioPlayerHandler(),
       config: const AudioServiceConfig(
@@ -60,11 +61,13 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
     stop();
     queue.add(mediaItems);
+    var index = 0;
     mediaItem
         .whereType<MediaItem>()
         .listen((item) => _recentSubject.add([item]));
     // Broadcast media item changes.
     _player.currentIndexStream.listen((index) {
+      index = index;
       if (index != null) mediaItem.add(queue.value[index]);
     });
     // Propagate all events from the audio player to AudioService clients.
@@ -92,16 +95,28 @@ class AudioPlayerHandler extends BaseAudioHandler
 
       dataMoodStore.updatePosition(currentlyPlaying.value?.title! ?? "",
           currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
+
+      dataIntroStore.updatePosition(currentlyPlaying.value?.title! ?? "",
+          currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
     });
     try {
       // After a cold restart (on Android), _player.load jumps straight from
       // the loading state to the completed state. Inserting a delay makes it
       // work. Not sure why!
       //await Future.delayed(Duration(seconds: 2)); // magic delay
+
       await _player.setAudioSource(ConcatenatingAudioSource(
-        children: queue.value
-            .map((item) => AudioSource.uri(Uri.parse(item.extras!['url'])))
-            .toList(),
+        children: queue.value.map((item) {
+          // if (item.extras?['downloadedPath'] != "") {
+          //   print("tatagdsan");
+          //   print(item.extras?['downloadedPath']);
+          //   print(Uri.parse(item.extras?['downloadedPath']));
+          //   return AudioSource.uri(Uri.parse(item.extras?['downloadedPath']));
+          // } else {
+          print("tatagdaagu");
+          return AudioSource.uri(Uri.parse(item.extras!['url']));
+          // }
+        }).toList(),
       ));
     } catch (e) {
       // ignore: avoid_print
@@ -115,7 +130,7 @@ class AudioPlayerHandler extends BaseAudioHandler
     // the [QueueHandler] mixin will delegate to this method.
 
     if (index < 0 || index >= queue.value.length) return;
-    // This jumps to the beginning of the queue item at newIndex.
+
     _player.seek(Duration.zero, index: index);
     // Demonstrate custom events.
     customEvent.add('skip to $index');
