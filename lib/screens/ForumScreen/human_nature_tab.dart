@@ -12,8 +12,7 @@ import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 
 class NatureOfHuman extends StatefulWidget {
-  final List<TagModel> tagList;
-  const NatureOfHuman({Key? key, required this.tagList}) : super(key: key);
+  const NatureOfHuman({Key? key}) : super(key: key);
 
   @override
   State<NatureOfHuman> createState() => _NatureOfHumanState();
@@ -31,7 +30,8 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
   @override
   void initState() {
     isAuth = Provider.of<Auth>(context, listen: false).isAuth;
-    tagList = widget.tagList;
+
+    getTagList();
     super.initState();
   }
 
@@ -149,8 +149,10 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
 
   Future<void> getTagList() async {
     var data = await Connection.getTagList(context);
-    setState(() {
-      tagList = data;
-    });
+    if (mounted) {
+      setState(() {
+        tagList = data;
+      });
+    }
   }
 }

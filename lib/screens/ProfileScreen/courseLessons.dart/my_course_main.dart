@@ -35,122 +35,127 @@ class _MyCourseMainState extends State<MyCourseMain> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: const SimpleAppBar(noCard: true),
-        body: Column(
-          children: [
-            Container(
-              height: 56,
-              padding: const EdgeInsets.only(left: 20),
-              alignment: Alignment.centerLeft,
-              child: Text(title,
-                  style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: MyColors.black)),
-            ),
-            FutureBuilder(
-                future: getBoughtCoursesItems(),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.hasData &&
-                      snapshot.connectionState == ConnectionState.done) {
-                    List<CoursesItems> coursesItemList = snapshot.data;
-                    return ListView.builder(
-                      itemCount: coursesItemList.length,
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        allTasks = coursesItemList[index].allTask ?? 0;
-                        doneTasks = coursesItemList[index].done ?? 0;
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: 56,
+                padding: const EdgeInsets.only(left: 20),
+                alignment: Alignment.centerLeft,
+                child: Text(title,
+                    style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: MyColors.black)),
+              ),
+              FutureBuilder(
+                  future: getBoughtCoursesItems(),
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData &&
+                        snapshot.connectionState == ConnectionState.done) {
+                      List<CoursesItems> coursesItemList = snapshot.data;
+                      return ListView.builder(
+                        itemCount: coursesItemList.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          allTasks = coursesItemList[index].allTask ?? 0;
+                          doneTasks = coursesItemList[index].done ?? 0;
 
-                        String tasks = doneTasks.toString() +
-                            "/" +
-                            allTasks.toString() +
-                            " даалгавар";
-                        return Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: ((context) => MyCoursesDetail(
-                                          lessonName:
-                                              coursesItemList[index].name ?? "",
-                                          coursesItems:
-                                              coursesItemList[index]))));
-                            },
-                            child: SizedBox(
-                              height: 48,
-                              width: double.infinity,
-                              child: Row(
-                                children: [
-                                  (coursesItemList[index].banner !=
-                                          "Image failed to upload")
-                                      ? ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          child: ImageView(
-                                            imgPath:
-                                                coursesItemList[index].banner ??
+                          String tasks = doneTasks.toString() +
+                              "/" +
+                              allTasks.toString() +
+                              " даалгавар";
+                          return Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: ((context) => MyCoursesDetail(
+                                            lessonName:
+                                                coursesItemList[index].name ??
                                                     "",
+                                            coursesItems:
+                                                coursesItemList[index]))));
+                              },
+                              child: SizedBox(
+                                height: 48,
+                                width: double.infinity,
+                                child: Row(
+                                  children: [
+                                    (coursesItemList[index].banner !=
+                                            "Image failed to upload")
+                                        ? ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: ImageView(
+                                              imgPath: coursesItemList[index]
+                                                      .banner ??
+                                                  "",
+                                              height: 48,
+                                              width: 48,
+                                            ),
+                                            //     Container(
+                                            //   color: Colors.blueGrey,
+                                            //   width: 48,
+                                            //   height: 48,
+                                            // )
+                                          )
+                                        : Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey[300],
+                                                borderRadius:
+                                                    BorderRadius.circular(4)),
                                             height: 48,
                                             width: 48,
                                           ),
-                                          //     Container(
-                                          //   color: Colors.blueGrey,
-                                          //   width: 48,
-                                          //   height: 48,
-                                          // )
-                                        )
-                                      : Container(
-                                          decoration: BoxDecoration(
-                                              color: Colors.grey[300],
-                                              borderRadius:
-                                                  BorderRadius.circular(4)),
-                                          height: 48,
-                                          width: 48,
-                                        ),
-                                  const SizedBox(width: 15),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(coursesItemList[index].name ?? "",
+                                    const SizedBox(width: 15),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(coursesItemList[index].name ?? "",
+                                            style: const TextStyle(
+                                                color: MyColors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold)),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          tasks,
                                           style: const TextStyle(
-                                              color: MyColors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold)),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        tasks,
-                                        style: const TextStyle(
-                                            color: MyColors.gray, fontSize: 12),
-                                      )
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  allTasks == doneTasks
-                                      ? SvgPicture.asset(
-                                          "assets/images/done_icon.svg")
-                                      : SvgPicture.asset(
-                                          "assets/images/undone_icon.svg"),
-                                  const SizedBox(width: 10),
-                                ],
+                                              color: MyColors.gray,
+                                              fontSize: 12),
+                                        )
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    allTasks == doneTasks
+                                        ? SvgPicture.asset(
+                                            "assets/images/done_icon.svg")
+                                        : SvgPicture.asset(
+                                            "assets/images/undone_icon.svg"),
+                                    const SizedBox(width: 10),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: MyColors.primaryColor,
-                      ),
-                    );
-                  }
-                }),
-          ],
+                          );
+                        },
+                      );
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: MyColors.primaryColor,
+                        ),
+                      );
+                    }
+                  }),
+            ],
+          ),
         ));
   }
 

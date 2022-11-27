@@ -13,8 +13,7 @@ import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 
 class MyFriendTab extends StatefulWidget {
-  final List<TagModel> tagList;
-  const MyFriendTab({Key? key, required this.tagList}) : super(key: key);
+  const MyFriendTab({Key? key}) : super(key: key);
 
   @override
   State<MyFriendTab> createState() => _MyFriendTabState();
@@ -32,7 +31,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
   @override
   void initState() {
     isAuth = Provider.of<Auth>(context, listen: false).isAuth;
-    tagList = widget.tagList;
+
     super.initState();
   }
 

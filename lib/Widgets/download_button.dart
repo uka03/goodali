@@ -48,6 +48,8 @@ class _DownloadButtonState extends State<DownloadButton> {
   Widget _downloadButton(TaskInfo task, BuildContext context) {
     switch (task.status!.value) {
       case 0:
+      case 4:
+      case 5:
         return Column(
           children: [
             IconButton(

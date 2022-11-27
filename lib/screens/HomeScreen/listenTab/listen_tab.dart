@@ -176,7 +176,7 @@ class _ListenTabbarState extends State<ListenTabbar>
               builder: (context, Box box, widget) {
                 if (box.length > 0) {
                   List<Products> data = [];
-                  for (int a = 0; a < 2; a++) {
+                  for (int a = 0; a < box.length; a++) {
                     data.add(box.getAt(a));
                   }
                   return PodcastAll(
@@ -272,7 +272,6 @@ class _ListenTabbarState extends State<ListenTabbar>
 
   Future<void> _refresh() async {
     setState(() {
-      getProducts();
       getVideoList();
       getPodcastList();
     });
@@ -297,8 +296,19 @@ class _ListenTabbarState extends State<ListenTabbar>
     return Connection.getVideoList(context);
   }
 
-  Future<List<Products>> getalbumListLogged() {
-    return Connection.getalbumListLogged(context);
+  Future<List<Products>> getalbumListLogged() async {
+    var data = await Connection.getalbumListLogged(context);
+    for (var element in data) {
+      if (element.isSpecial == 1) {
+        specialList.add(element);
+      }
+    }
+    if (mounted) {
+      setState(() {
+        specialList;
+      });
+    }
+    return data;
   }
 
   Future<void> getPodcastList() async {

@@ -295,8 +295,8 @@ class _MoodDetailState extends State<MoodDetail> {
                   progressBarColor: MyColors.primaryColor,
                   thumbColor: MyColors.primaryColor,
                   bufferedBarColor: MyColors.primaryColor.withAlpha(20),
-                  onSeek: (duration) async {
-                    await audioHandler.seek(duration);
+                  onSeek: (duration) {
+                    audioHandler.seek(duration);
                   },
                 ),
                 const SizedBox(height: 20),

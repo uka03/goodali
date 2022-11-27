@@ -15,8 +15,7 @@ import 'package:goodali/screens/ListItems/post_item.dart';
 import 'package:provider/provider.dart';
 
 class NuutsBulgem extends StatefulWidget {
-  final List<TagModel> tagList;
-  const NuutsBulgem({Key? key, required this.tagList}) : super(key: key);
+  const NuutsBulgem({Key? key}) : super(key: key);
 
   @override
   State<NuutsBulgem> createState() => _NuutsBulgemState();
@@ -36,7 +35,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
   void initState() {
     isAuth = Provider.of<Auth>(context, listen: false).isAuth;
     hasTraining = Provider.of<Auth>(context, listen: false).hasTraining;
-    tagList = widget.tagList;
+
     super.initState();
   }
 
@@ -90,7 +89,11 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                                     postItem: filteredList.isNotEmpty
                                         ? filteredList[index]
                                         : postList[index],
-                                    onRefresh: getPostList,
+                                    onRefresh: () {
+                                      setState(() {
+                                        getPostList();
+                                      });
+                                    },
                                     isHearted: isHearted[index]),
                               );
                             },

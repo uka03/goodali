@@ -26,12 +26,6 @@ class _ForumScreenState extends State<ForumScreen> {
   List<TagModel> tagList = [];
 
   @override
-  void initState() {
-    getTagList();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
@@ -149,17 +143,10 @@ class _ForumScreenState extends State<ForumScreen> {
                             )))
             ];
           },
-          body: TabBarView(children: [
-            NatureOfHuman(tagList: tagList),
-            NuutsBulgem(tagList: tagList),
-            MyFriendTab(tagList: tagList)
-          ]),
+          body: const TabBarView(
+              children: [NatureOfHuman(), NuutsBulgem(), MyFriendTab()]),
         ),
       ),
     );
-  }
-
-  Future<void> getTagList() async {
-    tagList = await Connection.getTagList(context);
   }
 }

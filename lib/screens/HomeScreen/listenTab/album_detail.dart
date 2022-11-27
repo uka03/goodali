@@ -391,16 +391,16 @@ class _AlbumDetailState extends State<AlbumDetail> {
   Future<void> getLectureListLogged() async {
     var data = await Connection.getLectureListLogged(
         context, widget.albumProduct.id.toString());
-    // Products introduction = Products(
-    //     title: "Танилцуулга",
-    //     id: widget.albumProduct.id,
-    //     albumTitle: widget.albumProduct.title,
-    //     audio: widget.albumProduct.audio,
-    //     isBought: widget.albumProduct.isBought,
-    //     duration: 0,
-    //     position: 0,
-    //     banner: widget.albumProduct.banner);
-    // await dataStore.addProduct(products: introduction);
+    Products introduction = Products(
+        title: "Танилцуулга",
+        id: widget.albumProduct.id,
+        albumTitle: widget.albumProduct.title,
+        audio: widget.albumProduct.audio,
+        isBought: widget.albumProduct.isBought,
+        duration: 0,
+        position: 0,
+        banner: widget.albumProduct.banner);
+    await dataStore.addProduct(products: introduction);
 
     setState(() {});
     for (var item in data) {

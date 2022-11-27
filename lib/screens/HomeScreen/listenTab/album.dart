@@ -95,7 +95,7 @@ class _AlbumLectureState extends State<AlbumLecture> {
           itemCount: albumList.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               childAspectRatio: MediaQuery.of(context).size.width /
-                  (MediaQuery.of(context).size.height / 1.4),
+                  (MediaQuery.of(context).size.height / 1.3),
               mainAxisSpacing: 20,
               crossAxisSpacing: 20,
               crossAxisCount: 2),

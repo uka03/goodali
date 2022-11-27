@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
@@ -167,6 +168,14 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
+  Future<void> share() async {
+    await FlutterShare.share(
+        title: widget.postItem.title ?? "",
+        text: widget.postItem.body,
+        linkUrl: "https://www.goodali.mn/",
+        chooserTitle: 'Goodali');
+  }
+
   insertLike(int id) async {
     bool unliked = await Connection.insertPostLiske(context, {"post_id": id});
     setState(() {
@@ -210,7 +219,7 @@ class _PostItemState extends State<PostItem> {
                   ),
                   const SizedBox(height: 30),
                   TextButton(
-                      onPressed: () {},
+                      onPressed: share,
                       child: const Text("Хуваалцах",
                           style: TextStyle(color: MyColors.black))),
                   TextButton(

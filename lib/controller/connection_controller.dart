@@ -448,8 +448,7 @@ class Connection {
       final response = await Http()
           .getDio(context, headerTypebearer)
           .post(Urls.lectureListLogged, data: {"album_id": id});
-      print("response.data");
-      print(response.data);
+
       if (response.statusCode == 200) {
         return (response.data as List)
             .map((e) => Products.fromJson(e))

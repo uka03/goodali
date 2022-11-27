@@ -123,8 +123,12 @@ class _ArticleDetailState extends State<ArticleDetail> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: similarArticle.length,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.all(20.0),
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ArticleDetail(articleItem: similarArticle[index]))),
               child: ArtcileItem(
                 articleModel: similarArticle[index],
               ),
