@@ -179,7 +179,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                 children: [
                   AudioPlayerButton(
                     id: widget.products.id!,
-                    onPlay: () {
+                    onPlay: () async {
                       widget.onTap();
                     },
                     onPause: () {

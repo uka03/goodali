@@ -71,6 +71,7 @@ class _CourseListState extends State<CourseList> {
   }
 
   Future<List<Products>> getTrainingDetailLogged() {
+    print("logged ");
     return Connection.getTrainingDetailLogged(context, widget.id.toString());
   }
 }

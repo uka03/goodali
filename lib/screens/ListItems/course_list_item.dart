@@ -20,13 +20,6 @@ class CourseListListItem extends StatefulWidget {
 
 class _CourseListListItemState extends State<CourseListListItem> {
   @override
-  void initState() {
-    print(widget.products.opennedDate.runtimeType);
-    print(widget.products.opennedDate == "");
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     return Padding(
@@ -54,7 +47,7 @@ class _CourseListListItemState extends State<CourseListListItem> {
                   ),
                   Text(
                     widget.products.opennedDate == ""
-                        ? ""
+                        ? "Нээлттэй"
                         : dateTimeFormatter(widget.products.opennedDate ?? ""),
                     style: const TextStyle(color: MyColors.gray, fontSize: 12),
                   ),
@@ -70,48 +63,47 @@ class _CourseListListItemState extends State<CourseListListItem> {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  GestureDetector(
-                    onTap: widget.products.isBought == true
-                        ? null
-                        : () {
-                            cart.addItemsIndex(widget.products.productId!);
+                  if (widget.products.isBought == false)
+                    GestureDetector(
+                      onTap: () {
+                        cart.addItemsIndex(widget.products.productId!);
 
-                            if (!cart.sameItemCheck) {
-                              cart.addProducts(widget.products);
-                              cart.addTotalPrice(
-                                  widget.products.price?.toDouble() ?? 0.0);
+                        if (!cart.sameItemCheck) {
+                          cart.addProducts(widget.products);
+                          cart.addTotalPrice(
+                              widget.products.price?.toDouble() ?? 0.0);
 
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const CartScreen()));
-                            } else {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const CartScreen()));
-                            }
-                          },
-                    child: Container(
-                      height: 40,
-                      width: 120,
-                      decoration: BoxDecoration(
-                          color: MyColors.primaryColor,
-                          borderRadius: BorderRadius.circular(6)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const [
-                          Text(
-                            "Сонгох",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Icon(IconlyLight.arrow_right_2, color: Colors.white)
-                        ],
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const CartScreen()));
+                        } else {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const CartScreen()));
+                        }
+                      },
+                      child: Container(
+                        height: 40,
+                        width: 120,
+                        decoration: BoxDecoration(
+                            color: MyColors.primaryColor,
+                            borderRadius: BorderRadius.circular(6)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: const [
+                            Text(
+                              "Сонгох",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Icon(IconlyLight.arrow_right_2, color: Colors.white)
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                   const Spacer(),
                   Wrap(children: [
                     const Text(

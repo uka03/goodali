@@ -36,6 +36,7 @@ class _ListenTabbarState extends State<ListenTabbar>
 
   late final futureAlbum = getProducts();
   late final futurLoggedeAlbum = getalbumListLogged();
+  late final futureVideo = getVideoList();
   final HiveDataStore dataStore = HiveDataStore();
   List<Products> specialList = [];
   @override
@@ -250,7 +251,7 @@ class _ListenTabbarState extends State<ListenTabbar>
 
   Widget videoList() {
     return FutureBuilder(
-      future: getVideoList(),
+      future: futureVideo,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {

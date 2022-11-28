@@ -80,18 +80,21 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
       if (value != null) {
         initialPage = value;
       }
-      setState(() {
-        getCoursesTasks(widget.id);
-      });
+      if (mounted) {
+        setState(() {
+          getCoursesTasks(widget.id);
+        });
+      }
     });
   }
 
   Future<List<CourseLessonsTasksModel>> getCoursesTasks(String lessonID) async {
     allTasks = await Connection.getCoursesTasks(context, lessonID);
-
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
     for (var item in allTasks) {
       switch (item.type) {
         case 0:
@@ -120,9 +123,11 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
 
       tasksName.add(taskType);
     }
-    setState(() {
-      taskList = allTasks;
-    });
+    if (mounted) {
+      setState(() {
+        taskList = allTasks;
+      });
+    }
 
     return allTasks;
   }

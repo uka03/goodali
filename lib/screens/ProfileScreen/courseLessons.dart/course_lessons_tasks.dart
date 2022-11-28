@@ -6,7 +6,6 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
@@ -65,7 +64,7 @@ class _CourseTasksState extends State<CourseTasks> {
   @override
   void initState() {
     super.initState();
-    print(widget.initialPage);
+
     _setOrientation([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
@@ -75,6 +74,10 @@ class _CourseTasksState extends State<CourseTasks> {
     for (var i = 0; i < widget.courseTasks.length; i++) {
       _controllers.add(TextEditingController());
       _checkboxValue.add(false);
+
+      if (widget.courseTasks[i].type == 4) {
+        initiliazeVideo(Urls.networkPath + widget.courseTasks[i].videoUrl!);
+      }
     }
     _current = widget.initialPage?.toDouble() ?? 1.0;
 
@@ -136,11 +139,16 @@ class _CourseTasksState extends State<CourseTasks> {
       params: const YoutubePlayerParams(
         showControls: true,
         origin: "https://www.youtube.com/embed/",
-        autoPlay: true,
+        startAt: Duration(seconds: 0),
+        autoPlay: false,
+        showFullscreenButton: true,
       ),
     );
-
-    // _controller?.addListener(listener);
+    _ytbPlayerController?.listen((event) {
+      print(event.isReady);
+      print(event.hasError);
+      print(event.error);
+    });
   }
 
   @override
@@ -211,9 +219,6 @@ class _CourseTasksState extends State<CourseTasks> {
                       );
 
                     case 4:
-                      initiliazeVideo(Urls.networkPath +
-                          widget.courseTasks[index].videoUrl!);
-
                       return video(widget.courseTasks[index], index);
 
                     case 5:
@@ -331,9 +336,12 @@ class _CourseTasksState extends State<CourseTasks> {
                 cursorColor: MyColors.primaryColor,
                 maxLength: 2000,
                 maxLines: null,
-                onChanged: (value) => setState(() {
+                onTap: () => setState(() {
                       isTyping = true;
                     }),
+                onChanged: (value) {
+                  print("type0 $value");
+                },
                 decoration: InputDecoration(
                   hintText: "Хариулт",
                   suffixIcon: isTyping
@@ -348,10 +356,11 @@ class _CourseTasksState extends State<CourseTasks> {
                         )
                       : const SizedBox(),
                   enabledBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+                    borderSide: BorderSide(color: MyColors.border1),
                   ),
                   focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: MyColors.primaryColor),
+                    borderSide:
+                        BorderSide(color: MyColors.primaryColor, width: 1.5),
                   ),
                 )),
           ),
@@ -371,12 +380,30 @@ class _CourseTasksState extends State<CourseTasks> {
         TextField(
             controller: _controllers[index],
             cursorColor: MyColors.primaryColor,
-            decoration: const InputDecoration(
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+            onTap: () => setState(() {
+                  isTyping = true;
+                }),
+            onChanged: (value) {
+              print("type1 $value");
+            },
+            decoration: InputDecoration(
+              suffixIcon: isTyping
+                  ? GestureDetector(
+                      onTap: () {
+                        _controllers[index].text = "";
+                        setState(() {
+                          isTyping = false;
+                        });
+                      },
+                      child: const Icon(Icons.close, color: MyColors.black),
+                    )
+                  : const SizedBox(),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: MyColors.border1),
               ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.primaryColor),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide:
+                    BorderSide(color: MyColors.primaryColor, width: 1.5),
               ),
             )),
       ],
@@ -389,13 +416,31 @@ class _CourseTasksState extends State<CourseTasks> {
         Text(courseTask.question ?? ""),
         TextField(
             controller: _controllers[index],
+            onTap: () => setState(() {
+                  isTyping = true;
+                }),
+            onChanged: (value) {
+              print("exercise $value");
+            },
             cursorColor: MyColors.primaryColor,
-            decoration: const InputDecoration(
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.border1, width: 0.5),
+            decoration: InputDecoration(
+              suffixIcon: isTyping
+                  ? GestureDetector(
+                      onTap: () {
+                        _controllers[index].text = "";
+                        setState(() {
+                          isTyping = false;
+                        });
+                      },
+                      child: const Icon(Icons.close, color: MyColors.black),
+                    )
+                  : const SizedBox(),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: MyColors.border1),
               ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.primaryColor),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide:
+                    BorderSide(color: MyColors.primaryColor, width: 1.5),
               ),
             )),
       ],
@@ -403,19 +448,21 @@ class _CourseTasksState extends State<CourseTasks> {
   }
 
   Widget video(CourseLessonsTasksModel courseTask, int index) {
-    log(courseTask.videoUrl ?? "", name: "videoUrl");
+    log(courseTask.videoUrl!.length.toString(), name: "videoUrl");
     return Column(
       children: [
-        _ytbPlayerController?.value.isReady != null
-            ? YoutubePlayerControllerProvider(
-                controller: _ytbPlayerController ??
-                    YoutubePlayerController(
-                        initialVideoId: courseTask.videoUrl ?? ""),
-                child: const YoutubePlayerIFrame(
-                  aspectRatio: 16 / 9,
-                ),
-              )
-            : const CircularProgressIndicator(color: MyColors.primaryColor),
+        SizedBox(
+          height: 250,
+          width: double.infinity,
+          child: YoutubePlayerControllerProvider(
+            controller: _ytbPlayerController ??
+                YoutubePlayerController(
+                    initialVideoId: courseTask.videoUrl ?? ""),
+            child: const YoutubePlayerIFrame(
+              aspectRatio: 16 / 9,
+            ),
+          ),
+        ),
         const Spacer(),
         Container(
           decoration: BoxDecoration(

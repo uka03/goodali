@@ -102,7 +102,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                         onTap: () => _openLesson(
                             lessons[index]?.name ?? "",
                             lessons[index]!.id.toString(),
-                            lessons[index]!.opened!),
+                            lessons[index]!.isBought!),
                         subtitle: Row(children: [
                           Text(
                             tasks,
@@ -143,8 +143,8 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
     );
   }
 
-  _openLesson(String name, String id, bool isOpened) {
-    if (isOpened) {
+  _openLesson(String name, String id, int isOpened) {
+    if (isOpened == 1) {
       Navigator.push(
           context,
           MaterialPageRoute(

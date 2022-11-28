@@ -298,7 +298,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       await audioHandler.seek(
                         Duration(milliseconds: product[index].position!),
                       );
-                      await audioHandler.play();
+                      audioHandler.play();
                     } else if (activeList.first.title != product.first.title ||
                         activeList.first.id != product.first.id) {
                       activeList = product;
@@ -307,7 +307,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       await audioHandler.seek(
                         Duration(milliseconds: product[index].position!),
                       );
-                      await audioHandler.play();
+                      audioHandler.play();
                     }
                     currentlyPlaying.value = product[index];
                   } else {}
