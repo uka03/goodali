@@ -74,7 +74,7 @@ class Products extends HiveObject {
       this.moodListId,
       this.lectureTitle,
       this.audioCount,
-      this.isBought = true,
+      this.isBought = false,
       this.trainingBanner,
       this.opennedDate,
       this.isSpecial,
@@ -99,7 +99,7 @@ class Products extends HiveObject {
     order = json['order'] ?? 0;
     status = json['status'] ?? 0;
     traingName = json['t_name'] ?? "";
-    isBought = json['is_bought'] ?? true;
+    isBought = json['is_bought'] ?? false;
     audioCount = json['audio_count'] ?? 0;
     trainingBanner = json['t_banner'] ?? "";
     duration = json['duration'] ?? 0;

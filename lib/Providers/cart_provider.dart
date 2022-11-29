@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:collection/collection.dart';
 
 class CartProvider with ChangeNotifier {
   List<Products> _items = [];
@@ -86,7 +87,7 @@ class CartProvider with ChangeNotifier {
     } else {
       print("albumProductIDs $albumProductIDs");
       if (albumProductIDs.isNotEmpty) {
-        print("iisheee orj ireed bgn bhdaaa");
+        print("_totalPrice $_totalPrice");
         for (var item in albumProductIDs) {
           if (_productsId.contains(item)) {
             print(item);
@@ -94,11 +95,13 @@ class CartProvider with ChangeNotifier {
             print(_productsId);
             _items.removeWhere((element) {
               var data = element.productId == item;
-              _totalPrice = _totalPrice - element.price!;
+
               return data;
             });
+            _totalPrice = _items.fold(0, (sum, item) => sum + item.price!);
           }
         }
+
         _productsId.add(index);
       } else {
         print("albumProductIDssdisd $albumProductIDs");
@@ -130,6 +133,7 @@ class CartProvider with ChangeNotifier {
     _items.remove(cartItem);
     _items.removeWhere((element) => element.productId == cartItem.productId);
     _setPrefItems();
+    print(_productsId);
     notifyListeners();
   }
 

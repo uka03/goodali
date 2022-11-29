@@ -61,7 +61,7 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
     stop();
     queue.add(mediaItems);
-    var index = 0;
+
     mediaItem
         .whereType<MediaItem>()
         .listen((item) => _recentSubject.add([item]));
