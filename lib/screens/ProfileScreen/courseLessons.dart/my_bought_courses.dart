@@ -105,7 +105,7 @@ class _MyCoursesState extends State<MyCourses> {
         if (box.isNotEmpty) {
           for (var i = 0; i < box.length; i++) {
             Products products = box.getAt(i);
-            if (products.title != "Танилцуулга") {
+            if (products.title != "Танилцуулга" && products.isBought == true) {
               allboughtLectures.add(products);
             }
           }

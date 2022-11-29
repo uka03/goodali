@@ -1,12 +1,7 @@
-import 'dart:async';
-import 'dart:io';
-
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Utils/constans.dart';
-import 'package:goodali/Utils/custom_catch_manager.dart';
 import 'package:goodali/Utils/styles.dart';
 
 import 'package:goodali/Utils/utils.dart';
@@ -24,7 +19,6 @@ import 'package:miniplayer/miniplayer.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/audio_description.dart';
 import 'package:iconly/iconly.dart';
-import 'package:just_audio/just_audio.dart';
 
 void onTap() {}
 
@@ -48,22 +42,13 @@ class PlayAudio extends StatefulWidget {
 }
 
 class _PlayAudioState extends State<PlayAudio> {
-  AudioPlayerController audioPlayerController = AudioPlayerController();
-  AudioPlayer audioPlayer = AudioPlayer();
-  Future<FileInfo>? fileFuture;
-  Stream<FileResponse>? fileStream;
-  FileInfo? fileInfo;
-  File? audioFile;
-
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
 
-  String url = "";
-  String audioURL = "";
-  String introURL = "";
-
   @override
   void initState() {
+    print('widget.products.isBought');
+    print(widget.products.isBought);
     super.initState();
   }
 
@@ -161,8 +146,7 @@ class _PlayAudioState extends State<PlayAudio> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          if (widget.products.isBought == true ||
-                              widget.products.moodListId == 0)
+                          if (widget.products.isBought == true)
                             DownloadButton(
                                 products: widget.products, isModalPlayer: true),
                           Column(

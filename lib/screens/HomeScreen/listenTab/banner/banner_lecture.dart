@@ -1,18 +1,21 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/screens/ListItems/album_detail_item.dart';
-import 'package:goodali/screens/ListItems/album_intro_item.dart';
+
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
+import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:provider/provider.dart';
 
 class BannerLecture extends StatefulWidget {
   final int? productID;
@@ -23,7 +26,6 @@ class BannerLecture extends StatefulWidget {
 }
 
 class _BannerLectureState extends State<BannerLecture> {
-  late final AudioPlayer introAudioPlayer = AudioPlayer();
   late final AudioPlayer audioPlayer = AudioPlayer();
   Products albumDetail = Products();
   List<Products> lectureList = [];
@@ -38,24 +40,26 @@ class _BannerLectureState extends State<BannerLecture> {
   @override
   void initState() {
     getProducts();
-    introAudioPlayer.positionStream.listen((event) {
-      position = event;
+    audioPlayer.positionStream.listen((event) {
+      setState(() {
+        position = event;
+      });
     });
-    introAudioPlayer.durationStream.listen((event) {
+    audioPlayer.durationStream.listen((event) {
       duration = event ?? Duration.zero;
     });
 
-    introAudioPlayer.playingStream.listen((event) {
-      isPlaying = event;
+    audioPlayer.playingStream.listen((event) {
+      setState(() {
+        isPlaying = event;
+      });
     });
     super.initState();
   }
 
-  setAlbumIntroAudio(String audioURl) {
+  Future<void> getFileDuration(String mediaPath) async {
     try {
-      introAudioPlayer.setUrl(audioURl).then((value) {
-        duration = value ?? Duration.zero;
-      });
+      duration = await audioPlayer.setUrl(mediaPath) ?? Duration.zero;
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -63,12 +67,14 @@ class _BannerLectureState extends State<BannerLecture> {
 
   @override
   void dispose() {
-    introAudioPlayer.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context);
+
     return Scaffold(
       appBar: const SimpleAppBar(title: "Лекц"),
       body: isLoading
@@ -140,9 +146,7 @@ class _BannerLectureState extends State<BannerLecture> {
                       const Divider(endIndent: 20, indent: 20),
                       const SizedBox(height: 10),
                       GestureDetector(
-                        onTap: () {
-                          showIntroAudioModal(albumDetail);
-                        },
+                        onTap: () {},
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -153,7 +157,8 @@ class _BannerLectureState extends State<BannerLecture> {
                                 ClipRRect(
                                     borderRadius: BorderRadius.circular(4),
                                     child: ImageView(
-                                        imgPath: albumDetail.banner ?? "",
+                                        imgPath:
+                                            bannerLecture.first.banner ?? "",
                                         width: 40,
                                         height: 40)),
                                 const SizedBox(width: 15),
@@ -163,7 +168,7 @@ class _BannerLectureState extends State<BannerLecture> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Танилцуулга".toUpperCase(),
+                                        bannerLecture.first.title ?? "",
                                         maxLines: 1,
                                         softWrap: true,
                                         overflow: TextOverflow.ellipsis,
@@ -173,7 +178,8 @@ class _BannerLectureState extends State<BannerLecture> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 10),
-                                      // CustomReadMoreText(text: widget.products.body ?? "")
+                                      CustomReadMoreText(
+                                          text: bannerLecture.first.body ?? "")
                                     ],
                                   ),
                                 )
@@ -187,11 +193,11 @@ class _BannerLectureState extends State<BannerLecture> {
                                   child: IconButton(
                                     splashRadius: 20,
                                     padding: EdgeInsets.zero,
-                                    onPressed: () async {
+                                    onPressed: () {
                                       if (isPlaying) {
-                                        introAudioPlayer.pause();
+                                        audioPlayer.pause();
                                       } else {
-                                        introAudioPlayer.play();
+                                        audioPlayer.play();
                                       }
                                     },
                                     icon: Icon(
@@ -210,45 +216,32 @@ class _BannerLectureState extends State<BannerLecture> {
                                 const Spacer(),
                                 IconButton(
                                     splashRadius: 20,
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.more_horiz,
-                                        color: MyColors.gray)),
+                                    onPressed: () {
+                                      cart.addItemsIndex(
+                                          bannerLecture.first.productId!,
+                                          albumID: albumDetail.productId!);
+                                      if (!cart.sameItemCheck) {
+                                        cart.addProducts(bannerLecture.first);
+                                        cart.addTotalPrice(bannerLecture
+                                                .first.price
+                                                ?.toDouble() ??
+                                            0.0);
+                                        TopSnackBar.successFactory(
+                                                msg:
+                                                    "Сагсанд амжилттай нэмэгдлээ")
+                                            .show(context);
+                                      } else {
+                                        TopSnackBar.errorFactory(
+                                                msg: "Сагсанд байна")
+                                            .show(context);
+                                      }
+                                    },
+                                    icon: const Icon(IconlyLight.buy,
+                                        color: MyColors.gray))
                               ],
                             ),
                             const SizedBox(height: 12)
                           ],
-                        ),
-                      ),
-                      ListView.separated(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.only(bottom: 15),
-                        itemBuilder: (BuildContext context, int index) {
-                          if (lectureList[index].isBought == false) {
-                            return AlbumIntroItem(
-                              albumName: '',
-                              audioPlayer: audioPlayer,
-                              products: bannerLecture[index],
-                              onTap: () {},
-                              albumProducts: albumDetail,
-                            );
-                          } else {
-                            return AlbumDetailItem(
-                              products: bannerLecture[index],
-                              isBought: false,
-                              albumName: "",
-                              productsList: bannerLecture,
-                              index: index,
-                              albumProducts: Products(),
-                              onTap: () {},
-                            );
-                          }
-                        },
-                        itemCount: bannerLecture.length,
-                        separatorBuilder: (BuildContext context, int index) =>
-                            const Divider(
-                          endIndent: 18,
-                          indent: 18,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -262,13 +255,18 @@ class _BannerLectureState extends State<BannerLecture> {
 
   Future<List<Products>> getAlbumLectures() async {
     lectureList = await Connection.getAlbumLectures(context, "5");
-    print(lectureList.length);
+
+    setState(() {
+      isLoading = false;
+    });
     for (var item in lectureList) {
       if (item.productId == widget.productID) {
         bannerLecture.add(item);
       }
     }
     print(bannerLecture.length);
+    await getFileDuration(Urls.networkPath + (bannerLecture.first.audio ?? ""));
+    setState(() {});
 
     return lectureList;
   }
@@ -299,13 +297,10 @@ class _BannerLectureState extends State<BannerLecture> {
       if (item.productId == 5) {
         setState(() {
           albumDetail = item;
-          isLoading = false;
         });
       }
     }
     log(albumDetail.banner ?? "hooson");
-    String audioURL = Urls.networkPath + (albumDetail.audio ?? "");
-    setAlbumIntroAudio(audioURL);
 
     return albumList;
   }

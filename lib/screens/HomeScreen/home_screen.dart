@@ -111,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen>
                     // PRODUCT TYPE 0 - ALBUM, 1 - LECTURE, 2 - TRAINING
                     switch (item.productType) {
                       case 0:
+                        print("banner album orj irle");
                         Navigator.push(
                             context,
                             MaterialPageRoute(

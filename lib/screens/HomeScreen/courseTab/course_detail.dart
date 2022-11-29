@@ -107,48 +107,60 @@ class _CourseDetailState extends State<CourseDetail> {
             }
 
             return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ImageView(
-                  imgPath: courseDetail.banner ?? "",
-                  height: 200,
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ImageView(
+                          imgPath: courseDetail.banner ?? "",
+                          height: 200,
+                        ),
+                        Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 20),
+                                Text(courseDetail.name ?? "",
+                                    style: const TextStyle(
+                                        color: MyColors.black,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.7)),
+                                const SizedBox(height: 10),
+                                const Text("Цахим сургалт",
+                                    style: TextStyle(
+                                      color: MyColors.primaryColor,
+                                    )),
+                                const SizedBox(height: 20),
+                                HtmlWidget(courseDetail.body ?? "",
+                                    textStyle: const TextStyle(
+                                        fontSize: 14,
+                                        height: 1.8,
+                                        color: MyColors.gray)),
+                                const SizedBox(height: 30),
+                              ],
+                            )),
+                      ],
+                    ),
+                  ),
                 ),
                 Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                        Text(courseDetail.name ?? "",
-                            style: const TextStyle(
-                                color: MyColors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                height: 1.7)),
-                        const SizedBox(height: 10),
-                        const Text("Цахим сургалт",
-                            style: TextStyle(
-                              color: MyColors.primaryColor,
-                            )),
-                        const SizedBox(height: 20),
-                        HtmlWidget(courseDetail.body ?? "",
-                            textStyle: const TextStyle(
-                                fontSize: 14,
-                                height: 1.8,
-                                color: MyColors.gray)),
-                        const SizedBox(height: 30),
-                        CustomElevatedButton(
-                          text: "Худалдаж авах",
-                          onPress: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CourseList(
-                                        id: courseDetail.id.toString())));
-                          },
-                        ),
-                        const SizedBox(height: 30),
-                      ],
-                    )),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: CustomElevatedButton(
+                    text: "Худалдаж авах",
+                    onPress: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  CourseList(id: courseDetail.id.toString())));
+                    },
+                  ),
+                ),
+                const SizedBox(height: 30),
               ],
             );
           } else {

@@ -409,6 +409,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
     setState(() {});
     for (var item in data) {
       item.albumTitle = widget.albumProduct.title;
+
       await dataStore.addProduct(products: item);
     }
   }
