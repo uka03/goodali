@@ -104,6 +104,7 @@ class _CartScreenState extends State<CartScreen> {
                     ? null
                     : () {
                         if (isAuth == true) {
+                          print(productIds);
                           Navigator.push(
                               context,
                               MaterialPageRoute(

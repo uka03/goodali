@@ -5,7 +5,7 @@ import 'package:iconly/iconly.dart';
 
 class TopSnackBar {
   static Flushbar successFactory(
-      {String title = "Амжилттай", String msg = ""}) {
+      {String title = "Амжилттай", String msg = "", int? duration}) {
     return Flushbar(
         flushbarPosition: FlushbarPosition.TOP,
         titleText: Text(title,
@@ -19,7 +19,7 @@ class TopSnackBar {
         messageText: Text(msg,
             style: const TextStyle(fontSize: 12, color: MyColors.gray)),
         backgroundColor: Colors.white,
-        duration: const Duration(seconds: 2),
+        duration: Duration(seconds: duration ?? 2),
         icon: const Icon(Icons.done, color: MyColors.success));
   }
 

@@ -51,96 +51,105 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const SimpleAppBar(noCard: true),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(children: [
-          const SizedBox(height: 20),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: ImageView(
-                imgPath: widget.coursesItems.banner ?? "",
-                width: 190,
-                height: 190),
-            //     Container(
-            //   color: Colors.blueGrey,
-            //   width: 190,
-            //   height: 190,
-            // )
-          ),
-          const SizedBox(height: 20),
-          Text(
-            widget.lessonName,
-            style: const TextStyle(
-                fontSize: 20,
-                color: MyColors.black,
-                fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          FutureBuilder(
-            future: future,
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                List<Lesson?> lessons = snapshot.data;
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(children: [
+            const SizedBox(height: 20),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: ImageView(
+                  imgPath: widget.coursesItems.banner ?? "",
+                  width: 190,
+                  height: 190),
+              //     Container(
+              //   color: Colors.blueGrey,
+              //   width: 190,
+              //   height: 190,
+              // )
+            ),
+            const SizedBox(height: 20),
+            Text(
+              widget.lessonName,
+              style: const TextStyle(
+                  fontSize: 20,
+                  color: MyColors.black,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            FutureBuilder(
+              future: future,
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  List<Lesson?> lessons = snapshot.data;
 
-                if (lessons.isNotEmpty) {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: lessons.length,
-                    itemBuilder: (context, index) {
-                      int allTasks = lessons[index]?.allTask ?? 0;
-                      int doneTasks = lessons[index]?.done ?? 0;
+                  if (lessons.isNotEmpty) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: lessons.length,
+                      itemBuilder: (context, index) {
+                        int allTasks = lessons[index]?.allTask ?? 0;
+                        int doneTasks = lessons[index]?.done ?? 0;
 
-                      String tasks =
-                          doneTasks.toString() + "/" + allTasks.toString();
+                        String tasks =
+                            doneTasks.toString() + "/" + allTasks.toString();
 
-                      return ListTile(
-                        iconColor: MyColors.black,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 20),
-                        onTap: () => _openLesson(
+                        return ListTile(
+                          iconColor: MyColors.black,
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 20),
+                          onTap: () => _openLesson(
+                              lessons[index]?.name ?? "",
+                              lessons[index]!.id.toString(),
+                              lessons[index]!.isBought!),
+                          subtitle: Row(children: [
+                            Text(
+                              tasks,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            // const Spacer(),
+                            // Text(lessons[index]?.expiry == null ||
+                            //         lessons[index]?.expiry == ""
+                            //     ? "null"
+                            //     : dateTimeFormatter(
+                            //         lessons[index]?.expiry ?? "")),
+                          ]),
+                          trailing: const Icon(IconlyLight.arrow_right_2,
+                              size: 18, color: MyColors.gray),
+                          title: Text(
                             lessons[index]?.name ?? "",
-                            lessons[index]!.id.toString(),
-                            lessons[index]!.isBought!),
-                        subtitle: Row(children: [
-                          Text(
-                            tasks,
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(
+                              color: MyColors.black,
+                            ),
                           ),
-                          // const Spacer(),
-                          // Text(lessons[index]?.expiry == null ||
-                          //         lessons[index]?.expiry == ""
-                          //     ? "null"
-                          //     : dateTimeFormatter(
-                          //         lessons[index]?.expiry ?? "")),
-                        ]),
-                        trailing: const Icon(IconlyLight.arrow_right_2,
-                            size: 18, color: MyColors.gray),
-                        title: Text(
-                          lessons[index]?.name ?? "",
-                          style: const TextStyle(
-                            color: MyColors.black,
-                          ),
-                        ),
-                      );
-                    },
-                  );
+                        );
+                      },
+                    );
+                  } else {
+                    return Container();
+                  }
                 } else {
-                  return Container();
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: MyColors.primaryColor,
+                    ),
+                  );
                 }
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    color: MyColors.primaryColor,
-                  ),
-                );
-              }
-            },
-          )
-        ]),
+              },
+            )
+          ]),
+        ),
       ),
     );
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      getCoursesLessons();
+    });
   }
 
   _openLesson(String name, String id, int isOpened) {

@@ -30,6 +30,12 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
     super.initState();
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      getCoursesTasks(widget.id);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,31 +48,36 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
                     child: Text("Хичээл хоосон байна",
                         style: TextStyle(color: MyColors.gray)),
                   )
-                : ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: taskList.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                          onTap: () => _onTap(index),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 20),
-                          title: Text(
-                              (index + 1).toString() + ". " + tasksName[index],
-                              style: const TextStyle(
-                                  color: MyColors.black, fontSize: 16)),
-                          subtitle: taskList[index].isAnswered == 0
-                              ? const Text("Хийгээгүй",
-                                  style: TextStyle(
-                                      fontSize: 12, color: MyColors.gray))
-                              : const Text("Дууссан",
-                                  style: TextStyle(
-                                      fontSize: 12, color: MyColors.gray)),
-                          trailing: taskList[index].isAnswered == 0
-                              ? SvgPicture.asset(
-                                  "assets/images/undone_icon.svg")
-                              : SvgPicture.asset(
-                                  "assets/images/done_icon.svg"));
-                    }));
+                : RefreshIndicator(
+                    onRefresh: _refresh,
+                    child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: taskList.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                              onTap: () => _onTap(index),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              title: Text(
+                                  (index + 1).toString() +
+                                      ". " +
+                                      tasksName[index],
+                                  style: const TextStyle(
+                                      color: MyColors.black, fontSize: 16)),
+                              subtitle: taskList[index].isAnswered == 0
+                                  ? const Text("Хийгээгүй",
+                                      style: TextStyle(
+                                          fontSize: 12, color: MyColors.gray))
+                                  : const Text("Дууссан",
+                                      style: TextStyle(
+                                          fontSize: 12, color: MyColors.gray)),
+                              trailing: taskList[index].isAnswered == 0
+                                  ? SvgPicture.asset(
+                                      "assets/images/undone_icon.svg")
+                                  : SvgPicture.asset(
+                                      "assets/images/done_icon.svg"));
+                        }),
+                  ));
   }
 
   _onTap(int index) {
@@ -89,6 +100,7 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
   }
 
   Future<List<CourseLessonsTasksModel>> getCoursesTasks(String lessonID) async {
+    print("set hiij bga yu");
     allTasks = await Connection.getCoursesTasks(context, lessonID);
     if (mounted) {
       setState(() {

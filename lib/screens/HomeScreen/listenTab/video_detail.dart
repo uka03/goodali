@@ -34,7 +34,7 @@ class _VideoDetailState extends State<VideoDetail> {
       initialVideoId: videoUrl,
       params: const YoutubePlayerParams(
         showControls: true,
-        origin: "https://www.youtube.com/embed/",
+        origin: "https://www.youtube.com/watch?v=",
         startAt: Duration(seconds: 0),
         autoPlay: true,
         showFullscreenButton: true,
