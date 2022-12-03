@@ -58,8 +58,8 @@ class _HomeScreenState extends State<HomeScreen>
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                  collapsedHeight: 271,
-                  expandedHeight: 271,
+                  collapsedHeight: 275,
+                  expandedHeight: 275,
                   backgroundColor: Colors.white,
                   flexibleSpace: Column(
                     mainAxisSize: MainAxisSize.min,

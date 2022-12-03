@@ -420,9 +420,10 @@ class _CreatePostState extends State<CreatePost> {
     var data = await Connection.insertPost(context, body);
 
     if (data['success']) {
-      TopSnackBar.successFactory(title: "Амжилттай шинэчлэгдлээ").show(context);
-
-      Navigator.popUntil(context, (route) => route.isFirst);
+      TopSnackBar.successFactory(title: "Амжилттай шинэчлэгдлээ")
+          .show(context)
+          .then((value) =>
+              Navigator.of(context).popUntil((route) => route.isFirst));
     } else {
       TopSnackBar.errorFactory(msg: "Алдаа гарлаа дахин оролдоно уу")
           .show(context);

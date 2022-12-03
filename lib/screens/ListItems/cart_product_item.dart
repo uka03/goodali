@@ -25,18 +25,12 @@ class CartProductItem extends StatelessWidget {
               left: 14,
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child:
-                      // Container(
-                      //   width: 36,
-                      //   height: 36,
-                      //   color: Colors.pink,
-                      // )
-                      ImageView(
-                          imgPath: products.banner == ""
-                              ? products.trainingBanner ?? ""
-                              : products.banner ?? "",
-                          width: 36,
-                          height: 36)),
+                  child: ImageView(
+                      imgPath: products.banner == ""
+                          ? products.trainingBanner ?? ""
+                          : products.banner ?? "",
+                      width: 36,
+                      height: 36)),
             ),
             Positioned(
               top: 20,

@@ -46,13 +46,6 @@ class _PlayAudioState extends State<PlayAudio> {
   Duration position = Duration.zero;
 
   @override
-  void initState() {
-    print('widget.products.isBought');
-    print(widget.products.isBought);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return playAudio();
   }
@@ -158,10 +151,9 @@ class _PlayAudioState extends State<PlayAudio> {
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               AudioDescription(
-                                                  description: widget
-                                                          .products.body ??
+                                                  description:
                                                       widget.products.body ??
-                                                      "")));
+                                                          "")));
                                 },
                                 icon: const Icon(
                                   IconlyLight.info_square,
