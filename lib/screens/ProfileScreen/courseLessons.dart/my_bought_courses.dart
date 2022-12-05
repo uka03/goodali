@@ -44,7 +44,8 @@ class _MyCoursesState extends State<MyCourses> {
     print("onPlayButtonClicked");
     currentlyPlaying.value = allLectures[index];
     if (activeList.first.title == allLectures.first.title &&
-        activeList.first.id == allLectures.first.id) {
+        activeList.first.id == allLectures.first.id &&
+        activeList.length == allLectures.length) {
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
@@ -54,7 +55,8 @@ class _MyCoursesState extends State<MyCourses> {
       audioHandler.play();
       currentlyPlaying.value = allLectures[index];
     } else if (activeList.first.title != allLectures.first.title ||
-        activeList.first.id != allLectures.first.id) {
+        activeList.first.id != allLectures.first.id ||
+        activeList.length != allLectures.length) {
       print("iisheee orj irj  bnu MyCourses");
       activeList = allLectures;
       print(allLectures[index].audio);

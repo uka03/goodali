@@ -74,6 +74,7 @@ dependencies:
   another_flushbar: ^1.12.29
   path: ^1.8.2
   flutter_share: ^2.0.0
+  location: ^4.4.0
 
 dev_dependencies:
   flutter_test:
