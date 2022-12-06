@@ -67,7 +67,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
     super.initState();
     audioPlayer.setLoopMode(LoopMode.off);
     bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
-    if (widget.albumProduct.isBought == true || isAuth) {
+    if (isAuth) {
       getLectureListLogged();
     } else {
       getAlbumLectures();
@@ -255,6 +255,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
               products: product[index],
               albumProducts: widget.albumProduct,
               onTap: () async {
+                print("intro");
                 currentlyPlaying.value = product[index];
                 if (activeList.first.title == product.first.title &&
                     activeList.first.id == product.first.id) {
@@ -265,7 +266,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     Duration(milliseconds: product[index].position!),
                   );
 
-                  audioHandler.play();
+                  await audioHandler.play();
                 } else if (activeList.first.title != product.first.title ||
                     activeList.first.id != product.first.id) {
                   activeList = product;
@@ -290,27 +291,28 @@ class _AlbumDetailState extends State<AlbumDetail> {
                 index: index,
                 albumProducts: widget.albumProduct,
                 onTap: () async {
-                  if (widget.albumProduct.isBought == true) {
-                    if (activeList.first.title == product.first.title &&
-                        activeList.first.id == product.first.id) {
-                      currentlyPlaying.value = product[index];
-                      await audioHandler.skipToQueueItem(index);
-                      await audioHandler.seek(
-                        Duration(milliseconds: product[index].position!),
-                      );
-                      audioHandler.play();
-                    } else if (activeList.first.title != product.first.title ||
-                        activeList.first.id != product.first.id) {
-                      activeList = product;
-                      await initiliazePodcast();
-                      await audioHandler.skipToQueueItem(index);
-                      await audioHandler.seek(
-                        Duration(milliseconds: product[index].position!),
-                      );
-                      audioHandler.play();
-                    }
+                  // if (widget.albumProduct.isBought == true) {
+
+                  if (activeList.first.title == product.first.title &&
+                      activeList.first.id == product.first.id) {
                     currentlyPlaying.value = product[index];
-                  } else {}
+                    await audioHandler.skipToQueueItem(index);
+                    await audioHandler.seek(
+                      Duration(milliseconds: product[index].position!),
+                    );
+                    await audioHandler.play();
+                  } else if (activeList.first.title != product.first.title ||
+                      activeList.first.id != product.first.id) {
+                    activeList = product;
+                    await initiliazePodcast();
+                    await audioHandler.skipToQueueItem(index);
+                    await audioHandler.seek(
+                      Duration(milliseconds: product[index].position!),
+                    );
+                    await audioHandler.play();
+                  }
+                  currentlyPlaying.value = product[index];
+                  // } else {}
                 },
               ),
             );

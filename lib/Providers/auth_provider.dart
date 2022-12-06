@@ -169,6 +169,7 @@ class Auth with ChangeNotifier {
     }
     preferences.remove("token");
     preferences.remove("has_training");
+    preferences.remove("user_profile");
     _isAuth = false;
     notifyListeners();
   }

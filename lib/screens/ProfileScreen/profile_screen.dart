@@ -41,8 +41,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<UserInfo?> userData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var data = pref.getString('userData');
-    if (data != null) {
-      var json = jsonDecode(data);
+    var avatar = pref.getString('user_profile');
+    if (data != null || avatar != null) {
+      avatarPath = avatar;
+      var json = jsonDecode(data!);
       userInfo = UserInfo.fromJson(json);
 
       return userInfo;

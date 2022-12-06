@@ -12,6 +12,7 @@ import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfile extends StatefulWidget {
   final UserInfo? userInfo;
@@ -286,9 +287,12 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   editUserData(File? imageFile) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
     String avatar = "";
     if (fileImage != null) {
       avatar = await uploadImage(fileImage!);
+      preferences.setString('user_profile', avatar);
     }
     var data = await Connection.editUserData(context, nicknameController.text);
     Navigator.pop(context);

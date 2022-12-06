@@ -54,7 +54,8 @@ class _MyCoursesState extends State<MyCourses> {
       audioHandler.play();
       currentlyPlaying.value = allLectures[index];
     } else if (activeList.first.title != allLectures.first.title ||
-        activeList.first.id != allLectures.first.id) {
+        activeList.first.id != allLectures.first.id ||
+        activeList.length != allLectures.length) {
       print("iisheee orj irj  bnu MyCourses");
       activeList = allLectures;
       print(allLectures[index].audio);
@@ -102,6 +103,8 @@ class _MyCoursesState extends State<MyCourses> {
       builder: (context, Box box, child) {
         List<Products> allboughtLectures = [];
 
+        allListProducts = [...allLectures, ...myCourses];
+        print("shdsdh ${allListProducts.length}");
         if (box.isNotEmpty) {
           for (var i = 0; i < box.length; i++) {
             Products products = box.getAt(i);
@@ -112,8 +115,9 @@ class _MyCoursesState extends State<MyCourses> {
 
           allLectures = removeDuplicates(allboughtLectures);
 
-          print(allLectures.length);
           allListProducts = [...allLectures, ...myCourses];
+          print("shdsdh ${allListProducts.length}");
+
           return ListView.separated(
               itemCount: allLectures.length,
               physics: const NeverScrollableScrollPhysics(),

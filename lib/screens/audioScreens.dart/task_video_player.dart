@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+// import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 typedef OnChanged = Function(bool isWatched);
 
@@ -26,78 +27,64 @@ class TaskVideoPlayer extends StatefulWidget {
 class _TaskVideoPlayerState extends State<TaskVideoPlayer> {
   late YoutubePlayerController _controller;
   bool isWatched = false;
-
+  String url = "";
   @override
   void initState() {
-    initiliazeVideo(widget.courseTasks.videoUrl!);
+    url = widget.courseTasks.videoUrl!;
+    initiliazeVideo(url);
+    print("url $url ");
     super.initState();
   }
 
-  void listener() {
-    if (mounted && !_controller.value.isFullScreen) {
-      setState(() {});
-      print(_controller.value.hasError);
-      print(_controller.value.errorCode);
-    }
-  }
-
-  _setOrientation(List<DeviceOrientation> orientations) {
-    SystemChrome.setPreferredOrientations(orientations);
-  }
+  YoutubePlayerController? _ytbPlayerController;
 
   @override
   void dispose() {
-    _controller.dispose();
-    _setOrientation([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    _ytbPlayerController?.pause();
     super.dispose();
   }
 
-  @override
-  void deactivate() {
-    _controller.pause();
-    super.deactivate();
-  }
+  // initiliazeVideo(String videoUrl) {
+  //   log(videoUrl, name: "videoUrl");
+  //   _controller = YoutubePlayerController(
+  //     initialVideoId: YoutubePlayer.convertUrlToId(videoUrl)!,
+  //     flags: const YoutubePlayerFlags(
+  //       mute: false,
+  //       disableDragSeek: false,
+  //       loop: false,
+  //       isLive: false,
+  //       autoPlay: false,
+  //       hideThumbnail: true,
+  //       forceHD: false,
+  //       enableCaption: true,
+  //     ),
+  //   )..addListener(listener);
+  // }
 
-  initiliazeVideo(String videoUrl) {
-    log(videoUrl, name: "videoUrl");
-    _controller = YoutubePlayerController(
+  initiliazeVideo(videoUrl) {
+    log(videoUrl, name: "vide");
+    _ytbPlayerController = YoutubePlayerController(
       initialVideoId: videoUrl,
-      flags: const YoutubePlayerFlags(
-        mute: false,
-        disableDragSeek: false,
-        loop: false,
-        isLive: false,
-        hideThumbnail: true,
-        forceHD: false,
-        enableCaption: true,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        origin: "https://www.youtube.com/embed/",
+
+        // autoPlay: true,
+        showFullscreenButton: true,
       ),
-    )..addListener(listener);
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 250,
-          width: double.infinity,
-          child: YoutubePlayer(
-            controller: _controller,
-            // showVideoProgressIndicator: true,
-            onReady: () {
-              _controller.addListener(listener);
-            },
-            bottomActions: [
-              CurrentPosition(),
-            ],
-            progressIndicatorColor: MyColors.primaryColor,
-            progressColors: ProgressBarColors(
-              playedColor: MyColors.primaryColor,
-              handleColor: MyColors.primaryColor.withOpacity(0.5),
-            ),
+        YoutubePlayerControllerProvider(
+          controller: _ytbPlayerController ??
+              YoutubePlayerController(
+                  initialVideoId: widget.courseTasks.videoUrl ?? ""),
+          child: const YoutubePlayerIFrame(
+            aspectRatio: 16 / 9,
           ),
         ),
         const Spacer(),

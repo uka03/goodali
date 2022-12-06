@@ -22,6 +22,7 @@ import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 
 import 'package:goodali/models/task_answer.dart';
+import 'package:goodali/screens/ProfileScreen/courseLessons.dart/task_type_0.dart';
 import 'package:goodali/screens/audioScreens.dart/task_video_player.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
@@ -166,7 +167,9 @@ class _CourseTasksState extends State<CourseTasks> {
                     case 1:
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 90),
-                        child: type0(widget.courseTasks[index], index),
+                        child: TaskType0(
+                            courseTask: widget.courseTasks[index],
+                            textController: _controllers[index]),
                       );
                     // case 1:
                     //   return Padding(
@@ -202,7 +205,9 @@ class _CourseTasksState extends State<CourseTasks> {
                     default:
                       return Padding(
                         padding: const EdgeInsets.all(20),
-                        child: type0(widget.courseTasks[index], index),
+                        child: TaskType0(
+                            courseTask: widget.courseTasks[index],
+                            textController: _controllers[index]),
                       );
                   }
                 }),
@@ -210,7 +215,7 @@ class _CourseTasksState extends State<CourseTasks> {
         ),
         floatingActionButton: Container(
           width: MediaQuery.of(context).size.width,
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -284,73 +289,6 @@ class _CourseTasksState extends State<CourseTasks> {
     } else {
       _pageController.nextPage(curve: _kCurve, duration: _kDuration);
     }
-  }
-
-  Widget type0(CourseLessonsTasksModel courseTask, int index) {
-    _controllers[index].text = courseTask.answerData == ""
-        ? _controllers[index].text
-        : courseTask.answerData ?? "";
-    return SingleChildScrollView(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 10),
-        if (courseTask.isAnswer == 1)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(courseTask.question ?? "",
-                  style: const TextStyle(
-                      color: MyColors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20)),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 70),
-                child: TextField(
-                    controller: _controllers[index],
-                    cursorColor: MyColors.primaryColor,
-                    maxLength: 2000,
-                    maxLines: null,
-                    onTap: () => setState(() {
-                          isTyping = true;
-                        }),
-                    onChanged: (value) {
-                      print("type0 $value");
-                    },
-                    enableInteractiveSelection: false,
-                    decoration: InputDecoration(
-                      hintText: "Хариулт",
-                      suffixIcon: isTyping
-                          ? GestureDetector(
-                              onTap: () {
-                                _controllers[index].text = "";
-                                setState(() {
-                                  isTyping = false;
-                                });
-                              },
-                              child: const Icon(Icons.close,
-                                  color: MyColors.black),
-                            )
-                          : const SizedBox(),
-                      enabledBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: MyColors.border1),
-                      ),
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(
-                            color: MyColors.primaryColor, width: 1.5),
-                      ),
-                    )),
-              ),
-            ],
-          ),
-        if (courseTask.body != "" || courseTask.body!.isNotEmpty)
-          HtmlWidget(
-            courseTask.body ?? "",
-            textStyle: const TextStyle(fontFamily: "Gilroy", height: 1.6),
-          ),
-      ],
-    ));
   }
 
   Widget type1(CourseLessonsTasksModel courseTask, int index) {
