@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
@@ -28,8 +29,8 @@ class _DownloadedState extends State<Downloaded> {
 
   _onPlayButtonTapped(int index) async {
     currentlyPlaying.value = downloadedList[index];
-    if (activeList.first.lectureTitle == downloadedList.first.lectureTitle &&
-        activeList.first.id == downloadedList.first.id) {
+    if (activeList.last.lectureTitle == downloadedList.last.lectureTitle &&
+        activeList.last.id == downloadedList.last.id) {
       print("init hiigdsen");
       print(activeList.first.downloadedPath);
       print("downloadedList.length ${downloadedList.length}");
@@ -37,10 +38,8 @@ class _DownloadedState extends State<Downloaded> {
       await audioHandler.seek(
         Duration(milliseconds: downloadedList[index].position!),
       );
-      audioHandler.play();
-    } else if (activeList.first.lectureTitle !=
-            downloadedList.first.lectureTitle ||
-        activeList.first.id != downloadedList.first.id) {
+      await audioHandler.play();
+    } else {
       activeList = downloadedList;
       print(activeList.first.lectureTitle);
       print("downloadedList.length ${downloadedList.length}");
@@ -50,51 +49,55 @@ class _DownloadedState extends State<Downloaded> {
       await audioHandler.seek(
         Duration(milliseconds: downloadedList[index].position!),
       );
-      audioHandler.play();
+      await audioHandler.play();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(20),
-        child: Consumer<DownloadController>(
-          builder: (context, value, child) {
-            List<Products> list = [];
-            for (var element in value.episodeTasks) {
-              list.add(element.products!);
-            }
-            downloadedList = removeDuplicates(list);
-            if (list.isEmpty) {
-              return Column(
-                children: [
-                  const SizedBox(height: 80),
-                  SvgPicture.asset("assets/images/empty_bought.svg"),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Хоосон байна.",
-                    style: TextStyle(fontSize: 14, color: MyColors.gray),
+    return Consumer<DownloadController>(
+      builder: (context, value, child) {
+        List<Products> list = [];
+        for (var element in value.episodeTasks) {
+          list.add(element.products!);
+        }
+        downloadedList = removeDuplicates(list);
+        print("list ${list.length}");
+        print("downloadedList ${downloadedList.length}");
+        print(Urls.networkPath + downloadedList[2].audio!);
+        if (list.isEmpty) {
+          return Column(
+            children: [
+              const SizedBox(height: 80),
+              SvgPicture.asset("assets/images/empty_bought.svg"),
+              const SizedBox(height: 20),
+              const Text(
+                "Хоосон байна.",
+                style: TextStyle(fontSize: 14, color: MyColors.gray),
+              ),
+            ],
+          );
+        } else {
+          return ListView.builder(
+              itemCount: downloadedList.length,
+              padding: const EdgeInsets.all(20),
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: AlbumDetailItem(
+                    index: index,
+                    products: downloadedList[index],
+                    albumName: downloadedList[index].albumTitle ?? "",
+                    isBought: downloadedList[index].isBought ?? true,
+                    onTap: () async {
+                      _onPlayButtonTapped(index);
+                    },
+                    productsList: const [],
                   ),
-                ],
-              );
-            } else {
-              return ListView.builder(
-                  itemCount: downloadedList.length,
-                  padding: const EdgeInsets.only(bottom: 30),
-                  itemBuilder: (context, index) {
-                    return AlbumDetailItem(
-                      index: index,
-                      products: downloadedList[index],
-                      albumName: downloadedList[index].albumTitle ?? "",
-                      isBought: downloadedList[index].isBought ?? true,
-                      onTap: () async {
-                        _onPlayButtonTapped(index);
-                      },
-                      productsList: const [],
-                    );
-                  });
-            }
-          },
-        ));
+                );
+              });
+        }
+      },
+    );
   }
 }

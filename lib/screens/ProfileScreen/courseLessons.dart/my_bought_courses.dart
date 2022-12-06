@@ -44,7 +44,8 @@ class _MyCoursesState extends State<MyCourses> {
     print("onPlayButtonClicked");
     currentlyPlaying.value = allLectures[index];
     if (activeList.first.title == allLectures.first.title &&
-        activeList.first.id == allLectures.first.id) {
+        activeList.first.id == allLectures.first.id &&
+        activeList.length == allLectures.length) {
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
