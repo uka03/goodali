@@ -4,16 +4,19 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
+import 'package:goodali/controller/download_controller.dart';
 import 'package:goodali/controller/http.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
@@ -82,7 +85,7 @@ class Auth with ChangeNotifier {
 
       if (response.statusCode == 200) {
         if (response.data['token'] != null) {
-          await checkUserIsChanged(data["email"]);
+          await checkUserIsChanged(data["email"], context);
           preferences.setString("email", data['email']);
           preferences.setString("password", data['password']);
           preferences.setString("token", response.data['token']);
@@ -132,14 +135,27 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> checkUserIsChanged(String username) async {
+  Future<void> checkUserIsChanged(String username, BuildContext context) async {
     final pref = await SharedPreferences.getInstance();
+    var tasks =
+        Provider.of<DownloadController>(context, listen: false).episodeTasks;
     String email = pref.getString("email") ?? "";
     print("username $username");
     print("email $email");
     if (username != email) {
       print("user changed so box is deleted");
       _dataStore.deleteBoxes();
+      print(tasks.length);
+      if (tasks.isNotEmpty) {
+        for (var element in tasks) {
+          print("element.taskId ${element.taskId} ");
+          await FlutterDownloader.remove(
+              taskId: element.taskId ?? "0", shouldDeleteContent: true);
+          Provider.of<DownloadController>(context, listen: false)
+              .episodeTasks
+              .clear();
+        }
+      }
     } else {
       print("ijil user");
     }
@@ -170,6 +186,8 @@ class Auth with ChangeNotifier {
     preferences.remove("token");
     preferences.remove("has_training");
     preferences.remove("user_profile");
+    FlutterDownloader.cancelAll();
+
     _isAuth = false;
     notifyListeners();
   }

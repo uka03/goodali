@@ -120,14 +120,14 @@ class Connection {
     }
   }
 
-  static Future<List<MoodMain>> getMoodMain(BuildContext context) async {
+  static Future<List<Products>> getMoodMain(BuildContext context) async {
     try {
       final response =
           await Http().getDio(context, headerTypeNone).post(Urls.getMoodMain);
 
       if (response.data != null) {
         return (response.data as List)
-            .map((e) => MoodMain.fromJson(e))
+            .map((e) => Products.fromJson(e))
             .toList();
       } else {
         return [];

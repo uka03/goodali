@@ -73,6 +73,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.detached:
         print("app is removed");
+        FlutterDownloader.cancelAll();
         removeTokenWhenAppKilled();
         break;
     }

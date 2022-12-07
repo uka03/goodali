@@ -173,6 +173,7 @@ class _PlayAudioState extends State<PlayAudio> {
                         valueListenable: progressNotifier,
                         builder: (context, durationValue, widget) {
                           var totalDuration = durationStateNotifier.value.total;
+                          position = durationValue.current;
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: SizedBox(

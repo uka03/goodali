@@ -210,6 +210,17 @@ class HiveMoodDataStore {
     return list;
   }
 
+  Future<List<Products>> getMoodMainfromBox(String title) async {
+    List<Products> list = [];
+    for (var i = 0; i < box.length; i++) {
+      final item = box.get(i);
+      if (item!.title == title) {
+        list.add(box.get(i)!);
+      }
+    }
+    return list;
+  }
+
   /// update user data
   Future<void> updateProducts(
       {required int index, required Products userModel}) async {

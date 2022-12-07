@@ -19,7 +19,7 @@ class MoodListItem extends StatelessWidget {
       child: Column(
         children: [
           ClipRRect(
-              borderRadius: BorderRadius.circular(50),
+              borderRadius: BorderRadius.circular(80),
               child: ImageView(
                 imgPath: getMoodList!.banner!,
                 width: MediaQuery.of(context).size.width / 3 - 30,

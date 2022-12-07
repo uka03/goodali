@@ -202,15 +202,21 @@ class _EditProfileState extends State<EditProfile> {
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          camerPhoto = await _picker.pickImage(
-                              source: ImageSource.camera);
-                          Navigator.pop(context);
-                          if (camerPhoto != null) {
-                            setState(() {
-                              isChanged = true;
-                              isImageChanged = true;
-                              fileImage = File(camerPhoto!.path);
-                            });
+                          try {
+                            camerPhoto = await _picker.pickImage(
+                                source: ImageSource.camera);
+                            Navigator.pop(context);
+                            if (camerPhoto != null) {
+                              setState(() {
+                                isChanged = true;
+                                isImageChanged = true;
+                                fileImage = File(camerPhoto!.path);
+                              });
+                            }
+                          } catch (e) {
+                            print(e);
+                            TopSnackBar.errorFactory(msg: "Need permission")
+                                .show(context);
                           }
                         },
                         child: Container(
@@ -234,16 +240,22 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          image = await _picker.pickImage(
-                              source: ImageSource.gallery);
-                          Navigator.pop(context);
+                          try {
+                            image = await _picker.pickImage(
+                                source: ImageSource.gallery);
+                            Navigator.pop(context);
 
-                          if (image != null) {
-                            setState(() {
-                              isChanged = true;
-                              isImageChanged = true;
-                              fileImage = File(image!.path);
-                            });
+                            if (image != null) {
+                              setState(() {
+                                isChanged = true;
+                                isImageChanged = true;
+                                fileImage = File(image!.path);
+                              });
+                            }
+                          } catch (e) {
+                            print(e);
+                            TopSnackBar.errorFactory(msg: "Need permission")
+                                .show(context);
                           }
                         },
                         child: Container(

@@ -126,9 +126,16 @@ class _AlbumDetailState extends State<AlbumDetail> {
                       lectureList.add(products);
                     }
                   }
+                  // print(lectureList.length);
                   buyList = removeDuplicates(lectureList);
 
-                  // });
+                  if (widget.albumProduct.isBought == true) {
+                    var introProd = buyList.indexWhere(
+                        (element) => element.title == "Танилцуулга");
+                    buyList.insert(0, buyList[introProd]);
+                    buyList.removeLast();
+                  }
+
                   return Column(
                     children: [
                       Expanded(

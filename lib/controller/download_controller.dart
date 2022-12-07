@@ -53,18 +53,22 @@ class DownloadController with ChangeNotifier {
       DownloadTaskStatus? status = data[1];
       int? progress = data[2];
 
-      for (var episodeTask in _episodeTasks) {
-        if (episodeTask.taskId == id) {
-          episodeTask.status = status;
-          episodeTask.progress = progress;
-          if (status == DownloadTaskStatus.complete) {
-            _saveMediaId(episodeTask).then((value) {
+      try {
+        for (var episodeTask in _episodeTasks) {
+          if (episodeTask.taskId == id) {
+            episodeTask.status = status;
+            episodeTask.progress = progress;
+            if (status == DownloadTaskStatus.complete) {
+              _saveMediaId(episodeTask).then((value) {
+                notifyListeners();
+              });
+            } else {
               notifyListeners();
-            });
-          } else {
-            notifyListeners();
+            }
           }
         }
+      } catch (e) {
+        print(e);
       }
     });
   }
