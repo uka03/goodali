@@ -377,6 +377,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
         audio: widget.albumProduct.audio,
         isBought: widget.albumProduct.isBought,
         productId: widget.albumProduct.productId,
+        price: widget.albumProduct.price,
         duration: 0,
         position: 0,
         banner: widget.albumProduct.banner);
@@ -405,6 +406,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
         productId: widget.albumProduct.productId,
         duration: 0,
         position: 0,
+        price: widget.albumProduct.price,
         banner: widget.albumProduct.banner);
     await dataStore.addProduct(products: introduction);
 

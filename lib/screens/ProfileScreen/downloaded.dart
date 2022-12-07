@@ -1,17 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/download_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
 typedef OnTap = Function(Products audioObject);
@@ -31,9 +26,6 @@ class _DownloadedState extends State<Downloaded> {
     currentlyPlaying.value = downloadedList[index];
     if (activeList.last.lectureTitle == downloadedList.last.lectureTitle &&
         activeList.last.id == downloadedList.last.id) {
-      print("init hiigdsen");
-      print(activeList.first.downloadedPath);
-      print("downloadedList.length ${downloadedList.length}");
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: downloadedList[index].position!),
@@ -41,9 +33,6 @@ class _DownloadedState extends State<Downloaded> {
       await audioHandler.play();
     } else {
       activeList = downloadedList;
-      print(activeList.first.lectureTitle);
-      print("downloadedList.length ${downloadedList.length}");
-
       await initiliazePodcast();
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
@@ -62,9 +51,7 @@ class _DownloadedState extends State<Downloaded> {
           list.add(element.products!);
         }
         downloadedList = removeDuplicates(list);
-        print("list ${list.length}");
-        print("downloadedList ${downloadedList.length}");
-        print(Urls.networkPath + downloadedList[2].audio!);
+
         if (list.isEmpty) {
           return Column(
             children: [

@@ -1,13 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart' as prog;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
@@ -27,7 +24,6 @@ import 'package:goodali/screens/audioScreens.dart/task_video_player.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class CourseTasks extends StatefulWidget {
   final String? title;
@@ -284,7 +280,7 @@ class _CourseTasksState extends State<CourseTasks> {
       if (_current + 1 == widget.courseTasks.length) {
         Navigator.pop(context, _current);
       }
-      if (_current + 1 == widget.courseTasks.length) return;
+      // if (_current + 1 == widget.courseTasks.length) return;
       _pageController.nextPage(curve: _kCurve, duration: _kDuration);
     } else {
       _pageController.nextPage(curve: _kCurve, duration: _kDuration);

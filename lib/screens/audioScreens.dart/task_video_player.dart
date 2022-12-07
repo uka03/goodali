@@ -25,14 +25,14 @@ class TaskVideoPlayer extends StatefulWidget {
 }
 
 class _TaskVideoPlayerState extends State<TaskVideoPlayer> {
-  late YoutubePlayerController _controller;
   bool isWatched = false;
+  // bool isReady = false;
   String url = "";
   @override
   void initState() {
     url = widget.courseTasks.videoUrl!;
     initiliazeVideo(url);
-    print("url $url ");
+
     super.initState();
   }
 
@@ -40,26 +40,10 @@ class _TaskVideoPlayerState extends State<TaskVideoPlayer> {
 
   @override
   void dispose() {
+    _ytbPlayerController?.stop();
     _ytbPlayerController?.pause();
     super.dispose();
   }
-
-  // initiliazeVideo(String videoUrl) {
-  //   log(videoUrl, name: "videoUrl");
-  //   _controller = YoutubePlayerController(
-  //     initialVideoId: YoutubePlayer.convertUrlToId(videoUrl)!,
-  //     flags: const YoutubePlayerFlags(
-  //       mute: false,
-  //       disableDragSeek: false,
-  //       loop: false,
-  //       isLive: false,
-  //       autoPlay: false,
-  //       hideThumbnail: true,
-  //       forceHD: false,
-  //       enableCaption: true,
-  //     ),
-  //   )..addListener(listener);
-  // }
 
   initiliazeVideo(videoUrl) {
     log(videoUrl, name: "vide");
@@ -68,8 +52,6 @@ class _TaskVideoPlayerState extends State<TaskVideoPlayer> {
       params: const YoutubePlayerParams(
         showControls: true,
         origin: "https://www.youtube.com/embed/",
-
-        // autoPlay: true,
         showFullscreenButton: true,
       ),
     );
@@ -79,6 +61,9 @@ class _TaskVideoPlayerState extends State<TaskVideoPlayer> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // !isReady
+        //     ? const Center(
+        //         child: CircularProgressIndicator(color: MyColors.primaryColor)):
         YoutubePlayerControllerProvider(
           controller: _ytbPlayerController ??
               YoutubePlayerController(

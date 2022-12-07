@@ -21,10 +21,9 @@ class TaskType0 extends StatefulWidget {
 
 class _TaskType0State extends State<TaskType0> {
   GlobalKey _orderFormKey = GlobalKey();
-
+  bool isTyping = false;
   BoxDecoration? boxSetting;
   TextEditingController _controller = TextEditingController();
-  bool isTyping = false;
 
   BoxDecoration defaultBoxSetting = const BoxDecoration(
     border: Border(bottom: BorderSide(color: MyColors.border1)),
@@ -62,72 +61,26 @@ class _TaskType0State extends State<TaskType0> {
                       fontSize: 20)),
               const SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.only(bottom: 70),
-                child: Platform.isAndroid
-                    ? TextField(
-                        key: _orderFormKey,
-                        controller: widget.textController,
-                        cursorColor: MyColors.primaryColor,
-                        maxLength: 2000,
-                        maxLines: null,
-                        onTap: () => setState(() {
+                  padding: const EdgeInsets.only(bottom: 70),
+                  child:
+                      // Platform.isAndroid?
+                      TextField(
+                          key: _orderFormKey,
+                          controller: widget.textController,
+                          cursorColor: MyColors.primaryColor,
+                          maxLength: 2000,
+                          maxLines: null,
+                          onChanged: (value) {
+                            setState(() {
                               isTyping = true;
-                            }),
-                        onChanged: (value) {
-                          print("type0 $value");
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Хариулт",
-                          suffixIcon: isTyping
-                              ? GestureDetector(
-                                  onTap: () {
-                                    widget.textController.text = "";
-                                    setState(() {
-                                      isTyping = false;
-                                    });
-                                  },
-                                  child: const Icon(Icons.close,
-                                      color: MyColors.black),
-                                )
-                              : const SizedBox(),
-                          enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: MyColors.border1),
-                          ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: MyColors.primaryColor, width: 1.5),
-                          ),
-                        ))
-                    : Focus(
-                        onFocusChange: (focus) {
-                          if (focus) {
-                            setState(() {
-                              boxSetting = boxHasFocus;
                             });
-                          } else {
-                            setState(() {
-                              boxSetting = defaultBoxSetting;
-                            });
-                          }
-                        },
-                        child: CupertinoTextField(
-                            key: _orderFormKey,
-                            controller: widget.textController,
-                            cursorColor: MyColors.primaryColor,
-                            maxLength: 2000,
-                            maxLines: null,
-                            onTap: () => setState(() {
-                                  isTyping = true;
-                                }),
-                            onChanged: (value) {
-                              print("type0 $value");
-                            },
-                            placeholder: "Хариулт",
-                            clearButtonMode: OverlayVisibilityMode.editing,
-                            suffix: isTyping
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Хариулт",
+                            suffixIcon: isTyping
                                 ? GestureDetector(
                                     onTap: () {
-                                      widget.textController.text = "";
+                                      _controller.clear();
                                       setState(() {
                                         isTyping = false;
                                       });
@@ -136,9 +89,37 @@ class _TaskType0State extends State<TaskType0> {
                                         color: MyColors.black),
                                   )
                                 : const SizedBox(),
-                            decoration: boxSetting),
-                      ),
-              ),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: MyColors.border1),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: MyColors.primaryColor, width: 1.5),
+                            ),
+                          ))
+                  // : Focus(
+                  //     onFocusChange: (focus) {
+                  //       if (focus) {
+                  //         setState(() {
+                  //           boxSetting = boxHasFocus;
+                  //         });
+                  //       } else {
+                  //         setState(() {
+                  //           boxSetting = defaultBoxSetting;
+                  //         });
+                  //       }
+                  //     },
+                  //     child: CupertinoTextField(
+                  //         key: _orderFormKey,
+                  //         controller: widget.textController,
+                  //         cursorColor: MyColors.primaryColor,
+                  //         maxLength: 2000,
+                  //         maxLines: null,
+                  //         placeholder: "Хариулт",
+                  //         clearButtonMode: OverlayVisibilityMode.editing,
+                  //         decoration: boxSetting),
+                  //   ),
+                  ),
             ],
           ),
         if (widget.courseTask.body != "" || widget.courseTask.body!.isNotEmpty)
