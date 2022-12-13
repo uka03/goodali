@@ -224,6 +224,7 @@ class _ListenTabbarState extends State<ListenTabbar>
       builder: (context, value, child) => FutureBuilder(
         future: value.isAuth ? futurLoggedeAlbum : futureAlbum,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
+          print(value.isAuth);
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
             List<Products> albumList = snapshot.data;
@@ -298,6 +299,7 @@ class _ListenTabbarState extends State<ListenTabbar>
   }
 
   Future<List<Products>> getalbumListLogged() async {
+    print("sifjifjdoijfojdjf");
     var data = await Connection.getalbumListLogged(context);
     for (var element in data) {
       if (element.isSpecial == 1) {

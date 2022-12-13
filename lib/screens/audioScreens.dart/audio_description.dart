@@ -14,20 +14,23 @@ class AudioDescription extends StatelessWidget {
       appBar: const SimpleAppBar(noCard: true),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            const Text(
-              "Тайлбар",
-              style: TextStyle(
-                  fontSize: 24,
-                  color: MyColors.black,
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            HtmlWidget(description,
-                textStyle: const TextStyle(color: MyColors.gray))
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 40),
+              const Text(
+                "Тайлбар",
+                style: TextStyle(
+                    fontSize: 24,
+                    color: MyColors.black,
+                    fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              HtmlWidget(description,
+                  textStyle: const TextStyle(color: MyColors.gray)),
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );

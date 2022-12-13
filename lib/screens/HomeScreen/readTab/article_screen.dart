@@ -20,6 +20,7 @@ class ArticleScreen extends StatefulWidget {
 }
 
 class _ArticleScreenState extends State<ArticleScreen> {
+  late final futureGetArticle = getArticle();
   bool isLoading = true;
   List<TagModel> tagList = [];
 
@@ -39,7 +40,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
       appBar: const SimpleAppBar(title: "", noCard: true),
       body: SingleChildScrollView(
           child: FutureBuilder(
-        future: getArticle(),
+        future: futureGetArticle,
         builder:
             (BuildContext context, AsyncSnapshot<List<ArticleModel>> snapshot) {
           if (snapshot.hasData) {
@@ -121,100 +122,95 @@ class _ArticleScreenState extends State<ArticleScreen> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => SizedBox(
-              height: MediaQuery.of(context).size.height - 100,
-              child: StatefulBuilder(
-                builder: (BuildContext context,
-                    void Function(void Function()) setState) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 38,
-                          height: 6,
-                          decoration: BoxDecoration(
-                              color: MyColors.gray,
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text("Шүүлтүүр",
-                            style: TextStyle(
-                                fontSize: 22,
-                                color: MyColors.black,
-                                fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Wrap(
-                              children: tagList
-                                  .map(
-                                    (e) => InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          if (!checkedTag.contains(e.id)) {
-                                            checkedTag.add(e.id!);
-                                          } else {
-                                            checkedTag.remove(e.id);
-                                          }
-                                        });
-                                      },
-                                      child: SizedBox(
-                                        height: 45,
-                                        child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(e.name ?? "",
-                                                  style: const TextStyle(
-                                                      color: MyColors.black)),
-                                              const SizedBox(width: 15),
-                                              SizedBox(
-                                                height: 24,
-                                                width: 24,
-                                                child: IgnorePointer(
-                                                  child: Checkbox(
-                                                      fillColor:
-                                                          MaterialStateProperty
-                                                              .all<Color>(MyColors
-                                                                  .primaryColor),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          4)),
-                                                      side: const BorderSide(
-                                                          color:
-                                                              MyColors.border1),
-                                                      splashRadius: 5,
-                                                      onChanged: (_) {},
-                                                      value: checkedTag
-                                                          .contains(e.id)),
-                                                ),
+        builder: (_) => StatefulBuilder(
+              builder: (BuildContext context,
+                  void Function(void Function()) setState) {
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 6,
+                        decoration: BoxDecoration(
+                            color: MyColors.gray,
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text("Шүүлтүүр",
+                          style: TextStyle(
+                              fontSize: 22,
+                              color: MyColors.black,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Wrap(
+                            children: tagList
+                                .map(
+                                  (e) => InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        if (!checkedTag.contains(e.id)) {
+                                          checkedTag.add(e.id!);
+                                        } else {
+                                          checkedTag.remove(e.id);
+                                        }
+                                      });
+                                    },
+                                    child: SizedBox(
+                                      height: 45,
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(e.name ?? "",
+                                                style: const TextStyle(
+                                                    color: MyColors.black)),
+                                            const SizedBox(width: 15),
+                                            SizedBox(
+                                              height: 24,
+                                              width: 24,
+                                              child: IgnorePointer(
+                                                child: Checkbox(
+                                                    fillColor:
+                                                        MaterialStateProperty
+                                                            .all<Color>(MyColors
+                                                                .primaryColor),
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4)),
+                                                    side: const BorderSide(
+                                                        color:
+                                                            MyColors.border1),
+                                                    splashRadius: 5,
+                                                    onChanged: (_) {},
+                                                    value: checkedTag
+                                                        .contains(e.id)),
                                               ),
-                                            ]),
-                                      ),
+                                            ),
+                                          ]),
                                     ),
-                                  )
-                                  .toList()),
-                        ),
-                        const SizedBox(height: 10),
-                        CustomElevatedButton(
-                            text: "Шүүх",
-                            onPress: () {
-                              log(checkedTag.length.toString(),
-                                  name: "checkedTag length");
-                              filterPost();
-                              Navigator.pop(context, checkedTag);
-                            }),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                                  ),
+                                )
+                                .toList()),
+                      ),
+                      const SizedBox(height: 10),
+                      CustomElevatedButton(
+                          text: "Шүүх",
+                          onPress: () {
+                            log(checkedTag.length.toString(),
+                                name: "checkedTag length");
+                            filterPost();
+                            Navigator.pop(context, checkedTag);
+                          }),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                );
+              },
             ));
   }
 
@@ -228,6 +224,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
           }
         }
       }
+      print(artcileList.length);
+      print(filteredList.length);
       if (checkedTag.isEmpty) {
         filteredList.clear();
       }

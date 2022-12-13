@@ -119,10 +119,13 @@ class DownloadController with ChangeNotifier {
       for (var task in tasks) {
         var episode = await dbHelper.getProductsFromUrl(url: task.url);
         if (episode == null) {
+          print("eswel null uuu");
           await FlutterDownloader.remove(
               taskId: task.taskId, shouldDeleteContent: true);
         } else {
+          print("task status ${task.status}");
           if (task.status == DownloadTaskStatus.complete) {
+            print("iisehee complete orj irjiinuu");
             var exist =
                 await File(path.join(task.savedDir, task.filename)).exists();
 
@@ -134,17 +137,12 @@ class DownloadController with ChangeNotifier {
                   progress: task.progress, status: task.status));
             }
           } else {
-            _episodeTasks.add(TaskInfo(episode, task.taskId,
-                progress: task.progress, status: task.status));
+            print("iisehee orj irjiinuu");
+            await FlutterDownloader.remove(
+                taskId: task.taskId, shouldDeleteContent: true);
+            _episodeTasks.clear();
           }
         }
-        // if (task.status == DownloadTaskStatus.complete) {
-        //   _episodeTasks.add(TaskInfo(episode, task.taskId,
-        //       progress: task.progress, status: task.status));
-        // } else {
-        //   _episodeTasks.add(TaskInfo(episode, task.taskId,
-        //       progress: task.progress, status: task.status));
-        // }
       }
       print("_episodeTasks.length ${_episodeTasks.length}");
     }

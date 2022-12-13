@@ -41,7 +41,6 @@ class _FeelTabbarState extends State<FeelTabbar>
 
   @override
   void initState() {
-    getMoodMain();
     super.initState();
   }
 
@@ -80,6 +79,7 @@ class _FeelTabbarState extends State<FeelTabbar>
 
   @override
   Widget build(BuildContext context) {
+    getMoodMain();
     super.build(context);
     return SingleChildScrollView(
       child: FutureBuilder(
@@ -277,24 +277,21 @@ class _FeelTabbarState extends State<FeelTabbar>
   }
 
   Future<void> getMoodMain() async {
+    if (moodMain.isNotEmpty) return;
     var listData = await Connection.getMoodMain(context);
     setState(() {
       isDone = false;
     });
+    url = Urls.networkPath + listData.first.audio!;
 
-    for (var item in listData) {
-      url = Urls.networkPath + item.audio!;
-
-      await dataMoodStore.addProduct(products: item);
-      moodMain = await dataMoodStore.getMoodMainfromBox(item.title!);
-      for (var element in moodMain) {
-        if (element.id == item.id) {
-          products = element;
-          savedPosition = element.position ?? 0;
-        }
+    await dataMoodStore.addProduct(products: listData.first);
+    moodMain = await dataMoodStore.getMoodMainfromBox(listData.first.title!);
+    for (var element in moodMain) {
+      if (element.id == listData.first.id) {
+        products = element;
+        savedPosition = element.position ?? 0;
       }
     }
-    print("moodMain ${moodMain.length}");
 
     if (url != "") {
       await getTotalDuration(url);

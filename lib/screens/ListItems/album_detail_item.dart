@@ -97,10 +97,12 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         _totalduration = Duration(milliseconds: widget.products.duration!);
       }
 
-      setState(() {
-        duration = _totalduration;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          duration = _totalduration;
+          isLoading = false;
+        });
+      }
 
       savedPosition = widget.products.position!;
 

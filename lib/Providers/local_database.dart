@@ -214,6 +214,7 @@ class HiveMoodDataStore {
     List<Products> list = [];
     for (var i = 0; i < box.length; i++) {
       final item = box.get(i);
+
       if (item!.title == title) {
         list.add(box.get(i)!);
       }
