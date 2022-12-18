@@ -46,11 +46,11 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Upload image from camera</string>
+	<string>This app requires to access your camera to show image on profile</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Authenticate by face id</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Upload image from storage</string>
+	<string>This app requires to access your storage to show image on profile</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

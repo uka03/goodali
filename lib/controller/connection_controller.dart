@@ -825,4 +825,26 @@ class Connection {
       return false;
     }
   }
+
+  static Future<bool> accountDeletion(BuildContext context) async {
+    try {
+      final response = await Http()
+          .getDio(context, headerTypebearer)
+          .post(Urls.accountDeletion);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] == 1) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        developer.log("error");
+        return false;
+      }
+    } catch (error) {
+      developer.log("search error $error");
+      return false;
+    }
+  }
 }

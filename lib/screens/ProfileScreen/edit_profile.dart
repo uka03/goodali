@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/utils.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/connection_controller.dart';
@@ -12,6 +13,7 @@ import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfile extends StatefulWidget {
@@ -151,6 +153,17 @@ class _EditProfileState extends State<EditProfile> {
                 style: TextStyle(fontSize: 12, color: MyColors.gray),
               ),
               const Spacer(),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: TextButton(
+                    onPressed: () {
+                      deleteProfile();
+                    },
+                    child: const Text(
+                      "Профайл устгах",
+                      style: TextStyle(color: MyColors.black),
+                    )),
+              ),
               CustomElevatedButton(
                   text: "Хадгалах",
                   onPress: isChanged
@@ -165,6 +178,41 @@ class _EditProfileState extends State<EditProfile> {
         ),
       ),
     );
+  }
+
+  deleteProfile() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Icon(IconlyLight.close_square, color: MyColors.black),
+            content: const Text("Профайл устгах уу?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: MyColors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold)),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    accountDeletion();
+                    Utils.showLoaderDialog(context);
+                  },
+                  child: const Text(
+                    "УСТГАХ",
+                    style: TextStyle(color: MyColors.black),
+                  )),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "БОЛИХ",
+                    style: TextStyle(color: MyColors.primaryColor),
+                  )),
+            ],
+          );
+        });
   }
 
   changeProfilePicture() {
@@ -296,6 +344,19 @@ class _EditProfileState extends State<EditProfile> {
     }
 
     return stream["avatar"];
+  }
+
+  Future<void> accountDeletion() async {
+    var stream = await Connection.accountDeletion(context);
+    Navigator.pop(context);
+    if (stream == true) {
+      await TopSnackBar.successFactory(title: "Амжилттай устгагдлаа")
+          .show(context);
+      Provider.of<Auth>(context, listen: false).logOut(context, isDelete: true);
+      Navigator.popUntil(context, (route) => route.isFirst);
+    } else {
+      TopSnackBar.errorFactory(msg: "Дахин оролдоно уу").show(context);
+    }
   }
 
   editUserData(File? imageFile) async {

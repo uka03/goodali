@@ -176,12 +176,29 @@ class Auth with ChangeNotifier {
     return {"to_remind": isRemembered, "email": nickname};
   }
 
-  Future<void> logOut(BuildContext context) async {
+  Future<void> logOut(BuildContext context, {bool isDelete = false}) async {
     final preferences = await SharedPreferences.getInstance();
     if (buttonNotifier.value == ButtonState.playing ||
         currentlyPlaying.value != null) {
       currentlyPlaying.value = null;
       audioHandler.pause();
+    }
+
+    if (isDelete == true) {
+      var tasks =
+          Provider.of<DownloadController>(context, listen: false).episodeTasks;
+      _dataStore.deleteBoxes();
+      print(tasks.length);
+      if (tasks.isNotEmpty) {
+        for (var element in tasks) {
+          print("element.taskId ${element.taskId} ");
+          await FlutterDownloader.remove(
+              taskId: element.taskId ?? "0", shouldDeleteContent: true);
+          Provider.of<DownloadController>(context, listen: false)
+              .episodeTasks
+              .clear();
+        }
+      }
     }
     preferences.remove("token");
     preferences.remove("has_training");

@@ -40,4 +40,5 @@ class Urls {
   static final getBannerList = "$host/banner_list";
   static final search = "$host/search_text";
   static final postDislike = "$host/insert_post_dislike";
+  static final accountDeletion = "$host/account_deletion";
 }
