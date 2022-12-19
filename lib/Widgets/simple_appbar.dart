@@ -5,13 +5,37 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SimpleAppBar extends StatelessWidget with PreferredSizeWidget {
+class SimpleAppBar extends StatefulWidget with PreferredSizeWidget {
   final String? title;
   final bool noCard;
   final dynamic data;
   const SimpleAppBar({Key? key, this.title, this.noCard = false, this.data})
       : super(key: key);
+
+  @override
+  State<SimpleAppBar> createState() => _SimpleAppBarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _SimpleAppBarState extends State<SimpleAppBar> {
+  String username = "";
+  @override
+  void initState() {
+    getUserName();
+    super.initState();
+  }
+
+  getUserName() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString("email") ?? "";
+    });
+    print('appbar $username');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +46,9 @@ class SimpleAppBar extends StatelessWidget with PreferredSizeWidget {
       leading: IconButton(
           splashRadius: 20,
           icon: const Icon(IconlyLight.arrow_left),
-          onPressed: () => Navigator.pop(context, data)),
+          onPressed: () => Navigator.pop(context, widget.data)),
       actions: [
-        noCard
+        widget.noCard || username == "surgalt9@gmail.com"
             ? Container()
             : Padding(
                 padding: const EdgeInsets.only(right: 10.0),
@@ -60,12 +84,9 @@ class SimpleAppBar extends StatelessWidget with PreferredSizeWidget {
       ],
       iconTheme: const IconThemeData(color: MyColors.black),
       title: Text(
-        title ?? "",
+        widget.title ?? "",
         style: const TextStyle(fontSize: 18, color: MyColors.black),
       ),
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

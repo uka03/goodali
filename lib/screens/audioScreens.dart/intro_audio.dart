@@ -1,6 +1,7 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -17,6 +18,7 @@ import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:goodali/Utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class IntroAudio extends StatefulWidget {
   final Products products;
@@ -38,16 +40,27 @@ class _IntroAudioState extends State<IntroAudio> {
   Duration audioPosition = Duration.zero;
   Duration savedPosition = Duration.zero;
   var totalDuration = Duration.zero;
-
+  String username = "";
   int saveddouble = 0;
+  bool isAuth = false;
 
   String audioUrl = "";
 
   @override
   void initState() {
-    super.initState();
+    getUserName();
+
     audioUrl = Urls.networkPath + widget.products.audio!;
     _init();
+    super.initState();
+  }
+
+  getUserName() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString("email") ?? "";
+    });
+    print('appbar $username');
   }
 
   Future<void> _init() async {
@@ -66,6 +79,7 @@ class _IntroAudioState extends State<IntroAudio> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
+    isAuth = Provider.of<Auth>(context).isAuth;
     return SizedBox(
       height: MediaQuery.of(context).size.height / 2 + 120,
       width: MediaQuery.of(context).size.width,
@@ -206,60 +220,63 @@ class _IntroAudioState extends State<IntroAudio> {
               ],
             ),
             const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(
-                    width: MediaQuery.of(context).size.width / 2 + 70,
-                    child: CustomElevatedButton(
-                        text: "Худалдаж авах",
-                        onPress: () {
-                          cart.addItemsIndex(widget.products.productId!);
-                          if (!cart.sameItemCheck) {
-                            cart.addProducts(widget.products);
-                            cart.addTotalPrice(
-                                widget.products.price?.toDouble() ?? 0.0);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const CartScreen()));
-                          } else {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const CartScreen()));
-                          }
-                        })),
-                GestureDetector(
-                  onTap: () {
-                    cart.addItemsIndex(widget.products.productId!);
-                    if (!cart.sameItemCheck) {
-                      cart.addProducts(widget.products);
-                      cart.addTotalPrice(
-                          widget.products.price?.toDouble() ?? 0.0);
-                      TopSnackBar.successFactory(
-                              msg: "Сагсанд амжилттай нэмэгдлээ")
-                          .show(context);
-                    } else {
-                      TopSnackBar.errorFactory(
-                              msg: "Сагсанд бүтээгдэхүүн байна")
-                          .show(context);
-                    }
-                  },
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: MyColors.input),
-                    child: const Icon(
-                      IconlyLight.buy,
-                      color: MyColors.primaryColor,
+            if (username != "surgalt9@gmail.com" && isAuth)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                      width: MediaQuery.of(context).size.width / 2 + 70,
+                      child: CustomElevatedButton(
+                          text: "Худалдаж авах",
+                          onPress: () {
+                            cart.addItemsIndex(widget.products.productId!);
+                            if (!cart.sameItemCheck) {
+                              cart.addProducts(widget.products);
+                              cart.addTotalPrice(
+                                  widget.products.price?.toDouble() ?? 0.0);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CartScreen()));
+                            } else {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CartScreen()));
+                            }
+                          })),
+                  GestureDetector(
+                    onTap: () {
+                      cart.addItemsIndex(widget.products.productId!);
+                      if (!cart.sameItemCheck) {
+                        cart.addProducts(widget.products);
+                        cart.addTotalPrice(
+                            widget.products.price?.toDouble() ?? 0.0);
+                        TopSnackBar.successFactory(
+                                msg: "Сагсанд амжилттай нэмэгдлээ")
+                            .show(context);
+                      } else {
+                        TopSnackBar.errorFactory(
+                                msg: "Сагсанд бүтээгдэхүүн байна")
+                            .show(context);
+                      }
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: MyColors.input),
+                      child: const Icon(
+                        IconlyLight.buy,
+                        color: MyColors.primaryColor,
+                      ),
                     ),
-                  ),
-                )
-              ],
-            ),
+                  )
+                ],
+              ),
             const SizedBox(height: 40)
           ],
         ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/info.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:iconly/iconly.dart';
+import 'package:provider/provider.dart';
 
 class OnlineBook extends StatefulWidget {
   const OnlineBook({Key? key}) : super(key: key);
@@ -14,6 +16,7 @@ class OnlineBook extends StatefulWidget {
 class _OnlineBookState extends State<OnlineBook> {
   @override
   Widget build(BuildContext context) {
+    bool isAuth = Provider.of<Auth>(context).isAuth;
     return Scaffold(
       appBar: const SimpleAppBar(),
       body: Column(

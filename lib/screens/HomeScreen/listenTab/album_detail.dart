@@ -24,6 +24,7 @@ import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 typedef OnTap = Function(Products products);
 
@@ -58,7 +59,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   double containerInitialHeight = 270;
   double imageOpacity = 1;
   bool isPlaying = false;
-
+  String username = "";
   List<Products> buyList = [];
   List<Products> introList = [];
   AudioPlayer audioPlayer = AudioPlayer();
@@ -66,6 +67,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   void initState() {
     super.initState();
     audioPlayer.setLoopMode(LoopMode.off);
+    getUserName();
     bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
     if (isAuth) {
       getLectureListLogged();
@@ -90,6 +92,14 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
         setState(() {});
       });
+  }
+
+  getUserName() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString("email") ?? "";
+    });
+    print('appbar $username');
   }
 
   @override
@@ -217,7 +227,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
                           ),
                         ]),
                       ),
-                      widget.albumProduct.isBought == true
+                      widget.albumProduct.isBought == true ||
+                              username == "surgalt9@gmail.com" && isAuth
                           ? Container()
                           : Container(
                               color: Theme.of(context).scaffoldBackgroundColor,

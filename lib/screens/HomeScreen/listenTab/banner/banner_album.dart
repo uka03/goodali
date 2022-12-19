@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/audio_provider.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -19,6 +20,7 @@ import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BannerAlbum extends StatefulWidget {
   final int productId;
@@ -37,14 +39,14 @@ class _BannerAlbumState extends State<BannerAlbum> {
   double imageSize = 180;
   bool isPlaying = false;
   bool isLoading = true;
-
+  String username = "";
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
 
   @override
   void initState() {
     getProducts();
-
+    getUserName();
     introAudioPlayer.positionStream.listen((event) {
       position = event;
     });
@@ -69,6 +71,14 @@ class _BannerAlbumState extends State<BannerAlbum> {
     }
   }
 
+  getUserName() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString("email") ?? "";
+    });
+    print('appbar $username');
+  }
+
   @override
   void dispose() {
     introAudioPlayer.dispose();
@@ -79,6 +89,8 @@ class _BannerAlbumState extends State<BannerAlbum> {
   Widget build(BuildContext context) {
     final _audioPlayerProvider = Provider.of<AudioPlayerProvider>(context);
     final cart = Provider.of<CartProvider>(context);
+    bool isAuth = Provider.of<Auth>(context).isAuth;
+
     return Scaffold(
       appBar: const SimpleAppBar(title: "Цомог"),
       body: isLoading
@@ -268,27 +280,29 @@ class _BannerAlbumState extends State<BannerAlbum> {
                 ),
               ),
             ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: CustomElevatedButton(
-            text: "Худалдаж авах",
-            onPress: () {
-              cart.addItemsIndex((widget.productId), albumProductIDs: []);
-              if (!cart.sameItemCheck) {
-                cart.addProducts(albumDetail);
-                cart.addTotalPrice(albumDetail.price?.toDouble() ?? 0.0);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const CartScreen()));
-              } else {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const CartScreen()));
-              }
-            }),
-      ),
+      floatingActionButton: username != "surgalt9@gmail.com" && isAuth
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: CustomElevatedButton(
+                  text: "Худалдаж авах",
+                  onPress: () {
+                    cart.addItemsIndex((widget.productId), albumProductIDs: []);
+                    if (!cart.sameItemCheck) {
+                      cart.addProducts(albumDetail);
+                      cart.addTotalPrice(albumDetail.price?.toDouble() ?? 0.0);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CartScreen()));
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CartScreen()));
+                    }
+                  }),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }

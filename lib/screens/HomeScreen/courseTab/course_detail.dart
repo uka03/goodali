@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
@@ -8,6 +9,8 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/HomeScreen/courseTab/course_list.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CourseDetail extends StatefulWidget {
   final Products? courseProducts;
@@ -21,9 +24,26 @@ class CourseDetail extends StatefulWidget {
 
 class _CourseDetailState extends State<CourseDetail> {
   Products courseDetail = Products();
+  bool isAuth = false;
+  String username = "";
+  @override
+  void initState() {
+    getUserName();
+    super.initState();
+  }
+
+  getUserName() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString("email") ?? "";
+    });
+    print('appbar $username');
+  }
 
   @override
   Widget build(BuildContext context) {
+    isAuth = Provider.of<Auth>(context).isAuth;
+
     return Scaffold(
       appBar: const SimpleAppBar(),
       body: widget.id != null
@@ -72,20 +92,21 @@ class _CourseDetailState extends State<CourseDetail> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: CustomElevatedButton(
-                    text: "Худалдаж авах",
-                    onPress: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CourseList(
-                                  id: widget.courseProducts?.id.toString() ??
-                                      "")));
-                    },
+                if (username != "surgalt9@gmail.com" && isAuth)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: CustomElevatedButton(
+                      text: "Худалдаж авах",
+                      onPress: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CourseList(
+                                    id: widget.courseProducts?.id.toString() ??
+                                        "")));
+                      },
+                    ),
                   ),
-                ),
                 const SizedBox(height: 10),
               ],
             ),
@@ -147,19 +168,20 @@ class _CourseDetailState extends State<CourseDetail> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: CustomElevatedButton(
-                    text: "Худалдаж авах",
-                    onPress: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  CourseList(id: courseDetail.id.toString())));
-                    },
+                if (username != "surgalt9@gmail.com" && isAuth)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: CustomElevatedButton(
+                      text: "Худалдаж авах",
+                      onPress: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CourseList(
+                                    id: courseDetail.id.toString())));
+                      },
+                    ),
                   ),
-                ),
                 const SizedBox(height: 30),
               ],
             );
