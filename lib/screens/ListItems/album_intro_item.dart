@@ -4,6 +4,7 @@ import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -24,6 +25,7 @@ import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 typedef SetIndex = void Function(int index);
 
@@ -59,11 +61,12 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
   bool isPlaying = false;
   String url = "";
   var _totalduration = Duration.zero;
-
+  String username = "";
   bool isLoading = true;
 
   @override
   void initState() {
+    getUserName();
     getTotalDuration(Urls.networkPath + widget.products.audio!);
     super.initState();
   }
@@ -71,6 +74,14 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  getUserName() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString("email") ?? "";
+    });
+    print('appbar $username');
   }
 
   Future<Duration> getTotalDuration(String url) async {
@@ -110,6 +121,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
+    var isAuth = Provider.of<Auth>(context).isAuth;
     return GestureDetector(
         onTap: () {
           showIntroAudioModal();
@@ -207,16 +219,17 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
                               ],
                             ),
                       const Spacer(),
-                      widget.products.isBought == false &&
-                              widget.products.title != "Танилцуулга"
-                          ? IconButton(
-                              splashRadius: 20,
-                              onPressed: () {
-                                addToCard(cart);
-                              },
-                              icon: const Icon(IconlyLight.buy,
-                                  color: MyColors.gray))
-                          : Container(),
+                      if (username != "surgalt9@gmail.com" && isAuth)
+                        widget.products.isBought == false &&
+                                widget.products.title != "Танилцуулга"
+                            ? IconButton(
+                                splashRadius: 20,
+                                onPressed: () {
+                                  addToCard(cart);
+                                },
+                                icon: const Icon(IconlyLight.buy,
+                                    color: MyColors.gray))
+                            : Container(),
                       IconButton(
                           splashRadius: 20,
                           onPressed: () {},

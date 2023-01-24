@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -16,6 +17,7 @@ import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BannerLecture extends StatefulWidget {
   final int? productID;
@@ -33,13 +35,14 @@ class _BannerLectureState extends State<BannerLecture> {
   double imageSize = 180;
   bool isPlaying = false;
   bool isLoading = true;
-
+  String username = "";
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
 
   @override
   void initState() {
     getProducts();
+    getUserName();
     audioPlayer.positionStream.listen((event) {
       setState(() {
         position = event;
@@ -65,6 +68,14 @@ class _BannerLectureState extends State<BannerLecture> {
     }
   }
 
+  getUserName() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString("email") ?? "";
+    });
+    print('appbar $username');
+  }
+
   @override
   void dispose() {
     audioPlayer.dispose();
@@ -74,7 +85,7 @@ class _BannerLectureState extends State<BannerLecture> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
-
+    var isAuth = Provider.of<Auth>(context).isAuth;
     return Scaffold(
       appBar: const SimpleAppBar(title: "Лекц"),
       body: isLoading
@@ -214,30 +225,31 @@ class _BannerLectureState extends State<BannerLecture> {
                                     style: const TextStyle(
                                         fontSize: 12, color: MyColors.black)),
                                 const Spacer(),
-                                IconButton(
-                                    splashRadius: 20,
-                                    onPressed: () {
-                                      cart.addItemsIndex(
-                                          bannerLecture.first.productId!,
-                                          albumID: albumDetail.productId!);
-                                      if (!cart.sameItemCheck) {
-                                        cart.addProducts(bannerLecture.first);
-                                        cart.addTotalPrice(bannerLecture
-                                                .first.price
-                                                ?.toDouble() ??
-                                            0.0);
-                                        TopSnackBar.successFactory(
-                                                msg:
-                                                    "Сагсанд амжилттай нэмэгдлээ")
-                                            .show(context);
-                                      } else {
-                                        TopSnackBar.errorFactory(
-                                                msg: "Сагсанд байна")
-                                            .show(context);
-                                      }
-                                    },
-                                    icon: const Icon(IconlyLight.buy,
-                                        color: MyColors.gray))
+                                if (username != "surgalt9@gmail.com" && isAuth)
+                                  IconButton(
+                                      splashRadius: 20,
+                                      onPressed: () {
+                                        cart.addItemsIndex(
+                                            bannerLecture.first.productId!,
+                                            albumID: albumDetail.productId!);
+                                        if (!cart.sameItemCheck) {
+                                          cart.addProducts(bannerLecture.first);
+                                          cart.addTotalPrice(bannerLecture
+                                                  .first.price
+                                                  ?.toDouble() ??
+                                              0.0);
+                                          TopSnackBar.successFactory(
+                                                  msg:
+                                                      "Сагсанд амжилттай нэмэгдлээ")
+                                              .show(context);
+                                        } else {
+                                          TopSnackBar.errorFactory(
+                                                  msg: "Сагсанд байна")
+                                              .show(context);
+                                        }
+                                      },
+                                      icon: const Icon(IconlyLight.buy,
+                                          color: MyColors.gray))
                               ],
                             ),
                             const SizedBox(height: 12)
