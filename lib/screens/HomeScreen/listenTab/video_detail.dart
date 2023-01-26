@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
@@ -34,13 +36,15 @@ class _VideoDetailState extends State<VideoDetail> {
       initialVideoId: videoUrl,
       params: const YoutubePlayerParams(
         showControls: true,
-        origin: "https://www.youtube.com/embed/",
+        origin: "https://www.youtube.com/embed?rel=0/",
         startAt: Duration(seconds: 0),
-        autoPlay: true,
         showFullscreenButton: true,
+        strictRelatedVideos: true,
       ),
     );
-    // _controller?.addListener(listener);
+    log(_ytbPlayerController?.initialVideoId ?? "", name: "initialVideoId");
+    log(_ytbPlayerController?.params.origin ?? "", name: "origin");
+    log(_ytbPlayerController?.value.metaData.videoId ?? "", name: "videoId");
   }
 
   // initiliazeSimilarVideo(videoUrl) {

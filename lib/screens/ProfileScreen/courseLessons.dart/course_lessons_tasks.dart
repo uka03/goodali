@@ -149,118 +149,124 @@ class _CourseTasksState extends State<CourseTasks> {
         ),
         body: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: Container(
-            padding: const EdgeInsets.only(bottom: 0.0),
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: PageView.builder(
-                controller: _pageController,
-                itemCount: widget.courseTasks.length,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  switch (widget.courseTasks[index].type) {
-                    case 0:
-                    case 1:
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 90),
-                        child: TaskType0(
-                            courseTask: widget.courseTasks[index],
-                            textController: _controllers[index]),
-                      );
-                    // case 1:
-                    //   return Padding(
-                    //     padding: const EdgeInsets.all(20),
-                    //     child: type1(widget.courseTasks[index], index),
-                    //   );
-                    case 2:
-                      initiliazeAudio(
-                          Urls.networkPath +
-                              widget.courseTasks[index].listenAudio!,
-                          widget.courseTasks[index].id ?? 0);
-
-                      return Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: listen(widget.courseTasks[index]),
-                      );
-
-                    case 4:
-                      return TaskVideoPlayer(
-                          courseTasks: widget.courseTasks[index],
-                          index: index,
-                          onChanged: (isWatched) {
-                            setState(() => _checkboxValue[index] = isWatched);
-                          });
-
-                    case 5:
-                    case 6:
-                      return Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: exercise(widget.courseTasks[index], index),
-                      );
-
-                    default:
-                      return Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: TaskType0(
-                            courseTask: widget.courseTasks[index],
-                            textController: _controllers[index]),
-                      );
-                  }
-                }),
-          ),
-        ),
-        floatingActionButton: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
-              Container(
-                height: 50,
-                width: 70,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: MyColors.gray, width: 0.5),
-                    borderRadius: BorderRadius.circular(14)),
-                child: Center(
-                  child: Wrap(children: [
-                    Text(
-                      ((_current + 1).toInt()).toString(),
-                      style: const TextStyle(
-                          color: MyColors.black,
-                          fontSize: 16,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const Text("/",
-                        style: TextStyle(
-                          color: MyColors.black,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 16,
-                        )),
-                    Text(widget.courseTasks.length.toString(),
-                        style: const TextStyle(
-                            color: MyColors.black,
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            fontWeight: FontWeight.bold)),
-                  ]),
-                ),
-              ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: CustomElevatedButton(
-                      onPress: _onPressed,
-                      text: _current + 1 == widget.courseTasks.length
-                          ? "Дуусгах"
-                          : "Дараах"),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: widget.courseTasks.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        switch (widget.courseTasks[index].type) {
+                          case 0:
+                          case 1:
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                              child: TaskType0(
+                                  courseTask: widget.courseTasks[index],
+                                  textController: _controllers[index]),
+                            );
+                          // case 1:
+                          //   return Padding(
+                          //     padding: const EdgeInsets.all(20),
+                          //     child: type1(widget.courseTasks[index], index),
+                          //   );
+                          case 2:
+                            initiliazeAudio(
+                                Urls.networkPath +
+                                    widget.courseTasks[index].listenAudio!,
+                                widget.courseTasks[index].id ?? 0);
+
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                              child: listen(widget.courseTasks[index]),
+                            );
+
+                          case 4:
+                            return TaskVideoPlayer(
+                                courseTasks: widget.courseTasks[index],
+                                index: index,
+                                onChanged: (isWatched) {
+                                  setState(
+                                      () => _checkboxValue[index] = isWatched);
+                                });
+
+                          case 5:
+                          case 6:
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                              child: exercise(widget.courseTasks[index], index),
+                            );
+
+                          default:
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                              child: TaskType0(
+                                  courseTask: widget.courseTasks[index],
+                                  textController: _controllers[index]),
+                            );
+                        }
+                      }),
                 ),
               ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 70,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: MyColors.gray, width: 0.5),
+                          borderRadius: BorderRadius.circular(14)),
+                      child: Center(
+                        child: Wrap(children: [
+                          Text(
+                            ((_current + 1).toInt()).toString(),
+                            style: const TextStyle(
+                                color: MyColors.black,
+                                fontSize: 16,
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const Text("/",
+                              style: TextStyle(
+                                color: MyColors.black,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 16,
+                              )),
+                          Text(widget.courseTasks.length.toString(),
+                              style: const TextStyle(
+                                  color: MyColors.black,
+                                  fontSize: 16,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.bold)),
+                        ]),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20.0),
+                        child: CustomElevatedButton(
+                            onPress: _onPressed,
+                            text: _current + 1 == widget.courseTasks.length
+                                ? "Дуусгах"
+                                : "Дараах"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20)
             ],
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }

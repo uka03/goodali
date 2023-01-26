@@ -204,7 +204,6 @@ class _ArticleScreenState extends State<ArticleScreen> {
                             log(checkedTag.length.toString(),
                                 name: "checkedTag length");
                             filterPost();
-                            Navigator.pop(context, checkedTag);
                           }),
                       const SizedBox(height: 20),
                     ],
@@ -216,20 +215,22 @@ class _ArticleScreenState extends State<ArticleScreen> {
 
   filterPost() {
     setState(() {
-      for (var item in artcileList) {
+      for (var article in artcileList) {
         for (var id in checkedTag) {
-          if (item.tags?.first.id == id &&
-              !filteredList.any((element) => element.id == item.id)) {
-            filteredList.add(item);
+          if (article.tags!.isNotEmpty) {
+            if (article.tags?.first.id == id &&
+                !filteredList.any((element) => element.id == article.id)) {
+              filteredList.add(article);
+            }
           }
         }
       }
-      print(artcileList.length);
-      print(filteredList.length);
+
       if (checkedTag.isEmpty) {
         filteredList.clear();
       }
     });
+    Navigator.pop(context);
   }
 
   Future<void> getTagList() async {
