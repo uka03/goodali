@@ -30,12 +30,16 @@ typedef OnTap = Function(Products products);
 
 class AlbumDetail extends StatefulWidget {
   final Products albumProduct;
+  final bool? isLecture;
+  final int? albumID;
   final OnTap onTap;
 
   const AlbumDetail({
     Key? key,
     required this.albumProduct,
     required this.onTap,
+    this.isLecture = false,
+    this.albumID,
   }) : super(key: key);
 
   @override
@@ -385,8 +389,14 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   Future<void> getAlbumLectures() async {
-    var data = await Connection.getAlbumLectures(
-        context, widget.albumProduct.id.toString());
+    List<Products> data;
+    if (widget.isLecture == true) {
+      data =
+          await Connection.getAlbumLectures(context, widget.albumID.toString());
+    } else {
+      data = await Connection.getAlbumLectures(
+          context, widget.albumProduct.id.toString());
+    }
 
     Products introduction = Products(
         title: "Танилцуулга",

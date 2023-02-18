@@ -13,6 +13,7 @@ import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/models/course_lessons_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/courses_item.dart';
+import 'package:goodali/models/faq_model.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/get_mood_list.dart';
@@ -845,6 +846,44 @@ class Connection {
     } catch (error) {
       developer.log("search error $error");
       return false;
+    }
+  }
+
+  static Future<List<Products>> specialList(BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypeNone).post(Urls.specialList);
+
+      if (response.data["status"] == 1) {
+        return (response.data['data'] as List)
+            .map((e) => Products.fromJson(e))
+            .toList();
+      } else {
+        developer.log("error");
+        return [];
+      }
+    } catch (error) {
+      developer.log("special list error $error");
+      return [];
+    }
+  }
+
+  static Future<List<FaqModel>> faqList(BuildContext context) async {
+    try {
+      final response =
+          await Http().getDio(context, headerTypeNone).post(Urls.faqList);
+
+      if (response.data["status"] == 1) {
+        return (response.data['data'] as List)
+            .map((e) => FaqModel.fromJson(e))
+            .toList();
+      } else {
+        developer.log("error");
+        return [];
+      }
+    } catch (error) {
+      developer.log("special list error $error");
+      return [];
     }
   }
 }

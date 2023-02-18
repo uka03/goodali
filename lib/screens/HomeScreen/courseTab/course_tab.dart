@@ -37,24 +37,24 @@ class _CourseTabbarState extends State<CourseTabbar> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (var item in products)
-                        if (item.isSpecial == 1)
-                          Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 20),
-                                const Text("Онцлох",
-                                    style: TextStyle(
-                                        color: MyColors.black,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold)),
-                                Padding(
-                                    padding: const EdgeInsets.only(top: 20.0),
-                                    child: CourseProductsListItem(
-                                      courseProducts: item,
-                                      courseProductsList: products,
-                                    )),
-                              ]),
+                      // for (var item in products)
+                      //   if (item.isSpecial == 1)
+                      //     Column(
+                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                      //         children: [
+                      //           const SizedBox(height: 20),
+                      //           const Text("Онцлох",
+                      //               style: TextStyle(
+                      //                   color: MyColors.black,
+                      //                   fontSize: 20,
+                      //                   fontWeight: FontWeight.bold)),
+                      //           Padding(
+                      //               padding: const EdgeInsets.only(top: 20.0),
+                      //               child: CourseProductsListItem(
+                      //                 courseProducts: item,
+                      //                 courseProductsList: products,
+                      //               )),
+                      //         ]),
                       const Padding(
                         padding: EdgeInsets.only(top: 30.0, bottom: 20),
                         child: Text("Онлайн сургалт",

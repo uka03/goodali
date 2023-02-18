@@ -1,14 +1,31 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/circle_tab_indicator.dart';
 import 'package:goodali/Utils/styles.dart';
+import 'package:goodali/Utils/urls.dart';
+import 'package:goodali/Utils/utils.dart';
+import 'package:goodali/Widgets/audio_progressbar.dart';
+import 'package:goodali/Widgets/audioplayer_button.dart';
+import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
+import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/controller/default_audio_handler.dart';
+import 'package:goodali/controller/duration_state.dart';
+import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/banner_model.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_lecture.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
@@ -16,6 +33,7 @@ import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
 
 import 'package:goodali/Widgets/search_bar.dart';
+import 'package:goodali/screens/ListItems/special_list_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -27,13 +45,25 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late final tabController = TabController(length: 4, vsync: this);
+  final HiveSpecialDataStore dataStore = HiveSpecialDataStore();
   final CarouselController _controller = CarouselController();
+  final PageController _pageController = PageController();
+  final _kDuration = const Duration(milliseconds: 300);
+  final _kCurve = Curves.easeIn;
+  bool isLoading = true;
+  bool isDone = true;
   List<BannerModel> bannerList = [];
+  List<Products> specialList = [];
+
+  String url = "";
+
   int _current = 0;
+  int _pageCurrent = 0;
 
   @override
   void initState() {
     getBannerList();
+    getSpecialList();
     super.initState();
   }
 
@@ -58,12 +88,12 @@ class _HomeScreenState extends State<HomeScreen>
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                  collapsedHeight: 275,
-                  expandedHeight: 275,
+                  collapsedHeight: 480,
+                  expandedHeight: 480,
                   backgroundColor: Colors.white,
                   flexibleSpace: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [banner(), const SearchBar()],
+                    children: [banner(), const SearchBar(), specialProducts()],
                   )),
               SliverPersistentHeader(
                   floating: false,
@@ -175,6 +205,89 @@ class _HomeScreenState extends State<HomeScreen>
     ]);
   }
 
+  Widget specialProducts() {
+    return !isDone
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text("Онцлох",
+                    style: TextStyle(
+                        color: MyColors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold)),
+              ),
+              SizedBox(
+                height: 190,
+                child: Stack(alignment: Alignment.bottomCenter, children: [
+                  PageView.builder(
+                    controller: _pageController,
+                    itemCount: specialList.length,
+                    onPageChanged: (value) {
+                      setState(() {
+                        _pageCurrent = value;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      List<Products> audioList = [];
+                      if (specialList[index].audio != null) {
+                        audioList.add(specialList[index]);
+                      }
+                      return SpecialListItem(
+                        specialItem: specialList[index],
+                        onTap: () async {
+                          if (activeList.first.title == audioList.first.title &&
+                              activeList.first.id == audioList.first.id) {
+                            currentlyPlaying.value = audioList[index];
+                            await audioHandler.skipToQueueItem(index);
+                            await audioHandler.seek(Duration(
+                                milliseconds: audioList[index].position!));
+                            await audioHandler.play();
+                          } else if (activeList.first.title !=
+                                  audioList.first.title ||
+                              activeList.first.id != audioList.first.id) {
+                            activeList = audioList;
+                            currentlyPlaying.value = audioList[index];
+                            await initiliazePodcast();
+                            await audioHandler.skipToQueueItem(index);
+                            await audioHandler.seek(
+                              Duration(
+                                  milliseconds: audioList[index].position!),
+                            );
+                            await audioHandler.play();
+                          }
+                        },
+                      );
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: specialList.asMap().entries.map((entry) {
+                      return GestureDetector(
+                        onTap: () => _pageController.animateToPage(entry.key,
+                            curve: _kCurve, duration: _kDuration),
+                        child: Container(
+                          width: 8.0,
+                          height: 8.0,
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 6.0),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: MyColors.primaryColor.withOpacity(
+                                  _pageCurrent == entry.key ? 0.9 : 0.4)),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ]),
+              ),
+            ],
+          )
+        : const CircularProgressIndicator(color: MyColors.primaryColor);
+  }
+
   Future getBannerList() async {
     bannerList = await Connection.getBannerList(context);
     if (mounted) {
@@ -183,5 +296,20 @@ class _HomeScreenState extends State<HomeScreen>
       });
     }
     return bannerList;
+  }
+
+  Future<void> getSpecialList() async {
+    if (specialList.isNotEmpty) return;
+    specialList = await Connection.specialList(context);
+    if (!mounted) return;
+    setState(() {
+      isDone = false;
+    });
+
+    for (var item in specialList) {
+      if (item.audio != null) {
+        dataStore.addProduct(products: item);
+      }
+    }
   }
 }

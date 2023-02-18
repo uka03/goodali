@@ -31,21 +31,21 @@ class _ReadTabbarState extends State<ReadTabbar>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (var item in articleList)
-                  if (item.isSpecial == 1)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20, left: 20),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text("Онцлох",
-                                style: TextStyle(
-                                    color: MyColors.black,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold)),
-                            ArtcileItem(articleModel: item),
-                          ]),
-                    ),
+                // for (var item in articleList)
+                //   if (item.isSpecial == 1)
+                //     Padding(
+                //       padding: const EdgeInsets.only(top: 20, left: 20),
+                //       child: Column(
+                //           crossAxisAlignment: CrossAxisAlignment.start,
+                //           children: [
+                //             const Text("Онцлох",
+                //                 style: TextStyle(
+                //                     color: MyColors.black,
+                //                     fontSize: 20,
+                //                     fontWeight: FontWeight.bold)),
+                //             ArtcileItem(articleModel: item),
+                //           ]),
+                //     ),
                 Padding(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                     child: Row(

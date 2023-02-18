@@ -55,78 +55,78 @@ class _ListenTabbarState extends State<ListenTabbar>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (var i = 0; i < specialList.length; i++)
-              if (specialList[i].isSpecial == 1)
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => AlbumDetail(
-                                albumProduct: specialList[i], onTap: (d) {})));
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("Онцлох",
-                              style: TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                          Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          child: ImageView(
-                                              imgPath:
-                                                  specialList[i].banner ?? "",
-                                              width: 40,
-                                              height: 40)),
-                                      const SizedBox(width: 15),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              specialList[i].lectureTitle !=
-                                                          null &&
-                                                      specialList[i]
-                                                          .lectureTitle!
-                                                          .isNotEmpty
-                                                  ? specialList[i].lectureTitle!
-                                                  : specialList[i].title ?? "",
-                                              maxLines: 1,
-                                              softWrap: true,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                  color: MyColors.black,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            CustomReadMoreText(
-                                                text: specialList[i].body ?? "")
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              )),
-                        ]),
-                  ),
-                ),
+            // for (var i = 0; i < specialList.length; i++)
+            //   if (specialList[i].isSpecial == 1)
+            //     GestureDetector(
+            //       onTap: () {
+            //         Navigator.push(
+            //             context,
+            //             MaterialPageRoute(
+            //                 builder: (_) => AlbumDetail(
+            //                     albumProduct: specialList[i], onTap: (d) {})));
+            //       },
+            //       child: Padding(
+            //         padding: const EdgeInsets.all(20),
+            //         child: Column(
+            //             crossAxisAlignment: CrossAxisAlignment.start,
+            //             children: [
+            //               const Text("Онцлох",
+            //                   style: TextStyle(
+            //                       color: MyColors.black,
+            //                       fontSize: 20,
+            //                       fontWeight: FontWeight.bold)),
+            //               Padding(
+            //                   padding: const EdgeInsets.only(top: 20.0),
+            //                   child: Column(
+            //                     mainAxisSize: MainAxisSize.min,
+            //                     children: [
+            //                       Row(
+            //                         crossAxisAlignment:
+            //                             CrossAxisAlignment.start,
+            //                         children: [
+            //                           ClipRRect(
+            //                               borderRadius:
+            //                                   BorderRadius.circular(4),
+            //                               child: ImageView(
+            //                                   imgPath:
+            //                                       specialList[i].banner ?? "",
+            //                                   width: 40,
+            //                                   height: 40)),
+            //                           const SizedBox(width: 15),
+            //                           Expanded(
+            //                             child: Column(
+            //                               crossAxisAlignment:
+            //                                   CrossAxisAlignment.start,
+            //                               children: [
+            //                                 Text(
+            //                                   specialList[i].lectureTitle !=
+            //                                               null &&
+            //                                           specialList[i]
+            //                                               .lectureTitle!
+            //                                               .isNotEmpty
+            //                                       ? specialList[i].lectureTitle!
+            //                                       : specialList[i].title ?? "",
+            //                                   maxLines: 1,
+            //                                   softWrap: true,
+            //                                   overflow: TextOverflow.ellipsis,
+            //                                   style: const TextStyle(
+            //                                       color: MyColors.black,
+            //                                       fontSize: 16,
+            //                                       fontWeight: FontWeight.bold),
+            //                                 ),
+            //                                 const SizedBox(height: 10),
+            //                                 CustomReadMoreText(
+            //                                     text: specialList[i].body ?? "")
+            //                               ],
+            //                             ),
+            //                           )
+            //                         ],
+            //                       ),
+            //                     ],
+            //                   )),
+            //             ]),
+            //       ),
+            //     ),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(20),

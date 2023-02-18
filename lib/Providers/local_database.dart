@@ -282,3 +282,42 @@ class HiveIntroDataStore {
     }
   }
 }
+
+class HiveSpecialDataStore {
+  static const boxName = "special_list";
+
+  static Box<Products> specialListBox = Hive.box<Products>(boxName);
+
+  Future<void> addProduct({required Products products}) async {
+    var datas = specialListBox.values
+        .where((c) => c.title == products.title && c.id == products.id)
+        .toList();
+    print("data hooson bnu uguu yu ${datas.length}");
+
+    if (datas.isEmpty) {
+      await specialListBox.add(products);
+    }
+  }
+
+  /// show user list
+  Future<void> getProducts({required String id}) async {
+    specialListBox.get(id);
+  }
+
+  /// update user data
+  Future<void> updateProducts(
+      {required int index, required Products userModel}) async {
+    await specialListBox.putAt(index, userModel);
+  }
+
+  Future<void> updatePosition(String title, int id, int position) async {
+    var datas = specialListBox.values
+        .where((c) => c.title == title && c.id == id)
+        .toList();
+    if (datas.isNotEmpty) {
+      var item = specialListBox.get(datas.first.key);
+      item!.position = position;
+      await item.save();
+    }
+  }
+}

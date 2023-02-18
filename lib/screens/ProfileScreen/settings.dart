@@ -4,6 +4,7 @@ import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/screens/Auth/reset_password.dart';
+import 'package:goodali/screens/ProfileScreen/faQ.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
@@ -110,8 +111,10 @@ class _SettingsState extends State<Settings> {
             ),
           ),
           InkWell(
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const ResetPassword())),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const FrequentlyQuestions())),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Row(
@@ -133,8 +136,7 @@ class _SettingsState extends State<Settings> {
             ),
           ),
           InkWell(
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const ResetPassword())),
+            onTap: () {},
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Row(
