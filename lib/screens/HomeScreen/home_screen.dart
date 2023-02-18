@@ -42,8 +42,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late final tabController = TabController(length: 4, vsync: this);
   final HiveSpecialDataStore dataStore = HiveSpecialDataStore();
   final CarouselController _controller = CarouselController();
@@ -54,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool isDone = true;
   List<BannerModel> bannerList = [];
   List<Products> specialList = [];
-
+  List<Products> audioList = [];
   String url = "";
 
   int _current = 0;
@@ -88,8 +87,8 @@ class _HomeScreenState extends State<HomeScreen>
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                  collapsedHeight: 480,
-                  expandedHeight: 480,
+                  collapsedHeight: 490,
+                  expandedHeight: 490,
                   backgroundColor: Colors.white,
                   flexibleSpace: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -109,24 +108,16 @@ class _HomeScreenState extends State<HomeScreen>
                       SizedBox(width: 70, child: Tab(text: "Сургалт*"))
                     ],
                     indicatorWeight: 4,
-                    indicator:
-                        const CustomTabIndicator(color: MyColors.primaryColor),
+                    indicator: const CustomTabIndicator(color: MyColors.primaryColor),
                     labelColor: MyColors.primaryColor,
-                    labelStyle: const TextStyle(
-                        fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
-                    unselectedLabelStyle: const TextStyle(
-                        fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
+                    labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                    unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
                     unselectedLabelColor: MyColors.gray,
                     indicatorColor: MyColors.primaryColor,
                   )))
             ];
           },
-          body: TabBarView(controller: tabController, children: const [
-            ListenTabbar(),
-            ReadTabbar(),
-            FeelTabbar(),
-            CourseTabbar()
-          ]),
+          body: TabBarView(controller: tabController, children: const [ListenTabbar(), ReadTabbar(), FeelTabbar(), CourseTabbar()]),
         ),
       ),
     );
@@ -142,11 +133,7 @@ class _HomeScreenState extends State<HomeScreen>
                     switch (item.productType) {
                       case 0:
                         print("banner album orj irle");
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => BannerAlbum(
-                                    productId: item.productID ?? 0)));
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => BannerAlbum(productId: item.productID ?? 0)));
                         break;
                       case 1:
                         print("banner lecuture orj irle");
@@ -159,18 +146,12 @@ class _HomeScreenState extends State<HomeScreen>
                         break;
                       case 2:
                         print("case 2 bailaaa");
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) =>
-                                    CourseDetail(id: item.productID)));
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => CourseDetail(id: item.productID)));
                         break;
                       default:
                     }
                   },
-                  child: ImageView(
-                      imgPath: item.banner!,
-                      width: MediaQuery.of(context).size.width),
+                  child: ImageView(imgPath: item.banner!, width: MediaQuery.of(context).size.width),
                 ))
             .toList(),
         carouselController: _controller,
@@ -192,12 +173,8 @@ class _HomeScreenState extends State<HomeScreen>
             child: Container(
               width: 8.0,
               height: 8.0,
-              margin:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 6.0),
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white
-                      .withOpacity(_current == entry.key ? 0.9 : 0.4)),
+              margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 6.0),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(_current == entry.key ? 0.9 : 0.4)),
             ),
           );
         }).toList(),
@@ -213,11 +190,7 @@ class _HomeScreenState extends State<HomeScreen>
             children: [
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text("Онцлох",
-                    style: TextStyle(
-                        color: MyColors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold)),
+                child: Text("Онцлох", style: TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold)),
               ),
               SizedBox(
                 height: 190,
@@ -231,33 +204,25 @@ class _HomeScreenState extends State<HomeScreen>
                       });
                     },
                     itemBuilder: (context, index) {
-                      List<Products> audioList = [];
-                      if (specialList[index].audio != null) {
-                        audioList.add(specialList[index]);
-                      }
+                      print("audioList.length ${audioList.length}");
                       return SpecialListItem(
                         specialItem: specialList[index],
                         onTap: () async {
-                          if (activeList.first.title == audioList.first.title &&
-                              activeList.first.id == audioList.first.id) {
+                          if (activeList.first.title == audioList.first.title && activeList.first.id == audioList.first.id) {
                             currentlyPlaying.value = audioList[index];
                             await audioHandler.skipToQueueItem(index);
-                            await audioHandler.seek(Duration(
-                                milliseconds: audioList[index].position!));
+                            await audioHandler.seek(Duration(milliseconds: audioList[index].position!));
                             await audioHandler.play();
-                          } else if (activeList.first.title !=
-                                  audioList.first.title ||
-                              activeList.first.id != audioList.first.id) {
+                          } else if (activeList.first.title != audioList.first.title || activeList.first.id != audioList.first.id) {
                             activeList = audioList;
-                            currentlyPlaying.value = audioList[index];
                             await initiliazePodcast();
                             await audioHandler.skipToQueueItem(index);
                             await audioHandler.seek(
-                              Duration(
-                                  milliseconds: audioList[index].position!),
+                              Duration(milliseconds: audioList[index].position!),
                             );
                             await audioHandler.play();
                           }
+                          currentlyPlaying.value = audioList[index];
                         },
                       );
                     },
@@ -266,17 +231,13 @@ class _HomeScreenState extends State<HomeScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: specialList.asMap().entries.map((entry) {
                       return GestureDetector(
-                        onTap: () => _pageController.animateToPage(entry.key,
-                            curve: _kCurve, duration: _kDuration),
+                        onTap: () => _pageController.animateToPage(entry.key, curve: _kCurve, duration: _kDuration),
                         child: Container(
                           width: 8.0,
                           height: 8.0,
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 6.0),
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: MyColors.primaryColor.withOpacity(
-                                  _pageCurrent == entry.key ? 0.9 : 0.4)),
+                          margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 6.0),
+                          decoration:
+                              BoxDecoration(shape: BoxShape.circle, color: MyColors.primaryColor.withOpacity(_pageCurrent == entry.key ? 0.9 : 0.4)),
                         ),
                       );
                     }).toList(),
@@ -300,16 +261,21 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<void> getSpecialList() async {
     if (specialList.isNotEmpty) return;
-    specialList = await Connection.specialList(context);
+    var list = await Connection.specialList(context);
     if (!mounted) return;
+
+    specialList.clear();
+    for (var item in list) {
+      await dataStore.addProduct(products: item);
+      specialList = await dataStore.getSpecialListfromBox();
+    }
+    for (var element in specialList) {
+      if (element.audio != null) {
+        audioList.add(element);
+      }
+    }
     setState(() {
       isDone = false;
     });
-
-    for (var item in specialList) {
-      if (item.audio != null) {
-        dataStore.addProduct(products: item);
-      }
-    }
   }
 }

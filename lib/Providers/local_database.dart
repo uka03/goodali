@@ -14,9 +14,7 @@ class HiveDataStore {
 
   /// Add new user
   Future<void> addProduct({required Products products}) async {
-    var datas = box.values
-        .where((c) => c.title == products.title && c.id == products.id)
-        .toList();
+    var datas = box.values.where((c) => c.title == products.title && c.id == products.id).toList();
 
     if (datas.isEmpty) {
       await box.add(products);
@@ -56,14 +54,12 @@ class HiveDataStore {
   }
 
   /// update user data
-  Future<void> updateProducts(
-      {required int index, required Products userModel}) async {
+  Future<void> updateProducts({required int index, required Products userModel}) async {
     await box.putAt(index, userModel);
   }
 
   Future<void> updatePosition(String title, int id, int position) async {
-    var datas =
-        box.values.where((c) => c.title == title && c.id == id).toList();
+    var datas = box.values.where((c) => c.title == title && c.id == id).toList();
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
@@ -85,12 +81,7 @@ class HiveBoughtDataStore {
 
   /// Add new user
   Future<void> addProduct({required Products products}) async {
-    var datas = box.values
-        .where((c) =>
-            c.title == products.title &&
-            c.id == products.id &&
-            c.albumTitle == products.albumTitle)
-        .toList();
+    var datas = box.values.where((c) => c.title == products.title && c.id == products.id && c.albumTitle == products.albumTitle).toList();
 
     if (datas.isEmpty) {
       await box.add(products);
@@ -145,14 +136,12 @@ class HiveBoughtDataStore {
   }
 
   /// update user data
-  Future<void> updateProducts(
-      {required int index, required Products userModel}) async {
+  Future<void> updateProducts({required int index, required Products userModel}) async {
     await box.putAt(index, userModel);
   }
 
   Future<void> updatePosition(String title, int id, int position) async {
-    var datas =
-        box.values.where((c) => c.title == title && c.id == id).toList();
+    var datas = box.values.where((c) => c.title == title && c.id == id).toList();
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
@@ -176,10 +165,7 @@ class HiveMoodDataStore {
   /// Add new user
   Future<void> addProduct({required Products products}) async {
     print("box length ${box.values.length}");
-    var datas = box.values
-        .where(
-            (c) => c.id == products.id && c.moodListId == products.moodListId)
-        .toList();
+    var datas = box.values.where((c) => c.id == products.id && c.moodListId == products.moodListId).toList();
     if (datas.isEmpty) {
       await box.add(products);
     }
@@ -223,8 +209,7 @@ class HiveMoodDataStore {
   }
 
   /// update user data
-  Future<void> updateProducts(
-      {required int index, required Products userModel}) async {
+  Future<void> updateProducts({required int index, required Products userModel}) async {
     await box.putAt(index, userModel);
   }
 
@@ -242,12 +227,7 @@ class HiveIntroDataStore {
 
   /// Add new user
   Future<void> addProduct({required Products products}) async {
-    var datas = box.values
-        .where((c) =>
-            c.title == products.title &&
-            c.id == products.id &&
-            c.albumTitle == products.albumTitle)
-        .toList();
+    var datas = box.values.where((c) => c.title == products.title && c.id == products.id && c.albumTitle == products.albumTitle).toList();
 
     if (datas.isEmpty) {
       await box.add(products);
@@ -267,14 +247,12 @@ class HiveIntroDataStore {
   }
 
   /// update user data
-  Future<void> updateProducts(
-      {required int index, required Products userModel}) async {
+  Future<void> updateProducts({required int index, required Products userModel}) async {
     await box.putAt(index, userModel);
   }
 
   Future<void> updatePosition(String title, int id, int position) async {
-    var datas =
-        box.values.where((c) => c.title == title && c.id == id).toList();
+    var datas = box.values.where((c) => c.title == title && c.id == id).toList();
     if (datas.isNotEmpty) {
       var item = box.get(datas.first.key);
       item!.position = position;
@@ -289,9 +267,7 @@ class HiveSpecialDataStore {
   static Box<Products> specialListBox = Hive.box<Products>(boxName);
 
   Future<void> addProduct({required Products products}) async {
-    var datas = specialListBox.values
-        .where((c) => c.title == products.title && c.id == products.id)
-        .toList();
+    var datas = specialListBox.values.where((c) => c.id == products.id).toList();
     print("data hooson bnu uguu yu ${datas.length}");
 
     if (datas.isEmpty) {
@@ -304,16 +280,21 @@ class HiveSpecialDataStore {
     specialListBox.get(id);
   }
 
+  Future<List<Products>> getSpecialListfromBox() async {
+    List<Products> list = [];
+    for (var i = 0; i < specialListBox.length; i++) {
+      list.add(specialListBox.get(i)!);
+    }
+    return list;
+  }
+
   /// update user data
-  Future<void> updateProducts(
-      {required int index, required Products userModel}) async {
+  Future<void> updateProducts({required int index, required Products userModel}) async {
     await specialListBox.putAt(index, userModel);
   }
 
   Future<void> updatePosition(String title, int id, int position) async {
-    var datas = specialListBox.values
-        .where((c) => c.title == title && c.id == id)
-        .toList();
+    var datas = specialListBox.values.where((c) => c.title == title && c.id == id).toList();
     if (datas.isNotEmpty) {
       var item = specialListBox.get(datas.first.key);
       item!.position = position;

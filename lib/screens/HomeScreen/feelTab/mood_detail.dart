@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/local_database.dart';
@@ -12,22 +11,17 @@ import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/controller/progress_notifier.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:http/http.dart';
 
 import 'package:iconly/iconly.dart';
 import 'dart:developer' as developer;
 
-import 'package:path/path.dart';
-
 class MoodDetail extends StatefulWidget {
   final String moodListId;
   final String? id;
-  const MoodDetail({Key? key, required this.moodListId, this.id})
-      : super(key: key);
+  const MoodDetail({Key? key, required this.moodListId, this.id}) : super(key: key);
 
   @override
   State<MoodDetail> createState() => _MoodDetailState();
@@ -50,8 +44,7 @@ class _MoodDetailState extends State<MoodDetail> {
   List<Products> moodList = [];
   Widget rightButton = const Text(
     "Дараах",
-    style: TextStyle(
-        color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
   );
 
   @override
@@ -122,9 +115,7 @@ class _MoodDetailState extends State<MoodDetail> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        leading: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(IconlyLight.arrow_left, color: MyColors.black)),
+        leading: GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(IconlyLight.arrow_left, color: MyColors.black)),
         iconTheme: const IconThemeData(color: MyColors.black),
       ),
       body: Stack(alignment: Alignment.bottomCenter, children: [
@@ -139,18 +130,11 @@ class _MoodDetailState extends State<MoodDetail> {
                     if (url != "") {}
 
                     if (page == moodList.length - 1) {
-                      rightButton = const Text("Дуусгах",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold));
+                      rightButton = const Text("Дуусгах", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold));
                     } else {
                       rightButton = const Text(
                         "Дараах",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                       );
                     }
                     setState(() {
@@ -158,12 +142,8 @@ class _MoodDetailState extends State<MoodDetail> {
                     });
                   },
                   itemBuilder: ((context, index) {
-                    imgUrl = moodList[index].banner == "Image failed to upload"
-                        ? ""
-                        : moodList[index].banner!;
-                    url = moodList[index].audio == "Audio failed to upload"
-                        ? ""
-                        : Urls.networkPath + moodList[index].audio!;
+                    imgUrl = moodList[index].banner == "Image failed to upload" ? "" : moodList[index].banner!;
+                    url = moodList[index].audio == "Audio failed to upload" ? "" : Urls.networkPath + moodList[index].audio!;
 
                     return Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -174,16 +154,12 @@ class _MoodDetailState extends State<MoodDetail> {
                           const SizedBox(height: 20),
                           HtmlWidget(
                             moodList[index].title!,
-                            textStyle: const TextStyle(
-                                color: MyColors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
+                            textStyle: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                           const SizedBox(height: 40),
                           HtmlWidget(
                             moodList[index].body!,
-                            textStyle: const TextStyle(
-                                color: MyColors.black, fontSize: 16),
+                            textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
                           ),
                           const SizedBox(height: 20),
                           if (url != "") audioPlayerWidget(index)
@@ -192,8 +168,7 @@ class _MoodDetailState extends State<MoodDetail> {
                     );
                   }))
               : const Center(
-                  child:
-                      CircularProgressIndicator(color: MyColors.primaryColor),
+                  child: CircularProgressIndicator(color: MyColors.primaryColor),
                 ),
         ),
         _current != 0
@@ -203,16 +178,12 @@ class _MoodDetailState extends State<MoodDetail> {
                 child: Container(
                   height: 50,
                   width: 50,
-                  decoration: BoxDecoration(
-                      color: MyColors.primaryColor,
-                      borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(12)),
                   child: RawMaterialButton(
                     onPressed: () {
-                      _pageController.previousPage(
-                          curve: _kCurve, duration: _kDuration);
+                      _pageController.previousPage(curve: _kCurve, duration: _kDuration);
                     },
-                    child:
-                        const Icon(IconlyLight.arrow_left, color: Colors.white),
+                    child: const Icon(IconlyLight.arrow_left, color: Colors.white),
                   ),
                 ))
             : Container(),
@@ -222,13 +193,10 @@ class _MoodDetailState extends State<MoodDetail> {
             child: Container(
               height: 50,
               width: 100,
-              decoration: BoxDecoration(
-                  color: MyColors.primaryColor,
-                  borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(12)),
               child: RawMaterialButton(
                 onPressed: () async {
-                  _pageController.nextPage(
-                      curve: _kCurve, duration: _kDuration);
+                  _pageController.nextPage(curve: _kCurve, duration: _kDuration);
                   if (_current == moodList.length - 1) {
                     Navigator.pop(context);
                   }
@@ -244,18 +212,14 @@ class _MoodDetailState extends State<MoodDetail> {
               children: moodList
                   .map((entry) => (moodList.indexOf(entry) - 1 == _current)
                       ? Container(
-                          width: MediaQuery.of(context).size.width /
-                              moodList.length,
+                          width: MediaQuery.of(context).size.width / moodList.length,
                           height: 2.0,
                           color: Colors.white,
                         )
                       : Container(
-                          width: MediaQuery.of(context).size.width /
-                              moodList.length,
+                          width: MediaQuery.of(context).size.width / moodList.length,
                           height: 2.0,
-                          color: (_current >= moodList.indexOf(entry))
-                              ? MyColors.primaryColor
-                              : Colors.white,
+                          color: (_current >= moodList.indexOf(entry)) ? MyColors.primaryColor : Colors.white,
                         ))
                   .toList(),
             )),
@@ -315,20 +279,16 @@ class _MoodDetailState extends State<MoodDetail> {
           onTap: () {
             buttonBackWard5Seconds(currentDuration);
           },
-          child: SvgPicture.asset("assets/images/replay_5.svg",
-              color: MyColors.primaryColor),
+          child: SvgPicture.asset("assets/images/replay_5.svg", color: MyColors.primaryColor),
         ),
         CircleAvatar(
           radius: 36,
           backgroundColor: MyColors.primaryColor,
           child: ValueListenableBuilder(
             valueListenable: buttonNotifier,
-            builder: (BuildContext context, ButtonState? buttonValue,
-                Widget? child) {
-              bool isPlaying =
-                  buttonValue == ButtonState.playing ? true : false;
-              bool isBuffering =
-                  buttonValue == ButtonState.loading ? true : false;
+            builder: (BuildContext context, ButtonState? buttonValue, Widget? child) {
+              bool isPlaying = buttonValue == ButtonState.playing ? true : false;
+              bool isBuffering = buttonValue == ButtonState.loading ? true : false;
 
               if (isBuffering) {
                 return const CircularProgressIndicator(color: Colors.white);
@@ -365,8 +325,7 @@ class _MoodDetailState extends State<MoodDetail> {
           onTap: () {
             buttonForward15Seconds(currentDuration, totalDuration);
           },
-          child: SvgPicture.asset("assets/images/forward_15.svg",
-              color: MyColors.primaryColor),
+          child: SvgPicture.asset("assets/images/forward_15.svg", color: MyColors.primaryColor),
         ),
       ],
     );
