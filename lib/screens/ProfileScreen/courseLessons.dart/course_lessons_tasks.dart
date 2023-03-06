@@ -89,7 +89,7 @@ class _CourseTasksState extends State<CourseTasks> {
   }
 
   initiliazeAudio(String audioURl, int id) async {
-    log(audioURl);
+    // log(audioURl);
     await audioPlayer.setUrl(audioURl).then((value) {
           setState(() => isLoading = false);
           return value;
@@ -376,6 +376,8 @@ class _CourseTasksState extends State<CourseTasks> {
     // initiliazeAudio(Urls.networkPath + widget.courseTasks[index].listenAudio!, widget.courseTasks[index].id ?? 0);
     String url = Urls.networkPath + widget.courseTasks[index].listenAudio!;
     getTotalDuration(url, widget.courseTasks[index].products!);
+    initiliazeAudio(Urls.networkPath + widget.courseTasks[index].listenAudio!, widget.courseTasks[index].id ?? 0);
+
     return Column(
       children: [audioPlayerWidget(index)],
     );
@@ -505,7 +507,7 @@ class _CourseTasksState extends State<CourseTasks> {
 
   Future<void> getTotalDuration(url, Products products) async {
     try {
-      log("getTotalDuration: ${products.title}");
+      // log("getTotalDuration: ${products.title}");
       if (products.duration == null || products.duration == 0) {
         totalDuration = await getFileDuration(url, products);
       } else {
@@ -514,7 +516,7 @@ class _CourseTasksState extends State<CourseTasks> {
       await initiliaze(products);
       setState(() {});
     } catch (e) {
-      log(e.toString(), name: "getTotalDuration error");
+      // log(e.toString(), name: "getTotalDuration error");
     }
   }
 
@@ -528,7 +530,7 @@ class _CourseTasksState extends State<CourseTasks> {
 
   Future<bool> initiliaze(Products products) async {
     currentlyPlaying.value = products;
-    log("initiliaze");
+    // log("initiliaze");
     if (activeList.isNotEmpty && activeList.first.id == products.id) {
       return true;
     } else {
