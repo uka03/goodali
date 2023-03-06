@@ -39,12 +39,7 @@ class AlbumIntroItem extends StatefulWidget {
   final AudioPlayer audioPlayer;
 
   const AlbumIntroItem(
-      {Key? key,
-      required this.products,
-      required this.albumName,
-      required this.audioPlayer,
-      this.albumProducts,
-      required this.onTap})
+      {Key? key, required this.products, required this.albumName, required this.audioPlayer, this.albumProducts, required this.onTap})
       : super(key: key);
   @override
   State<AlbumIntroItem> createState() => _AlbumIntroItemState();
@@ -133,12 +128,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: ImageView(
-                        imgPath: widget.products.banner ?? "",
-                        width: 40,
-                        height: 40)),
+                ClipRRect(borderRadius: BorderRadius.circular(4), child: ImageView(imgPath: widget.products.banner ?? "", width: 40, height: 40)),
                 const SizedBox(width: 15),
                 Expanded(
                   child: Column(
@@ -149,18 +139,14 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
                         maxLines: 1,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            color: MyColors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         parseHtmlString(widget.products.body ?? ""),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 14, height: 1.6, color: MyColors.gray),
+                        style: const TextStyle(fontSize: 14, height: 1.6, color: MyColors.gray),
                       )
                     ],
                   ),
@@ -169,75 +155,61 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
             ),
             const SizedBox(height: 14),
             ValueListenableBuilder(
-                valueListenable: durationStateNotifier,
-                builder: (context, DurationState value, child) {
-                  var buttonState = buttonNotifier.value;
-                  var currently = currentlyPlaying.value;
-                  bool isPlaying = currently?.title == widget.products.title &&
-                          buttonState == ButtonState.playing
-                      ? true
-                      : false;
+              valueListenable: durationStateNotifier,
+              builder: (context, DurationState value, child) {
+                var buttonState = buttonNotifier.value;
+                var currently = currentlyPlaying.value;
+                bool isPlaying = currently?.title == widget.products.title && buttonState == ButtonState.playing ? true : false;
 
-                  return Row(
-                    children: [
-                      AudioPlayerButton(
-                        onPlay: () async {
-                          widget.onTap();
-                        },
-                        onPause: () {
-                          audioHandler.pause();
-                        },
-                        title: widget.products.title ?? "",
-                        id: widget.products.id!,
-                      ),
-                      const SizedBox(width: 10),
-                      isLoading
-                          ? const SizedBox(
-                              width: 30,
-                              child: LinearProgressIndicator(
-                                  backgroundColor: Colors.transparent,
-                                  minHeight: 2,
-                                  color: MyColors.black))
-                          : Row(
-                              children: [
-                                (savedPosition > 0 || isPlaying)
-                                    ? AudioProgressBar(
-                                        totalDuration: duration,
-                                        title: widget.products.title ?? "",
-                                        savedPostion: Duration(
-                                            milliseconds: savedPosition),
-                                      )
-                                    : Container(),
-                                const SizedBox(width: 10),
-                                AudioplayerTimer(
-                                  id: widget.products.id!,
-                                  title: widget.products.title ?? "",
-                                  totalDuration: _totalduration,
-                                  savedDuration:
-                                      Duration(milliseconds: savedPosition),
-                                ),
-                              ],
-                            ),
-                      const Spacer(),
-                      if (username != "surgalt9@gmail.com" && isAuth)
-                        widget.products.isBought == false &&
-                                widget.products.title != "Танилцуулга"
-                            ? IconButton(
-                                splashRadius: 20,
-                                onPressed: () {
-                                  addToCard(cart);
-                                },
-                                icon: const Icon(IconlyLight.buy,
-                                    color: MyColors.gray))
-                            : Container(),
-                      IconButton(
-                          splashRadius: 20,
-                          onPressed: () {},
-                          icon: const Icon(Icons.more_horiz,
-                              color: MyColors.gray)),
-                    ],
-                  );
-                }),
+                return Row(
+                  children: [
+                    AudioPlayerButton(
+                      onPlay: () async {
+                        widget.onTap();
+                      },
+                      onPause: () {
+                        audioHandler.pause();
+                      },
+                      title: widget.products.title ?? "",
+                      id: widget.products.id!,
+                    ),
+                    const SizedBox(width: 10),
+                    isLoading
+                        ? const SizedBox(
+                            width: 30, child: LinearProgressIndicator(backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                        : Row(
+                            children: [
+                              (savedPosition > 0 || isPlaying)
+                                  ? AudioProgressBar(
+                                      totalDuration: duration,
+                                      title: widget.products.title ?? "",
+                                      savedPostion: Duration(milliseconds: savedPosition),
+                                    )
+                                  : Container(),
+                              const SizedBox(width: 10),
+                              AudioplayerTimer(
+                                id: widget.products.id!,
+                                title: widget.products.title ?? "",
+                                totalDuration: _totalduration,
+                                savedDuration: Duration(milliseconds: savedPosition),
+                              ),
+                            ],
+                          ),
+                    const Spacer(),
+                    if (username != "surgalt9@gmail.com" && isAuth)
+                      widget.products.isBought == false && widget.products.title != "Танилцуулга"
+                          ? IconButton(
+                              splashRadius: 20,
+                              onPressed: () {
+                                addToCard(cart);
+                              },
+                              icon: const Icon(IconlyLight.buy, color: MyColors.gray))
+                          : Container(),
+                    IconButton(splashRadius: 20, onPressed: () {}, icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
+                  ],
+                );
+              },
+            ),
             const SizedBox(height: 12)
           ],
         ));
@@ -250,27 +222,21 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
         enableDrag: true,
         backgroundColor: Colors.white,
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
-              builder:
-                  (BuildContext _, void Function(void Function()) setState) {
+              builder: (BuildContext _, void Function(void Function()) setState) {
                 // setState(() {});
-                return IntroAudio(
-                    products: widget.products, productsList: const []);
+                return IntroAudio(products: widget.products, productsList: const []);
               },
             ));
   }
 
   addToCard(cart) {
-    cart.addItemsIndex(widget.products.productId!,
-        albumID: widget.albumProducts?.productId!);
+    cart.addItemsIndex(widget.products.productId!, albumID: widget.albumProducts?.productId!);
     if (!cart.sameItemCheck) {
       cart.addProducts(widget.products);
       cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
-      TopSnackBar.successFactory(msg: "Сагсанд амжилттай нэмэгдлээ")
-          .show(context);
+      TopSnackBar.successFactory(msg: "Сагсанд амжилттай нэмэгдлээ").show(context);
     } else {
       TopSnackBar.errorFactory(msg: "Сагсанд байна").show(context);
     }

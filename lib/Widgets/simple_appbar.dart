@@ -1,4 +1,4 @@
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -11,8 +11,7 @@ class SimpleAppBar extends StatefulWidget with PreferredSizeWidget {
   final String? title;
   final bool noCard;
   final dynamic data;
-  const SimpleAppBar({Key? key, this.title, this.noCard = false, this.data})
-      : super(key: key);
+  const SimpleAppBar({Key? key, this.title, this.noCard = false, this.data}) : super(key: key);
 
   @override
   State<SimpleAppBar> createState() => _SimpleAppBarState();
@@ -43,10 +42,7 @@ class _SimpleAppBarState extends State<SimpleAppBar> {
       backgroundColor: Colors.white,
       elevation: 0,
       centerTitle: false,
-      leading: IconButton(
-          splashRadius: 20,
-          icon: const Icon(IconlyLight.arrow_left),
-          onPressed: () => Navigator.pop(context, widget.data)),
+      leading: IconButton(splashRadius: 20, icon: const Icon(IconlyLight.arrow_left), onPressed: () => Navigator.pop(context, widget.data)),
       actions: [
         widget.noCard || username == "surgalt9@gmail.com"
             ? Container()
@@ -56,28 +52,19 @@ class _SimpleAppBarState extends State<SimpleAppBar> {
                   radius: 22,
                   backgroundColor: MyColors.input,
                   child: Consumer<CartProvider>(
-                    builder: (context, value, child) => Badge(
-                      showBadge:
-                          value.getCounter() < 0 || value.getCounter() == 0
-                              ? false
-                              : true,
+                    builder: (context, value, child) => badges.Badge(
+                      showBadge: value.getCounter() < 0 || value.getCounter() == 0 ? false : true,
                       badgeContent: Text(
-                        value.getCounter() < 0
-                            ? "0"
-                            : value.getCounter().toString(),
+                        value.getCounter() < 0 ? "0" : value.getCounter().toString(),
                         style: const TextStyle(color: Colors.white),
                       ),
                       animationDuration: const Duration(milliseconds: 600),
                       child: IconButton(
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const CartScreen()));
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
                           },
                           splashRadius: 10,
-                          icon: const Icon(IconlyLight.buy,
-                              size: 28, color: MyColors.black)),
+                          icon: const Icon(IconlyLight.buy, size: 28, color: MyColors.black)),
                     ),
                   ),
                 ))

@@ -1,3 +1,5 @@
+import 'package:goodali/models/products_model.dart';
+
 class CourseLessonsTasksModel {
   String? body;
   int? id;
@@ -9,6 +11,9 @@ class CourseLessonsTasksModel {
   int? isAnswer;
   String? answerData;
   int? isAnswered;
+  int? duration;
+  int? position;
+  Products? products;
 
   CourseLessonsTasksModel(
       {this.body,

@@ -1,4 +1,4 @@
-package com.goodali.net
+package com.goodali.mn
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import com.ryanheise.audioservice.AudioServiceFragmentActivity;

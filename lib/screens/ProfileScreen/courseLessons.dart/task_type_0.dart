@@ -54,63 +54,40 @@ class _TaskType0State extends State<TaskType0> {
               Text(widget.courseTask.question ?? "", style: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 20)),
               const SizedBox(height: 20),
               Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child:
-                      // Platform.isAndroid?
-                      TextField(
-                          key: _orderFormKey,
-                          controller: widget.textController,
-                          cursorColor: MyColors.primaryColor,
-                          maxLength: 2000,
-                          maxLines: null,
-                          onChanged: (value) {
-                            setState(() {
-                              isTyping = true;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Хариулт",
-                            suffixIcon: isTyping
-                                ? GestureDetector(
-                                    onTap: () {
-                                      _controller.clear();
-                                      setState(() {
-                                        isTyping = false;
-                                      });
-                                    },
-                                    child: const Icon(Icons.close, color: MyColors.black),
-                                  )
-                                : const SizedBox(),
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: MyColors.border1),
-                            ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
-                            ),
-                          ))
-                  // : Focus(
-                  //     onFocusChange: (focus) {
-                  //       if (focus) {
-                  //         setState(() {
-                  //           boxSetting = boxHasFocus;
-                  //         });
-                  //       } else {
-                  //         setState(() {
-                  //           boxSetting = defaultBoxSetting;
-                  //         });
-                  //       }
-                  //     },
-                  //     child: CupertinoTextField(
-                  //         key: _orderFormKey,
-                  //         controller: widget.textController,
-                  //         cursorColor: MyColors.primaryColor,
-                  //         maxLength: 2000,
-                  //         maxLines: null,
-                  //         placeholder: "Хариулт",
-                  //         clearButtonMode: OverlayVisibilityMode.editing,
-                  //         decoration: boxSetting),
-                  //   ),
+                padding: const EdgeInsets.only(bottom: 20),
+                child: TextField(
+                  key: _orderFormKey,
+                  controller: widget.textController,
+                  cursorColor: MyColors.primaryColor,
+                  maxLength: 2000,
+                  maxLines: null,
+                  onChanged: (value) {
+                    setState(() {
+                      isTyping = true;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: "Хариулт",
+                    suffixIcon: isTyping
+                        ? GestureDetector(
+                            onTap: () {
+                              _controller.clear();
+                              setState(() {
+                                isTyping = false;
+                              });
+                            },
+                            child: const Icon(Icons.close, color: MyColors.black),
+                          )
+                        : const SizedBox(),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: MyColors.border1),
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                    ),
                   ),
+                ),
+              ),
             ],
           ),
         if (widget.courseTask.body != "" || widget.courseTask.body!.isNotEmpty)

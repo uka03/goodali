@@ -23,13 +23,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 final currentlyPlaying = ValueNotifier<Products?>(null);
 final playlistNotifier = ValueNotifier<List<String>>([]);
 final playerExpandProgress = ValueNotifier<double>(playerMinHeight);
-final currentPlayingItem =
-    ValueNotifier<MediaItem>(const MediaItem(id: "", title: ''));
+final currentPlayingItem = ValueNotifier<MediaItem>(const MediaItem(id: "", title: ''));
 
 final currentPlayingSong = ValueNotifier<String>("");
 
-final durationStateNotifier = ValueNotifier<DurationState>(
-    const DurationState(Duration.zero, Duration.zero, Duration.zero));
+final durationStateNotifier = ValueNotifier<DurationState>(const DurationState(Duration.zero, Duration.zero, Duration.zero));
 final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
 final progressNotifier = ValueNotifier<ProgressBarState>(const ProgressBarState(
   current: Duration.zero,
@@ -37,8 +35,7 @@ final progressNotifier = ValueNotifier<ProgressBarState>(const ProgressBarState(
   buffered: Duration.zero,
 ));
 
-final podcastsNotifier =
-    ValueNotifier<PodcastState>(const PodcastState([], false));
+final podcastsNotifier = ValueNotifier<PodcastState>(const PodcastState([], false));
 
 class AudioPlayerController with ChangeNotifier {
   AudioPlayer audioPlayer = AudioPlayer();
@@ -67,9 +64,7 @@ class AudioPlayerController with ChangeNotifier {
       //   log('${currentlyPlaying.value!.title}');
       // }
 
-      if ((processingState == AudioProcessingState.idle ||
-              processingState == AudioProcessingState.error) &&
-          !isPlaying) {
+      if ((processingState == AudioProcessingState.idle || processingState == AudioProcessingState.error) && !isPlaying) {
         // var item = currentlyPlaying.value;
         // if (item != null) {
         //   item.position = durationStateNotifier.value.progress!.inMilliseconds;
@@ -78,8 +73,7 @@ class AudioPlayerController with ChangeNotifier {
       }
       if (processingState == AudioProcessingState.ready && isPlaying == true) {
         buttonNotifier.value = ButtonState.playing;
-      } else if (processingState == AudioProcessingState.loading ||
-          processingState == AudioProcessingState.buffering) {
+      } else if (processingState == AudioProcessingState.loading || processingState == AudioProcessingState.buffering) {
         buttonNotifier.value = ButtonState.loading;
       } else if (!isPlaying) {
         buttonNotifier.value = ButtonState.paused;
@@ -129,9 +123,7 @@ class AudioPlayerController with ChangeNotifier {
   Future<int> getSavedPosition(AudioPlayerModel mediaItem) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> decodedAudioString = prefs.getStringList("save_audio") ?? [];
-    List<AudioPlayerModel> decodedProduct = decodedAudioString
-        .map((res) => AudioPlayerModel.fromJson(json.decode(res)))
-        .toList();
+    List<AudioPlayerModel> decodedProduct = decodedAudioString.map((res) => AudioPlayerModel.fromJson(json.decode(res))).toList();
     int savedPosition = 0;
 
     for (var item in decodedProduct) {
@@ -148,23 +140,17 @@ class AudioPlayerController with ChangeNotifier {
     List<AudioPlayerModel> _audioItems = [];
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _audioItems.add(audio);
-    List<String> encodedProducts =
-        _audioItems.map((res) => json.encode(res.toJson())).toList();
+    List<String> encodedProducts = _audioItems.map((res) => json.encode(res.toJson())).toList();
     prefs.setStringList("save_audio", encodedProducts);
   }
 
   Future<FileInfo?> checkCachefor(String url) async {
-    final FileInfo? value =
-        await CustomCacheManager.instance.getFileFromCache(url);
+    final FileInfo? value = await CustomCacheManager.instance.getFileFromCache(url);
     return value;
   }
 
-  toAudioModel(Products item) => AudioPlayerModel(
-      productID: item.productId,
-      audioPosition: 0,
-      audioUrl: item.audio,
-      banner: item.banner,
-      title: item.title);
+  toAudioModel(Products item) =>
+      AudioPlayerModel(productID: item.productId, audioPosition: 0, audioUrl: item.audio, banner: item.banner, title: item.title);
 
   toMediaItem(AudioPlayerModel products) => MediaItem(
       id: products.productID.toString(),
@@ -180,20 +166,14 @@ Future<bool> initiliazePodcast() async {
   List<MediaItem> mediaItems = [];
   audioHandler.queue.value.clear();
 
-  log(activeList.length.toString(), name: "lesture list");
+  log("initiliazePodcast");
 
   for (var item in activeList) {
     MediaItem mediaItem = MediaItem(
       id: item.id.toString(),
-      artUri: Uri.parse(Urls.networkPath + item.banner!),
       title: item.title!,
-      duration: item.duration != 0 && item.duration != null
-          ? Duration(milliseconds: item.duration!)
-          : null,
-      extras: {
-        'url': Urls.networkPath + item.audio!,
-        'downloadedPath': item.downloadedPath ?? ""
-      },
+      duration: item.duration != 0 && item.duration != null ? Duration(milliseconds: item.duration!) : null,
+      extras: {'url': Urls.networkPath + item.audio!, 'downloadedPath': item.downloadedPath ?? ""},
     );
 
     mediaItems.add(mediaItem);
@@ -203,8 +183,7 @@ Future<bool> initiliazePodcast() async {
   //Queue рүү нэмнэ.
 
   var firstItem = await audioHandler.queue.first;
-  if (audioHandler.queue.value.isEmpty ||
-      identical(firstItem, mediaItems.first) == true) {
+  if (audioHandler.queue.value.isEmpty || identical(firstItem, mediaItems.first) == true) {
     log("initiliaze add queue lecture", name: mediaItems.length.toString());
     await audioHandler.addQueueItems(mediaItems);
 
