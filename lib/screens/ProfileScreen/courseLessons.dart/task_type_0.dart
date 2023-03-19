@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -35,6 +36,8 @@ class _TaskType0State extends State<TaskType0> {
   void initState() {
     _controller = widget.textController;
     _controller.text = widget.courseTask.answerData ?? "";
+    log('[TaskType0] {initState} answerData: ${widget.courseTask.answerData}');
+
     boxSetting = defaultBoxSetting;
 
     super.initState();

@@ -39,7 +39,9 @@ class CourseTasks extends StatefulWidget {
   final String? title;
   final List<CourseLessonsTasksModel> courseTasks;
   final double? initialPage;
-  const CourseTasks({Key? key, this.title, required this.courseTasks, this.initialPage}) : super(key: key);
+  final String? banner;
+  final String? lessonName;
+  const CourseTasks({Key? key, this.title, required this.courseTasks, this.initialPage, this.banner, this.lessonName}) : super(key: key);
 
   @override
   State<CourseTasks> createState() => _CourseTasksState();
@@ -72,6 +74,7 @@ class _CourseTasksState extends State<CourseTasks> {
   void initState() {
     for (var i = 0; i < widget.courseTasks.length; i++) {
       TextEditingController controller = TextEditingController();
+      // log('[CourseTasks] {initState} answerData: ${widget.courseTasks[i].answerData}');
       controller.text = widget.courseTasks[i].answerData ?? "";
       _controllers.add(controller);
 
@@ -259,7 +262,13 @@ class _CourseTasksState extends State<CourseTasks> {
 
     if (_controllers[_current.toInt()].text != "" || _checkboxValue[_current.toInt()] == true || widget.courseTasks[_current.toInt()].isAnswer == 0) {
       print("hadgalagdlee");
-      await saveAnswer(widget.courseTasks[_current.toInt()].id.toString(), _controllers[_current.toInt()].text, 1);
+      String answerData = _controllers[_current.toInt()].text.toString();
+      await saveAnswer(widget.courseTasks[_current.toInt()].id.toString(), answerData, 1);
+      setState(() {
+        widget.courseTasks[_current.toInt()].answerData = _controllers[_current.toInt()].text.toString();
+      });
+      log('[CourseTasks] {_onPressed} answerData: $answerData');
+
       await TopSnackBar.successFactory(msg: "Амжилттай хадгалагдлаа", duration: 1).show(context);
       if (_current + 1 == widget.courseTasks.length) {
         Navigator.pop(context, _current);
@@ -313,60 +322,65 @@ class _CourseTasksState extends State<CourseTasks> {
   }
 
   Widget exercise(CourseLessonsTasksModel courseTask, int index) {
-    return Column(
-      children: [
-        if (courseTask.body != "" || courseTask.body!.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-            child: HtmlWidget(
-              courseTask.body ?? "",
-              textStyle: const TextStyle(fontFamily: "Gilroy", height: 1.6),
-            ),
-          ),
-        if (courseTask.listenAudio != null && courseTask.listenAudio != 'Audio failed to upload')
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-            child: listen(index),
-          ),
-        if (courseTask.isAnswer == 1)
-          TextField(
-            controller: _controllers[index],
-            maxLength: 2000,
-            maxLines: null,
-            cursorColor: MyColors.primaryColor,
-            onTap: () => setState(() {
-              isTyping = true;
-            }),
-            decoration: InputDecoration(
-              hintText: "Хариулт",
-              suffixIcon: isTyping
-                  ? GestureDetector(
-                      onTap: () {
-                        _controllers[index].text = "";
-                        setState(() {
-                          isTyping = false;
-                        });
-                      },
-                      child: const Icon(Icons.close, color: MyColors.black),
-                    )
-                  : const SizedBox(),
-              enabledBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.border1),
-              ),
-              focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          if (courseTask.body != "" || courseTask.body!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: HtmlWidget(
+                courseTask.body ?? "",
+                textStyle: const TextStyle(fontFamily: "Gilroy", height: 1.6),
               ),
             ),
-          ),
-      ],
+          if (courseTask.listenAudio != null && courseTask.listenAudio != 'Audio failed to upload')
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              child: listen(index),
+            ),
+          if (courseTask.isAnswer == 1)
+            TextField(
+              controller: _controllers[index],
+              maxLength: 2000,
+              maxLines: null,
+              cursorColor: MyColors.primaryColor,
+              onTap: () => setState(() {
+                isTyping = true;
+              }),
+              decoration: InputDecoration(
+                hintText: "Хариулт",
+                suffixIcon: isTyping
+                    ? GestureDetector(
+                        onTap: () {
+                          _controllers[index].text = "";
+                          setState(() {
+                            isTyping = false;
+                          });
+                        },
+                        child: const Icon(Icons.close, color: MyColors.black),
+                      )
+                    : const SizedBox(),
+                enabledBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: MyColors.border1),
+                ),
+                focusedBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
   Widget listen(index) {
     Products prodItem = Products(
       title: widget.title,
+      banner: widget.banner,
       id: widget.courseTasks[index].id,
-      albumTitle: widget.title,
+      body: widget.courseTasks[index].body,
+      albumTitle: widget.lessonName,
       audio: widget.courseTasks[index].listenAudio,
       productId: widget.courseTasks[index].id,
       duration: 0,
@@ -379,7 +393,7 @@ class _CourseTasksState extends State<CourseTasks> {
     initiliazeAudio(Urls.networkPath + widget.courseTasks[index].listenAudio!, widget.courseTasks[index].id ?? 0);
 
     return Column(
-      children: [audioPlayerWidget(index)],
+      children: [audioPlayerWidget(index, prodItem)],
     );
   }
 
@@ -525,6 +539,7 @@ class _CourseTasksState extends State<CourseTasks> {
     final mediaInfo = mediaInfoSession.getMediaInformation()!;
     final double _duration = double.parse(mediaInfo.getDuration()!);
     products.duration = (_duration * 1000).toInt();
+    // await products.save();
     return Duration(milliseconds: (_duration * 1000).toInt());
   }
 
@@ -543,7 +558,7 @@ class _CourseTasksState extends State<CourseTasks> {
     );
     return true;
   }
-
+/* 
   Widget audioPlayerWidget(int index) {
     return ValueListenableBuilder(
         valueListenable: progressNotifier,
@@ -579,12 +594,12 @@ class _CourseTasksState extends State<CourseTasks> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        /* InkWell(
+        InkWell(
           onTap: () {
             buttonBackWard5Seconds(currentDuration);
           },
           child: SvgPicture.asset("assets/images/replay_5.svg", color: MyColors.primaryColor),
-        ), */
+        ),
         CircleAvatar(
           radius: 36,
           backgroundColor: MyColors.primaryColor,
@@ -625,14 +640,126 @@ class _CourseTasksState extends State<CourseTasks> {
             },
           ),
         ),
-        /* InkWell(
+        InkWell(
           onTap: () {
             buttonForward15Seconds(currentDuration, totalDuration);
           },
           child: SvgPicture.asset("assets/images/forward_15.svg", color: MyColors.primaryColor),
-        ), */
+        ),
       ],
     );
+  }
+ */
+
+  Widget audioPlayerWidget(int index, Products prod) {
+    return ValueListenableBuilder(
+        valueListenable: progressNotifier,
+        builder: (context, ProgressBarState value, child) {
+          currentDuration = value.current;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                prog.ProgressBar(
+                  progress: currentDuration,
+                  buffered: currentDuration,
+                  total: totalDuration,
+                  thumbGlowColor: MyColors.primaryColor,
+                  timeLabelTextStyle: const TextStyle(color: MyColors.gray),
+                  baseBarColor: MyColors.border1,
+                  progressBarColor: MyColors.primaryColor,
+                  thumbColor: MyColors.primaryColor,
+                  bufferedBarColor: MyColors.primaryColor.withAlpha(20),
+                  onSeek: (duration) {
+                    audioHandler.seek(duration);
+                  },
+                ),
+                const SizedBox(height: 20),
+                playerButton(index, prod)
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget playerButton(int index, Products prod) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        InkWell(
+          onTap: () {
+            buttonBackWard5Seconds(currentDuration);
+          },
+          child: SvgPicture.asset("assets/images/replay_5.svg", color: MyColors.primaryColor),
+        ),
+        CircleAvatar(
+          radius: 36,
+          backgroundColor: MyColors.primaryColor,
+          child: ValueListenableBuilder(
+            valueListenable: buttonNotifier,
+            builder: (BuildContext context, ButtonState? buttonValue, Widget? child) {
+              bool isPlaying = buttonValue == ButtonState.playing ? true : false;
+              bool isBuffering = buttonValue == ButtonState.loading ? true : false;
+
+              if (isBuffering) {
+                return const CircularProgressIndicator(color: Colors.white);
+              } else if (isPlaying != true) {
+                return IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.white,
+                    size: 40.0,
+                  ),
+                  onPressed: () {
+                    onPlayButtonClicked(prod);
+                  },
+                );
+              } else {
+                return IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.pause_rounded,
+                    color: Colors.white,
+                    size: 40.0,
+                  ),
+                  onPressed: () async {
+                    // await updateSavedPosition();
+                    audioHandler.pause();
+                  },
+                );
+              }
+            },
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            buttonForward15Seconds(currentDuration, totalDuration);
+          },
+          child: SvgPicture.asset("assets/images/forward_15.svg", color: MyColors.primaryColor),
+        ),
+      ],
+    );
+  }
+
+  buttonBackWard5Seconds(Duration position) {
+    position = position - const Duration(seconds: 5);
+
+    if (position < const Duration(seconds: 0)) {
+      audioHandler.seek(const Duration(seconds: 0));
+    } else {
+      audioHandler.seek(position);
+    }
+  }
+
+  buttonForward15Seconds(Duration position, Duration duration) {
+    position = position + const Duration(seconds: 15);
+
+    if (duration > position) {
+      audioHandler.seek(position);
+    } else if (duration < position) {
+      audioHandler.seek(duration);
+    }
   }
 
   onPlayButtonClicked(Products products) async {

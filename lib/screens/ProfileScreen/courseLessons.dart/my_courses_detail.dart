@@ -16,12 +16,7 @@ class MyCoursesDetail extends StatefulWidget {
   final CoursesItems coursesItems;
   final String lessonName;
   final String? body;
-  const MyCoursesDetail(
-      {Key? key,
-      required this.coursesItems,
-      required this.lessonName,
-      this.body})
-      : super(key: key);
+  const MyCoursesDetail({Key? key, required this.coursesItems, required this.lessonName, this.body}) : super(key: key);
 
   @override
   State<MyCoursesDetail> createState() => _MyCoursesDetailState();
@@ -59,10 +54,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
             const SizedBox(height: 20),
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: ImageView(
-                  imgPath: widget.coursesItems.banner ?? "",
-                  width: 190,
-                  height: 190),
+              child: ImageView(imgPath: widget.coursesItems.banner ?? "", width: 190, height: 190),
               //     Container(
               //   color: Colors.blueGrey,
               //   width: 190,
@@ -72,17 +64,13 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
             const SizedBox(height: 20),
             Text(
               widget.lessonName,
-              style: const TextStyle(
-                  fontSize: 20,
-                  color: MyColors.black,
-                  fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             FutureBuilder(
               future: future,
               builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                   List<Lesson?> lessons = snapshot.data;
 
                   if (lessons.isNotEmpty) {
@@ -94,17 +82,17 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                         int allTasks = lessons[index]?.allTask ?? 0;
                         int doneTasks = lessons[index]?.done ?? 0;
 
-                        String tasks =
-                            doneTasks.toString() + "/" + allTasks.toString();
+                        String tasks = doneTasks.toString() + "/" + allTasks.toString();
 
                         return ListTile(
                           iconColor: MyColors.black,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 20),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                           onTap: () => _openLesson(
-                              lessons[index]?.name ?? "",
-                              lessons[index]!.id.toString(),
-                              lessons[index]!.isBought!),
+                            lessons[index]?.name ?? "",
+                            lessons[index]!.id.toString(),
+                            lessons[index]!.isBought!,
+                            lessons[index]!.banner!,
+                          ),
                           subtitle: Row(children: [
                             Text(
                               tasks,
@@ -117,8 +105,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
                             //     : dateTimeFormatter(
                             //         lessons[index]?.expiry ?? "")),
                           ]),
-                          trailing: const Icon(IconlyLight.arrow_right_2,
-                              size: 18, color: MyColors.gray),
+                          trailing: const Icon(IconlyLight.arrow_right_2, size: 18, color: MyColors.gray),
                           title: Text(
                             lessons[index]?.name ?? "",
                             style: const TextStyle(
@@ -152,12 +139,10 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
     });
   }
 
-  _openLesson(String name, String id, int isOpened) {
+  _openLesson(String name, String id, int isOpened, String banner) {
     if (isOpened == 1) {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => CourseLessonType(title: name, id: id)));
+          context, MaterialPageRoute(builder: (_) => CourseLessonType(title: name, id: id, banner: banner, lessonName: widget.lessonName)));
     } else {
       TopSnackBar.errorFactory(msg: "Түгжээтэй контент").show(context);
     }
@@ -165,8 +150,7 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
 
   Future<List<Lesson?>> getCoursesLessons() async {
     List<Lesson?> courseLessons = [];
-    courseLessons = await Connection.getCoursesLessons(
-        context, widget.coursesItems.id.toString());
+    courseLessons = await Connection.getCoursesLessons(context, widget.coursesItems.id.toString());
 
     return courseLessons;
   }

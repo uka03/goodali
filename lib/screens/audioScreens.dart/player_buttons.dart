@@ -22,8 +22,7 @@ class PlayerButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: buttonNotifier,
-      builder:
-          (BuildContext context, ButtonState? buttonValue, Widget? widget) {
+      builder: (BuildContext context, ButtonState? buttonValue, Widget? widget) {
         switch (buttonValue) {
           case ButtonState.loading:
             return const CircularProgressIndicator(color: Colors.white);
@@ -48,8 +47,12 @@ class PlayerButtons extends StatelessWidget {
                 size: 40.0,
               ),
               onPressed: () async {
-                await updateSavedPosition();
                 audioHandler.pause();
+                try {
+                  await updateSavedPosition();
+                } catch (e) {
+                  debugPrint(e.toString());
+                }
               },
             );
           default:
