@@ -29,12 +29,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
 class Connection {
-  static Future<Map<String, dynamic>> userRegister(
-      BuildContext context, dynamic data) async {
+  static Future<Map<String, dynamic>> userRegister(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .post(Urls.signup, data: data);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.signup, data: data);
 
       if (response.data["status"] == 1) {
         return {"success": true};
@@ -44,54 +41,40 @@ class Connection {
     } on DioError catch (e) {
       print(e.type);
       if (e.type == DioErrorType.other) {
-        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
-            .show(context);
+        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
-        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа")
-            .show(context);
+        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа").show(context);
       }
       return {};
     }
   }
 
-  static Future<List<Products>> getProducts(
-      BuildContext context, String id) async {
+  static Future<List<Products>> getProducts(BuildContext context, String id) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .get(Urls.getProducts + id);
+      final response = await Http().getDio(context, headerTypeNone).get(Urls.getProducts + id);
 
       if (response.data != null) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else {
         return [];
       }
     } on DioError catch (e) {
       print(e.type);
       if (e.type == DioErrorType.other) {
-        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
-            .show(context);
+        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
-        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа")
-            .show(context);
+        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа").show(context);
       }
       return [];
     }
   }
 
-  static Future<List<Products>> getTrainingDetail(
-      BuildContext context, String id) async {
+  static Future<List<Products>> getTrainingDetail(BuildContext context, String id) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .post(Urls.getTrainingDetail, data: {"training_id": id});
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.getTrainingDetail, data: {"training_id": id});
 
       if (response.data != null) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -101,17 +84,12 @@ class Connection {
     }
   }
 
-  static Future<List<GetMoodList>> getMoodList(
-      BuildContext context, String id) async {
+  static Future<List<GetMoodList>> getMoodList(BuildContext context, String id) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .post(Urls.getMoodList, data: {"mood_id": id});
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.getMoodList, data: {"mood_id": id});
 
       if (response.data != null) {
-        return (response.data as List)
-            .map((e) => GetMoodList.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => GetMoodList.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -123,13 +101,10 @@ class Connection {
 
   static Future<List<Products>> getMoodMain(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.getMoodMain);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.getMoodMain);
 
       if (response.data != null) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -139,17 +114,12 @@ class Connection {
     }
   }
 
-  static Future<List<Products>> getMoodItem(
-      BuildContext context, String id) async {
+  static Future<List<Products>> getMoodItem(BuildContext context, String id) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .post(Urls.getMoodItem, data: {"mood_list_id": id});
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.getMoodItem, data: {"mood_list_id": id});
 
       if (response.data != null) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -159,25 +129,18 @@ class Connection {
     }
   }
 
-  static Future<Map<String, dynamic>> createOrderRequest(
-      BuildContext context, int invoiceType, List<int> productIDs) async {
+  static Future<Map<String, dynamic>> createOrderRequest(BuildContext context, int invoiceType, List<int> productIDs) async {
     var data = {"invoice_type": invoiceType, "product_ids": productIDs};
     print("data $data");
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.orderRequest, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.orderRequest, data: data);
 
       if (response.statusCode == 200) {
         print("success");
         print(response.data);
         return {
           "success": true,
-          "data": invoiceType == 0
-              ? (response.data['urls'] as List)
-                  .map((e) => QpayURLS.fromJson(e))
-                  .toList()
-              : response.data
+          "data": invoiceType == 0 ? (response.data['urls'] as List).map((e) => QpayURLS.fromJson(e)).toList() : response.data
         };
       } else {
         print("error");
@@ -189,12 +152,9 @@ class Connection {
     }
   }
 
-  static Future<Map<String, dynamic>> resetPassword(
-      BuildContext context, dynamic data) async {
+  static Future<Map<String, dynamic>> resetPassword(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.passwordChange, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.passwordChange, data: data);
       print(response.data);
       if (response.statusCode == 200 && response.data['status'] == 1) {
         return {"success": true};
@@ -211,13 +171,10 @@ class Connection {
 
   static Future<List<ArticleModel>> getArticle(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.getArticle);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.getArticle);
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => ArticleModel.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => ArticleModel.fromJson(e)).toList();
       } else {
         print("error");
         return [];
@@ -229,19 +186,12 @@ class Connection {
     }
   }
 
-  static Future<Map<String, dynamic>> editUserData(
-      BuildContext context, String nickname) async {
+  static Future<Map<String, dynamic>> editUserData(BuildContext context, String nickname) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.editUserData, data: {"nickname": nickname});
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.editUserData, data: {"nickname": nickname});
 
       if (response.data['status'] == 1) {
-        return {
-          'success': true,
-          'name': response.data['name']['data'],
-          'avatar': response.data['name']["avatar"]
-        };
+        return {'success': true, 'name': response.data['name']['data'], 'avatar': response.data['name']["avatar"]};
       } else {
         return {'succes': false};
       }
@@ -252,17 +202,12 @@ class Connection {
     }
   }
 
-  static Future<List<Products>> getAlbumLectures(
-      BuildContext context, String albumId) async {
+  static Future<List<Products>> getAlbumLectures(BuildContext context, String albumId) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .post(Urls.lectureList, data: {"album_id": albumId});
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.lectureList, data: {"album_id": albumId});
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else {
         print("error");
         return [];
@@ -274,17 +219,11 @@ class Connection {
     }
   }
 
-  static Future<Map<String, dynamic>> uploadUserAvatar(
-      BuildContext context, File imageFile) async {
+  static Future<Map<String, dynamic>> uploadUserAvatar(BuildContext context, File imageFile) async {
     try {
       String imagePath = imageFile.path.split('/').last;
-      FormData data = FormData.fromMap({
-        "image":
-            await MultipartFile.fromFile(imageFile.path, filename: imagePath)
-      });
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.uploadUserAvatar, data: data);
+      FormData data = FormData.fromMap({"image": await MultipartFile.fromFile(imageFile.path, filename: imagePath)});
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.uploadUserAvatar, data: data);
       print("upload user avatar ${response.data}");
       if (response.data['status'] == 1) {
         return {'success': true, 'avatar': response.data["resp"]};
@@ -300,14 +239,10 @@ class Connection {
 
   static Future<List<Products>> getBougthAlbums(BuildContext context) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .get(Urls.getBoughtAlbums);
+      final response = await Http().getDio(context, headerTypebearer).get(Urls.getBoughtAlbums);
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       }
@@ -324,14 +259,10 @@ class Connection {
 
   static Future<List<Products>> getAllLectures(BuildContext context) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .get(Urls.getAllLectures);
+      final response = await Http().getDio(context, headerTypebearer).get(Urls.getAllLectures);
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -345,12 +276,9 @@ class Connection {
     }
   }
 
-  static Future<Map<String, dynamic>> forgotPassword(
-      BuildContext context, String email) async {
+  static Future<Map<String, dynamic>> forgotPassword(BuildContext context, String email) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .post(Urls.forgotPassword, data: {"email": email});
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.forgotPassword, data: {"email": email});
 
       print(response.data);
       if (response.statusCode == 200 && response.data["status"] == 1) {
@@ -363,8 +291,7 @@ class Connection {
       }
     } on DioError catch (e) {
       if (e.type == DioErrorType.other) {
-        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
-            .show(context);
+        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       }
       return {};
     }
@@ -372,15 +299,12 @@ class Connection {
 
   static Future<List<Products>> getBoughtCourses(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypebearer).get(Urls.getCourses);
+      final response = await Http().getDio(context, headerTypebearer).get(Urls.getCourses);
 
-      print("getBoughtCourses ${response.data}");
+      // print("getBoughtCourses ${response.data}");
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -394,17 +318,12 @@ class Connection {
     }
   }
 
-  static Future<List<CoursesItems>> getBoughtCoursesItems(
-      BuildContext context, String id) async {
+  static Future<List<CoursesItems>> getBoughtCoursesItems(BuildContext context, String id) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .get(Urls.getCoursesItem + id);
+      final response = await Http().getDio(context, headerTypebearer).get(Urls.getCoursesItem + id);
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => CoursesItems.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => CoursesItems.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -423,13 +342,10 @@ class Connection {
       var prefs = await SharedPreferences.getInstance();
       var token = prefs.getString('token');
       var url = Uri.parse(Urls.albumListLogged);
-      var response =
-          await http.post(url, headers: {"Authorization": "Bearer $token"});
+      var response = await http.post(url, headers: {"Authorization": "Bearer $token"});
 
       if (response.statusCode == 200) {
-        return (jsonDecode(response.body) as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (jsonDecode(response.body) as List).map((e) => Products.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -443,17 +359,12 @@ class Connection {
     }
   }
 
-  static Future<List<Products>> getLectureListLogged(
-      BuildContext context, String id) async {
+  static Future<List<Products>> getLectureListLogged(BuildContext context, String id) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.lectureListLogged, data: {"album_id": id});
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.lectureListLogged, data: {"album_id": id});
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -467,17 +378,12 @@ class Connection {
     }
   }
 
-  static Future<List<Products>> getTrainingDetailLogged(
-      BuildContext context, String id) async {
+  static Future<List<Products>> getTrainingDetailLogged(BuildContext context, String id) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.trainingDetailLogged, data: {"training_id": id});
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.trainingDetailLogged, data: {"training_id": id});
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -491,13 +397,10 @@ class Connection {
     }
   }
 
-  static Future<List<Lesson>> getCoursesLessons(
-      BuildContext context, String id) async {
+  static Future<List<Lesson>> getCoursesLessons(BuildContext context, String id) async {
     print("getCoursesLessons $id");
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .get(Urls.getCoursesLessons + id);
+      final response = await Http().getDio(context, headerTypebearer).get(Urls.getCoursesLessons + id);
 
       if (response.statusCode == 200) {
         return (response.data as List).map((e) => Lesson.fromJson(e)).toList();
@@ -514,17 +417,12 @@ class Connection {
     }
   }
 
-  static Future<List<CourseLessonsTasksModel>> getCoursesTasks(
-      BuildContext context, String id) async {
+  static Future<List<CourseLessonsTasksModel>> getCoursesTasks(BuildContext context, String id) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .get(Urls.getCoursesTasks + id);
+      final response = await Http().getDio(context, headerTypebearer).get(Urls.getCoursesTasks + id);
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => CourseLessonsTasksModel.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => CourseLessonsTasksModel.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -538,12 +436,9 @@ class Connection {
     }
   }
 
-  static Future<Map<String, dynamic>> saveAnswer(
-      BuildContext context, dynamic data) async {
+  static Future<Map<String, dynamic>> saveAnswer(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.saveAnswerData, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.saveAnswerData, data: data);
 
       if (response.statusCode == 200) {
         return {"success": true};
@@ -562,13 +457,10 @@ class Connection {
 
   static Future<List<Products>> getPodcastList(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.podcastList);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.podcastList);
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -580,13 +472,10 @@ class Connection {
 
   static Future<List<VideoModel>> getVideoList(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.videoList);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.videoList);
 
       if (response.statusCode == 200) {
-        return (response.data as List)
-            .map((e) => VideoModel.fromJson(e))
-            .toList();
+        return (response.data as List).map((e) => VideoModel.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -596,12 +485,9 @@ class Connection {
     }
   }
 
-  static Future<Map<String, dynamic>> insertPost(
-      BuildContext context, dynamic data) async {
+  static Future<Map<String, dynamic>> insertPost(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.insertPost, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.insertPost, data: data);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
@@ -624,14 +510,11 @@ class Connection {
 
   static Future<List<TagModel>> getTagList(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.getTagList);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.getTagList);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
-          return (response.data['data'] as List)
-              .map((e) => TagModel.fromJson(e))
-              .toList();
+          return (response.data['data'] as List).map((e) => TagModel.fromJson(e)).toList();
         }
         return [];
       } else if (response.statusCode == 401) {
@@ -647,18 +530,13 @@ class Connection {
     }
   }
 
-  static Future<List<PostListModel>> getPostList(
-      BuildContext context, dynamic data) async {
+  static Future<List<PostListModel>> getPostList(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.getPostList, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.getPostList, data: data);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
-          return (response.data['data'] as List)
-              .map((e) => PostListModel.fromJson(e))
-              .toList();
+          return (response.data['data'] as List).map((e) => PostListModel.fromJson(e)).toList();
         } else {
           return [];
         }
@@ -673,12 +551,9 @@ class Connection {
     }
   }
 
-  static Future<bool> insertPostLiske(
-      BuildContext context, dynamic data) async {
+  static Future<bool> insertPostLiske(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.insertPostLike, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.insertPostLike, data: data);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
@@ -697,12 +572,9 @@ class Connection {
     }
   }
 
-  static Future<bool> insertPostReply(
-      BuildContext context, dynamic data) async {
+  static Future<bool> insertPostReply(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.insertPostReply, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.insertPostReply, data: data);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
@@ -721,18 +593,13 @@ class Connection {
     }
   }
 
-  static Future<List<ArticleModel>> getSimilarPost(
-      BuildContext context, dynamic data) async {
+  static Future<List<ArticleModel>> getSimilarPost(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.getSimilarPost, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.getSimilarPost, data: data);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
-          return (response.data['data'] as List)
-              .map((e) => ArticleModel.fromJson(e))
-              .toList();
+          return (response.data['data'] as List).map((e) => ArticleModel.fromJson(e)).toList();
         } else {
           return [];
         }
@@ -747,17 +614,12 @@ class Connection {
     }
   }
 
-  static Future<List<VideoModel>> getSimilarVideo(
-      BuildContext context, dynamic data) async {
+  static Future<List<VideoModel>> getSimilarVideo(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.getSimilarVideo, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.getSimilarVideo, data: data);
 
       if (response.statusCode == 200) {
-        return (response.data["data"] as List)
-            .map((e) => VideoModel.fromJson(e))
-            .toList();
+        return (response.data["data"] as List).map((e) => VideoModel.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -769,13 +631,10 @@ class Connection {
 
   static Future<List<BannerModel>> getBannerList(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.getBannerList);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.getBannerList);
 
       if (response.statusCode == 200 && response.data["status"] == 1) {
-        return (response.data['data'] as List)
-            .map((e) => BannerModel.fromJson(e))
-            .toList();
+        return (response.data['data'] as List).map((e) => BannerModel.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -785,17 +644,12 @@ class Connection {
     }
   }
 
-  static Future<List<SearchModel>> getSearchText(BuildContext context,
-      {String? query}) async {
+  static Future<List<SearchModel>> getSearchText(BuildContext context, {String? query}) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .post(Urls.search, data: {"value": query});
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.search, data: {"value": query});
 
       if (response.statusCode == 200 && response.data["status"] == 1) {
-        return (response.data['data'] as List)
-            .map((e) => SearchModel.fromJson(e))
-            .toList();
+        return (response.data['data'] as List).map((e) => SearchModel.fromJson(e)).toList();
       } else {
         return [];
       }
@@ -807,9 +661,7 @@ class Connection {
 
   static Future<bool> postDislike(BuildContext context, dynamic data) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.postDislike, data: data);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.postDislike, data: data);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
@@ -829,9 +681,7 @@ class Connection {
 
   static Future<bool> accountDeletion(BuildContext context) async {
     try {
-      final response = await Http()
-          .getDio(context, headerTypebearer)
-          .post(Urls.accountDeletion);
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.accountDeletion);
 
       if (response.statusCode == 200) {
         if (response.data['status'] == 1) {
@@ -851,13 +701,10 @@ class Connection {
 
   static Future<List<Products>> specialList(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.specialList);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.specialList);
 
       if (response.data["status"] == 1) {
-        return (response.data['data'] as List)
-            .map((e) => Products.fromJson(e))
-            .toList();
+        return (response.data['data'] as List).map((e) => Products.fromJson(e)).toList();
       } else {
         developer.log("error");
         return [];
@@ -870,13 +717,10 @@ class Connection {
 
   static Future<List<FaqModel>> faqList(BuildContext context) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.faqList);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.faqList);
 
       if (response.data["status"] == 1) {
-        return (response.data['data'] as List)
-            .map((e) => FaqModel.fromJson(e))
-            .toList();
+        return (response.data['data'] as List).map((e) => FaqModel.fromJson(e)).toList();
       } else {
         developer.log("error");
         return [];

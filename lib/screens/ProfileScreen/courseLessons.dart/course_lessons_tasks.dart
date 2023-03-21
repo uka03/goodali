@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart' as prog;
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -15,10 +14,10 @@ import 'package:goodali/Widgets/audio_progressbar.dart';
 import 'package:goodali/Widgets/audioplayer_button.dart';
 import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
+import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
-
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
@@ -27,7 +26,6 @@ import 'package:goodali/controller/progress_notifier.dart';
 import 'package:goodali/models/audio_player_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/products_model.dart';
-
 import 'package:goodali/models/task_answer.dart';
 import 'package:goodali/screens/ProfileScreen/courseLessons.dart/task_type_0.dart';
 import 'package:goodali/screens/audioScreens.dart/task_video_player.dart';
@@ -39,9 +37,8 @@ class CourseTasks extends StatefulWidget {
   final String? title;
   final List<CourseLessonsTasksModel> courseTasks;
   final double? initialPage;
-  final String? banner;
   final String? lessonName;
-  const CourseTasks({Key? key, this.title, required this.courseTasks, this.initialPage, this.banner, this.lessonName}) : super(key: key);
+  const CourseTasks({Key? key, this.title, required this.courseTasks, this.initialPage, this.lessonName}) : super(key: key);
 
   @override
   State<CourseTasks> createState() => _CourseTasksState();
@@ -322,54 +319,77 @@ class _CourseTasksState extends State<CourseTasks> {
   }
 
   Widget exercise(CourseLessonsTasksModel courseTask, int index) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: Column(
-        children: [
-          if (courseTask.body != "" || courseTask.body!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-              child: HtmlWidget(
-                courseTask.body ?? "",
-                textStyle: const TextStyle(fontFamily: "Gilroy", height: 1.6),
-              ),
-            ),
-          if (courseTask.listenAudio != null && courseTask.listenAudio != 'Audio failed to upload')
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-              child: listen(index),
-            ),
-          if (courseTask.isAnswer == 1)
-            TextField(
-              controller: _controllers[index],
-              maxLength: 2000,
-              maxLines: null,
-              cursorColor: MyColors.primaryColor,
-              onTap: () => setState(() {
-                isTyping = true;
-              }),
-              decoration: InputDecoration(
-                hintText: "Хариулт",
-                suffixIcon: isTyping
-                    ? GestureDetector(
-                        onTap: () {
-                          _controllers[index].text = "";
-                          setState(() {
-                            isTyping = false;
-                          });
-                        },
-                        child: const Icon(Icons.close, color: MyColors.black),
-                      )
-                    : const SizedBox(),
-                enabledBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: MyColors.border1),
-                ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            if (courseTask.banner != null && courseTask.banner != "Image failed to upload") banner(courseTask.banner!),
+            if (courseTask.body != "" || courseTask.body!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                child: HtmlWidget(
+                  courseTask.body ?? "",
+                  textStyle: const TextStyle(fontFamily: "Gilroy", height: 1.6),
                 ),
               ),
-            ),
-        ],
+            if (courseTask.listenAudio != null && courseTask.listenAudio != 'Audio failed to upload')
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                child: listen(index),
+              ),
+            if (courseTask.isAnswer == 1)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: TextField(
+                  controller: _controllers[index],
+                  maxLength: 2000,
+                  maxLines: null,
+                  cursorColor: MyColors.primaryColor,
+                  onTap: () => setState(() {
+                    isTyping = true;
+                  }),
+                  decoration: InputDecoration(
+                    hintText: "Хариулт",
+                    suffixIcon: isTyping
+                        ? GestureDetector(
+                            onTap: () {
+                              _controllers[index].text = "";
+                              setState(() {
+                                isTyping = false;
+                              });
+                            },
+                            child: const Icon(Icons.close, color: MyColors.black),
+                          )
+                        : const SizedBox(),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: MyColors.border1),
+                    ),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget banner(String imgUrl) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 20),
+      child: Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: ImageView(
+            imgPath: imgUrl,
+            height: 260,
+            width: 260,
+          ),
+        ),
       ),
     );
   }
@@ -377,7 +397,7 @@ class _CourseTasksState extends State<CourseTasks> {
   Widget listen(index) {
     Products prodItem = Products(
       title: widget.title,
-      banner: widget.banner,
+      banner: widget.courseTasks[index].banner,
       id: widget.courseTasks[index].id,
       body: widget.courseTasks[index].body,
       albumTitle: widget.lessonName,

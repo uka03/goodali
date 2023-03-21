@@ -24,9 +24,7 @@ class IntroAudio extends StatefulWidget {
   final Products products;
   final List<Products> productsList;
 
-  const IntroAudio(
-      {Key? key, required this.products, required this.productsList})
-      : super(key: key);
+  const IntroAudio({Key? key, required this.products, required this.productsList}) : super(key: key);
 
   @override
   State<IntroAudio> createState() => _IntroAudioState();
@@ -60,7 +58,7 @@ class _IntroAudioState extends State<IntroAudio> {
     setState(() {
       username = pref.getString("email") ?? "";
     });
-    print('appbar $username');
+    // print('appbar $username');
   }
 
   Future<void> _init() async {
@@ -91,9 +89,7 @@ class _IntroAudioState extends State<IntroAudio> {
             Container(
               width: 38,
               height: 6,
-              decoration: BoxDecoration(
-                  color: MyColors.gray,
-                  borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(10)),
             ),
             const SizedBox(height: 40),
             Row(
@@ -114,19 +110,14 @@ class _IntroAudioState extends State<IntroAudio> {
                     children: [
                       Text(
                         widget.products.title ?? "",
-                        style: const TextStyle(
-                            fontSize: 16,
-                            height: 1.6,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                        style: const TextStyle(fontSize: 16, height: 1.6, fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                       const SizedBox(height: 15),
                       Text(
                         parseHtmlString(widget.products.body ?? ""),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 12, color: MyColors.gray, height: 1.5),
+                        style: const TextStyle(fontSize: 12, color: MyColors.gray, height: 1.5),
                       ),
                       const SizedBox(height: 15),
                       Row(
@@ -135,26 +126,21 @@ class _IntroAudioState extends State<IntroAudio> {
                           Wrap(children: [
                             const Text(
                               "Үргэлжлэх хугацаа: ",
-                              style:
-                                  TextStyle(fontSize: 12, color: MyColors.gray),
+                              style: TextStyle(fontSize: 12, color: MyColors.gray),
                             ),
-                            Text(formatTime(audioPosition) + " мин",
-                                style: const TextStyle(
-                                    fontSize: 12, color: MyColors.black))
+                            Text(formatTime(audioPosition) + " мин", style: const TextStyle(fontSize: 12, color: MyColors.black))
                           ]),
                           const SizedBox(width: 20),
                           Wrap(children: [
                             const Text(
                               "Үнэ: ",
                               textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(fontSize: 12, color: MyColors.gray),
+                              style: TextStyle(fontSize: 12, color: MyColors.gray),
                             ),
                             Text(
                               widget.products.price.toString() + "₮",
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                  fontSize: 12, color: MyColors.black),
+                              style: const TextStyle(fontSize: 12, color: MyColors.black),
                             ),
                           ]),
                         ],
@@ -183,8 +169,7 @@ class _IntroAudioState extends State<IntroAudio> {
                         onSeek: (duration) async {
                           await audioHandler.seek(duration);
                         },
-                        timeLabelTextStyle:
-                            const TextStyle(color: MyColors.gray),
+                        timeLabelTextStyle: const TextStyle(color: MyColors.gray),
                         baseBarColor: MyColors.border1,
                         progressBarColor: MyColors.primaryColor,
                         thumbColor: MyColors.primaryColor,
@@ -205,10 +190,7 @@ class _IntroAudioState extends State<IntroAudio> {
                     "assets/images/replay_5.svg",
                   ),
                 ),
-                CircleAvatar(
-                    radius: 36,
-                    backgroundColor: MyColors.primaryColor,
-                    child: PlayerButtons(title: widget.products.title ?? "")),
+                CircleAvatar(radius: 36, backgroundColor: MyColors.primaryColor, child: PlayerButtons(title: widget.products.title ?? "")),
                 InkWell(
                   onTap: () {
                     buttonForward15Seconds();
@@ -232,19 +214,10 @@ class _IntroAudioState extends State<IntroAudio> {
                             cart.addItemsIndex(widget.products.productId!);
                             if (!cart.sameItemCheck) {
                               cart.addProducts(widget.products);
-                              cart.addTotalPrice(
-                                  widget.products.price?.toDouble() ?? 0.0);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CartScreen()));
+                              cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
                             } else {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CartScreen()));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
                             }
                           })),
                   GestureDetector(
@@ -252,23 +225,16 @@ class _IntroAudioState extends State<IntroAudio> {
                       cart.addItemsIndex(widget.products.productId!);
                       if (!cart.sameItemCheck) {
                         cart.addProducts(widget.products);
-                        cart.addTotalPrice(
-                            widget.products.price?.toDouble() ?? 0.0);
-                        TopSnackBar.successFactory(
-                                msg: "Сагсанд амжилттай нэмэгдлээ")
-                            .show(context);
+                        cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
+                        TopSnackBar.successFactory(msg: "Сагсанд амжилттай нэмэгдлээ").show(context);
                       } else {
-                        TopSnackBar.errorFactory(
-                                msg: "Сагсанд бүтээгдэхүүн байна")
-                            .show(context);
+                        TopSnackBar.errorFactory(msg: "Сагсанд бүтээгдэхүүн байна").show(context);
                       }
                     },
                     child: Container(
                       height: 50,
                       width: 50,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: MyColors.input),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: MyColors.input),
                       child: const Icon(
                         IconlyLight.buy,
                         color: MyColors.primaryColor,

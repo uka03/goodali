@@ -31,8 +31,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
       bottomNavigationBar: ValueListenableBuilder(
         valueListenable: playerExpandProgress,
         builder: (BuildContext context, double height, Widget? child) {
-          final value = percentageFromValueInRange(
-              min: playerMinHeight, max: playerMaxHeight, value: height);
+          final value = percentageFromValueInRange(min: playerMinHeight, max: playerMaxHeight, value: height);
 
           var opacity = 1 - value;
           if (opacity < 0) opacity = 0;
@@ -45,8 +44,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
           return SizedBox(
             height: bottomBarHeight - bottomBarHeight * value,
             child: Transform.translate(
-              offset:
-                  Offset(0.0, (kBottomNavigationBarHeight + 30) * value * 0.5),
+              offset: Offset(0.0, (kBottomNavigationBarHeight + 30) * value * 0.5),
               child: Opacity(
                 opacity: opacity,
                 child: OverflowBox(
@@ -76,15 +74,13 @@ class _BottomTabbarState extends State<BottomTabbar> {
             BottomNavigationBarItem(
                 activeIcon: Padding(
                   padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Image.asset("assets/images/tuudeg_gal_icon.png",
-                      height: 27, width: 27, color: MyColors.primaryColor),
+                  child: Image.asset("assets/images/tuudeg_gal_icon.png", height: 27, width: 27, color: MyColors.primaryColor),
                 ),
                 icon: Padding(
                   padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Image.asset("assets/images/tuudeg_gal_icon.png",
-                      height: 27, width: 27, color: MyColors.gray),
+                  child: Image.asset("assets/images/tuudeg_gal_icon.png", height: 27, width: 27, color: MyColors.gray),
                 ),
-                label: "Түүдэг гал"),
+                label: "Сэтгэлийн гэр"),
             const BottomNavigationBarItem(
                 activeIcon: Padding(
                   padding: EdgeInsets.only(bottom: 3.0),
@@ -108,8 +104,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
           _widgetOptions.elementAt(selectedIndex),
           ValueListenableBuilder(
               valueListenable: currentlyPlaying,
-              builder:
-                  (BuildContext context, Products? podcastItem, Widget? child) {
+              builder: (BuildContext context, Products? podcastItem, Widget? child) {
                 return podcastItem != null
                     ? PlayAudio(
                         products: podcastItem,
@@ -129,9 +124,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
   ];
 
   void onTabTapped(int index) {
-    Provider.of<ForumTagNotifier>(context, listen: false)
-        .selectedForumNames
-        .clear();
+    Provider.of<ForumTagNotifier>(context, listen: false).selectedForumNames.clear();
     setState(() {
       selectedIndex = index;
     });

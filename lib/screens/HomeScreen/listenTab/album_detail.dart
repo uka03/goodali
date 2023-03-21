@@ -103,7 +103,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
     setState(() {
       username = pref.getString("email") ?? "";
     });
-    print('appbar $username');
+    // print('appbar $username');
   }
 
   @override
@@ -126,9 +126,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
           builder: (context, value, child) {
             return ValueListenableBuilder(
               valueListenable:
-                  value.isAuth || widget.albumProduct.isBought == true
-                      ? HiveBoughtDataStore.box.listenable()
-                      : HiveIntroDataStore.box.listenable(),
+                  value.isAuth || widget.albumProduct.isBought == true ? HiveBoughtDataStore.box.listenable() : HiveIntroDataStore.box.listenable(),
               builder: (context, Box box, boxWidgets) {
                 if (box.length > 0) {
                   List<Products> lectureList = [];
@@ -144,8 +142,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   buyList = removeDuplicates(lectureList);
 
                   if (widget.albumProduct.isBought == true) {
-                    var introProd = buyList.indexWhere(
-                        (element) => element.title == "Танилцуулга");
+                    var introProd = buyList.indexWhere((element) => element.title == "Танилцуулга");
                     buyList.insert(0, buyList[introProd]);
                     buyList.removeLast();
                   }
@@ -166,26 +163,21 @@ class _AlbumDetailState extends State<AlbumDetail> {
                                     child: ClipRRect(
                                         borderRadius: BorderRadius.circular(14),
                                         child: CachedNetworkImage(
-                                          imageUrl:
-                                              "${Urls.networkPath}${widget.albumProduct.banner}",
+                                          imageUrl: "${Urls.networkPath}${widget.albumProduct.banner}",
                                           width: imageSize,
                                           height: imageSize,
-                                          progressIndicatorBuilder:
-                                              (context, url, downloadProgress) {
+                                          progressIndicatorBuilder: (context, url, downloadProgress) {
                                             return Center(
                                               child: CircularProgressIndicator(
                                                 color: MyColors.primaryColor,
                                                 strokeWidth: 2,
-                                                value:
-                                                    downloadProgress.progress,
+                                                value: downloadProgress.progress,
                                               ),
                                             );
                                           },
                                           fit: BoxFit.cover,
                                           errorWidget: (context, url, error) {
-                                            if (error
-                                                    is NetworkImageLoadException &&
-                                                error.statusCode == 404) {
+                                            if (error is NetworkImageLoadException && error.statusCode == 404) {
                                               return const Text("404");
                                             }
 
@@ -194,8 +186,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                                                 height: imageSize,
                                                 child: const Text(
                                                   "No Image",
-                                                  style:
-                                                      TextStyle(fontSize: 12),
+                                                  style: TextStyle(fontSize: 12),
                                                 ));
                                           },
                                         )),
@@ -210,15 +201,11 @@ class _AlbumDetailState extends State<AlbumDetail> {
                               SizedBox(height: initialSize + 32),
                               Text(
                                 widget.albumProduct.title ?? "" "",
-                                style: const TextStyle(
-                                    fontSize: 20,
-                                    color: MyColors.black,
-                                    fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 20),
                               Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                                   child: CustomReadMoreText(
                                     text: widget.albumProduct.body ?? "",
                                     textAlign: TextAlign.center,
@@ -231,14 +218,12 @@ class _AlbumDetailState extends State<AlbumDetail> {
                           ),
                         ]),
                       ),
-                      widget.albumProduct.isBought == true ||
-                              username == "surgalt9@gmail.com" && isAuth
+                      widget.albumProduct.isBought == true || username == "surgalt9@gmail.com" && isAuth
                           ? Container()
                           : Container(
                               color: Theme.of(context).scaffoldBackgroundColor,
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                                 child: CustomElevatedButton(
                                     text: "Худалдаж авах",
                                     onPress: () {
@@ -249,9 +234,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     ],
                   );
                 } else {
-                  return const Center(
-                      child: CircularProgressIndicator(
-                          color: MyColors.primaryColor));
+                  return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
                 }
               },
             );
@@ -269,8 +252,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
         shrinkWrap: true,
         padding: const EdgeInsets.only(bottom: 15),
         itemBuilder: (BuildContext context, int index) {
-          if (widget.albumProduct.isBought == false &&
-              product[index].isBought == false) {
+          if (widget.albumProduct.isBought == false && product[index].isBought == false) {
             return AlbumIntroItem(
               albumName: '',
               audioPlayer: audioPlayer,
@@ -279,8 +261,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
               onTap: () async {
                 print("intro");
                 currentlyPlaying.value = product[index];
-                if (activeList.first.title == product.first.title &&
-                    activeList.first.id == product.first.id) {
+                if (activeList.first.title == product.first.title && activeList.first.id == product.first.id) {
                   await audioHandler.skipToQueueItem(index);
                   log("Starts in: ${product[index].position}");
 
@@ -289,8 +270,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   );
 
                   await audioHandler.play();
-                } else if (activeList.first.title != product.first.title ||
-                    activeList.first.id != product.first.id) {
+                } else if (activeList.first.title != product.first.title || activeList.first.id != product.first.id) {
                   activeList = product;
                   log("Starts in: ${product[index].position}");
                   await initiliazePodcast();
@@ -315,16 +295,14 @@ class _AlbumDetailState extends State<AlbumDetail> {
                 onTap: () async {
                   // if (widget.albumProduct.isBought == true) {
 
-                  if (activeList.first.title == product.first.title &&
-                      activeList.first.id == product.first.id) {
+                  if (activeList.first.title == product.first.title && activeList.first.id == product.first.id) {
                     currentlyPlaying.value = product[index];
                     await audioHandler.skipToQueueItem(index);
                     await audioHandler.seek(
                       Duration(milliseconds: product[index].position!),
                     );
                     await audioHandler.play();
-                  } else if (activeList.first.title != product.first.title ||
-                      activeList.first.id != product.first.id) {
+                  } else if (activeList.first.title != product.first.title || activeList.first.id != product.first.id) {
                     activeList = product;
                     await initiliazePodcast();
                     await audioHandler.skipToQueueItem(index);
@@ -354,18 +332,14 @@ class _AlbumDetailState extends State<AlbumDetail> {
         albumProductsList.add(item.productId!);
       }
     }
-    cart.addItemsIndex(
-        (widget.albumProduct.productId ?? widget.albumProduct.id ?? 0),
-        albumProductIDs: albumProductsList);
+    cart.addItemsIndex((widget.albumProduct.productId ?? widget.albumProduct.id ?? 0), albumProductIDs: albumProductsList);
     if (!cart.sameItemCheck) {
       cart.addProducts(widget.albumProduct);
       cart.addTotalPrice(widget.albumProduct.price?.toDouble() ?? 0.0);
 
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const CartScreen()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
     } else {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const CartScreen()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
     }
   }
 
@@ -376,14 +350,10 @@ class _AlbumDetailState extends State<AlbumDetail> {
         enableDrag: true,
         backgroundColor: Colors.white,
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return IntroAudio(
-                    products: widget.albumProduct, productsList: const []);
+              builder: (BuildContext context, void Function(void Function()) setState) {
+                return IntroAudio(products: widget.albumProduct, productsList: const []);
               },
             ));
   }
@@ -391,11 +361,9 @@ class _AlbumDetailState extends State<AlbumDetail> {
   Future<void> getAlbumLectures() async {
     List<Products> data;
     if (widget.isLecture == true) {
-      data =
-          await Connection.getAlbumLectures(context, widget.albumID.toString());
+      data = await Connection.getAlbumLectures(context, widget.albumID.toString());
     } else {
-      data = await Connection.getAlbumLectures(
-          context, widget.albumProduct.id.toString());
+      data = await Connection.getAlbumLectures(context, widget.albumProduct.id.toString());
     }
 
     Products introduction = Products(
@@ -423,8 +391,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   Future<void> getLectureListLogged() async {
-    var data = await Connection.getLectureListLogged(
-        context, widget.albumProduct.id.toString());
+    var data = await Connection.getLectureListLogged(context, widget.albumProduct.id.toString());
     Products introduction = Products(
         title: "Танилцуулга",
         id: widget.albumProduct.id,

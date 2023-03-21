@@ -1,38 +1,24 @@
-import 'dart:developer';
-
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/circle_tab_indicator.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/urls.dart';
-import 'package:goodali/Utils/utils.dart';
-import 'package:goodali/Widgets/audio_progressbar.dart';
-import 'package:goodali/Widgets/audioplayer_button.dart';
-import 'package:goodali/Widgets/audioplayer_timer.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
-import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
+import 'package:goodali/Widgets/my_delegate.dart';
+import 'package:goodali/Widgets/search_bar.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
-import 'package:goodali/controller/duration_state.dart';
-import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
-import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
-import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
+import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_lecture.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
-import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
-
-import 'package:goodali/Widgets/search_bar.dart';
 import 'package:goodali/screens/ListItems/special_list_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -132,11 +118,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     // PRODUCT TYPE 0 - ALBUM, 1 - LECTURE, 2 - TRAINING
                     switch (item.productType) {
                       case 0:
-                        print("banner album orj irle");
+                        // print("banner album orj irle");
                         Navigator.push(context, MaterialPageRoute(builder: (_) => BannerAlbum(productId: item.productID ?? 0)));
                         break;
                       case 1:
-                        print("banner lecuture orj irle");
+                        // print("banner lecuture orj irle");
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -145,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     )));
                         break;
                       case 2:
-                        print("case 2 bailaaa");
+                        // print("case 2 bailaaa");
                         Navigator.push(context, MaterialPageRoute(builder: (_) => CourseDetail(id: item.productID)));
                         break;
                       default:
@@ -204,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       });
                     },
                     itemBuilder: (context, index) {
-                      print("audioList.length ${audioList.length}");
+                      // print("audioList.length ${audioList.length}");
                       return SpecialListItem(
                         specialItem: specialList[index],
                         onTap: () async {

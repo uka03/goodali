@@ -46,14 +46,9 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   Future<void> checkUserHasTraining() async {
-    hasTraining =
-        await Provider.of<Auth>(context, listen: false).checkTraining();
+    hasTraining = await Provider.of<Auth>(context, listen: false).checkTraining();
     if (hasTraining) {
-      postTypes = [
-        'Хүний байгаль',
-        'Нууц бүлгэм',
-        'Миний нандин (Зөвхөн танд)'
-      ];
+      postTypes = ['Хүний байгаль', 'Түүдэг гал', 'Миний нандин (Зөвхөн танд)'];
     } else {
       postTypes = ['Хүний байгаль', 'Миний нандин (Зөвхөн танд)'];
     }
@@ -76,11 +71,7 @@ class _CreatePostState extends State<CreatePost> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  const Text("Та юу бодож байна?",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: MyColors.black)),
+                  const Text("Та юу бодож байна?", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: MyColors.black)),
                   const SizedBox(height: 24),
                   TextField(
                     controller: titleController,
@@ -93,8 +84,7 @@ class _CreatePostState extends State<CreatePost> {
                     decoration: InputDecoration(
                       hintText: "Гарчиг",
                       enabledBorder: const UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: MyColors.border1, width: 1),
+                        borderSide: BorderSide(color: MyColors.border1, width: 1),
                       ),
                       suffixIcon: _noTyped
                           ? GestureDetector(
@@ -110,8 +100,7 @@ class _CreatePostState extends State<CreatePost> {
                               ))
                           : const SizedBox(),
                       focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(
-                            color: MyColors.primaryColor, width: 1.5),
+                        borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
                       ),
                     ),
                     maxLength: 30,
@@ -128,8 +117,7 @@ class _CreatePostState extends State<CreatePost> {
                     decoration: InputDecoration(
                       hintText: "Үндсэн хэсэг",
                       enabledBorder: const UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: MyColors.border1, width: 1),
+                        borderSide: BorderSide(color: MyColors.border1, width: 1),
                       ),
                       suffixIcon: _noTyped1
                           ? GestureDetector(
@@ -145,8 +133,7 @@ class _CreatePostState extends State<CreatePost> {
                               ))
                           : const SizedBox(),
                       focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(
-                            color: MyColors.primaryColor, width: 1.5),
+                        borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
                       ),
                     ),
                     maxLength: 1200,
@@ -155,13 +142,10 @@ class _CreatePostState extends State<CreatePost> {
                   const Spacer(),
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: CustomElevatedButton(
-                        text: "Нийтлэх",
-                        onPress: _noTyped && _noTyped1 ? _onPressed : null),
+                    child: CustomElevatedButton(text: "Нийтлэх", onPress: _noTyped && _noTyped1 ? _onPressed : null),
                   ),
                   const SizedBox(height: 8),
-                  const Text("Та өдөрт 2 удаа пост оруулах эрхтэй.",
-                      style: TextStyle(fontSize: 12, color: MyColors.gray)),
+                  const Text("Та өдөрт 2 удаа пост оруулах эрхтэй.", style: TextStyle(fontSize: 12, color: MyColors.gray)),
                   const SizedBox(height: 30)
                 ],
               ),
@@ -180,10 +164,7 @@ class _CreatePostState extends State<CreatePost> {
           backgroundColor: MyColors.error,
           behavior: SnackBarBehavior.floating,
           action: SnackBarAction(
-              onPressed: () => loginWithBio
-                  ? Provider.of<Auth>(context, listen: false)
-                      .authenticateWithBiometrics(context)
-                  : showLoginModal(),
+              onPressed: () => loginWithBio ? Provider.of<Auth>(context, listen: false).authenticateWithBiometrics(context) : showLoginModal(),
               label: 'Нэвтрэх',
               textColor: Colors.white)));
     }
@@ -196,11 +177,8 @@ class _CreatePostState extends State<CreatePost> {
         enableDrag: true,
         useRootNavigator: true,
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) =>
-            const LoginBottomSheet(isRegistered: true));
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (BuildContext context) => const LoginBottomSheet(isRegistered: true));
   }
 
   showModalTag() {
@@ -208,12 +186,9 @@ class _CreatePostState extends State<CreatePost> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
+              builder: (BuildContext context, void Function(void Function()) setState) {
                 return SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -222,23 +197,14 @@ class _CreatePostState extends State<CreatePost> {
                       Container(
                         width: 38,
                         height: 6,
-                        decoration: BoxDecoration(
-                            color: MyColors.gray,
-                            borderRadius: BorderRadius.circular(10)),
+                        decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(10)),
                       ),
                       const SizedBox(height: 20),
-                      const Text("Холбогдох сэдэв",
-                          style: TextStyle(
-                              fontSize: 22,
-                              color: MyColors.black,
-                              fontWeight: FontWeight.bold)),
+                      const Text("Холбогдох сэдэв", style: TextStyle(fontSize: 22, color: MyColors.black, fontWeight: FontWeight.bold)),
                       FutureBuilder(
                         future: tagFuture,
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasData &&
-                              ConnectionState.done ==
-                                  snapshot.connectionState) {
+                        builder: (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData && ConnectionState.done == snapshot.connectionState) {
                             tagList = snapshot.data;
                             return Container(
                               width: MediaQuery.of(context).size.width,
@@ -252,8 +218,7 @@ class _CreatePostState extends State<CreatePost> {
                                     isSelected = true;
                                   }
                                   return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                       child: GestureDetector(
                                           onTap: () {
                                             if (!selectedTabs.contains(i.id)) {
@@ -266,32 +231,19 @@ class _CreatePostState extends State<CreatePost> {
                                           child: Container(
                                             child: Text(
                                               i.name!,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: isSelected
-                                                      ? Colors.white
-                                                      : MyColors.gray),
+                                              style: TextStyle(fontSize: 14, color: isSelected ? Colors.white : MyColors.gray),
                                             ),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 14, vertical: 12),
+                                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                             decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    color: MyColors.border1,
-                                                    width: 0.8),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color: isSelected
-                                                    ? MyColors.primaryColor
-                                                    : Colors.white),
+                                                border: Border.all(color: MyColors.border1, width: 0.8),
+                                                borderRadius: BorderRadius.circular(12),
+                                                color: isSelected ? MyColors.primaryColor : Colors.white),
                                           )));
                                 }).toList(),
                               ),
                             );
                           } else {
-                            return const Center(
-                                child: CircularProgressIndicator(
-                                    color: MyColors.primaryColor,
-                                    strokeWidth: 2));
+                            return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor, strokeWidth: 2));
                           }
                         },
                       ),
@@ -301,9 +253,7 @@ class _CreatePostState extends State<CreatePost> {
                               padding: EdgeInsets.only(left: 20.0),
                               child: Align(
                                 alignment: Alignment.bottomLeft,
-                                child: Text("Холбогдох сэдэвээ сонгоно уу",
-                                    style: TextStyle(
-                                        color: MyColors.error, fontSize: 12)),
+                                child: Text("Холбогдох сэдэвээ сонгоно уу", style: TextStyle(color: MyColors.error, fontSize: 12)),
                               ),
                             )
                           : const SizedBox(),
@@ -338,12 +288,9 @@ class _CreatePostState extends State<CreatePost> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
+              builder: (BuildContext context, void Function(void Function()) setState) {
                 return Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -352,27 +299,19 @@ class _CreatePostState extends State<CreatePost> {
                       Container(
                         width: 38,
                         height: 6,
-                        decoration: BoxDecoration(
-                            color: MyColors.gray,
-                            borderRadius: BorderRadius.circular(10)),
+                        decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(10)),
                       ),
                       const SizedBox(height: 20),
-                      const Text("Хаана постлох вэ?",
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: MyColors.black,
-                              fontWeight: FontWeight.bold)),
+                      const Text("Хаана постлох вэ?", style: TextStyle(fontSize: 18, color: MyColors.black, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 20),
                       Wrap(
                         alignment: WrapAlignment.center,
                         crossAxisAlignment: WrapCrossAlignment.start,
                         children: postTypes
                             .map((i) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 child: RadioListTile(
-                                  controlAffinity:
-                                      ListTileControlAffinity.trailing,
+                                  controlAffinity: ListTileControlAffinity.trailing,
                                   activeColor: MyColors.primaryColor,
                                   groupValue: postType,
                                   value: postTypes.indexOf(i),
@@ -381,9 +320,7 @@ class _CreatePostState extends State<CreatePost> {
 
                                     print(postType);
                                   },
-                                  title: Text(i,
-                                      style: const TextStyle(
-                                          color: MyColors.black)),
+                                  title: Text(i, style: const TextStyle(color: MyColors.black)),
                                 )))
                             .toList(),
                       ),
@@ -410,23 +347,16 @@ class _CreatePostState extends State<CreatePost> {
     if (!hasTraining) {
       postType = postType == 0 ? 0 : 2;
     }
-    Map body = {
-      "title": titleController.text,
-      "body": textController.text,
-      "post_type": postType,
-      "tags": selectedTabs
-    };
+    Map body = {"title": titleController.text, "body": textController.text, "post_type": postType, "tags": selectedTabs};
     print(body);
     var data = await Connection.insertPost(context, body);
 
     if (data['success']) {
       TopSnackBar.successFactory(title: "Амжилттай шинэчлэгдлээ")
           .show(context)
-          .then((value) =>
-              Navigator.of(context).popUntil((route) => route.isFirst));
+          .then((value) => Navigator.of(context).popUntil((route) => route.isFirst));
     } else {
-      TopSnackBar.errorFactory(msg: "Алдаа гарлаа дахин оролдоно уу")
-          .show(context);
+      TopSnackBar.errorFactory(msg: "Алдаа гарлаа дахин оролдоно уу").show(context);
     }
   }
 }

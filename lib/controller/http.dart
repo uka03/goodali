@@ -14,20 +14,18 @@ class Http {
   static Http? _instance;
   factory Http() => _instance ?? Http._();
 
-  BaseOptions options =
-      BaseOptions(receiveTimeout: 30000, connectTimeout: 30000);
+  BaseOptions options = BaseOptions(receiveTimeout: 30000, connectTimeout: 30000);
   Http._() {
     try {
       _dio = Dio(options);
-      _dio.interceptors
-          .add(InterceptorsWrapper(onRequest: (options, handler) async {
-        print("URL ${options.path} \n DATA : ${options.data}");
+      _dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) async {
+        // print("URL ${options.path} \n DATA : ${options.data}");
         options.headers = {'Content-Type': 'application/json'};
         if (type == headerTypebearer) {
           var prefs = await SharedPreferences.getInstance();
           var token = prefs.getString('token');
           if (token != null && token.isNotEmpty) {
-            print("token $token");
+            // print("token $token");
             options.headers = {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
@@ -43,7 +41,7 @@ class Http {
       }, onResponse: (response, handler) async {
         var prefs = await SharedPreferences.getInstance();
         var token = prefs.getString('token');
-        print("Response is: $response");
+        // print("Response is: $response");
 
         if (response.statusCode == 200) {
           return handler.next(response);
@@ -58,12 +56,10 @@ class Http {
         }
       }, onError: (e, handler) async {
         if (e.type == DioErrorType.connectTimeout) {
-          TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
-              .show(context);
+          TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
         } else if (e.type == DioErrorType.receiveTimeout) {
           print("DIO RECEIVE TIME OUT");
-          TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа")
-              .show(context);
+          TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа").show(context);
         }
 
         if (e.response?.statusCode == 401) {
@@ -90,7 +86,6 @@ class Http {
           // Refresh token expired
           // Redirect user to login...
           // }
-
         }
 
         return handler.next(e);

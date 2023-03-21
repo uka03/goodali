@@ -13,6 +13,7 @@ class CourseLessonsTasksModel {
   int? isAnswered;
   int? duration;
   int? position;
+  String? banner;
   Products? products;
 
   CourseLessonsTasksModel(
@@ -25,7 +26,8 @@ class CourseLessonsTasksModel {
       this.isAnswer,
       this.videoUrl,
       this.isAnswered,
-      this.answerData});
+      this.answerData,
+      this.banner});
 
   CourseLessonsTasksModel.fromJson(Map<String, dynamic> json) {
     body = json['body'];
@@ -37,6 +39,7 @@ class CourseLessonsTasksModel {
     videoUrl = json['video_url'];
     isAnswer = json['is_answer'];
     answerData = json['answer_data'];
+    banner = json['banner'];
     isAnswered = json['is_answered'] ?? 0;
   }
 
@@ -51,6 +54,7 @@ class CourseLessonsTasksModel {
     data['video_url'] = videoUrl;
     data['is_answer'] = isAnswer;
     data['answer_data'] = answerData;
+    data['banner'] = banner;
     data['is_answered'] = isAnswered;
     return data;
   }

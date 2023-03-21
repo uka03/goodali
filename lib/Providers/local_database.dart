@@ -103,7 +103,7 @@ class HiveBoughtDataStore {
 
   Future<Products?> getProductsFromUrl({required String url}) async {
     Products products = Products();
-    print(url);
+    // print(url);
     var datas = box.values;
     developer.log(datas.length.toString());
     for (var element in datas) {
@@ -164,7 +164,7 @@ class HiveMoodDataStore {
 
   /// Add new user
   Future<void> addProduct({required Products products}) async {
-    print("box length ${box.values.length}");
+    // print("box length ${box.values.length}");
     var datas = box.values.where((c) => c.id == products.id && c.moodListId == products.moodListId).toList();
     if (datas.isEmpty) {
       await box.add(products);
@@ -268,7 +268,7 @@ class HiveSpecialDataStore {
 
   Future<void> addProduct({required Products products}) async {
     var datas = specialListBox.values.where((c) => c.id == products.id).toList();
-    print("data hooson bnu uguu yu ${datas.length}");
+    // print("data hooson bnu uguu yu ${datas.length}");
 
     if (datas.isEmpty) {
       await specialListBox.add(products);

@@ -27,14 +27,12 @@ Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
     );
 
 /// An [AudioHandler] for playing a single item.
-class AudioPlayerHandler extends BaseAudioHandler
-    with QueueHandler, SeekHandler {
+class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   final _player = AudioPlayer();
 
   @override
   final BehaviorSubject<double> speed = BehaviorSubject.seeded(1.0);
-  final BehaviorSubject<List<MediaItem>> _recentSubject =
-      BehaviorSubject.seeded(<MediaItem>[]);
+  final BehaviorSubject<List<MediaItem>> _recentSubject = BehaviorSubject.seeded(<MediaItem>[]);
 
   /// Initialise our audio handler.
   AudioPlayerHandler() {
@@ -62,9 +60,7 @@ class AudioPlayerHandler extends BaseAudioHandler
     stop();
     queue.add(mediaItems);
 
-    mediaItem
-        .whereType<MediaItem>()
-        .listen((item) => _recentSubject.add([item]));
+    mediaItem.whereType<MediaItem>().listen((item) => _recentSubject.add([item]));
     // Broadcast media item changes.
     _player.currentIndexStream.listen((index) {
       index = index;
@@ -84,20 +80,14 @@ class AudioPlayerHandler extends BaseAudioHandler
       );
 
       dataStore.updatePosition(
-          currentlyPlaying.value?.title! ?? "",
-          currentlyPlaying.value?.id! ?? 0,
-          durationStateNotifier.value.progress?.inMilliseconds ?? 0);
+          currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, durationStateNotifier.value.progress?.inMilliseconds ?? 0);
 
       dataAlbumStore.updatePosition(
-          currentlyPlaying.value?.title! ?? "",
-          currentlyPlaying.value?.id! ?? 0,
-          durationStateNotifier.value.progress?.inMilliseconds ?? 0);
+          currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, durationStateNotifier.value.progress?.inMilliseconds ?? 0);
 
-      dataMoodStore.updatePosition(currentlyPlaying.value?.title! ?? "",
-          currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
+      dataMoodStore.updatePosition(currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
 
-      dataIntroStore.updatePosition(currentlyPlaying.value?.title! ?? "",
-          currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
+      dataIntroStore.updatePosition(currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
     });
     try {
       // After a cold restart (on Android), _player.load jumps straight from
@@ -113,7 +103,7 @@ class AudioPlayerHandler extends BaseAudioHandler
           //   print(Uri.parse(item.extras?['downloadedPath']));
           //   return AudioSource.uri(Uri.parse(item.extras?['downloadedPath']));
           // } else {
-          print("tatagdaagu");
+          // print("tatagdaagu");
           return AudioSource.uri(Uri.parse(item.extras!['url']));
           // }
         }).toList(),

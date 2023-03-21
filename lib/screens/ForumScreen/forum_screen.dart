@@ -29,7 +29,7 @@ class _ForumScreenState extends State<ForumScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: 'Түүдэг гал',
+        title: 'Сэтгэлийн гэр',
         actionButton2: null,
         isCartButton: false,
       ),
@@ -60,15 +60,11 @@ class _ForumScreenState extends State<ForumScreen> {
                         child: TextField(
                           onTap: () {
                             FocusManager.instance.primaryFocus?.unfocus();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const CreatePost()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const CreatePost()));
                           },
                           readOnly: true,
                           cursorColor: MyColors.primaryColor,
-                          decoration: const InputDecoration(
-                              border: InputBorder.none, hintText: "Пост нэмэх"),
+                          decoration: const InputDecoration(border: InputBorder.none, hintText: "Пост нэмэх"),
                         ),
                       ),
                     ],
@@ -83,31 +79,22 @@ class _ForumScreenState extends State<ForumScreen> {
                         isScrollable: true,
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         tabs: [
-                          SizedBox(
-                              width: 110, child: Tab(text: "Хүний байгаль")),
-                          SizedBox(width: 110, child: Tab(text: "Нууц бүлгэм")),
+                          SizedBox(width: 110, child: Tab(text: "Хүний байгаль")),
+                          SizedBox(width: 110, child: Tab(text: "Түүдэг гал")),
                           SizedBox(width: 110, child: Tab(text: "Миний нандин"))
                         ],
                         indicatorWeight: 4,
-                        indicator:
-                            CustomTabIndicator(color: MyColors.primaryColor),
+                        indicator: CustomTabIndicator(color: MyColors.primaryColor),
                         labelColor: MyColors.primaryColor,
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
-                        unselectedLabelStyle: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontFamily: 'Gilroy'),
+                        labelStyle: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
                         unselectedLabelColor: MyColors.gray,
                         indicatorColor: MyColors.primaryColor,
                       ),
-                      container: context
-                              .watch<ForumTagNotifier>()
-                              .selectedForumNames
-                              .isEmpty
+                      container: context.watch<ForumTagNotifier>().selectedForumNames.isEmpty
                           ? null
                           : Consumer<ForumTagNotifier>(
-                              builder:
-                                  (BuildContext context, value, Widget? child) {
+                              builder: (BuildContext context, value, Widget? child) {
                                 return SizedBox(
                                   height: 40,
                                   width: MediaQuery.of(context).size.width,
@@ -115,23 +102,16 @@ class _ForumScreenState extends State<ForumScreen> {
                                       scrollDirection: Axis.horizontal,
                                       children: value.selectedForumNames
                                           .map((e) => Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 8.0),
+                                                padding: const EdgeInsets.only(left: 8.0),
                                                 child: Chip(
-                                                  padding:
-                                                      const EdgeInsets.all(2.0),
-                                                  side: const BorderSide(
-                                                      color: MyColors.border2,
-                                                      width: 0.5),
+                                                  padding: const EdgeInsets.all(2.0),
+                                                  side: const BorderSide(color: MyColors.border2, width: 0.5),
                                                   backgroundColor: Colors.white,
                                                   label: Text(
                                                     e['name'],
-                                                    style: const TextStyle(
-                                                        color: MyColors.black),
+                                                    style: const TextStyle(color: MyColors.black),
                                                   ),
-                                                  deleteIcon: const Icon(
-                                                      Icons.close,
-                                                      size: 20),
+                                                  deleteIcon: const Icon(Icons.close, size: 20),
                                                   onDeleted: () {
                                                     value.removeTags(e);
                                                   },
@@ -143,8 +123,7 @@ class _ForumScreenState extends State<ForumScreen> {
                             )))
             ];
           },
-          body: const TabBarView(
-              children: [NatureOfHuman(), NuutsBulgem(), MyFriendTab()]),
+          body: const TabBarView(children: [NatureOfHuman(), NuutsBulgem(), MyFriendTab()]),
         ),
       ),
     );

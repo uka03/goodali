@@ -24,8 +24,7 @@ class DownloadPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final downloadAudio =
-        Provider.of<AudioDownloadProvider>(context, listen: false);
+    final downloadAudio = Provider.of<AudioDownloadProvider>(context, listen: false);
     return StreamBuilder<FileResponse>(
       stream: fileStream,
       builder: (context, AsyncSnapshot snapshot) {
@@ -34,15 +33,15 @@ class DownloadPage extends StatelessWidget {
         if (snapshot.hasData) {
           if (loading) {
             bool finished = (snapshot.data as DownloadProgress).progress == 1;
-            print((snapshot.data as DownloadProgress).progress);
-            print("finished $finished");
+            // print((snapshot.data as DownloadProgress).progress);
+            // print("finished $finished");
             if (finished == true) {
               if (isPodcast == true) {
                 downloadAudio.addAudio(products);
-                log("downloaded audio");
+                // log("downloaded audio");
               } else {
                 downloadAudio.addPodcast(products);
-                log("downloaded podcast");
+                // log("downloaded podcast");
               }
             }
             double? percent = (snapshot.data as DownloadProgress).progress;
@@ -52,14 +51,12 @@ class DownloadPage extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(IconlyLight.arrow_down,
-                      color: MyColors.primaryColor),
+                  icon: const Icon(IconlyLight.arrow_down, color: MyColors.primaryColor),
                   splashRadius: 1,
                 ),
                 Text(
                   percentInt.toString() + "%",
-                  style: const TextStyle(
-                      fontSize: 12, color: MyColors.primaryColor),
+                  style: const TextStyle(fontSize: 12, color: MyColors.primaryColor),
                 ),
               ],
             );
@@ -68,13 +65,11 @@ class DownloadPage extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(IconlyLight.arrow_down,
-                      color: MyColors.primaryColor),
+                  icon: const Icon(IconlyLight.arrow_down, color: MyColors.primaryColor),
                   splashRadius: 1,
                 ),
                 // if (products != null)
-                const Text("Татсан",
-                    style: TextStyle(fontSize: 12, color: MyColors.gray))
+                const Text("Татсан", style: TextStyle(fontSize: 12, color: MyColors.gray))
               ],
             );
           }

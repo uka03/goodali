@@ -43,9 +43,7 @@ class _MyCoursesState extends State<MyCourses> {
   onPlayButtonClicked(int index) async {
     print("onPlayButtonClicked");
     currentlyPlaying.value = allLectures[index];
-    if (activeList.first.title == allLectures.first.title &&
-        activeList.first.id == allLectures.first.id &&
-        activeList.length == allLectures.length) {
+    if (activeList.first.title == allLectures.first.title && activeList.first.id == allLectures.first.id && activeList.length == allLectures.length) {
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
@@ -91,8 +89,7 @@ class _MyCoursesState extends State<MyCourses> {
             ),
           );
         } else {
-          return const Center(
-              child: CircularProgressIndicator(color: MyColors.primaryColor));
+          return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
         }
       },
     );
@@ -105,7 +102,7 @@ class _MyCoursesState extends State<MyCourses> {
         List<Products> allboughtLectures = [];
 
         allListProducts = [...allLectures, ...myCourses];
-        print("shdsdh ${allListProducts.length}");
+        // print("shdsdh ${allListProducts.length}");
         if (box.isNotEmpty) {
           for (var i = 0; i < box.length; i++) {
             Products products = box.getAt(i);
@@ -117,14 +114,13 @@ class _MyCoursesState extends State<MyCourses> {
           allLectures = removeDuplicates(allboughtLectures);
 
           allListProducts = [...allLectures, ...myCourses];
-          print("shdsdh ${allListProducts.length}");
+          // print("shdsdh ${allListProducts.length}");
 
           return ListView.separated(
               itemCount: allLectures.length,
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              separatorBuilder: (BuildContext context, int index) =>
-                  const Divider(),
+              separatorBuilder: (BuildContext context, int index) => const Divider(),
               itemBuilder: (context, index) {
                 String empty = "";
                 if (albumName == allLectures[index].albumTitle) {
@@ -140,11 +136,7 @@ class _MyCoursesState extends State<MyCourses> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (empty != "") const SizedBox(height: 30),
-                    Text(empty,
-                        style: const TextStyle(
-                            color: MyColors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold)),
+                    Text(empty, style: const TextStyle(color: MyColors.black, fontSize: 18, fontWeight: FontWeight.bold)),
                     if (empty != "") const SizedBox(height: 30),
                     AlbumDetailItem(
                         index: index,
@@ -188,21 +180,14 @@ class _MyCoursesState extends State<MyCourses> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
-          const Text("Онлайн сургалт",
-              style: TextStyle(
-                  color: MyColors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold)),
+          const Text("Онлайн сургалт", style: TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
           ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: myCourses.length,
               itemBuilder: (BuildContext context, int index) {
-                return CourseProductsListItem(
-                    isBought: true,
-                    courseProducts: myCourses[index],
-                    courseProductsList: myCourses);
+                return CourseProductsListItem(isBought: true, courseProducts: myCourses[index], courseProductsList: myCourses);
               }),
         ],
       );

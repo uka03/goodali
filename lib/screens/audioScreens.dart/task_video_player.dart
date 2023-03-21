@@ -22,7 +22,6 @@ class TaskVideoPlayer extends StatefulWidget {
 
 class _TaskVideoPlayerState extends State<TaskVideoPlayer> {
   bool isWatched = false;
-  // bool isReady = false;
   String url = "";
   bool isTyping = false;
 
@@ -76,26 +75,27 @@ class _TaskVideoPlayerState extends State<TaskVideoPlayer> {
               ),
             ),
           const SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: MyColors.border1)),
-            margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Row(
-              children: [
-                Checkbox(
-                    shape: const CircleBorder(),
-                    activeColor: MyColors.success,
-                    value: isWatched,
-                    onChanged: (value) {
-                      setState(() {
-                        isWatched = value!;
-                      });
-                      widget.onChanged.call(value!);
-                    }),
-                const Text("Видеог дуустал нь үзсэн.", style: TextStyle(color: MyColors.black)),
-              ],
+          if (url.isNotEmpty)
+            Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: MyColors.border1)),
+              margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Row(
+                children: [
+                  Checkbox(
+                      shape: const CircleBorder(),
+                      activeColor: MyColors.success,
+                      value: isWatched,
+                      onChanged: (value) {
+                        setState(() {
+                          isWatched = value!;
+                        });
+                        widget.onChanged.call(value!);
+                      }),
+                  const Text("Видеог дуустал нь үзсэн.", style: TextStyle(color: MyColors.black)),
+                ],
+              ),
             ),
-          ),
           if (widget.courseTasks.isAnswer == 1)
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 110),

@@ -76,7 +76,7 @@ class _BannerAlbumState extends State<BannerAlbum> {
     setState(() {
       username = pref.getString("email") ?? "";
     });
-    print('appbar $username');
+    // print('appbar $username');
   }
 
   @override
@@ -109,8 +109,7 @@ class _BannerAlbumState extends State<BannerAlbum> {
                         Urls.networkPath + (albumDetail.banner ?? ""),
                         width: imageSize,
                         height: imageSize,
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
+                        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                           if (loadingProgress == null) {
                             return child;
                           }
@@ -119,16 +118,14 @@ class _BannerAlbumState extends State<BannerAlbum> {
                               color: MyColors.primaryColor,
                               strokeWidth: 2,
                               value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
+                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                                   : null,
                             ),
                           );
                         },
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stack) {
-                          if (error is NetworkImageLoadException &&
-                              error.statusCode == 404) {
+                          if (error is NetworkImageLoadException && error.statusCode == 404) {
                             return const Text("404");
                           }
 
@@ -145,10 +142,7 @@ class _BannerAlbumState extends State<BannerAlbum> {
                     const SizedBox(height: 20),
                     Text(
                       albumDetail.title ?? "" "",
-                      style: const TextStyle(
-                          fontSize: 20,
-                          color: MyColors.black,
-                          fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),
                     Padding(
@@ -172,11 +166,7 @@ class _BannerAlbumState extends State<BannerAlbum> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ClipRRect(
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: ImageView(
-                                      imgPath: albumDetail.banner ?? "",
-                                      width: 40,
-                                      height: 40)),
+                                  borderRadius: BorderRadius.circular(4), child: ImageView(imgPath: albumDetail.banner ?? "", width: 40, height: 40)),
                               const SizedBox(width: 15),
                               Expanded(
                                 child: Column(
@@ -187,10 +177,7 @@ class _BannerAlbumState extends State<BannerAlbum> {
                                       maxLines: 1,
                                       softWrap: true,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          color: MyColors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
+                                      style: const TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
                                     const SizedBox(height: 10),
                                     // CustomReadMoreText(text: widget.products.body ?? "")
@@ -208,11 +195,9 @@ class _BannerAlbumState extends State<BannerAlbum> {
                                   splashRadius: 20,
                                   padding: EdgeInsets.zero,
                                   onPressed: () async {
-                                    AudioPlayerModel _audio = AudioPlayerModel(
-                                        productID: albumDetail.productId,
-                                        audioPosition: position.inMilliseconds);
-                                    _audioPlayerProvider
-                                        .addAudioPosition(_audio);
+                                    AudioPlayerModel _audio =
+                                        AudioPlayerModel(productID: albumDetail.productId, audioPosition: position.inMilliseconds);
+                                    _audioPlayerProvider.addAudioPosition(_audio);
                                     if (isPlaying) {
                                       introAudioPlayer.pause();
                                     } else {
@@ -220,24 +205,16 @@ class _BannerAlbumState extends State<BannerAlbum> {
                                     }
                                   },
                                   icon: Icon(
-                                    isPlaying
-                                        ? Icons.pause_rounded
-                                        : Icons.play_arrow_rounded,
+                                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                                     size: 30,
                                     color: MyColors.black,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              Text(formatTime(duration - position) + "мин",
-                                  style: const TextStyle(
-                                      fontSize: 12, color: MyColors.black)),
+                              Text(formatTime(duration - position) + "мин", style: const TextStyle(fontSize: 12, color: MyColors.black)),
                               const Spacer(),
-                              IconButton(
-                                  splashRadius: 20,
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.more_horiz,
-                                      color: MyColors.gray)),
+                              IconButton(splashRadius: 20, onPressed: () {}, icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
                             ],
                           ),
                           const SizedBox(height: 12)
@@ -269,8 +246,7 @@ class _BannerAlbumState extends State<BannerAlbum> {
                         }
                       },
                       itemCount: bannerLecture.length,
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const Divider(
+                      separatorBuilder: (BuildContext context, int index) => const Divider(
                         endIndent: 18,
                         indent: 18,
                       ),
@@ -290,15 +266,9 @@ class _BannerAlbumState extends State<BannerAlbum> {
                     if (!cart.sameItemCheck) {
                       cart.addProducts(albumDetail);
                       cart.addTotalPrice(albumDetail.price?.toDouble() ?? 0.0);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const CartScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
                     } else {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const CartScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
                     }
                   }),
             )
@@ -314,14 +284,10 @@ class _BannerAlbumState extends State<BannerAlbum> {
         enableDrag: true,
         backgroundColor: Colors.white,
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return IntroAudio(
-                    products: albumDetail, productsList: const []);
+              builder: (BuildContext context, void Function(void Function()) setState) {
+                return IntroAudio(products: albumDetail, productsList: const []);
               },
             ));
   }

@@ -91,12 +91,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       providers: [
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
         ChangeNotifierProvider<CartProvider>(create: (_) => CartProvider()),
-        ChangeNotifierProvider<AudioPlayerProvider>(
-            create: (_) => AudioPlayerProvider()),
-        ChangeNotifierProvider<AudioDownloadProvider>(
-            create: (_) => AudioDownloadProvider()),
-        ChangeNotifierProvider<ForumTagNotifier>(
-            create: (_) => ForumTagNotifier()),
+        ChangeNotifierProvider<AudioPlayerProvider>(create: (_) => AudioPlayerProvider()),
+        ChangeNotifierProvider<AudioDownloadProvider>(create: (_) => AudioDownloadProvider()),
+        ChangeNotifierProvider<ForumTagNotifier>(create: (_) => ForumTagNotifier()),
         ChangeNotifierProvider<DownloadController>(
           lazy: false,
           create: (_) => DownloadController(),
@@ -118,13 +115,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                       type: BottomNavigationBarType.fixed,
                       selectedItemColor: MyColors.primaryColor,
                       unselectedItemColor: Colors.black,
-                      unselectedLabelStyle:
-                          TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
-                      selectedLabelStyle: TextStyle(
-                          fontSize: 10, fontWeight: FontWeight.w300))),
+                      unselectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
+                      selectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w300))),
               home: Consumer<Auth>(builder: (context, value, _) {
-                developer.log("biometric ${value.isBiometricEnabled}");
-                developer.log("intro ${value.isFirstTime}");
+                // developer.log("biometric ${value.isBiometricEnabled}");
+                // developer.log("intro ${value.isFirstTime}");
 
                 if (value.isFirstTime) {
                   return const IntroScreen();

@@ -10,9 +10,7 @@ class ImageView extends StatelessWidget {
   final double? height;
   final double? width;
   final bool? isQpay;
-  const ImageView(
-      {Key? key, required this.imgPath, this.height, this.width, this.isQpay})
-      : super(key: key);
+  const ImageView({Key? key, required this.imgPath, this.height, this.width, this.isQpay}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +36,7 @@ class ImageView extends StatelessWidget {
               width: width,
               child: Center(
                 child: CircularProgressIndicator(
-                    color: MyColors.primaryColor,
-                    strokeWidth: 2,
-                    value:
-                        state.loadingProgress?.expectedTotalBytes?.toDouble()),
+                    color: MyColors.primaryColor, strokeWidth: 2, value: state.loadingProgress?.expectedTotalBytes?.toDouble()),
               ),
             );
 

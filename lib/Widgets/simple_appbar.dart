@@ -33,7 +33,7 @@ class _SimpleAppBarState extends State<SimpleAppBar> {
     setState(() {
       username = pref.getString("email") ?? "";
     });
-    print('appbar $username');
+    // print('appbar $username');
   }
 
   @override

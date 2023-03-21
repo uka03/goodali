@@ -15,8 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CourseDetail extends StatefulWidget {
   final Products? courseProducts;
   final int? id;
-  const CourseDetail({Key? key, this.courseProducts, this.id})
-      : super(key: key);
+  const CourseDetail({Key? key, this.courseProducts, this.id}) : super(key: key);
 
   @override
   State<CourseDetail> createState() => _CourseDetailState();
@@ -37,7 +36,7 @@ class _CourseDetailState extends State<CourseDetail> {
     setState(() {
       username = pref.getString("email") ?? "";
     });
-    print('appbar $username');
+    // print('appbar $username');
   }
 
   @override
@@ -61,17 +60,12 @@ class _CourseDetailState extends State<CourseDetail> {
                           width: double.infinity,
                         ),
                         Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
                             child: Column(
                               children: [
                                 const SizedBox(height: 20),
                                 Text(widget.courseProducts?.name ?? "",
-                                    style: const TextStyle(
-                                        color: MyColors.black,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        height: 1.7)),
+                                    style: const TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
                                 const SizedBox(height: 10),
                                 const Text("Цахим сургалт",
                                     style: TextStyle(
@@ -79,11 +73,7 @@ class _CourseDetailState extends State<CourseDetail> {
                                     )),
                                 const SizedBox(height: 20),
                                 HtmlWidget(widget.courseProducts?.body ?? "",
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        height: 1.8,
-                                        fontFamily: "Gilroy",
-                                        color: MyColors.gray)),
+                                    textStyle: const TextStyle(fontSize: 14, height: 1.8, fontFamily: "Gilroy", color: MyColors.gray)),
                                 const SizedBox(height: 30),
                               ],
                             )),
@@ -98,12 +88,7 @@ class _CourseDetailState extends State<CourseDetail> {
                     child: CustomElevatedButton(
                       text: "Худалдаж авах",
                       onPress: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CourseList(
-                                    id: widget.courseProducts?.id.toString() ??
-                                        "")));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => CourseList(id: widget.courseProducts?.id.toString() ?? "")));
                       },
                     ),
                   ),
@@ -139,28 +124,19 @@ class _CourseDetailState extends State<CourseDetail> {
                           height: 200,
                         ),
                         Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
                             child: Column(
                               children: [
                                 const SizedBox(height: 20),
                                 Text(courseDetail.name ?? "",
-                                    style: const TextStyle(
-                                        color: MyColors.black,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        height: 1.7)),
+                                    style: const TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
                                 const SizedBox(height: 10),
                                 const Text("Цахим сургалт",
                                     style: TextStyle(
                                       color: MyColors.primaryColor,
                                     )),
                                 const SizedBox(height: 20),
-                                HtmlWidget(courseDetail.body ?? "",
-                                    textStyle: const TextStyle(
-                                        fontSize: 14,
-                                        height: 1.8,
-                                        color: MyColors.gray)),
+                                HtmlWidget(courseDetail.body ?? "", textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.gray)),
                                 const SizedBox(height: 30),
                               ],
                             )),
@@ -174,11 +150,7 @@ class _CourseDetailState extends State<CourseDetail> {
                     child: CustomElevatedButton(
                       text: "Худалдаж авах",
                       onPress: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CourseList(
-                                    id: courseDetail.id.toString())));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => CourseList(id: courseDetail.id.toString())));
                       },
                     ),
                   ),

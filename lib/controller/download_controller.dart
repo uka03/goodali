@@ -16,8 +16,7 @@ import 'package:path/path.dart' as path;
 final downloadProgressNotifier = ValueNotifier<int>(0);
 final currentIndexNotifier = ValueNotifier<int>(0);
 final downloadTaskIDNotifier = ValueNotifier<String>("0");
-final downloadStatusNotifier =
-    ValueNotifier<DownloadState>(DownloadState.undefined);
+final downloadStatusNotifier = ValueNotifier<DownloadState>(DownloadState.undefined);
 
 @pragma('vm:entry-point')
 void downloadCallback(String id, DownloadTaskStatus status, int progress) {
@@ -40,8 +39,7 @@ class DownloadController with ChangeNotifier {
 
   void _bindBackgroundIsolate() {
     final _port = ReceivePort();
-    final isSuccess = IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
+    final isSuccess = IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
     if (!isSuccess) {
       _unbindBackgroundIsolate();
       _bindBackgroundIsolate();
@@ -82,14 +80,12 @@ class DownloadController with ChangeNotifier {
   Future _saveMediaId(TaskInfo episodeTask) async {
     episodeTask.status = DownloadTaskStatus.complete;
 
-    final episodePodcast = await _dataStore.getProductsFromUrl(
-        url: Urls.networkPath + episodeTask.products!.audio!);
+    final episodePodcast = await _dataStore.getProductsFromUrl(url: Urls.networkPath + episodeTask.products!.audio!);
     episodePodcast!.isDownloaded = true;
     episodePodcast.downloadedPath = _localPath;
     await episodePodcast.save();
     log(episodePodcast.isDownloaded.toString(), name: "podcast downloaded");
-    _episodeTasks.add(TaskInfo(episodePodcast, episodeTask.taskId,
-        progress: 100, status: DownloadTaskStatus.complete));
+    _episodeTasks.add(TaskInfo(episodePodcast, episodeTask.taskId, progress: 100, status: DownloadTaskStatus.complete));
     notifyListeners();
   }
 
@@ -109,42 +105,37 @@ class DownloadController with ChangeNotifier {
   }
 
   Future<void> _loadTasks() async {
-    print("_loadTasks");
+    // print("_loadTasks");
     _episodeTasks = [];
     var dbHelper = HiveBoughtDataStore();
     var tasks = await FlutterDownloader.loadTasks();
 
-    print("task length ${tasks?.length}");
+    // print("task length ${tasks?.length}");
     if (tasks != null && tasks.isNotEmpty) {
       for (var task in tasks) {
         var episode = await dbHelper.getProductsFromUrl(url: task.url);
         if (episode == null) {
-          print("eswel null uuu");
-          await FlutterDownloader.remove(
-              taskId: task.taskId, shouldDeleteContent: true);
+          // print("eswel null uuu");
+          await FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: true);
         } else {
-          print("task status ${task.status}");
+          // print("task status ${task.status}");
           if (task.status == DownloadTaskStatus.complete) {
-            print("iisehee complete orj irjiinuu");
-            var exist =
-                await File(path.join(task.savedDir, task.filename)).exists();
+            // print("iisehee complete orj irjiinuu");
+            var exist = await File(path.join(task.savedDir, task.filename)).exists();
 
             if (!exist) {
-              await FlutterDownloader.remove(
-                  taskId: task.taskId, shouldDeleteContent: true);
+              await FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: true);
             } else {
-              _episodeTasks.add(TaskInfo(episode, task.taskId,
-                  progress: task.progress, status: task.status));
+              _episodeTasks.add(TaskInfo(episode, task.taskId, progress: task.progress, status: task.status));
             }
           } else {
-            print("iisehee orj irjiinuu");
-            await FlutterDownloader.remove(
-                taskId: task.taskId, shouldDeleteContent: true);
+            // print("iisehee orj irjiinuu");
+            await FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: true);
             _episodeTasks.clear();
           }
         }
       }
-      print("_episodeTasks.length ${_episodeTasks.length}");
+      // print("_episodeTasks.length ${_episodeTasks.length}");
     }
     notifyListeners();
   }
@@ -194,8 +185,7 @@ class DownloadController with ChangeNotifier {
         print(e);
       }
     } else if (Platform.isIOS) {
-      externalStorageDirPath =
-          (await getApplicationDocumentsDirectory()).absolute.path;
+      externalStorageDirPath = (await getApplicationDocumentsDirectory()).absolute.path;
     }
     return externalStorageDirPath;
   }

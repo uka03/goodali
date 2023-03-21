@@ -48,7 +48,7 @@ class Auth with ChangeNotifier {
   }
 
   Auth() {
-    print("ene ehend bnuu");
+    // print("ene ehend bnuu");
     checkIntroScreen();
     checkBiometric();
   }
@@ -75,13 +75,10 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>> login(BuildContext context, dynamic data,
-      {bool? toRemind}) async {
+  Future<Map<String, dynamic>> login(BuildContext context, dynamic data, {bool? toRemind}) async {
     final preferences = await SharedPreferences.getInstance();
     try {
-      final response = await Http()
-          .getDio(context, headerTypeNone)
-          .post(Urls.signin, data: data);
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.signin, data: data);
 
       if (response.statusCode == 200) {
         if (response.data['token'] != null) {
@@ -97,8 +94,7 @@ class Auth with ChangeNotifier {
             preferences.remove("toRemind");
           }
 
-          if (buttonNotifier.value == ButtonState.playing ||
-              currentlyPlaying.value != null) {
+          if (buttonNotifier.value == ButtonState.playing || currentlyPlaying.value != null) {
             currentlyPlaying.value = null;
             audioHandler.pause();
           }
@@ -125,11 +121,9 @@ class Auth with ChangeNotifier {
     } on DioError catch (e) {
       print(e.type);
       if (e.type == DioErrorType.other) {
-        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.")
-            .show(context);
+        TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
-        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа.")
-            .show(context);
+        TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа.").show(context);
       }
       return {};
     }
@@ -137,8 +131,7 @@ class Auth with ChangeNotifier {
 
   Future<void> checkUserIsChanged(String username, BuildContext context) async {
     final pref = await SharedPreferences.getInstance();
-    var tasks =
-        Provider.of<DownloadController>(context, listen: false).episodeTasks;
+    var tasks = Provider.of<DownloadController>(context, listen: false).episodeTasks;
     String email = pref.getString("email") ?? "";
     print("username $username");
     print("email $email");
@@ -149,11 +142,8 @@ class Auth with ChangeNotifier {
       if (tasks.isNotEmpty) {
         for (var element in tasks) {
           print("element.taskId ${element.taskId} ");
-          await FlutterDownloader.remove(
-              taskId: element.taskId ?? "0", shouldDeleteContent: true);
-          Provider.of<DownloadController>(context, listen: false)
-              .episodeTasks
-              .clear();
+          await FlutterDownloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
+          Provider.of<DownloadController>(context, listen: false).episodeTasks.clear();
         }
       }
     } else {
@@ -178,25 +168,20 @@ class Auth with ChangeNotifier {
 
   Future<void> logOut(BuildContext context, {bool isDelete = false}) async {
     final preferences = await SharedPreferences.getInstance();
-    if (buttonNotifier.value == ButtonState.playing ||
-        currentlyPlaying.value != null) {
+    if (buttonNotifier.value == ButtonState.playing || currentlyPlaying.value != null) {
       currentlyPlaying.value = null;
       audioHandler.pause();
     }
 
     if (isDelete == true) {
-      var tasks =
-          Provider.of<DownloadController>(context, listen: false).episodeTasks;
+      var tasks = Provider.of<DownloadController>(context, listen: false).episodeTasks;
       _dataStore.deleteBoxes();
       print(tasks.length);
       if (tasks.isNotEmpty) {
         for (var element in tasks) {
           print("element.taskId ${element.taskId} ");
-          await FlutterDownloader.remove(
-              taskId: element.taskId ?? "0", shouldDeleteContent: true);
-          Provider.of<DownloadController>(context, listen: false)
-              .episodeTasks
-              .clear();
+          await FlutterDownloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
+          Provider.of<DownloadController>(context, listen: false).episodeTasks.clear();
         }
       }
     }
@@ -251,8 +236,7 @@ class Auth with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     try {
       bool _authenticated = await localAuth.authenticate(
-        localizedReason:
-            'Scan your fingerprint (or face or whatever) to authenticate',
+        localizedReason: 'Scan your fingerprint (or face or whatever) to authenticate',
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: true,
@@ -282,8 +266,7 @@ class Auth with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       bool _authenticated = await localAuth.authenticate(
-        localizedReason:
-            'Scan your fingerprint (or face or whatever) to authenticate',
+        localizedReason: 'Scan your fingerprint (or face or whatever) to authenticate',
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: true,

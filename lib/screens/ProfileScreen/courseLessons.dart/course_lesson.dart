@@ -78,7 +78,6 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
                   initialPage: index.toDouble(),
                   title: widget.title,
                   courseTasks: taskList,
-                  banner: widget.banner,
                   lessonName: widget.lessonName,
                 ))).then((value) {
       if (value != null) {
@@ -129,9 +128,6 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
       tasksName.add(taskType);
     }
 
-    for (var i = 0; i < allTasks.length; i++) {
-      log('[CourseLessonType] {getCoursesTasks} answerData[$i]: ${allTasks[i].answerData}');
-    }
     if (mounted) {
       setState(() {
         taskList = allTasks;

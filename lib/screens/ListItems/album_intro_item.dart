@@ -76,7 +76,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
     setState(() {
       username = pref.getString("email") ?? "";
     });
-    print('appbar $username');
+    // print('appbar $username');
   }
 
   Future<Duration> getTotalDuration(String url) async {

@@ -73,7 +73,7 @@ class _BannerLectureState extends State<BannerLecture> {
     setState(() {
       username = pref.getString("email") ?? "";
     });
-    print('appbar $username');
+    // print('appbar $username');
   }
 
   @override
@@ -104,8 +104,7 @@ class _BannerLectureState extends State<BannerLecture> {
                           Urls.networkPath + (albumDetail.banner ?? ""),
                           width: imageSize,
                           height: imageSize,
-                          loadingBuilder: (BuildContext context, Widget child,
-                              ImageChunkEvent? loadingProgress) {
+                          loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                             if (loadingProgress == null) {
                               return child;
                             }
@@ -113,18 +112,15 @@ class _BannerLectureState extends State<BannerLecture> {
                               child: CircularProgressIndicator(
                                 color: MyColors.primaryColor,
                                 strokeWidth: 2,
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                                     : null,
                               ),
                             );
                           },
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stack) {
-                            if (error is NetworkImageLoadException &&
-                                error.statusCode == 404) {
+                            if (error is NetworkImageLoadException && error.statusCode == 404) {
                               return const Text("404");
                             }
 
@@ -141,10 +137,7 @@ class _BannerLectureState extends State<BannerLecture> {
                       const SizedBox(height: 20),
                       Text(
                         albumDetail.title ?? "" "",
-                        style: const TextStyle(
-                            fontSize: 20,
-                            color: MyColors.black,
-                            fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 20),
                       Padding(
@@ -167,30 +160,21 @@ class _BannerLectureState extends State<BannerLecture> {
                               children: [
                                 ClipRRect(
                                     borderRadius: BorderRadius.circular(4),
-                                    child: ImageView(
-                                        imgPath:
-                                            bannerLecture.first.banner ?? "",
-                                        width: 40,
-                                        height: 40)),
+                                    child: ImageView(imgPath: bannerLecture.first.banner ?? "", width: 40, height: 40)),
                                 const SizedBox(width: 15),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         bannerLecture.first.title ?? "",
                                         maxLines: 1,
                                         softWrap: true,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            color: MyColors.black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                        style: const TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 10),
-                                      CustomReadMoreText(
-                                          text: bannerLecture.first.body ?? "")
+                                      CustomReadMoreText(text: bannerLecture.first.body ?? "")
                                     ],
                                   ),
                                 )
@@ -212,44 +196,29 @@ class _BannerLectureState extends State<BannerLecture> {
                                       }
                                     },
                                     icon: Icon(
-                                      isPlaying
-                                          ? Icons.pause_rounded
-                                          : Icons.play_arrow_rounded,
+                                      isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                                       size: 30,
                                       color: MyColors.black,
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                Text(formatTime(duration - position) + "мин",
-                                    style: const TextStyle(
-                                        fontSize: 12, color: MyColors.black)),
+                                Text(formatTime(duration - position) + "мин", style: const TextStyle(fontSize: 12, color: MyColors.black)),
                                 const Spacer(),
                                 if (username != "surgalt9@gmail.com" && isAuth)
                                   IconButton(
                                       splashRadius: 20,
                                       onPressed: () {
-                                        cart.addItemsIndex(
-                                            bannerLecture.first.productId!,
-                                            albumID: albumDetail.productId!);
+                                        cart.addItemsIndex(bannerLecture.first.productId!, albumID: albumDetail.productId!);
                                         if (!cart.sameItemCheck) {
                                           cart.addProducts(bannerLecture.first);
-                                          cart.addTotalPrice(bannerLecture
-                                                  .first.price
-                                                  ?.toDouble() ??
-                                              0.0);
-                                          TopSnackBar.successFactory(
-                                                  msg:
-                                                      "Сагсанд амжилттай нэмэгдлээ")
-                                              .show(context);
+                                          cart.addTotalPrice(bannerLecture.first.price?.toDouble() ?? 0.0);
+                                          TopSnackBar.successFactory(msg: "Сагсанд амжилттай нэмэгдлээ").show(context);
                                         } else {
-                                          TopSnackBar.errorFactory(
-                                                  msg: "Сагсанд байна")
-                                              .show(context);
+                                          TopSnackBar.errorFactory(msg: "Сагсанд байна").show(context);
                                         }
                                       },
-                                      icon: const Icon(IconlyLight.buy,
-                                          color: MyColors.gray))
+                                      icon: const Icon(IconlyLight.buy, color: MyColors.gray))
                               ],
                             ),
                             const SizedBox(height: 12)
@@ -290,14 +259,10 @@ class _BannerLectureState extends State<BannerLecture> {
         enableDrag: true,
         backgroundColor: Colors.white,
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
-              builder: (BuildContext context,
-                  void Function(void Function()) setState) {
-                return IntroAudio(
-                    products: albumDetail, productsList: const []);
+              builder: (BuildContext context, void Function(void Function()) setState) {
+                return IntroAudio(products: albumDetail, productsList: const []);
               },
             ));
   }

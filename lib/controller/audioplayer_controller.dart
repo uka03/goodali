@@ -111,7 +111,7 @@ class AudioPlayerController with ChangeNotifier {
   void _listenToTotalDuration() {
     audioHandler.mediaItem.listen((mediaItem) {
       final oldState = durationStateNotifier.value;
-      log(mediaItem?.duration.toString() ?? "", name: "totalDuration");
+      // log(mediaItem?.duration.toString() ?? "", name: "totalDuration");
       durationStateNotifier.value = DurationState(
         oldState.progress,
         oldState.buffered,
@@ -166,7 +166,7 @@ Future<bool> initiliazePodcast() async {
   List<MediaItem> mediaItems = [];
   audioHandler.queue.value.clear();
 
-  log("initiliazePodcast");
+  // log("initiliazePodcast");
 
   for (var item in activeList) {
     MediaItem mediaItem = MediaItem(
@@ -184,7 +184,7 @@ Future<bool> initiliazePodcast() async {
 
   var firstItem = await audioHandler.queue.first;
   if (audioHandler.queue.value.isEmpty || identical(firstItem, mediaItems.first) == true) {
-    log("initiliaze add queue lecture", name: mediaItems.length.toString());
+    // log("initiliaze add queue lecture", name: mediaItems.length.toString());
     await audioHandler.addQueueItems(mediaItems);
 
     return true;
