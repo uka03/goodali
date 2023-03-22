@@ -328,7 +328,7 @@ class _CourseTasksState extends State<CourseTasks> {
             if (courseTask.banner != null && courseTask.banner != "Image failed to upload") banner(courseTask.banner!),
             if (courseTask.body != "" || courseTask.body!.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                padding: const EdgeInsets.fromLTRB(0, 10, 20, 10),
                 child: HtmlWidget(
                   courseTask.body ?? "",
                   textStyle: const TextStyle(fontFamily: "Gilroy", height: 1.6),
