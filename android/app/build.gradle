@@ -57,7 +57,7 @@ android {
         applicationId "com.goodali.mn"
         minSdkVersion 24
         targetSdkVersion 33
-        versionCode flutterVersionCode.toInteger()
+        versionCode 2
         versionName flutterVersionName
     }
 
