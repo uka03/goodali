@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
+// import 'package:flutter_downloader/flutter_downloader.dart';
+import 'Utils/downloader_stub.dart' if (dart.library.io) 'Utils/downloader_mobile.dart';
 
 import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Providers/audio_provider.dart';
@@ -25,8 +27,12 @@ Future<void> main() async {
   await initAudioHandler();
   AudioPlayerController audioPlayerController = AudioPlayerController();
   audioPlayerController.initiliaze();
-  await FlutterDownloader.initialize(debug: true);
+  // await FlutterDownloader.initialize(debug: true);
   WidgetsFlutterBinding.ensureInitialized();
+
+  final downloader = Downloader();
+  await downloader.initialize();
+
   CacheManager.logLevel = CacheManagerLogLevel.verbose;
   await Hive.initFlutter();
   Hive.registerAdapter<Products>(ProductsAdapter());
@@ -74,7 +80,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.detached:
         print("app is removed");
-        FlutterDownloader.cancelAll();
+        Downloader.cancelAll();
         removeTokenWhenAppKilled();
         break;
     }
@@ -94,10 +100,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ChangeNotifierProvider<AudioPlayerProvider>(create: (_) => AudioPlayerProvider()),
         ChangeNotifierProvider<AudioDownloadProvider>(create: (_) => AudioDownloadProvider()),
         ChangeNotifierProvider<ForumTagNotifier>(create: (_) => ForumTagNotifier()),
-        ChangeNotifierProvider<DownloadController>(
-          lazy: false,
-          create: (_) => DownloadController(),
-        )
+        if (!kIsWeb)
+          ChangeNotifierProvider<DownloadController>(
+            lazy: false,
+            create: (_) => DownloadController(),
+          )
       ],
       child: Consumer<Auth>(
         builder: (context, value, child) {

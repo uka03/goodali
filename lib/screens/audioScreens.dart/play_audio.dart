@@ -1,4 +1,5 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Utils/constans.dart';
@@ -68,16 +69,11 @@ class _PlayAudioState extends State<PlayAudio> {
           const double maxImgSize = 220;
 
           var percentageExpandedPlayer = percentageFromValueInRange(
-              min: playerMaxHeight * miniplayerPercentageDeclaration +
-                  playerMinHeight,
-              max: playerMaxHeight,
-              value: height);
+              min: playerMaxHeight * miniplayerPercentageDeclaration + playerMinHeight, max: playerMaxHeight, value: height);
           if (percentageExpandedPlayer < 0) percentageExpandedPlayer = 0;
-          final paddingVertical = valueFromPercentageInRange(
-              min: 0, max: 0, percentage: percentageExpandedPlayer);
+          final paddingVertical = valueFromPercentageInRange(min: 0, max: 0, percentage: percentageExpandedPlayer);
           final double heightWithoutPadding = height - paddingVertical * 2 / 9;
-          final double imageSize =
-              heightWithoutPadding > maxImgSize ? maxImgSize : 48;
+          final double imageSize = heightWithoutPadding > maxImgSize ? maxImgSize : 48;
 
           position = durationStateNotifier.value.progress ?? Duration.zero;
           duration = durationStateNotifier.value.total ?? Duration.zero;
@@ -85,10 +81,7 @@ class _PlayAudioState extends State<PlayAudio> {
           if (!miniplayer) {
             return Container(
               decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12))),
+                  color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SingleChildScrollView(
                 child: Opacity(
@@ -99,16 +92,11 @@ class _PlayAudioState extends State<PlayAudio> {
                       Container(
                         width: 38,
                         height: 6,
-                        decoration: BoxDecoration(
-                            color: MyColors.gray,
-                            borderRadius: BorderRadius.circular(10)),
+                        decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(10)),
                       ),
                       const SizedBox(height: 30),
                       Padding(
-                        padding: EdgeInsets.only(
-                            left: paddingVertical,
-                            top: paddingVertical,
-                            bottom: paddingVertical),
+                        padding: EdgeInsets.only(left: paddingVertical, top: paddingVertical, bottom: paddingVertical),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: ImageView(
@@ -121,39 +109,25 @@ class _PlayAudioState extends State<PlayAudio> {
                       const SizedBox(height: 40),
                       Text(
                         widget.albumName,
-                        style:
-                            const TextStyle(fontSize: 12, color: MyColors.gray),
+                        style: const TextStyle(fontSize: 12, color: MyColors.gray),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        widget.products.title == ""
-                            ? widget.products.lectureTitle ?? ""
-                            : widget.products.title ?? "",
+                        widget.products.title == "" ? widget.products.lectureTitle ?? "" : widget.products.title ?? "",
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                       const SizedBox(height: 46),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          if (widget.products.isBought == true)
-                            DownloadButton(
-                                products: widget.products, isModalPlayer: true),
+                          if (widget.products.isBought == true && !kIsWeb) DownloadButton(products: widget.products, isModalPlayer: true),
                           Column(
                             children: [
                               IconButton(
                                 onPressed: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              AudioDescription(
-                                                  description:
-                                                      widget.products.body ??
-                                                          "")));
+                                      context, MaterialPageRoute(builder: (context) => AudioDescription(description: widget.products.body ?? "")));
                                 },
                                 icon: const Icon(
                                   IconlyLight.info_square,
@@ -161,9 +135,7 @@ class _PlayAudioState extends State<PlayAudio> {
                                 ),
                                 splashRadius: 1,
                               ),
-                              const Text("Тайлбар",
-                                  style: TextStyle(
-                                      fontSize: 12, color: MyColors.gray))
+                              const Text("Тайлбар", style: TextStyle(fontSize: 12, color: MyColors.gray))
                             ],
                           ),
                         ],
@@ -192,8 +164,7 @@ class _PlayAudioState extends State<PlayAudio> {
                                 baseBarColor: MyColors.border1,
                                 progressBarColor: MyColors.primaryColor,
                                 thumbColor: MyColors.primaryColor,
-                                bufferedBarColor:
-                                    MyColors.primaryColor.withAlpha(20),
+                                bufferedBarColor: MyColors.primaryColor.withAlpha(20),
                               ),
                             ),
                           );
@@ -209,11 +180,7 @@ class _PlayAudioState extends State<PlayAudio> {
                               "assets/images/replay_5.svg",
                             ),
                           ),
-                          CircleAvatar(
-                              radius: 36,
-                              backgroundColor: MyColors.primaryColor,
-                              child:
-                                  PlayerButtons(title: widget.products.title!)),
+                          CircleAvatar(radius: 36, backgroundColor: MyColors.primaryColor, child: PlayerButtons(title: widget.products.title!)),
                           InkWell(
                             onTap: buttonForward15Seconds,
                             child: SvgPicture.asset(
@@ -229,10 +196,7 @@ class _PlayAudioState extends State<PlayAudio> {
             );
           }
           final percentageMiniplayer = percentageFromValueInRange(
-              min: playerMinHeight,
-              max: playerMaxHeight * miniplayerPercentageDeclaration +
-                  playerMinHeight,
-              value: height);
+              min: playerMinHeight, max: playerMaxHeight * miniplayerPercentageDeclaration + playerMinHeight, value: height);
 
           final elementOpacity = 1 - 1 * percentageMiniplayer;
           final progressIndicatorHeight = 3 - 3 * percentageMiniplayer;
@@ -245,14 +209,11 @@ class _PlayAudioState extends State<PlayAudio> {
                   child: Row(
                     children: [
                       ConstrainedBox(
-                        constraints:
-                            const BoxConstraints(maxHeight: maxImgSize),
+                        constraints: const BoxConstraints(maxHeight: maxImgSize),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: ImageView(
-                            imgPath: widget.products.banner ??
-                                widget.products.banner ??
-                                "",
+                            imgPath: widget.products.banner ?? widget.products.banner ?? "",
                             width: imageSize,
                             height: imageSize,
                           ),
@@ -270,14 +231,10 @@ class _PlayAudioState extends State<PlayAudio> {
                               children: [
                                 Text(widget.products.title ?? "",
                                     maxLines: 1,
-                                    style: const TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        fontWeight: FontWeight.bold,
-                                        color: MyColors.black)),
+                                    style: const TextStyle(overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold, color: MyColors.black)),
                                 Text(
                                   widget.albumName,
-                                  style: const TextStyle(
-                                      fontSize: 12, color: MyColors.gray),
+                                  style: const TextStyle(fontSize: 12, color: MyColors.gray),
                                 ),
                               ],
                             ),
@@ -290,8 +247,7 @@ class _PlayAudioState extends State<PlayAudio> {
                           opacity: elementOpacity,
                           child: ValueListenableBuilder(
                             valueListenable: buttonNotifier,
-                            builder:
-                                (context, ButtonState? buttonValue, widget) {
+                            builder: (context, ButtonState? buttonValue, widget) {
                               if (buttonValue?.index == 0) {
                                 return IconButton(
                                   icon: const Icon(Icons.play_arrow_rounded),
@@ -309,8 +265,7 @@ class _PlayAudioState extends State<PlayAudio> {
                               } else {
                                 return const Padding(
                                   padding: EdgeInsets.all(8.0),
-                                  child: CircularProgressIndicator(
-                                      color: Colors.grey),
+                                  child: CircularProgressIndicator(color: Colors.grey),
                                 );
                               }
                             },
@@ -348,8 +303,7 @@ class _PlayAudioState extends State<PlayAudio> {
                               thumbRadius: 0,
                               thumbGlowRadius: 0,
                               thumbColor: Colors.transparent,
-                              bufferedBarColor:
-                                  MyColors.primaryColor.withAlpha(20),
+                              bufferedBarColor: MyColors.primaryColor.withAlpha(20),
                             ),
                           );
                         },

@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'dart:developer';
-
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
+// import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/constans.dart';
+import 'package:goodali/Utils/downloader.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/download_controller.dart';
@@ -131,7 +131,7 @@ class Auth with ChangeNotifier {
 
   Future<void> checkUserIsChanged(String username, BuildContext context) async {
     final pref = await SharedPreferences.getInstance();
-    var tasks = Provider.of<DownloadController>(context, listen: false).episodeTasks;
+    var tasks = kIsWeb ? [] : Provider.of<DownloadController>(context, listen: false).episodeTasks;
     String email = pref.getString("email") ?? "";
     print("username $username");
     print("email $email");
@@ -142,7 +142,8 @@ class Auth with ChangeNotifier {
       if (tasks.isNotEmpty) {
         for (var element in tasks) {
           print("element.taskId ${element.taskId} ");
-          await FlutterDownloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
+          // await FlutterDownloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
+          await Downloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
           Provider.of<DownloadController>(context, listen: false).episodeTasks.clear();
         }
       }
@@ -174,13 +175,14 @@ class Auth with ChangeNotifier {
     }
 
     if (isDelete == true) {
-      var tasks = Provider.of<DownloadController>(context, listen: false).episodeTasks;
+      var tasks = kIsWeb ? [] : Provider.of<DownloadController>(context, listen: false).episodeTasks;
       _dataStore.deleteBoxes();
       print(tasks.length);
       if (tasks.isNotEmpty) {
         for (var element in tasks) {
           print("element.taskId ${element.taskId} ");
-          await FlutterDownloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
+          // await FlutterDownloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
+          await Downloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
           Provider.of<DownloadController>(context, listen: false).episodeTasks.clear();
         }
       }
@@ -188,7 +190,8 @@ class Auth with ChangeNotifier {
     preferences.remove("token");
     preferences.remove("has_training");
     preferences.remove("user_profile");
-    FlutterDownloader.cancelAll();
+    // FlutterDownloader.cancelAll();
+    Downloader.cancelAll();
 
     _isAuth = false;
     notifyListeners();

@@ -68,7 +68,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
       body: DefaultTabController(
         length: 4,
-        child: NestedScrollView(
+        child:
+            /* NestedScrollView(
           physics: const NeverScrollableScrollPhysics(),
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
@@ -76,9 +77,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   collapsedHeight: 490,
                   expandedHeight: 490,
                   backgroundColor: Colors.white,
-                  flexibleSpace: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [banner(), const SearchBar(), specialProducts()],
+                  flexibleSpace: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [banner(), const SearchBar(), specialProducts()],
+                    ),
                   )),
               SliverPersistentHeader(
                   floating: false,
@@ -104,6 +107,50 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ];
           },
           body: TabBarView(controller: tabController, children: const [ListenTabbar(), ReadTabbar(), FeelTabbar(), CourseTabbar()]),
+        ), */
+            CustomScrollView(
+          slivers: [
+            SliverList(
+              delegate: SliverChildListDelegate([
+                banner(),
+                const SearchBar(),
+                specialProducts(),
+              ]),
+            ),
+            SliverPersistentHeader(
+              floating: false,
+              pinned: true,
+              delegate: MyDelegate(TabBar(
+                controller: tabController,
+                isScrollable: true,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                tabs: const [
+                  SizedBox(width: 70, child: Tab(text: "Cонсох")),
+                  SizedBox(width: 70, child: Tab(text: "Унших")),
+                  SizedBox(width: 70, child: Tab(text: "Мэдрэх")),
+                  SizedBox(width: 70, child: Tab(text: "Сургалт*"))
+                ],
+                indicatorWeight: 4,
+                indicator: const CustomTabIndicator(color: MyColors.primaryColor),
+                labelColor: MyColors.primaryColor,
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
+                unselectedLabelColor: MyColors.gray,
+                indicatorColor: MyColors.primaryColor,
+              )),
+            ),
+            SliverFillRemaining(
+              child: TabBarView(
+                controller: tabController,
+                children: const [
+                  ListenTabbar(),
+                  ReadTabbar(),
+                  FeelTabbar(),
+                  CourseTabbar(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

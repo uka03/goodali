@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/constans.dart';
@@ -38,7 +39,7 @@ class _BottomTabbarState extends State<BottomTabbar> {
           if (opacity > 1) opacity = 1;
 
           double bottomBarHeight = kBottomNavigationBarHeight;
-          if (Platform.isIOS) {
+          if (!kIsWeb && Platform.isIOS) {
             bottomBarHeight = kBottomNavigationBarHeight + 30;
           }
           return SizedBox(

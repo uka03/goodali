@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -134,30 +135,20 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: ImageView(
-                    imgPath: widget.products.banner ?? "",
-                    width: 40,
-                    height: 40)),
+            ClipRRect(borderRadius: BorderRadius.circular(4), child: ImageView(imgPath: widget.products.banner ?? "", width: 40, height: 40)),
             const SizedBox(width: 15),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.isBought &&
-                            widget.products.lectureTitle != null &&
-                            widget.products.lectureTitle!.isNotEmpty
+                    widget.isBought && widget.products.lectureTitle != null && widget.products.lectureTitle!.isNotEmpty
                         ? widget.products.lectureTitle!
                         : widget.products.title ?? "",
                     maxLines: 1,
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: MyColors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   CustomReadMoreText(text: widget.products.body ?? "")
@@ -172,10 +163,7 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
             builder: (context, DurationState value, child) {
               var buttonState = buttonNotifier.value;
               var currently = currentlyPlaying.value;
-              bool isPlaying = currently?.title == widget.products.title &&
-                      buttonState == ButtonState.playing
-                  ? true
-                  : false;
+              bool isPlaying = currently?.title == widget.products.title && buttonState == ButtonState.playing ? true : false;
 
               return Row(
                 children: [
@@ -192,19 +180,14 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                   const SizedBox(width: 10),
                   isLoading
                       ? const SizedBox(
-                          width: 30,
-                          child: LinearProgressIndicator(
-                              backgroundColor: Colors.transparent,
-                              minHeight: 2,
-                              color: MyColors.black))
+                          width: 30, child: LinearProgressIndicator(backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
                       : Row(
                           children: [
                             (savedPosition > 0 || isPlaying)
                                 ? AudioProgressBar(
                                     totalDuration: duration,
                                     title: widget.products.title ?? "",
-                                    savedPostion:
-                                        Duration(milliseconds: savedPosition),
+                                    savedPostion: Duration(milliseconds: savedPosition),
                                   )
                                 : Container(),
                             const SizedBox(width: 10),
@@ -212,17 +195,13 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
                               id: widget.products.id!,
                               title: widget.products.title ?? "",
                               totalDuration: _totalduration,
-                              savedDuration:
-                                  Duration(milliseconds: savedPosition),
+                              savedDuration: Duration(milliseconds: savedPosition),
                             ),
                           ],
                         ),
                   const Spacer(),
-                  DownloadButton(products: widget.products),
-                  IconButton(
-                      splashRadius: 20,
-                      onPressed: () {},
-                      icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
+                  if (!kIsWeb) DownloadButton(products: widget.products),
+                  IconButton(splashRadius: 20, onPressed: () {}, icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
                 ],
               );
             }),
