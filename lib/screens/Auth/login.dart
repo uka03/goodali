@@ -13,8 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginBottomSheet extends StatefulWidget {
   final bool isRegistered;
-  const LoginBottomSheet({Key? key, required this.isRegistered})
-      : super(key: key);
+  const LoginBottomSheet({Key? key, required this.isRegistered}) : super(key: key);
 
   @override
   State<LoginBottomSheet> createState() => _LoginBottomSheetState();
@@ -64,8 +63,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   Widget login() {
     final focus = FocusScope.of(context);
     return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
@@ -79,9 +77,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 child: Container(
                   width: 40,
                   height: 6,
-                  decoration: BoxDecoration(
-                      color: MyColors.gray,
-                      borderRadius: BorderRadius.circular(3)),
+                  decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(3)),
                 ),
               ),
               const SizedBox(height: 20),
@@ -98,11 +94,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 ),
               ),
               const SizedBox(height: 30),
-              const Text("Нэвтрэх",
-                  style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: MyColors.black)),
+              const Text("Нэвтрэх", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
               const SizedBox(height: 40),
               TextFormField(
                 controller: emailController,
@@ -133,8 +125,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                     borderSide: BorderSide(color: MyColors.border1),
                   ),
                   focusedBorder: const UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: MyColors.primaryColor, width: 1.5),
+                    borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
                   ),
                 ),
               ),
@@ -145,10 +136,8 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   width: 24,
                   child: Checkbox(
                       value: toRemind,
-                      fillColor: MaterialStateProperty.all<Color>(
-                          MyColors.primaryColor),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4)),
+                      fillColor: MaterialStateProperty.all<Color>(MyColors.primaryColor),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                       side: const BorderSide(color: MyColors.border1),
                       splashRadius: 5,
                       onChanged: (bool? value) {
@@ -192,8 +181,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                     borderSide: BorderSide(color: MyColors.border1),
                   ),
                   focusedBorder: const UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: MyColors.primaryColor, width: 1.5),
+                    borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
                   ),
                 ),
               ),
@@ -211,25 +199,20 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   const SizedBox(height: 30),
                   Center(
                     child: RichText(
-                      text: TextSpan(
-                          text: 'Хаяг байхгүй?',
-                          style: const TextStyle(color: MyColors.gray),
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: '  Бүртгүүлэх',
-                                style: const TextStyle(
-                                    color: MyColors.primaryColor,
-                                    fontWeight: FontWeight.bold),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    setState(() {
-                                      isRegistered = false;
-                                      emailController.text = "";
-                                      passwordController.text = "";
-                                      nicknameController.text = "";
-                                    });
-                                  })
-                          ]),
+                      text: TextSpan(text: 'Хаяг байхгүй?', style: const TextStyle(color: MyColors.gray), children: <TextSpan>[
+                        TextSpan(
+                            text: '  Бүртгүүлэх',
+                            style: const TextStyle(color: MyColors.primaryColor, fontWeight: FontWeight.bold),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                setState(() {
+                                  isRegistered = false;
+                                  emailController.text = "";
+                                  passwordController.text = "";
+                                  nicknameController.text = "";
+                                });
+                              })
+                      ]),
                     ),
                   ),
                 ],
@@ -239,10 +222,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 alignment: Alignment.center,
                 child: TextButton(
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ForgotPassword()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPassword()));
                     },
                     child: const Text(
                       "Пин код мартсан",
@@ -261,8 +241,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
     final focus = FocusScope.of(context);
 
     return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
@@ -277,9 +256,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   child: Container(
                     width: 40,
                     height: 6,
-                    decoration: BoxDecoration(
-                        color: MyColors.gray,
-                        borderRadius: BorderRadius.circular(3)),
+                    decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(3)),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -296,11 +273,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                const Text("Бүртгүүлэх",
-                    style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: MyColors.black)),
+                const Text("Бүртгүүлэх", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
                 const SizedBox(height: 50),
                 TextFormField(
                   controller: emailController,
@@ -334,15 +307,13 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                                 isTyping = false;
                               });
                             },
-                            child:
-                                const Icon(Icons.close, color: MyColors.black))
+                            child: const Icon(Icons.close, color: MyColors.black))
                         : const SizedBox(),
                     enabledBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: MyColors.border1),
                     ),
                     focusedBorder: const UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.primaryColor, width: 1.5),
+                      borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                 ),
@@ -369,15 +340,13 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                                 isTyping2 = false;
                               });
                             },
-                            child:
-                                const Icon(Icons.close, color: MyColors.black))
+                            child: const Icon(Icons.close, color: MyColors.black))
                         : const SizedBox(),
                     enabledBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: MyColors.border1),
                     ),
                     focusedBorder: const UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.primaryColor, width: 1.5),
+                      borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                 ),
@@ -421,15 +390,13 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                               });
                               passwordController.text = "";
                             },
-                            child:
-                                const Icon(Icons.close, color: MyColors.black))
+                            child: const Icon(Icons.close, color: MyColors.black))
                         : const SizedBox(),
                     enabledBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: MyColors.border1),
                     ),
                     focusedBorder: const UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.primaryColor, width: 1.5),
+                      borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
                     ),
                   ),
                 ),
@@ -447,24 +414,19 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   const SizedBox(height: 30),
                   Center(
                     child: RichText(
-                      text: TextSpan(
-                          text: 'Хаяг байгаа?',
-                          style: const TextStyle(color: MyColors.gray),
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: '  Нэвтрэх',
-                                style: const TextStyle(
-                                    color: MyColors.primaryColor,
-                                    fontWeight: FontWeight.bold),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    setState(() {
-                                      isRegistered = true;
-                                      emailController.text = "";
-                                      passwordController.text = "";
-                                    });
-                                  })
-                          ]),
+                      text: TextSpan(text: 'Хаяг байгаа?', style: const TextStyle(color: MyColors.gray), children: <TextSpan>[
+                        TextSpan(
+                            text: '  Нэвтрэх',
+                            style: const TextStyle(color: MyColors.primaryColor, fontWeight: FontWeight.bold),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                setState(() {
+                                  isRegistered = true;
+                                  emailController.text = "";
+                                  passwordController.text = "";
+                                });
+                              })
+                      ]),
                     ),
                   ),
                   const SizedBox(height: 160)
@@ -478,12 +440,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   }
 
   Future<bool> userRegister() async {
-    var sendData = {
-      "email": emailController.text,
-      "nickname": nicknameController.text,
-      "password": passwordController.text
-    };
-    print(sendData);
+    var sendData = {"email": emailController.text, "nickname": nicknameController.text, "password": passwordController.text};
     var data = await Connection.userRegister(context, sendData);
     Navigator.pop(context);
     if (data['success'] == true) {
@@ -506,16 +463,11 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
 
   userSignin() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    var sendData = {
-      "email": emailController.text,
-      "password": passwordController.text
-    };
-    var data = await Provider.of<Auth>(context, listen: false)
-        .login(context, sendData, toRemind: toRemind);
+    var sendData = {"email": emailController.text, "password": passwordController.text};
+    var data = await Provider.of<Auth>(context, listen: false).login(context, sendData, toRemind: toRemind);
     Navigator.pop(context);
 
     if (data['success'] == true) {
-      print("firstbio ${preferences.containsKey("first_biometric")}");
       if (!preferences.containsKey("first_biometric")) {
         Provider.of<Auth>(context, listen: false).canBiometrics();
       }

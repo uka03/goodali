@@ -123,7 +123,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           changedName = value['name'];
                                           avatarPath = value["avatar"];
                                         });
-                                        log(changedName ?? "dd", name: "changedName");
                                       }
                                     });
                                   },
@@ -199,7 +198,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: CustomElevatedButton(
                     text: "Нэвтрэх",
                     onPress: () {
-                      log(loginWithBio.toString(), name: "loginwith bio");
                       loginWithBio ? value.authenticateWithBiometrics(context) : showLoginModal(true);
                     },
                   ),

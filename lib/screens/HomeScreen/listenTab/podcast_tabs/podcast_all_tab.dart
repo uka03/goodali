@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -13,16 +14,13 @@ class PodcastAll extends StatefulWidget {
   final bool? isHomeScreen;
   final List<Products> podcastList;
 
-  const PodcastAll(
-      {Key? key, required this.podcastList, this.isHomeScreen = false})
-      : super(key: key);
+  const PodcastAll({Key? key, required this.podcastList, this.isHomeScreen = false}) : super(key: key);
 
   @override
   State<PodcastAll> createState() => _PodcastAllState();
 }
 
-class _PodcastAllState extends State<PodcastAll>
-    with AutomaticKeepAliveClientMixin<PodcastAll> {
+class _PodcastAllState extends State<PodcastAll> with AutomaticKeepAliveClientMixin<PodcastAll> {
   List<MediaItem> mediaItems = [];
   List<int> savedPos = [];
 
@@ -33,9 +31,7 @@ class _PodcastAllState extends State<PodcastAll>
   }
 
   Future<bool> initiliaze() async {
-    if (activeList.isNotEmpty &&
-        activeList.first.name == widget.podcastList.first.name &&
-        activeList.first.id == widget.podcastList.first.id) {
+    if (activeList.isNotEmpty && activeList.first.name == widget.podcastList.first.name && activeList.first.id == widget.podcastList.first.id) {
       return true;
     }
 
@@ -68,31 +64,50 @@ class _PodcastAllState extends State<PodcastAll>
         child: ValueListenableBuilder<List<String>>(
           valueListenable: playlistNotifier,
           builder: (context, playlistTitles, _) {
-            return ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 15),
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: PodcastItem(
-                      onTap: () => onPlayButtonClicked(index),
-                      index: index,
-                      podcastList: widget.podcastList,
-                      podcastItem: widget.podcastList[index],
-                    ));
-              },
-              itemCount: widget.isHomeScreen == true
-                  ? widget.podcastList.length > 5
-                      ? 5
-                      : widget.podcastList.length
-                  : widget.podcastList.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  const Divider(
-                endIndent: 18,
-                indent: 18,
-              ),
-            );
+            if (kIsWeb && widget.isHomeScreen == true)
+              return GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: 6,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 15,
+                    childAspectRatio: 2,
+                    crossAxisCount: 3,
+                  ),
+                  itemBuilder: (BuildContext context, int index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: PodcastItem(
+                        onTap: () => onPlayButtonClicked(index),
+                        index: index,
+                        podcastList: widget.podcastList,
+                        podcastItem: widget.podcastList[index],
+                      )));
+            else
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 15),
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: PodcastItem(
+                        onTap: () => onPlayButtonClicked(index),
+                        index: index,
+                        podcastList: widget.podcastList,
+                        podcastItem: widget.podcastList[index],
+                      ));
+                },
+                itemCount: widget.isHomeScreen == true
+                    ? widget.podcastList.length > 5
+                        ? 5
+                        : widget.podcastList.length
+                    : widget.podcastList.length,
+                separatorBuilder: (BuildContext context, int index) => const Divider(
+                  endIndent: 18,
+                  indent: 18,
+                ),
+              );
           },
         ),
       ),

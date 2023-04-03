@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Providers/local_database.dart';
@@ -21,8 +22,7 @@ class SearchScreen extends SearchDelegate<String> {
   String get searchFieldLabel => 'Нэрээр хайх';
   final HiveDataStore dataStore = HiveDataStore();
 
-  SearchScreen({String? searchFieldLabel, required this.onSearchChanged})
-      : super(searchFieldLabel: searchFieldLabel);
+  SearchScreen({String? searchFieldLabel, required this.onSearchChanged}) : super(searchFieldLabel: searchFieldLabel);
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -67,10 +67,8 @@ class SearchScreen extends SearchDelegate<String> {
   Widget buildResults(BuildContext context) {
     return FutureBuilder(
       future: searchText(context, query: query),
-      builder:
-          (BuildContext context, AsyncSnapshot<List<SearchModel>> snapshot) {
-        if (snapshot.hasData &&
-            snapshot.connectionState == ConnectionState.done) {
+      builder: (BuildContext context, AsyncSnapshot<List<SearchModel>> snapshot) {
+        if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
           List<SearchModel> searchResult = snapshot.data ?? [];
           if (searchResult.isEmpty) {
             return Center(
@@ -90,63 +88,55 @@ class SearchScreen extends SearchDelegate<String> {
             return ListView.builder(
                 itemCount: searchResult.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    onTap: () {
-                      switch (searchResult[index].module) {
-                        case 'post':
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => ArticleScreen(
-                                        id: searchResult[index].id,
-                                      )));
-                          break;
-                        case 'training':
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => CourseDetail(
-                                      id: searchResult[index].id)));
-                          break;
-                        case 'album':
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => AlbumLecture(
-                                      id: searchResult[index].id)));
-                          break;
-                        case 'mood':
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => MoodDetail(
-                                      moodListId:
-                                          searchResult[index].id.toString())));
-                          break;
-                        case 'podcast':
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => Podcast(
-                                        id: searchResult[index].id,
-                                        dataStore: dataStore,
-                                      )));
-                          break;
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: kIsWeb ? MediaQuery.of(context).size.width / 2 : double.infinity,
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          switch (searchResult[index].module) {
+                            case 'post':
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => ArticleScreen(
+                                            id: searchResult[index].id,
+                                          )));
+                              break;
+                            case 'training':
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => CourseDetail(id: searchResult[index].id)));
+                              break;
+                            case 'album':
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => AlbumLecture(id: searchResult[index].id)));
+                              break;
+                            case 'mood':
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => MoodDetail(moodListId: searchResult[index].id.toString())));
+                              break;
+                            case 'podcast':
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => Podcast(
+                                            id: searchResult[index].id,
+                                            dataStore: dataStore,
+                                          )));
+                              break;
 
-                        default:
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => const Blank()));
-                          break;
-                      }
-                    },
-                    title: Text(
-                      searchResult[index].title!,
-                      maxLines: 2,
-                      style: const TextStyle(color: MyColors.black),
+                            default:
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const Blank()));
+                              break;
+                          }
+                        },
+                        title: Text(
+                          searchResult[index].title!,
+                          maxLines: 2,
+                          style: const TextStyle(color: MyColors.black),
+                        ),
+                        subtitle: Text(searchResult[index].module!),
+                        trailing: const Icon(Icons.arrow_forward_ios_rounded, color: MyColors.gray, size: 20),
+                      ),
                     ),
-                    subtitle: Text(searchResult[index].module!),
-                    trailing: const Icon(Icons.arrow_forward_ios_rounded,
-                        color: MyColors.gray, size: 20),
                   );
                 });
           }

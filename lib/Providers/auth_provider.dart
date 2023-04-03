@@ -177,10 +177,10 @@ class Auth with ChangeNotifier {
     if (isDelete == true) {
       var tasks = kIsWeb ? [] : Provider.of<DownloadController>(context, listen: false).episodeTasks;
       _dataStore.deleteBoxes();
-      print(tasks.length);
+      // print(tasks.length);
       if (tasks.isNotEmpty) {
         for (var element in tasks) {
-          print("element.taskId ${element.taskId} ");
+          // print("element.taskId ${element.taskId} ");
           // await FlutterDownloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
           await Downloader.remove(taskId: element.taskId ?? "0", shouldDeleteContent: true);
           Provider.of<DownloadController>(context, listen: false).episodeTasks.clear();
@@ -215,7 +215,7 @@ class Auth with ChangeNotifier {
     } on PlatformException catch (e) {
       _canBiometric = false;
       notifyListeners();
-      print(e);
+      // print(e);
     }
   }
 
@@ -253,12 +253,12 @@ class Auth with ChangeNotifier {
       } else {}
       notifyListeners();
     } on PlatformException catch (e) {
-      print(e);
+      // print(e);
     }
   }
 
   Future<void> disableBiometric() async {
-    print(" huruunii hee haagdlaa");
+    // print(" huruunii hee haagdlaa");
     final prefs = await SharedPreferences.getInstance();
     _loginWithBio = false;
     prefs.setBool("login_biometric", _loginWithBio);
@@ -282,12 +282,12 @@ class Auth with ChangeNotifier {
         if (_authenticated) {
           login(context, data);
         } else {
-          print("");
+          // print("");
         }
       }
       notifyListeners();
     } on PlatformException catch (e) {
-      print(e);
+      // print(e);
       return;
     }
   }

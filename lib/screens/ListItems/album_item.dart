@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -30,14 +31,13 @@ class AlbumItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               child: ImageView(
                 imgPath: albumData.banner ?? '',
-                height: MediaQuery.of(context).size.width / 2 - 30,
-                width: MediaQuery.of(context).size.width / 2 - 30,
+                height: kIsWeb ? 210 : MediaQuery.of(context).size.width / 2 - 30,
+                width: kIsWeb ? 210 : MediaQuery.of(context).size.width / 2 - 30,
               )),
           const SizedBox(height: 10),
           Text(
             albumData.title ?? "",
-            style: const TextStyle(
-                color: MyColors.black, fontSize: 16, height: 1.6),
+            style: const TextStyle(color: MyColors.black, fontSize: 16, height: 1.6),
           ),
           const SizedBox(height: 5),
           Text(

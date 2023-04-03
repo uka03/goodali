@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:goodali/screens/HomeScreen/home_screen.dart';
+import 'package:goodali/screens/HomeScreen/web_home_screen.dart';
 // import 'package:flutter_downloader/flutter_downloader.dart';
-import 'Utils/downloader_stub.dart' if (dart.library.io) 'Utils/downloader_mobile.dart';
+import 'Utils/downloader_stub.dart' if (dart.library.io) 'Utils/downloader.dart';
 
 import 'package:goodali/Providers/audio_download_provider.dart';
 import 'package:goodali/Providers/audio_provider.dart';
@@ -127,13 +129,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               home: Consumer<Auth>(builder: (context, value, _) {
                 // developer.log("biometric ${value.isBiometricEnabled}");
                 // developer.log("intro ${value.isFirstTime}");
-
-                if (value.isFirstTime) {
-                  return const IntroScreen();
-                } else if (value.isBiometricEnabled) {
-                  return const EnableBiometric();
+                if (kIsWeb) {
+                  return const WebHomeScreen();
                 } else {
-                  return const BottomTabbar();
+                  if (value.isFirstTime) {
+                    return const IntroScreen();
+                  } else if (value.isBiometricEnabled) {
+                    return const EnableBiometric();
+                  } else {
+                    return const BottomTabbar();
+                  }
                 }
               }));
         },
