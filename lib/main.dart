@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:goodali/screens/HomeScreen/home_screen.dart';
 import 'package:goodali/screens/HomeScreen/web_home_screen.dart';
-// import 'package:flutter_downloader/flutter_downloader.dart';
 import 'Utils/downloader_stub.dart' if (dart.library.io) 'Utils/downloader.dart';
 
 import 'package:goodali/Providers/audio_download_provider.dart';
@@ -23,13 +21,11 @@ import 'package:goodali/screens/intro_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer' as developer;
 
 Future<void> main() async {
   await initAudioHandler();
   AudioPlayerController audioPlayerController = AudioPlayerController();
   audioPlayerController.initiliaze();
-  // await FlutterDownloader.initialize(debug: true);
   WidgetsFlutterBinding.ensureInitialized();
 
   final downloader = Downloader();
@@ -72,16 +68,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        print("app in resumed from background");
         break;
       case AppLifecycleState.inactive:
-        print("app is in inactive state");
         break;
       case AppLifecycleState.paused:
-        print("app is in paused state");
         break;
       case AppLifecycleState.detached:
-        print("app is removed");
         Downloader.cancelAll();
         removeTokenWhenAppKilled();
         break;
@@ -127,8 +119,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                       unselectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
                       selectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w300))),
               home: Consumer<Auth>(builder: (context, value, _) {
-                // developer.log("biometric ${value.isBiometricEnabled}");
-                // developer.log("intro ${value.isFirstTime}");
                 if (kIsWeb) {
                   return const WebHomeScreen();
                 } else {

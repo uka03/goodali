@@ -32,6 +32,8 @@ class Connection {
   static Future<Map<String, dynamic>> userRegister(BuildContext context, dynamic data) async {
     try {
       final response = await Http().getDio(context, headerTypeNone).post(Urls.signup, data: data);
+      print('userRegister: response: ${response}');
+      print('userRegister: response data: ${response.data}');
 
       if (response.data["status"] == 1) {
         return {"success": true};
@@ -39,7 +41,7 @@ class Connection {
         return {"success": false, "message": response.data['msg']};
       }
     } on DioError catch (e) {
-      print(e.type);
+      print(e);
       if (e.type == DioErrorType.other) {
         TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {

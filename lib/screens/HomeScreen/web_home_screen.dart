@@ -1,29 +1,38 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:goodali/Providers/auth_provider.dart';
+import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/local_database.dart';
-import 'package:goodali/Utils/circle_tab_indicator.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/Widgets/search_bar.dart';
-import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
-import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:goodali/screens/Auth/login_web.dart';
+import 'package:goodali/screens/Auth/reset_password.dart';
+import 'package:goodali/screens/ForumScreen/forum_screen.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
-import 'package:goodali/screens/HomeScreen/courseTab/course_tab.dart';
+import 'package:goodali/screens/HomeScreen/courseTab/course_tab_web.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_album.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_lecture.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/video_list.dart';
+import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
-import 'package:goodali/screens/ListItems/course_products_item.dart';
 import 'package:goodali/screens/ListItems/course_products_item_web.dart';
-import 'package:goodali/screens/ListItems/special_list_item.dart';
+import 'package:goodali/screens/ProfileScreen/edit_profile.dart';
+import 'package:goodali/screens/ProfileScreen/faQ.dart';
+import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
+import 'package:goodali/screens/payment/cart_screen.dart';
+import 'package:provider/provider.dart';
 
 class WebHomeScreen extends StatefulWidget {
   const WebHomeScreen({Key? key}) : super(key: key);
@@ -35,6 +44,7 @@ class WebHomeScreen extends StatefulWidget {
 class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProviderStateMixin {
   late final tabController = TabController(length: 4, vsync: this);
   final HiveSpecialDataStore dataStore = HiveSpecialDataStore();
+  final HiveDataStore dStore = HiveDataStore();
   final CarouselController _controller = CarouselController();
   final PageController _pageController = PageController();
   final _kDuration = const Duration(milliseconds: 300);
@@ -77,34 +87,221 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
                     child: Image.asset("assets/images/title_logo.png", width: 113, height: 32),
                   ),
                   Expanded(child: Container(padding: EdgeInsets.symmetric(horizontal: 60), child: const SearchBar())),
+                  Builder(
+                    builder: (BuildContext innerContext) {
+                      return InkWell(
+                        onTap: () {
+                          final RenderBox rowRenderBox = innerContext.findRenderObject() as RenderBox;
+                          final rowSize = rowRenderBox.size;
+                          final rowPosition = rowRenderBox.localToGlobal(Offset.zero);
+                          showMenu<String>(
+                            context: context,
+                            position: RelativeRect.fromLTRB(
+                              rowPosition.dx,
+                              rowPosition.dy + rowSize.height,
+                              MediaQuery.of(context).size.width - rowPosition.dx - rowSize.width - (rowSize.width / 1.25),
+                              rowPosition.dy,
+                            ),
+                            items: [
+                              'Цомог',
+                              'Подкаст',
+                              'Видео',
+                              'Бичвэр',
+                              'Мүүд',
+                              'Онлайн сургалт',
+                            ].map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(choice),
+                                ),
+                              );
+                            }).toList(),
+                          ).then((String? value) {
+                            if (value != null) {
+                              if (value == 'Цомог') {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const AlbumLecture()));
+                              } else if (value == 'Подкаст') {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => Podcast(dataStore: dStore)));
+                              } else if (value == 'Видео') {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const VideoList()));
+                              } else if (value == 'Бичвэр') {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const ArticleScreen()));
+                              } else if (value == 'Мүүд') {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const FeelTabbar(isHomeScreen: true)));
+                              } else if (value == 'Онлайн сургалт') {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const CourseTabbar()));
+                              }
+                            }
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Сэтгэл",
+                                  style: TextStyle(
+                                    fontFamily: 'Gilroy',
+                                    color: Color(0xff778089),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    fontStyle: FontStyle.normal,
+                                  )),
+                              SizedBox(height: 24, width: 24, child: SvgPicture.asset("assets/images/chevron_down.svg", color: Color(0xff778089))),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Сэтгэл",
+                    padding: EdgeInsets.only(left: 30, right: 60),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ForumScreen()));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Сэтгэлийн гэр",
                             style: TextStyle(
-                              fontFamily: 'Gilroy-☞',
+                              fontFamily: 'Gilroy',
                               color: Color(0xff778089),
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               fontStyle: FontStyle.normal,
                             )),
-                        SizedBox(height: 24, width: 24, child: SvgPicture.asset("assets/images/chevron_down.svg", color: Color(0xff778089))),
-                      ],
+                      ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.only(left: 30, right: 60),
-                    child: new Text("Түүдэг гал",
-                        style: TextStyle(
-                          fontFamily: 'Gilroy-☞',
-                          color: Color(0xff778089),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.normal,
-                        )),
-                  ),
-                  Container(margin: EdgeInsets.only(right: 155), width: 86, height: 36, child: CustomElevatedButton(onPress: () {}, text: "Нэвтрэх")),
+                  Consumer<Auth>(builder: (BuildContext context, value, Widget? child) {
+                    if (value.isAuth == true) {
+                      return Row(
+                        children: [
+                          /* InkWell(
+                            onTap: () {
+                              // Your action here
+                            },
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFBF9F8),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: SvgPicture.asset(
+                                  'assets/images/web_icon_favorite.svg',
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 30), */
+
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
+                            },
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFBF9F8),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: SvgPicture.asset(
+                                  'assets/images/web_icon_cart.svg',
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 30),
+                          Builder(
+                            builder: (BuildContext innerContext) {
+                              return InkWell(
+                                onTap: () {
+                                  final RenderBox rowRenderBox = innerContext.findRenderObject() as RenderBox;
+                                  final rowSize = rowRenderBox.size;
+                                  final rowPosition = rowRenderBox.localToGlobal(Offset.zero);
+                                  showMenu<String>(
+                                    context: context,
+                                    position: RelativeRect.fromLTRB(
+                                      rowPosition.dx,
+                                      rowPosition.dy + rowSize.height,
+                                      MediaQuery.of(context).size.width - rowPosition.dx - rowSize.width - (rowSize.width / 1.25),
+                                      rowPosition.dy,
+                                    ),
+                                    items: [
+                                      'Би',
+                                      'Миний мэдээлэл',
+                                      'Пин код солих',
+                                      'Нийтлэг асуулт хариулт',
+                                      'Гарах',
+                                    ].map((String choice) {
+                                      return PopupMenuItem<String>(
+                                        value: choice,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(choice),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ).then((String? value) {
+                                    if (value != null) {
+                                      if (value == 'Би') {
+                                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+                                      } else if (value == 'Миний мэдээлэл') {
+                                        Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfile()));
+                                      } else if (value == 'Пин код солих') {
+                                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ResetPassword()));
+                                      } else if (value == 'Нийтлэг асуулт хариулт') {
+                                        Navigator.push(context, MaterialPageRoute(builder: (_) => const FrequentlyQuestions()));
+                                      } else if (value == 'Гарах') {
+                                        showLogOutDialog();
+                                      }
+                                    }
+                                  });
+                                },
+                                child: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFBF9F8),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: SvgPicture.asset(
+                                      'assets/images/web_icon_profile.svg',
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          SizedBox(width: 30),
+                        ],
+                      );
+                    } else {
+                      return Container(
+                        margin: EdgeInsets.only(right: 155),
+                        width: 86,
+                        height: 36,
+                        child: CustomElevatedButton(
+                            onPress: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const WebLoginScreen()));
+                            },
+                            text: "Нэвтрэх"),
+                      );
+                    }
+                  }),
                 ],
               ),
             ),
@@ -136,7 +333,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
             sliver: SliverToBoxAdapter(
               child: Container(
                 margin: EdgeInsets.only(left: 155, right: 155, bottom: 155),
-                child: FeelTabbar(),
+                child: FeelTabbar(isHomeScreen: true),
               ),
             ),
           ),
@@ -149,9 +346,259 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
               ),
             ),
           ),
+          SliverPadding(
+            padding: EdgeInsets.all(10),
+            sliver: SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.only(left: 10, right: 155, top: 60, bottom: 34),
+                height: 420,
+                decoration: new BoxDecoration(color: Color(0xfffbf9f8)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Image.asset("assets/images/title_logo.png", width: 113, height: 32),
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Үндсэн",
+                          style: TextStyle(
+                            fontFamily: 'Gilroy',
+                            color: Color(0xff84807d),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            fontStyle: FontStyle.normal,
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            // Navigator.push(context, MaterialPageRoute(builder: (_) => const WebHomeScreen()));
+                          },
+                          child: Text(
+                            "Сэтгэл",
+                            style: TextStyle(
+                              fontFamily: 'Gilroy',
+                              color: Color(0xff393837),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.normal,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const ForumScreen()));
+                          },
+                          child: new Text("Сэтгэлийн гэр",
+                              style: TextStyle(
+                                fontFamily: 'Gilroy',
+                                color: Color(0xff393837),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                              )),
+                        )
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        new Text("Контент",
+                            style: TextStyle(
+                              fontFamily: 'Gilroy',
+                              color: Color(0xff84807d),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              fontStyle: FontStyle.normal,
+                            )),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const AlbumLecture()));
+                          },
+                          child: new Text("Цомог",
+                              style: TextStyle(
+                                fontFamily: 'Gilroy',
+                                color: Color(0xff393837),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                              )),
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => Podcast(dataStore: dStore)));
+                          },
+                          child: new Text("Подкаст",
+                              style: TextStyle(
+                                fontFamily: 'Gilroy',
+                                color: Color(0xff393837),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                              )),
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => VideoList()));
+                          },
+                          child: new Text("Видео",
+                              style: TextStyle(
+                                fontFamily: 'Gilroy',
+                                color: Color(0xff393837),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                              )),
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => ArticleScreen()));
+                          },
+                          child: new Text("Бичвэр",
+                              style: TextStyle(
+                                fontFamily: 'Gilroy',
+                                color: Color(0xff393837),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                              )),
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => CourseTabbar()));
+                          },
+                          child: new Text("Онлайн сургалт",
+                              style: TextStyle(
+                                fontFamily: 'Gilroy',
+                                color: Color(0xff393837),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                              )),
+                        )
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Бусад",
+                          style: TextStyle(
+                            fontFamily: 'Gilroy',
+                            color: Color(0xff84807d),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            fontStyle: FontStyle.normal,
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          child: Text(
+                            "Үйлчилгээний нөхцөл",
+                            style: TextStyle(
+                              fontFamily: 'Gilroy',
+                              color: Color(0xff393837),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.normal,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => FrequentlyQuestions()));
+                          },
+                          child: new Text("Тусламж",
+                              style: TextStyle(
+                                fontFamily: 'Gilroy',
+                                color: Color(0xff393837),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                              )),
+                        )
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Апп татах",
+                          style: TextStyle(
+                            fontFamily: 'Gilroy',
+                            color: Color(0xff84807d),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            fontStyle: FontStyle.normal,
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        Image.asset(
+                          "assets/images/app_store.png",
+                          width: 140,
+                          height: 40,
+                        ),
+                        SizedBox(height: 15),
+                        Image.asset(
+                          "assets/images/google_play.png",
+                          width: 140,
+                          height: 40,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  showLogOutDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text("Та гарахдаа итгэлтэй байна уу?", textAlign: TextAlign.center, style: TextStyle(color: MyColors.black, fontSize: 18)),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "ҮГҮЙ",
+                    style: TextStyle(color: MyColors.primaryColor),
+                  )),
+              TextButton(
+                  onPressed: () {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                    Provider.of<Auth>(context, listen: false).logOut(context);
+                    Provider.of<CartProvider>(context, listen: false).removeAllProducts();
+                  },
+                  child: const Text(
+                    "ТИЙМ",
+                    style: TextStyle(color: MyColors.primaryColor),
+                  )),
+            ],
+          );
+        });
   }
 
   late final futureCourses = getCourses();

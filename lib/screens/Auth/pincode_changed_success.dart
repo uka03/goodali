@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,9 +9,7 @@ class PinCodeChangedSuccess extends StatelessWidget {
   final String? buttonText;
   final String? successText;
   final String? descriptionText;
-  const PinCodeChangedSuccess(
-      {Key? key, this.buttonText, this.successText, this.descriptionText})
-      : super(key: key);
+  const PinCodeChangedSuccess({Key? key, this.buttonText, this.successText, this.descriptionText}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,20 +20,18 @@ class PinCodeChangedSuccess extends StatelessWidget {
           const SizedBox(height: 156),
           Center(
             child: CircleAvatar(
-              radius: 62,
+              radius: kIsWeb ? 109 : 62,
               backgroundColor: MyColors.input,
               child: SvgPicture.asset(
                 "assets/images/success.svg",
+                width: kIsWeb ? 112 : 53,
               ),
             ),
           ),
           const SizedBox(height: 40),
           Text(
             successText ?? "Амжилттай",
-            style: const TextStyle(
-                color: MyColors.black,
-                fontSize: 24,
-                fontWeight: FontWeight.bold),
+            style: const TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
@@ -45,14 +42,17 @@ class PinCodeChangedSuccess extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const Spacer(),
+          kIsWeb ? SizedBox(height: 64) : const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: CustomElevatedButton(
-              onPress: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              text: buttonText ?? "Дуусгах",
+            child: Container(
+              width: kIsWeb ? 109 : double.infinity,
+              child: CustomElevatedButton(
+                onPress: () {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                },
+                text: buttonText ?? "Дуусгах",
+              ),
             ),
           ),
           const SizedBox(height: 20),

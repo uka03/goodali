@@ -22,7 +22,9 @@ import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/mood_item.dart';
 
 class FeelTabbar extends StatefulWidget {
-  const FeelTabbar({Key? key}) : super(key: key);
+  final bool? isHomeScreen;
+
+  const FeelTabbar({Key? key, this.isHomeScreen = false}) : super(key: key);
 
   @override
   State<FeelTabbar> createState() => _FeelTabbarState();
@@ -81,268 +83,272 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     getMoodMain();
     super.build(context);
-    return SingleChildScrollView(
-      child: FutureBuilder(
-          future: futureMoodList,
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-              List<GetMoodList> moodList = snapshot.data;
-              if (moodList.isNotEmpty) {
-                return isDone
-                    ? const Center(child: CircularProgressIndicator(color: MyColors.primaryColor))
-                    : kIsWeb
-                        ? Row(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Мүүд",
-                                      style: TextStyle(
-                                        color: MyColors.black,
-                                        fontSize: 56,
-                                        fontWeight: FontWeight.bold,
+    return Material(
+      child: SingleChildScrollView(
+        child: FutureBuilder(
+            future: futureMoodList,
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                List<GetMoodList> moodList = snapshot.data;
+                if (moodList.isNotEmpty) {
+                  return isDone
+                      ? const Center(child: CircularProgressIndicator(color: MyColors.primaryColor))
+                      : (kIsWeb && widget.isHomeScreen == true)
+                          ? Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Мүүд",
+                                        style: TextStyle(
+                                          color: MyColors.black,
+                                          fontSize: 56,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(height: 20),
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(4),
-                                          child: ImageView(imgPath: moodMain[0].banner ?? "", width: 30, height: 30),
-                                        ),
-                                        const SizedBox(width: 15),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                moodMain[0].title ?? "",
-                                                style: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                                              ),
-                                              const SizedBox(height: 5),
-                                              CustomReadMoreText(text: moodMain[0].body ?? "")
-                                            ],
+                                      SizedBox(height: 20),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(4),
+                                            child: ImageView(imgPath: moodMain[0].banner ?? "", width: 30, height: 30),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 14),
-                                    ValueListenableBuilder(
-                                        valueListenable: durationStateNotifier,
-                                        builder: (context, DurationState value, child) {
-                                          var buttonState = buttonNotifier.value;
-                                          var currently = currentlyPlaying.value;
-                                          bool isPlaying = currently?.title == moodMain[0].title && buttonState == ButtonState.playing ? true : false;
-                                          return Row(
-                                            children: [
-                                              AudioPlayerButton(
-                                                id: moodMain[0].id!,
-                                                onPlay: () async {
-                                                  currentlyPlaying.value = moodMain.first;
-                                                  if (activeList.first.title == moodMain.first.title && activeList.first.id == moodMain.first.id) {
+                                          const SizedBox(width: 15),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  moodMain[0].title ?? "",
+                                                  style: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                CustomReadMoreText(text: moodMain[0].body ?? "")
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 14),
+                                      ValueListenableBuilder(
+                                          valueListenable: durationStateNotifier,
+                                          builder: (context, DurationState value, child) {
+                                            var buttonState = buttonNotifier.value;
+                                            var currently = currentlyPlaying.value;
+                                            bool isPlaying =
+                                                currently?.title == moodMain[0].title && buttonState == ButtonState.playing ? true : false;
+                                            return Row(
+                                              children: [
+                                                AudioPlayerButton(
+                                                  id: moodMain[0].id!,
+                                                  onPlay: () async {
                                                     currentlyPlaying.value = moodMain.first;
-                                                    await audioHandler.skipToQueueItem(0);
-                                                    await audioHandler.seek(
-                                                      Duration(milliseconds: moodMain.first.position!),
-                                                    );
-                                                    await audioHandler.play();
-                                                  } else if (activeList.first.title != moodMain.first.title ||
-                                                      activeList.first.id != moodMain.first.id) {
-                                                    activeList = moodMain;
-                                                    await initiliazePodcast();
-                                                    await audioHandler.skipToQueueItem(0);
-                                                    await audioHandler.seek(
-                                                      Duration(milliseconds: moodMain.first.position!),
-                                                    );
-                                                    await audioHandler.play();
-                                                  }
-                                                },
-                                                onPause: () {
-                                                  audioHandler.pause();
-                                                },
-                                                title: moodMain[0].title ?? "",
-                                              ),
-                                              const SizedBox(width: 10),
-                                              isLoading
-                                                  ? const SizedBox(
-                                                      width: 30,
-                                                      child: LinearProgressIndicator(
-                                                          backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
-                                                  : Row(
-                                                      children: [
-                                                        (savedPosition > 0 || isPlaying)
-                                                            ? AudioProgressBar(
-                                                                totalDuration: duration,
-                                                                title: moodMain[0].title ?? "",
-                                                                savedPostion: Duration(milliseconds: savedPosition),
-                                                              )
-                                                            : Container(),
-                                                        const SizedBox(width: 10),
-                                                        AudioplayerTimer(
-                                                          id: moodMain[0].id!,
-                                                          title: moodMain[0].title ?? "",
-                                                          totalDuration: _totalduration,
-                                                          savedDuration: Duration(milliseconds: savedPosition),
-                                                        ),
-                                                      ],
-                                                    ),
-                                            ],
-                                          );
-                                        }),
-                                    const SizedBox(height: 600),
-                                  ],
+                                                    if (activeList.first.title == moodMain.first.title && activeList.first.id == moodMain.first.id) {
+                                                      currentlyPlaying.value = moodMain.first;
+                                                      await audioHandler.skipToQueueItem(0);
+                                                      await audioHandler.seek(
+                                                        Duration(milliseconds: moodMain.first.position!),
+                                                      );
+                                                      await audioHandler.play();
+                                                    } else if (activeList.first.title != moodMain.first.title ||
+                                                        activeList.first.id != moodMain.first.id) {
+                                                      activeList = moodMain;
+                                                      await initiliazePodcast();
+                                                      await audioHandler.skipToQueueItem(0);
+                                                      await audioHandler.seek(
+                                                        Duration(milliseconds: moodMain.first.position!),
+                                                      );
+                                                      await audioHandler.play();
+                                                    }
+                                                  },
+                                                  onPause: () {
+                                                    audioHandler.pause();
+                                                  },
+                                                  title: moodMain[0].title ?? "",
+                                                ),
+                                                const SizedBox(width: 10),
+                                                isLoading
+                                                    ? const SizedBox(
+                                                        width: 30,
+                                                        child: LinearProgressIndicator(
+                                                            backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                                                    : Row(
+                                                        children: [
+                                                          (savedPosition > 0 || isPlaying)
+                                                              ? AudioProgressBar(
+                                                                  totalDuration: duration,
+                                                                  title: moodMain[0].title ?? "",
+                                                                  savedPostion: Duration(milliseconds: savedPosition),
+                                                                )
+                                                              : Container(),
+                                                          const SizedBox(width: 10),
+                                                          AudioplayerTimer(
+                                                            id: moodMain[0].id!,
+                                                            title: moodMain[0].title ?? "",
+                                                            totalDuration: _totalduration,
+                                                            savedDuration: Duration(milliseconds: savedPosition),
+                                                          ),
+                                                        ],
+                                                      ),
+                                              ],
+                                            );
+                                          }),
+                                      const SizedBox(height: 600),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 20),
-                              Expanded(
-                                flex: 2,
-                                child: GridView.builder(
+                                const SizedBox(height: 20),
+                                Expanded(
+                                  flex: 2,
+                                  child: GridView.builder(
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: moodList.length,
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      childAspectRatio: 1,
+                                      crossAxisCount: 4,
+                                      crossAxisSpacing: 20,
+                                      mainAxisSpacing: 20,
+                                    ),
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return MoodListItem(getMoodList: moodList[index], isHomeScreen: widget.isHomeScreen);
+                                    },
+                                  ),
+                                )
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 30.0, bottom: 20, right: 20, left: 20),
+                                  child: Text("Мүүд", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 20, left: 20),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(4),
+                                            child: ImageView(imgPath: moodMain[0].banner ?? "", width: 30, height: 30),
+                                          ),
+                                          const SizedBox(width: 15),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  moodMain[0].title ?? "",
+                                                  style: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                CustomReadMoreText(text: moodMain[0].body ?? "")
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 14),
+                                      ValueListenableBuilder(
+                                          valueListenable: durationStateNotifier,
+                                          builder: (context, DurationState value, child) {
+                                            var buttonState = buttonNotifier.value;
+                                            var currently = currentlyPlaying.value;
+                                            bool isPlaying =
+                                                currently?.title == moodMain[0].title && buttonState == ButtonState.playing ? true : false;
+
+                                            return Row(
+                                              children: [
+                                                AudioPlayerButton(
+                                                  id: moodMain[0].id!,
+                                                  onPlay: () async {
+                                                    currentlyPlaying.value = moodMain.first;
+                                                    if (activeList.first.title == moodMain.first.title && activeList.first.id == moodMain.first.id) {
+                                                      currentlyPlaying.value = moodMain.first;
+                                                      await audioHandler.skipToQueueItem(0);
+                                                      await audioHandler.seek(
+                                                        Duration(milliseconds: moodMain.first.position!),
+                                                      );
+                                                      await audioHandler.play();
+                                                    } else if (activeList.first.title != moodMain.first.title ||
+                                                        activeList.first.id != moodMain.first.id) {
+                                                      activeList = moodMain;
+                                                      await initiliazePodcast();
+                                                      await audioHandler.skipToQueueItem(0);
+                                                      await audioHandler.seek(
+                                                        Duration(milliseconds: moodMain.first.position!),
+                                                      );
+                                                      await audioHandler.play();
+                                                    }
+                                                  },
+                                                  onPause: () {
+                                                    audioHandler.pause();
+                                                  },
+                                                  title: moodMain[0].title ?? "",
+                                                ),
+                                                const SizedBox(width: 10),
+                                                isLoading
+                                                    ? const SizedBox(
+                                                        width: 30,
+                                                        child: LinearProgressIndicator(
+                                                            backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                                                    : Row(
+                                                        children: [
+                                                          (savedPosition > 0 || isPlaying)
+                                                              ? AudioProgressBar(
+                                                                  totalDuration: duration,
+                                                                  title: moodMain[0].title ?? "",
+                                                                  savedPostion: Duration(milliseconds: savedPosition),
+                                                                )
+                                                              : Container(),
+                                                          const SizedBox(width: 10),
+                                                          AudioplayerTimer(
+                                                            id: moodMain[0].id!,
+                                                            title: moodMain[0].title ?? "",
+                                                            totalDuration: _totalduration,
+                                                            savedDuration: Duration(milliseconds: savedPosition),
+                                                          ),
+                                                        ],
+                                                      ),
+                                              ],
+                                            );
+                                          }),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                GridView.builder(
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
                                   itemCount: moodList.length,
                                   padding: const EdgeInsets.symmetric(horizontal: 20),
                                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    childAspectRatio: 1,
-                                    crossAxisCount: 4,
+                                    childAspectRatio: 1 / 1.4,
+                                    crossAxisCount: 3,
                                     crossAxisSpacing: 15,
-                                    mainAxisSpacing: 15,
                                   ),
                                   itemBuilder: (BuildContext context, int index) {
-                                    return MoodListItem(getMoodList: moodList[index]);
+                                    return MoodListItem(getMoodList: moodList[index], isHomeScreen: widget.isHomeScreen);
                                   },
-                                ),
-                              )
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(top: 30.0, bottom: 20, right: 20, left: 20),
-                                child: Text("Мүүд", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 20, left: 20),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(4),
-                                          child: ImageView(imgPath: moodMain[0].banner ?? "", width: 30, height: 30),
-                                        ),
-                                        const SizedBox(width: 15),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                moodMain[0].title ?? "",
-                                                style: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 16),
-                                              ),
-                                              const SizedBox(height: 5),
-                                              CustomReadMoreText(text: moodMain[0].body ?? "")
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 14),
-                                    ValueListenableBuilder(
-                                        valueListenable: durationStateNotifier,
-                                        builder: (context, DurationState value, child) {
-                                          var buttonState = buttonNotifier.value;
-                                          var currently = currentlyPlaying.value;
-                                          bool isPlaying = currently?.title == moodMain[0].title && buttonState == ButtonState.playing ? true : false;
-
-                                          return Row(
-                                            children: [
-                                              AudioPlayerButton(
-                                                id: moodMain[0].id!,
-                                                onPlay: () async {
-                                                  currentlyPlaying.value = moodMain.first;
-                                                  if (activeList.first.title == moodMain.first.title && activeList.first.id == moodMain.first.id) {
-                                                    currentlyPlaying.value = moodMain.first;
-                                                    await audioHandler.skipToQueueItem(0);
-                                                    await audioHandler.seek(
-                                                      Duration(milliseconds: moodMain.first.position!),
-                                                    );
-                                                    await audioHandler.play();
-                                                  } else if (activeList.first.title != moodMain.first.title ||
-                                                      activeList.first.id != moodMain.first.id) {
-                                                    activeList = moodMain;
-                                                    await initiliazePodcast();
-                                                    await audioHandler.skipToQueueItem(0);
-                                                    await audioHandler.seek(
-                                                      Duration(milliseconds: moodMain.first.position!),
-                                                    );
-                                                    await audioHandler.play();
-                                                  }
-                                                },
-                                                onPause: () {
-                                                  audioHandler.pause();
-                                                },
-                                                title: moodMain[0].title ?? "",
-                                              ),
-                                              const SizedBox(width: 10),
-                                              isLoading
-                                                  ? const SizedBox(
-                                                      width: 30,
-                                                      child: LinearProgressIndicator(
-                                                          backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
-                                                  : Row(
-                                                      children: [
-                                                        (savedPosition > 0 || isPlaying)
-                                                            ? AudioProgressBar(
-                                                                totalDuration: duration,
-                                                                title: moodMain[0].title ?? "",
-                                                                savedPostion: Duration(milliseconds: savedPosition),
-                                                              )
-                                                            : Container(),
-                                                        const SizedBox(width: 10),
-                                                        AudioplayerTimer(
-                                                          id: moodMain[0].id!,
-                                                          title: moodMain[0].title ?? "",
-                                                          totalDuration: _totalduration,
-                                                          savedDuration: Duration(milliseconds: savedPosition),
-                                                        ),
-                                                      ],
-                                                    ),
-                                            ],
-                                          );
-                                        }),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              GridView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: moodList.length,
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  childAspectRatio: 1 / 1.4,
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: 15,
-                                ),
-                                itemBuilder: (BuildContext context, int index) {
-                                  return MoodListItem(getMoodList: moodList[index]);
-                                },
-                              )
-                            ],
-                          );
+                                )
+                              ],
+                            );
+                } else {
+                  return Container();
+                }
               } else {
-                return Container();
+                return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
               }
-            } else {
-              return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
-            }
-          }),
+            }),
+      ),
     );
   }
 

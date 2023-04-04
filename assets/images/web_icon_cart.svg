@@ -1,0 +1,17 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="m5.505 6.621.634 7.54c.046.58.52 1.015 1.1 1.015h11.475c.548 0 1.016-.408 1.093-.95l1-6.894a.617.617 0 0 0-.119-.46.61.61 0 0 0-.407-.243c-.22.008-9.337-.005-14.776-.008zm1.732 10.131a2.693 2.693 0 0 1-2.669-2.462L3.605 2.838l-1.584-.273a.79.79 0 0 1-.643-.913c.075-.43.49-.71.911-.642l2.187.378c.352.062.62.355.65.712l.247 2.944c15.007.007 15.055.014 15.128.022a2.19 2.19 0 0 1 1.451.862c.351.47.499 1.05.414 1.63l-.997 6.893a2.693 2.693 0 0 1-2.652 2.301H7.237zM6.784 19.608a.572.572 0 1 1 0 1.145.572.572 0 0 1 0-1.145z" fill="#393837"/>
+    <mask id="a9fptg5l3a" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="6" y="19" width="2" height="2">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M6.212 20.178a.573.573 0 1 0 1.145.003.573.573 0 0 0-1.145-.003z" fill="#fff"/>
+    </mask>
+    <g mask="url(#a9fptg5l3a)">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M.957 26.007h11.656V14.351H.957v11.656z" fill="#393837"/>
+    </g>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.784 19.965a.216.216 0 0 0-.215.215c0 .239.432.239.432 0a.217.217 0 0 0-.217-.215zm0 1.577a1.362 1.362 0 0 1 0-2.722c.75 0 1.36.61 1.36 1.36 0 .751-.61 1.362-1.36 1.362zM18.642 19.608a.572.572 0 1 1 .002 1.144.572.572 0 0 1-.002-1.144z" fill="#393837"/>
+    <mask id="1m48n5n6lb" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="18" y="19" width="2" height="2">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.07 20.178a.572.572 0 1 0 1.145.003.572.572 0 0 0-1.145-.003z" fill="#fff"/>
+    </mask>
+    <g mask="url(#1m48n5n6lb)">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.814 26.007h11.657V14.351H12.814v11.656z" fill="#393837"/>
+    </g>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M18.641 19.965a.216.216 0 0 0-.214.216c0 .24.432.238.43 0a.217.217 0 0 0-.216-.216zm0 1.577a1.362 1.362 0 0 1 0-2.722c.752 0 1.363.61 1.363 1.36 0 .751-.611 1.362-1.363 1.362z" fill="#393837"/>
+</svg>

@@ -7,7 +7,9 @@ import 'package:goodali/screens/HomeScreen/feelTab/mood_detail.dart';
 
 class MoodListItem extends StatelessWidget {
   final GetMoodList? getMoodList;
-  const MoodListItem({Key? key, this.getMoodList}) : super(key: key);
+  final bool? isHomeScreen;
+
+  const MoodListItem({Key? key, this.getMoodList, this.isHomeScreen = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +17,7 @@ class MoodListItem extends StatelessWidget {
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MoodDetail(moodListId: getMoodList!.id.toString()))),
       child: Column(
         children: [
-          kIsWeb
+          kIsWeb && isHomeScreen == true
               ? CircleAvatar(
                   radius: 75,
                   child: ClipOval(
