@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
@@ -11,9 +14,7 @@ import 'package:provider/provider.dart';
 class DownloadButton extends StatefulWidget {
   final Products products;
   final bool? isModalPlayer;
-  const DownloadButton(
-      {Key? key, required this.products, this.isModalPlayer = false})
-      : super(key: key);
+  const DownloadButton({Key? key, required this.products, this.isModalPlayer = false}) : super(key: key);
 
   @override
   State<DownloadButton> createState() => _DownloadButtonState();
@@ -24,13 +25,9 @@ class _DownloadButtonState extends State<DownloadButton> {
     final hasGranted = await _checkPermission();
 
     if (hasGranted) {
-      Provider.of<DownloadController>(context, listen: false)
-          .download(episode!);
+      Provider.of<DownloadController>(context, listen: false).download(episode!);
     } else {
-      TopSnackBar.errorFactory(
-              title: "Алдаа гарлаа",
-              msg: "Grant storage permission to continue")
-          .show(context);
+      TopSnackBar.errorFactory(title: "Алдаа гарлаа", msg: "Grant storage permission to continue").show(context);
     }
   }
 
@@ -38,8 +35,7 @@ class _DownloadButtonState extends State<DownloadButton> {
   Widget build(BuildContext context) {
     return Consumer<DownloadController>(
       builder: (context, value, child) {
-        var _task = Provider.of<DownloadController>(context, listen: false)
-            .episodeToTask(widget.products);
+        var _task = Provider.of<DownloadController>(context, listen: false).episodeToTask(widget.products);
         return _downloadButton(_task, context);
       },
     );
@@ -54,15 +50,10 @@ class _DownloadButtonState extends State<DownloadButton> {
           children: [
             IconButton(
               onPressed: () => _requestDownload(widget.products),
-              icon: Icon(IconlyLight.arrow_down,
-                  size: widget.isModalPlayer == true ? 20 : 24,
-                  color: MyColors.gray),
+              icon: Icon(IconlyLight.arrow_down, size: widget.isModalPlayer == true ? 20 : 24, color: MyColors.gray),
               splashRadius: 1,
             ),
-            widget.isModalPlayer == true
-                ? const Text("Татах",
-                    style: TextStyle(fontSize: 12, color: MyColors.gray))
-                : const SizedBox()
+            widget.isModalPlayer == true ? const Text("Татах", style: TextStyle(fontSize: 12, color: MyColors.gray)) : const SizedBox()
           ],
         );
       case 2:
@@ -78,15 +69,10 @@ class _DownloadButtonState extends State<DownloadButton> {
           children: [
             IconButton(
               onPressed: () {},
-              icon: Icon(IconlyLight.arrow_down,
-                  size: widget.isModalPlayer == true ? 24 : 20,
-                  color: MyColors.primaryColor),
+              icon: Icon(IconlyLight.arrow_down, size: widget.isModalPlayer == true ? 24 : 20, color: MyColors.primaryColor),
               splashRadius: 1,
             ),
-            widget.isModalPlayer == true
-                ? const Text("Татсан",
-                    style: TextStyle(fontSize: 12, color: MyColors.gray))
-                : const SizedBox()
+            widget.isModalPlayer == true ? const Text("Татсан", style: TextStyle(fontSize: 12, color: MyColors.gray)) : const SizedBox()
           ],
         );
 
@@ -96,17 +82,25 @@ class _DownloadButtonState extends State<DownloadButton> {
   }
 
   Future<bool> _checkPermission() async {
-    final storageStatus = await Permission.storage.status;
-
-    if (storageStatus != PermissionStatus.granted) {
-      var permissions = await [Permission.storage].request();
-      if (permissions[Permission.storage] == PermissionStatus.granted) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
+    if (Platform.isIOS) {
       return true;
     }
+
+    if (Platform.isAndroid) {
+      final info = await DeviceInfoPlugin().androidInfo;
+      if (info.version.sdkInt! > 28) {
+        return true;
+      }
+
+      final status = await Permission.storage.status;
+      if (status == PermissionStatus.granted) {
+        return true;
+      }
+
+      final result = await Permission.storage.request();
+      return result == PermissionStatus.granted;
+    }
+
+    throw StateError('unknown platform');
   }
 }
