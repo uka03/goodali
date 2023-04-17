@@ -61,8 +61,6 @@ class _MoodDetailState extends State<MoodDetail> {
 
   Future<void> getTotalDuration(url, Products products) async {
     try {
-      print("2 dahi function");
-      print(products.title);
       if (products.duration == null || products.duration == 0) {
         totalDuration = await getFileDuration(url, products);
       } else {
@@ -86,7 +84,6 @@ class _MoodDetailState extends State<MoodDetail> {
 
   Future<bool> initiliaze() async {
     currentlyPlaying.value = products;
-    print("3 dahi function");
     if (activeList.isNotEmpty && activeList.first.id == products!.id) {
       return true;
     } else {

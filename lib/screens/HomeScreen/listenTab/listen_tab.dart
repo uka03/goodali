@@ -157,7 +157,7 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
           List<VideoModel> videoList = snapshot.data;
-          if (kIsWeb)
+          if (kIsWeb) {
             return GridView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 physics: const NeverScrollableScrollPhysics(),
@@ -172,7 +172,7 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
                       videoModel: videoList[index],
                       isHomeScreen: true,
                     ));
-          else
+          } else {
             return ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -182,6 +182,7 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
                       videoModel: videoList[index],
                       isHomeScreen: true,
                     ));
+          }
         } else {
           return const Center(
             child: CircularProgressIndicator(color: MyColors.primaryColor),
@@ -218,7 +219,6 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
   }
 
   Future<List<Products>> getalbumListLogged() async {
-    print("sifjifjdoijfojdjf");
     var data = await Connection.getalbumListLogged(context);
     for (var element in data) {
       if (element.isSpecial == 1) {
