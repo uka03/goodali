@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
@@ -11,8 +12,7 @@ class AlbumLecture extends StatefulWidget {
   final int? id;
   final int? productType;
   final int? productID;
-  const AlbumLecture({Key? key, this.id, this.productType, this.productID})
-      : super(key: key);
+  const AlbumLecture({Key? key, this.id, this.productType, this.productID}) : super(key: key);
 
   @override
   State<AlbumLecture> createState() => _AlbumLectureState();
@@ -37,13 +37,9 @@ class _AlbumLectureState extends State<AlbumLecture> {
           SizedBox(
               height: 40,
               child: Container(
-                padding: const EdgeInsets.only(left: 20),
+                padding: const EdgeInsets.only(left: kIsWeb ? 255 : 20),
                 alignment: Alignment.topLeft,
-                child: const Text("Цомог",
-                    style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: MyColors.black)),
+                child: const Text("Цомог", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
               )),
           const SizedBox(height: 20),
           Consumer<Auth>(
@@ -51,8 +47,7 @@ class _AlbumLectureState extends State<AlbumLecture> {
               return FutureBuilder(
                   future: value.isAuth ? getalbumListLogged() : getProducts(),
                   builder: (context, AsyncSnapshot snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData) {
+                    if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                       List<Products> albumList = snapshot.data;
                       List<Products> searchResult = [];
                       List<Products> banner = [];
@@ -74,9 +69,7 @@ class _AlbumLectureState extends State<AlbumLecture> {
                                   ? searchResult
                                   : albumList);
                     } else {
-                      return const Center(
-                          child: CircularProgressIndicator(
-                              color: MyColors.primaryColor));
+                      return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
                     }
                   });
             },
@@ -88,19 +81,18 @@ class _AlbumLectureState extends State<AlbumLecture> {
 
   Widget albumLecture(BuildContext context, List<Products> albumList) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: kIsWeb ? 255 : 20),
       child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: albumList.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: MediaQuery.of(context).size.width /
-                  (MediaQuery.of(context).size.height / 1.3),
+              // childAspectRatio: MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height / 1.3),
+              childAspectRatio: kIsWeb ? 0.5 : 1 / 1.6,
               mainAxisSpacing: 20,
               crossAxisSpacing: 20,
-              crossAxisCount: 2),
-          itemBuilder: (BuildContext context, int index) =>
-              AlbumItem(albumData: albumList[index])),
+              crossAxisCount: kIsWeb ? 6 : 2),
+          itemBuilder: (BuildContext context, int index) => AlbumItem(albumData: albumList[index])),
     );
   }
 

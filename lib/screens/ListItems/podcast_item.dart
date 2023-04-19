@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -80,8 +81,7 @@ class _PodcastItemState extends State<PodcastItem> {
 
   getTotalDuration() async {
     try {
-      if (widget.podcastItem.duration == null ||
-          widget.podcastItem.duration == 0) {
+      if (widget.podcastItem.duration == null || widget.podcastItem.duration == 0) {
         _totalduration = await getFileDuration(audioUrl);
       } else {
         _totalduration = Duration(milliseconds: widget.podcastItem.duration!);
@@ -119,12 +119,29 @@ class _PodcastItemState extends State<PodcastItem> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: ImageView(
-                  height: 40,
-                  width: 40,
-                  imgPath: widget.podcastItem.banner ?? ""),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: ImageView(height: kIsWeb ? 90 : 40, width: kIsWeb ? 90 : 40, imgPath: widget.podcastItem.banner ?? ""),
+                ),
+                Visibility(
+                  visible: kIsWeb ? true : false,
+                  child: AudioPlayerButton(
+                    id: widget.podcastItem.id!,
+                    onPlay: () async {
+                      await updateSavedPosition();
+                      widget.onTap!.call();
+                    },
+                    onPause: () async {
+                      await updateSavedPosition();
+                      audioHandler.pause();
+                    },
+                    title: widget.podcastItem.title ?? "",
+                  ),
+                ),
+              ],
             ),
             const SizedBox(width: 15),
             Expanded(
@@ -136,81 +153,116 @@ class _PodcastItemState extends State<PodcastItem> {
                     maxLines: 1,
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: MyColors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     parseHtmlString(widget.podcastItem.body ?? ""),
-                    style: const TextStyle(
-                        color: MyColors.gray, fontSize: 12, height: 1.5),
+                    style: const TextStyle(color: MyColors.gray, fontSize: 12, height: 1.5),
+                  ),
+                  Visibility(
+                    visible: kIsWeb ? true : false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 14),
+                      child: ValueListenableBuilder(
+                          valueListenable: durationStateNotifier,
+                          builder: (context, DurationState value, child) {
+                            var buttonState = buttonNotifier.value;
+                            var currently = currentlyPlaying.value;
+                            bool isPlaying = currently?.title == widget.podcastItem.title && buttonState == ButtonState.playing ? true : false;
+
+                            return GestureDetector(
+                              onTap: () {},
+                              child: Row(
+                                children: [
+                                  isLoading
+                                      ? const SizedBox(
+                                          width: 30,
+                                          child: LinearProgressIndicator(backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                                      : Row(
+                                          children: [
+                                            (savedDuration > 0 || isPlaying)
+                                                ? AudioProgressBar(
+                                                    totalDuration: progressMax,
+                                                    title: widget.podcastItem.title ?? "",
+                                                    savedPostion: Duration(milliseconds: savedDuration),
+                                                  )
+                                                : Container(),
+                                            const SizedBox(width: 10),
+                                            AudioplayerTimer(
+                                              id: widget.podcastItem.id!,
+                                              title: widget.podcastItem.title ?? "",
+                                              totalDuration: _totalduration,
+                                              savedDuration: Duration(milliseconds: savedDuration),
+                                            ),
+                                          ],
+                                        ),
+                                ],
+                              ),
+                            );
+                          }),
+                    ),
                   ),
                 ],
               ),
             )
           ],
         ),
-        const SizedBox(height: 14),
-        ValueListenableBuilder(
-            valueListenable: durationStateNotifier,
-            builder: (context, DurationState value, child) {
-              var buttonState = buttonNotifier.value;
-              var currently = currentlyPlaying.value;
-              bool isPlaying = currently?.title == widget.podcastItem.title &&
-                      buttonState == ButtonState.playing
-                  ? true
-                  : false;
+        Visibility(
+          visible: kIsWeb ? false : true,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: ValueListenableBuilder(
+                valueListenable: durationStateNotifier,
+                builder: (context, DurationState value, child) {
+                  var buttonState = buttonNotifier.value;
+                  var currently = currentlyPlaying.value;
+                  bool isPlaying = currently?.title == widget.podcastItem.title && buttonState == ButtonState.playing ? true : false;
 
-              return GestureDetector(
-                onTap: () {},
-                child: Row(
-                  children: [
-                    AudioPlayerButton(
-                      id: widget.podcastItem.id!,
-                      onPlay: () async {
-                        await updateSavedPosition();
-                        widget.onTap!.call();
-                      },
-                      onPause: () async {
-                        await updateSavedPosition();
-                        audioHandler.pause();
-                      },
-                      title: widget.podcastItem.title ?? "",
-                    ),
-                    const SizedBox(width: 10),
-                    isLoading
-                        ? const SizedBox(
-                            width: 30,
-                            child: LinearProgressIndicator(
-                                backgroundColor: Colors.transparent,
-                                minHeight: 2,
-                                color: MyColors.black))
-                        : Row(
-                            children: [
-                              (savedDuration > 0 || isPlaying)
-                                  ? AudioProgressBar(
-                                      totalDuration: progressMax,
-                                      title: widget.podcastItem.title ?? "",
-                                      savedPostion:
-                                          Duration(milliseconds: savedDuration),
-                                    )
-                                  : Container(),
-                              const SizedBox(width: 10),
-                              AudioplayerTimer(
-                                id: widget.podcastItem.id!,
-                                title: widget.podcastItem.title ?? "",
-                                totalDuration: _totalduration,
-                                savedDuration:
-                                    Duration(milliseconds: savedDuration),
+                  return GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        AudioPlayerButton(
+                          id: widget.podcastItem.id!,
+                          onPlay: () async {
+                            await updateSavedPosition();
+                            widget.onTap!.call();
+                          },
+                          onPause: () async {
+                            await updateSavedPosition();
+                            audioHandler.pause();
+                          },
+                          title: widget.podcastItem.title ?? "",
+                        ),
+                        const SizedBox(width: 10),
+                        isLoading
+                            ? const SizedBox(
+                                width: 30, child: LinearProgressIndicator(backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                            : Row(
+                                children: [
+                                  (savedDuration > 0 || isPlaying)
+                                      ? AudioProgressBar(
+                                          totalDuration: progressMax,
+                                          title: widget.podcastItem.title ?? "",
+                                          savedPostion: Duration(milliseconds: savedDuration),
+                                        )
+                                      : Container(),
+                                  const SizedBox(width: 10),
+                                  AudioplayerTimer(
+                                    id: widget.podcastItem.id!,
+                                    title: widget.podcastItem.title ?? "",
+                                    totalDuration: _totalduration,
+                                    savedDuration: Duration(milliseconds: savedDuration),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                  ],
-                ),
-              );
-            }),
+                      ],
+                    ),
+                  );
+                }),
+          ),
+        ),
         const SizedBox(height: 12)
       ],
     );

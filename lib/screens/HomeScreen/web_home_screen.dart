@@ -33,6 +33,7 @@ import 'package:goodali/screens/ProfileScreen/faQ.dart';
 import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WebHomeScreen extends StatefulWidget {
   const WebHomeScreen({Key? key}) : super(key: key);
@@ -548,16 +549,32 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
                           ),
                         ),
                         SizedBox(height: 15),
-                        Image.asset(
-                          "assets/images/app_store.png",
-                          width: 140,
-                          height: 40,
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: InkWell(
+                            onTap: () {
+                              launch("https://apps.apple.com/us/app/goodali/id1661415299");
+                            },
+                            child: Image.asset(
+                              "assets/images/app_store.png",
+                              width: 140,
+                              height: 40,
+                            ),
+                          ),
                         ),
                         SizedBox(height: 15),
-                        Image.asset(
-                          "assets/images/google_play.png",
-                          width: 140,
-                          height: 40,
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: InkWell(
+                            onTap: () {
+                              launch("https://play.google.com/store/apps/details?id=com.goodali.mn");
+                            },
+                            child: Image.asset(
+                              "assets/images/google_play.png",
+                              width: 140,
+                              height: 40,
+                            ),
+                          ),
                         ),
                       ],
                     ),

@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
@@ -42,23 +41,10 @@ class _VideoDetailState extends State<VideoDetail> {
         strictRelatedVideos: true,
       ),
     );
-    log(_ytbPlayerController?.initialVideoId ?? "", name: "initialVideoId");
-    log(_ytbPlayerController?.params.origin ?? "", name: "origin");
-    log(_ytbPlayerController?.value.metaData.videoId ?? "", name: "videoId");
+    // log(_ytbPlayerController?.initialVideoId ?? "", name: "initialVideoId");
+    // log(_ytbPlayerController?.params.origin ?? "", name: "origin");
+    // log(_ytbPlayerController?.value.metaData.videoId ?? "", name: "videoId");
   }
-
-  // initiliazeSimilarVideo(videoUrl) {
-  //   _ytbPlayerController = YoutubePlayerController(
-  //     initialVideoId: videoUrl,
-  //     params: const YoutubePlayerParams(
-  //       showControls: true,
-  //       origin: "https://www.youtube.com/embed/",
-  //       startAt: Duration(seconds: 0),
-  //       autoPlay: true,
-  //     ),
-  //   );
-  //   // _controller?.addListener(listener);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -67,26 +53,44 @@ class _VideoDetailState extends State<VideoDetail> {
         body: SingleChildScrollView(
             child: Column(
           children: [
-            SizedBox(
-              height: 200,
-              width: double.infinity,
-              child: YoutubePlayerControllerProvider(
-                controller: _ytbPlayerController ??
-                    YoutubePlayerController(
-                        initialVideoId: widget.videoModel.videoUrl ?? ""),
-                child: const YoutubePlayerIFrame(
-                  aspectRatio: 16 / 9,
+            Visibility(
+              visible: kIsWeb ? true : false,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  widget.videoModel.title ?? "",
+                  style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: MyColors.black),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Text(
-                widget.videoModel.title ?? "",
-                style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: MyColors.black),
+            kIsWeb
+                ? Container(
+                    height: 700,
+                    child: YoutubePlayerControllerProvider(
+                      controller: _ytbPlayerController ?? YoutubePlayerController(initialVideoId: widget.videoModel.videoUrl ?? ""),
+                      child: const YoutubePlayerIFrame(
+                        aspectRatio: 16 / 9,
+                      ),
+                    ),
+                  )
+                : SizedBox(
+                    height: 200,
+                    width: double.infinity,
+                    child: YoutubePlayerControllerProvider(
+                      controller: _ytbPlayerController ?? YoutubePlayerController(initialVideoId: widget.videoModel.videoUrl ?? ""),
+                      child: const YoutubePlayerIFrame(
+                        aspectRatio: 16 / 9,
+                      ),
+                    ),
+                  ),
+            Visibility(
+              visible: kIsWeb ? false : true,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  widget.videoModel.title ?? "",
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: MyColors.black),
+                ),
               ),
             ),
             Padding(
@@ -101,13 +105,8 @@ class _VideoDetailState extends State<VideoDetail> {
             const Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text("Төстэй видео",
-                    style: TextStyle(
-                        color: MyColors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        height: 1.7)),
+                padding: EdgeInsets.symmetric(horizontal: kIsWeb ? 255 : 20),
+                child: Text("Төстэй видео", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
               ),
             ),
             const SizedBox(height: 30),
@@ -122,13 +121,32 @@ class _VideoDetailState extends State<VideoDetail> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
           List<VideoModel> similarVideo = snapshot.data;
-          return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: similarVideo.length,
-              itemBuilder: (context, index) {
-                return VideoItem(videoModel: similarVideo[index]);
-              });
+          if (kIsWeb) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 255),
+              child: GridView.builder(
+                  // padding: const EdgeInsets.symmetric(horizontal: 20),
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: similarVideo.length > 3 ? 3 : similarVideo.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 15,
+                    childAspectRatio: 1,
+                    crossAxisCount: 3,
+                  ),
+                  itemBuilder: (BuildContext context, int index) => VideoItem(
+                        videoModel: similarVideo[index],
+                      )),
+            );
+          } else {
+            return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: similarVideo.length,
+                itemBuilder: (context, index) {
+                  return VideoItem(videoModel: similarVideo[index]);
+                });
+          }
         } else {
           return const Center(
             child: CircularProgressIndicator(

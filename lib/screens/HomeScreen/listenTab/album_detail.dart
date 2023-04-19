@@ -1,20 +1,19 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/local_database.dart';
+import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/Utils/utils.dart';
-import 'package:goodali/Widgets/image_view.dart';
-import 'package:goodali/controller/audioplayer_controller.dart';
-import 'package:goodali/controller/connection_controller.dart';
-import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
+import 'package:goodali/controller/audioplayer_controller.dart';
+import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/ListItems/album_detail_item.dart';
@@ -58,8 +57,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
   ScrollController? _controller;
   double imageSize = 0;
-  double initialSize = 180;
-  double containerHeight = 270;
+  double initialSize = kIsWeb ? 360 : 180;
+  double containerHeight = kIsWeb ? 450 : 270;
   double containerInitialHeight = 270;
   double imageOpacity = 1;
   bool isPlaying = false;
@@ -147,91 +146,96 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     buyList.removeLast();
                   }
 
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: Stack(children: [
-                          Container(
-                              height: containerHeight,
-                              width: MediaQuery.of(context).size.width,
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Opacity(
-                                    opacity: imageOpacity.clamp(0, 1),
-                                    child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(14),
-                                        child: CachedNetworkImage(
-                                          imageUrl: "${Urls.networkPath}${widget.albumProduct.banner}",
-                                          width: imageSize,
-                                          height: imageSize,
-                                          progressIndicatorBuilder: (context, url, downloadProgress) {
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                color: MyColors.primaryColor,
-                                                strokeWidth: 2,
-                                                value: downloadProgress.progress,
-                                              ),
-                                            );
-                                          },
-                                          fit: BoxFit.cover,
-                                          errorWidget: (context, url, error) {
-                                            if (error is NetworkImageLoadException && error.statusCode == 404) {
-                                              return const Text("404");
-                                            }
+                  return Center(
+                    child: Container(
+                      width: kIsWeb ? MediaQuery.of(context).size.width / 2.5 : MediaQuery.of(context).size.width,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Stack(children: [
+                              Container(
+                                  height: containerHeight,
+                                  width: MediaQuery.of(context).size.width,
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Opacity(
+                                        opacity: imageOpacity.clamp(0, 1),
+                                        child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(14),
+                                            child: CachedNetworkImage(
+                                              imageUrl: "${Urls.networkPath}${widget.albumProduct.banner}",
+                                              width: imageSize,
+                                              height: imageSize,
+                                              progressIndicatorBuilder: (context, url, downloadProgress) {
+                                                return Center(
+                                                  child: CircularProgressIndicator(
+                                                    color: MyColors.primaryColor,
+                                                    strokeWidth: 2,
+                                                    value: downloadProgress.progress,
+                                                  ),
+                                                );
+                                              },
+                                              fit: BoxFit.cover,
+                                              errorWidget: (context, url, error) {
+                                                if (error is NetworkImageLoadException && error.statusCode == 404) {
+                                                  return const Text("404");
+                                                }
 
-                                            return SizedBox(
-                                                width: imageSize,
-                                                height: imageSize,
-                                                child: const Text(
-                                                  "No Image",
-                                                  style: TextStyle(fontSize: 12),
-                                                ));
-                                          },
-                                        )),
-                                  ),
-                                  const SizedBox(height: 80)
-                                ],
-                              )),
-                          SingleChildScrollView(
-                            controller: _controller,
-                            physics: const BouncingScrollPhysics(),
-                            child: Column(children: [
-                              SizedBox(height: initialSize + 32),
-                              Text(
-                                widget.albumProduct.title ?? "" "",
-                                style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 20),
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                  child: CustomReadMoreText(
-                                    text: widget.albumProduct.body ?? "",
-                                    textAlign: TextAlign.center,
+                                                return SizedBox(
+                                                    width: imageSize,
+                                                    height: imageSize,
+                                                    child: const Text(
+                                                      "No Image",
+                                                      style: TextStyle(fontSize: 12),
+                                                    ));
+                                              },
+                                            )),
+                                      ),
+                                      const SizedBox(height: 80)
+                                    ],
                                   )),
-                              const SizedBox(height: 20),
-                              const Divider(endIndent: 20, indent: 20),
-                              lecture(context, buyList, isAuth),
-                              const SizedBox(height: 70),
+                              SingleChildScrollView(
+                                controller: _controller,
+                                physics: const BouncingScrollPhysics(),
+                                child: Column(children: [
+                                  SizedBox(height: initialSize + 32),
+                                  Text(
+                                    widget.albumProduct.title ?? "" "",
+                                    style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                      child: CustomReadMoreText(
+                                        text: widget.albumProduct.body ?? "",
+                                        textAlign: TextAlign.center,
+                                      )),
+                                  const SizedBox(height: 20),
+                                  const Divider(endIndent: 20, indent: 20),
+                                  lecture(context, buyList, isAuth),
+                                  const SizedBox(height: 70),
+                                ]),
+                              ),
                             ]),
                           ),
-                        ]),
+                          widget.albumProduct.isBought == true || username == "surgalt9@gmail.com" && isAuth
+                              ? Container()
+                              : Container(
+                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+                                    child: CustomElevatedButton(
+                                        text: "Худалдаж авах",
+                                        onPress: () {
+                                          _onBuyClicked(cart, isAuth);
+                                        }),
+                                  ),
+                                ),
+                        ],
                       ),
-                      widget.albumProduct.isBought == true || username == "surgalt9@gmail.com" && isAuth
-                          ? Container()
-                          : Container(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                                child: CustomElevatedButton(
-                                    text: "Худалдаж авах",
-                                    onPress: () {
-                                      _onBuyClicked(cart, isAuth);
-                                    }),
-                              ),
-                            ),
-                    ],
+                    ),
                   );
                 } else {
                   return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
@@ -259,11 +263,11 @@ class _AlbumDetailState extends State<AlbumDetail> {
               products: product[index],
               albumProducts: widget.albumProduct,
               onTap: () async {
-                print("intro");
+                // print("intro");
                 currentlyPlaying.value = product[index];
                 if (activeList.first.title == product.first.title && activeList.first.id == product.first.id) {
                   await audioHandler.skipToQueueItem(index);
-                  log("Starts in: ${product[index].position}");
+                  // log("Starts in: ${product[index].position}");
 
                   await audioHandler.seek(
                     Duration(milliseconds: product[index].position!),
@@ -325,8 +329,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   _onBuyClicked(cart, bool isAuth) {
-    print("buyList.length ${buyList.length}");
-    print("product id ${buyList[0].productId}");
+    // print("buyList.length ${buyList.length}");
+    // print("product id ${buyList[0].productId}");
     for (var item in buyList) {
       if (item.isBought == false) {
         albumProductsList.add(item.productId!);
@@ -345,17 +349,29 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
   showIntroAudioModal() {
     showModalBottomSheet(
-        context: context,
-        isDismissible: false,
-        enableDrag: true,
-        backgroundColor: Colors.white,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => StatefulBuilder(
-              builder: (BuildContext context, void Function(void Function()) setState) {
-                return IntroAudio(products: widget.albumProduct, productsList: const []);
-              },
-            ));
+      context: context,
+      isDismissible: false,
+      enableDrag: true,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      clipBehavior: Clip.antiAlias,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+        ),
+      ),
+      builder: (_) => StatefulBuilder(
+        builder: (BuildContext context, void Function(void Function()) setState) {
+          return Center(
+            child: Container(
+              width: kIsWeb ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width,
+              child: IntroAudio(products: widget.albumProduct, productsList: const []),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Future<void> getAlbumLectures() async {

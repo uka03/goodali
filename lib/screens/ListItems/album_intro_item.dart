@@ -1,11 +1,12 @@
 import 'dart:developer';
 
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/file.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:goodali/Providers/auth_provider.dart';
-
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Utils/urls.dart';
@@ -19,12 +20,12 @@ import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/duration_state.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
-
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/audioScreens.dart/intro_audio.dart';
 import 'package:iconly/iconly.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 typedef SetIndex = void Function(int index);
@@ -205,7 +206,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
                               },
                               icon: const Icon(IconlyLight.buy, color: MyColors.gray))
                           : Container(),
-                    IconButton(splashRadius: 20, onPressed: () {}, icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
+                    moreButton()
                   ],
                 );
               },
@@ -215,20 +216,78 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
         ));
   }
 
+  //To show a PopupMenu with Share and Copy Link options on the onTap event of the IconButton widget
+  Widget moreButton() {
+    return PopupMenuButton(
+      icon: IconButton(splashRadius: 20, onPressed: () {}, icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
+      onSelected: (value) {
+        if (value == 0) {
+          Share.share(Urls.networkPath + widget.products.audio!);
+        } else if (value == 1) {
+          Clipboard.setData(ClipboardData(text: Urls.networkPath + widget.products.audio!));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Линк хуулагдлаа')));
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 0,
+          child: Text('Хуваалцах'),
+        ),
+        const PopupMenuItem(
+          value: 1,
+          child: Text('Линк хуулах'),
+        ),
+      ],
+    );
+  }
+
   showIntroAudioModal() {
-    showModalBottomSheet(
+    if (kIsWeb) {
+      showModalBottomSheet(
         context: context,
         isDismissible: false,
         enableDrag: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent, // Change this to transparent
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        clipBehavior: Clip.antiAlias,
         builder: (_) => StatefulBuilder(
-              builder: (BuildContext _, void Function(void Function()) setState) {
-                // setState(() {});
-                return IntroAudio(products: widget.products, productsList: const []);
-              },
-            ));
+          builder: (BuildContext context, void Function(void Function()) setState) {
+            return Column(
+              children: [
+                Spacer(),
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.25,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(12),
+                      ),
+                    ),
+                    child: IntroAudio(products: widget.products, productsList: const []),
+                  ),
+                ),
+                Spacer(),
+              ],
+            );
+          },
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+          context: context,
+          isDismissible: false,
+          enableDrag: true,
+          backgroundColor: Colors.white,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+          builder: (_) => StatefulBuilder(
+                builder: (BuildContext _, void Function(void Function()) setState) {
+                  // setState(() {});
+                  return IntroAudio(products: widget.products, productsList: const []);
+                },
+              ));
+    }
   }
 
   addToCard(cart) {
