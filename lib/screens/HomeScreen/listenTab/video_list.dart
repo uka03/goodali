@@ -162,7 +162,7 @@ class _VideoListState extends State<VideoList> {
         isScrollControlled: true,
         isDismissible: true,
         clipBehavior: Clip.antiAlias,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
         builder: (_) => StatefulBuilder(
               builder: (BuildContext context, void Function(void Function()) setState) {
                 return Column(

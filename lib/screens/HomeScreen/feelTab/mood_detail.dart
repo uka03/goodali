@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -70,6 +71,7 @@ class _MoodDetailState extends State<MoodDetail> {
       setState(() {});
     } catch (e) {
       developer.log(e.toString(), name: "mood error");
+      setState(() {});
     }
   }
 
@@ -99,7 +101,6 @@ class _MoodDetailState extends State<MoodDetail> {
 
   onPlayButtonClicked(Products products) async {
     currentlyPlaying.value = products;
-    developer.log("Starts in: ${products.position}");
     audioHandler.play();
   }
 
@@ -120,50 +121,56 @@ class _MoodDetailState extends State<MoodDetail> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: moodList.isNotEmpty
-              ? PageView.builder(
-                  controller: _pageController,
-                  itemCount: moodList.length,
-                  onPageChanged: (int page) {
-                    if (url != "") {}
+              ? SizedBox(
+                  child: Center(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * (kIsWeb ? 0.25 : 1),
+                      child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: moodList.length,
+                          onPageChanged: (int page) {
+                            if (page == moodList.length - 1) {
+                              rightButton = const Text("Дуусгах", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold));
+                            } else {
+                              rightButton = const Text(
+                                "Дараах",
+                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                              );
+                            }
+                            setState(() {
+                              _current = page;
+                            });
+                          },
+                          itemBuilder: ((context, index) {
+                            imgUrl = moodList[index].banner == "Image failed to upload" ? "" : moodList[index].banner!;
+                            url = moodList[index].audio == "Audio failed to upload" ? "" : Urls.networkPath + moodList[index].audio!;
 
-                    if (page == moodList.length - 1) {
-                      rightButton = const Text("Дуусгах", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold));
-                    } else {
-                      rightButton = const Text(
-                        "Дараах",
-                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                      );
-                    }
-                    setState(() {
-                      _current = page;
-                    });
-                  },
-                  itemBuilder: ((context, index) {
-                    imgUrl = moodList[index].banner == "Image failed to upload" ? "" : moodList[index].banner!;
-                    url = moodList[index].audio == "Audio failed to upload" ? "" : Urls.networkPath + moodList[index].audio!;
-
-                    return Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          banner(imgUrl),
-                          const SizedBox(height: 20),
-                          HtmlWidget(
-                            moodList[index].title!,
-                            textStyle: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 20),
-                          ),
-                          const SizedBox(height: 40),
-                          HtmlWidget(
-                            moodList[index].body!,
-                            textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
-                          ),
-                          const SizedBox(height: 20),
-                          if (url != "") audioPlayerWidget(index)
-                        ],
-                      ),
-                    );
-                  }))
+                            return Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(
+                                crossAxisAlignment: kIsWeb ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: kIsWeb ? 20 : 0),
+                                  banner(imgUrl),
+                                  const SizedBox(height: kIsWeb ? 40 : 20),
+                                  HtmlWidget(
+                                    moodList[index].title!,
+                                    textStyle: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: kIsWeb ? 32 : 20),
+                                  ),
+                                  const SizedBox(height: 40),
+                                  HtmlWidget(
+                                    moodList[index].body!,
+                                    textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  if (url != "") audioPlayerWidget(index)
+                                ],
+                              ),
+                            );
+                          })),
+                    ),
+                  ),
+                )
               : const Center(
                   child: CircularProgressIndicator(color: MyColors.primaryColor),
                 ),
@@ -310,7 +317,6 @@ class _MoodDetailState extends State<MoodDetail> {
                     size: 40.0,
                   ),
                   onPressed: () async {
-                    // await updateSavedPosition();
                     audioHandler.pause();
                   },
                 );

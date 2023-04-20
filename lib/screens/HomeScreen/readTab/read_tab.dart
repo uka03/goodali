@@ -105,7 +105,7 @@ class _ReadTabbarState extends State<ReadTabbar> with AutomaticKeepAliveClientMi
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GestureDetector(
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleDetail(articleItem: articleList[index]))),
-                  child: ArtcileItem(articleModel: articleList[index]))));
+                  child: ArtcileItem(articleModel: articleList[index], isFromHome: true))));
     else
       return ListView.separated(
           shrinkWrap: true,
@@ -114,7 +114,7 @@ class _ReadTabbarState extends State<ReadTabbar> with AutomaticKeepAliveClientMi
           separatorBuilder: (BuildContext context, int index) => const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
           itemBuilder: (context, index) => GestureDetector(
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleDetail(articleItem: articleList[index]))),
-              child: ArtcileItem(articleModel: articleList[index])));
+              child: ArtcileItem(articleModel: articleList[index], isFromHome: true)));
   }
 
   Future<List<ArticleModel>> getArticle() {

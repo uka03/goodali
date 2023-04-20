@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -48,48 +49,48 @@ class _ArticleDetailState extends State<ArticleDetail> {
         SingleChildScrollView(
           controller: _scrollController,
           physics: const ClampingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ImageView(
-                imgPath: widget.articleItem.banner ?? "",
-                height: 200,
-                width: double.infinity,
-              ),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: 300,
-                  child: Text(widget.articleItem.title ?? "",
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          color: MyColors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          height: 1.7)),
+          child: SizedBox(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ImageView(
+                  imgPath: widget.articleItem.banner ?? "",
+                  height: kIsWeb ? 512 : 200,
+                  width: double.infinity,
                 ),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: HtmlWidget(widget.articleItem.body ?? "",
-                    textStyle: const TextStyle(
-                        fontSize: 14, height: 1.8, color: MyColors.black)),
-              ),
-              const SizedBox(height: 40),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text("Төстэй бичвэрүүд",
-                    style: TextStyle(
-                        color: MyColors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        height: 1.7)),
-              ),
-              const SizedBox(height: 20),
-              _similarArticle()
-            ],
+                Center(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                    child: Column(children: [
+                      const SizedBox(height: 20),
+                      Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: 300,
+                          child: Text(widget.articleItem.title ?? "",
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold, height: 1.7)),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child:
+                            HtmlWidget(widget.articleItem.body ?? "", textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.black)),
+                      ),
+                      const SizedBox(height: 40),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child:
+                            Text("Төстэй бичвэрүүд", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
+                      ),
+                      const SizedBox(height: 20),
+                      _similarArticle()
+                    ]),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         Positioned(
@@ -101,12 +102,7 @@ class _ArticleDetailState extends State<ArticleDetail> {
             axisTrackStyle: const LinearAxisTrackStyle(thickness: 2.5),
             showLabels: false,
             showTicks: false,
-            barPointers: [
-              LinearBarPointer(
-                  thickness: 2.5,
-                  color: MyColors.primaryColor,
-                  value: scrollPercent)
-            ],
+            barPointers: [LinearBarPointer(thickness: 2.5, color: MyColors.primaryColor, value: scrollPercent)],
           ),
         ),
       ]),
@@ -124,18 +120,10 @@ class _ArticleDetailState extends State<ArticleDetail> {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: similarArticle.length,
             itemBuilder: (context, index) => GestureDetector(
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ArticleDetail(articleItem: similarArticle[index]))),
-              child: ArtcileItem(
-                articleModel: similarArticle[index],
-              ),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleDetail(articleItem: similarArticle[index]))),
+              child: ArtcileItem(articleModel: similarArticle[index], isFromHome: false),
             ),
-            separatorBuilder: (BuildContext context, int index) =>
-                const Divider(
-                    color: MyColors.border1, endIndent: 20, indent: 20),
+            separatorBuilder: (BuildContext context, int index) => const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
           );
         } else {
           return const Center(

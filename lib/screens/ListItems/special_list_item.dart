@@ -22,9 +22,7 @@ import 'package:goodali/screens/ListItems/article_item.dart';
 class SpecialListItem extends StatefulWidget {
   final Products specialItem;
   final VoidCallback onTap;
-  const SpecialListItem(
-      {Key? key, required this.specialItem, required this.onTap})
-      : super(key: key);
+  const SpecialListItem({Key? key, required this.specialItem, required this.onTap}) : super(key: key);
 
   @override
   State<SpecialListItem> createState() => _SpecialListItemState();
@@ -41,11 +39,8 @@ class _SpecialListItemState extends State<SpecialListItem> {
   @override
   void initState() {
     if (widget.specialItem.type == "article") {
-      articleModel = ArticleModel(
-          banner: widget.specialItem.banner,
-          body: widget.specialItem.body,
-          id: widget.specialItem.id,
-          title: widget.specialItem.title);
+      articleModel =
+          ArticleModel(banner: widget.specialItem.banner, body: widget.specialItem.body, id: widget.specialItem.id, title: widget.specialItem.title);
     }
     if (widget.specialItem.audio != "Audio failed to upload") {
       audioURL = widget.specialItem.audio ?? "";
@@ -75,11 +70,7 @@ class _SpecialListItemState extends State<SpecialListItem> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: ImageView(
-                              imgPath: widget.specialItem.banner ?? "",
-                              width: 40,
-                              height: 40)),
+                          borderRadius: BorderRadius.circular(4), child: ImageView(imgPath: widget.specialItem.banner ?? "", width: 40, height: 40)),
                       const SizedBox(width: 15),
                       Expanded(
                         child: Column(
@@ -90,42 +81,29 @@ class _SpecialListItemState extends State<SpecialListItem> {
                               maxLines: 1,
                               softWrap: true,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  color: MyColors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 10),
                             Text(
                               parseHtmlString(widget.specialItem.body ?? ""),
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  height: 1.6,
-                                  color: MyColors.gray),
+                              style: const TextStyle(fontSize: 14, height: 1.6, color: MyColors.gray),
                             )
                           ],
                         ),
                       )
                     ],
                   ),
-                  if (widget.specialItem.type == "lecture" ||
-                      widget.specialItem.type == "album")
-                    const SizedBox(height: 14),
-                  if (widget.specialItem.type == "lecture" ||
-                      widget.specialItem.type == "album")
+                  if (widget.specialItem.type == "lecture" || widget.specialItem.type == "album") const SizedBox(height: 14),
+                  if (widget.specialItem.type == "lecture" || widget.specialItem.type == "album")
                     ValueListenableBuilder(
                         valueListenable: durationStateNotifier,
                         builder: (context, DurationState value, child) {
                           var buttonState = buttonNotifier.value;
                           var currently = currentlyPlaying.value;
 
-                          bool isPlaying =
-                              currently?.title == widget.specialItem.title &&
-                                      buttonState == ButtonState.playing
-                                  ? true
-                                  : false;
+                          bool isPlaying = currently?.title == widget.specialItem.title && buttonState == ButtonState.playing ? true : false;
 
                           return Row(
                             children: [
@@ -143,21 +121,14 @@ class _SpecialListItemState extends State<SpecialListItem> {
                               isLoading
                                   ? const SizedBox(
                                       width: 30,
-                                      child: LinearProgressIndicator(
-                                          backgroundColor: Colors.transparent,
-                                          minHeight: 2,
-                                          color: MyColors.black))
+                                      child: LinearProgressIndicator(backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
                                   : Row(
                                       children: [
                                         (savedPosition > 0 || isPlaying)
                                             ? AudioProgressBar(
                                                 totalDuration: duration,
-                                                title:
-                                                    widget.specialItem.title ??
-                                                        "",
-                                                savedPostion: Duration(
-                                                    milliseconds:
-                                                        savedPosition),
+                                                title: widget.specialItem.title ?? "",
+                                                savedPostion: Duration(milliseconds: savedPosition),
                                               )
                                             : Container(),
                                         const SizedBox(width: 10),
@@ -165,8 +136,7 @@ class _SpecialListItemState extends State<SpecialListItem> {
                                           id: widget.specialItem.id!,
                                           title: widget.specialItem.title ?? "",
                                           totalDuration: _totalduration,
-                                          savedDuration: Duration(
-                                              milliseconds: savedPosition),
+                                          savedDuration: Duration(milliseconds: savedPosition),
                                         ),
                                       ],
                                     ),
@@ -183,8 +153,7 @@ class _SpecialListItemState extends State<SpecialListItem> {
 
   Future<Duration> getTotalDuration(String url) async {
     try {
-      if (widget.specialItem.duration == null ||
-          widget.specialItem.duration == 0) {
+      if (widget.specialItem.duration == null || widget.specialItem.duration == 0) {
         _totalduration = await getFileDuration(url);
       } else {
         _totalduration = Duration(milliseconds: widget.specialItem.duration!);
@@ -221,32 +190,17 @@ class _SpecialListItemState extends State<SpecialListItem> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) => AlbumDetail(
-                    albumProduct: widget.specialItem,
-                    onTap: (value) {},
-                    isLecture: true,
-                    albumID: widget.specialItem.albumId)));
+                builder: (_) =>
+                    AlbumDetail(albumProduct: widget.specialItem, onTap: (value) {}, isLecture: true, albumID: widget.specialItem.albumId)));
         break;
       case "album":
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => AlbumDetail(
-                    albumProduct: widget.specialItem, onTap: (value) {})));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => AlbumDetail(albumProduct: widget.specialItem, onTap: (value) {})));
         break;
       case "article":
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => ArtcileItem(articleModel: articleModel)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ArtcileItem(articleModel: articleModel, isFromHome: true)));
         break;
       case "training":
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => CourseDetail(
-                    courseProducts: widget.specialItem,
-                    id: widget.specialItem.id)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CourseDetail(courseProducts: widget.specialItem, id: widget.specialItem.id)));
         break;
       default:
     }
