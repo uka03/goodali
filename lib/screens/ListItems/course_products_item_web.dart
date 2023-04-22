@@ -21,75 +21,76 @@ class CourseProductsListItemWeb extends StatefulWidget {
 class _CourseProductsListItemState extends State<CourseProductsListItemWeb> {
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: ImageView(
-          imgPath: widget.courseProducts.banner ?? "",
-          height: 345,
+    return Container(
+      child: Stack(children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: ImageView(
+            imgPath: widget.courseProducts.banner ?? "",
+            height: 360,
+            width: double.infinity,
+          ),
+        ),
+        Container(
+          height: 360,
           width: double.infinity,
-        ),
-      ),
-      Container(
-        height: 345,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(12),
-            topRight: Radius.circular(12),
-          ),
-          gradient: LinearGradient(
-            colors: [
-              Colors.black.withOpacity(0.5),
-              Colors.transparent,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-      ),
-      Positioned(
-        left: 20,
-        top: 30,
-        child: Text(
-          widget.courseProducts.name ?? "",
-          style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-      Container(
-        margin: EdgeInsets.only(top: 280, left: 20),
-        child: Positioned(
-          left: 20,
-          child: GestureDetector(
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => widget.isBought
-                        ? MyCourseMain(
-                            courseItem: widget.courseProducts,
-                            courseListItem: widget.courseProductsList,
-                          )
-                        : CourseDetail(courseProducts: widget.courseProducts))),
-            child: Container(
-              height: 40,
-              width: 120,
-              decoration: BoxDecoration(color: MyColors.input, borderRadius: BorderRadius.circular(6)),
-              child: Row(
-                children: const [
-                  SizedBox(width: 15),
-                  Text(
-                    "Цааш үзэх",
-                    style: TextStyle(color: MyColors.black, fontWeight: FontWeight.bold),
-                  ),
-                  Spacer(),
-                  Icon(IconlyLight.arrow_right_2, size: 18),
-                  SizedBox(width: 8),
-                ],
-              ),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+            ),
+            gradient: LinearGradient(
+              colors: [
+                Colors.black.withOpacity(0.5),
+                Colors.transparent,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
           ),
         ),
-      )
-    ]);
+        Container(
+          padding: EdgeInsets.all(20),
+          height: 360,
+          child: Column(
+            children: [
+              Text(
+                widget.courseProducts.name ?? "",
+                style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              InkWell(
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => widget.isBought
+                            ? MyCourseMain(
+                                courseItem: widget.courseProducts,
+                                courseListItem: widget.courseProductsList,
+                              )
+                            : CourseDetail(courseProducts: widget.courseProducts))),
+                child: Container(
+                  height: 40,
+                  width: 120,
+                  decoration: BoxDecoration(color: MyColors.input, borderRadius: BorderRadius.circular(6)),
+                  child: Row(
+                    children: const [
+                      SizedBox(width: 15),
+                      Text(
+                        "Цааш үзэх",
+                        style: TextStyle(color: MyColors.black, fontWeight: FontWeight.bold),
+                      ),
+                      // Spacer(),
+                      Icon(IconlyLight.arrow_right_2, size: 18),
+                      SizedBox(width: 8),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]),
+    );
   }
 }

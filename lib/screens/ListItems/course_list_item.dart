@@ -11,8 +11,7 @@ import 'package:provider/provider.dart';
 
 class CourseListListItem extends StatefulWidget {
   final Products products;
-  const CourseListListItem({Key? key, required this.products})
-      : super(key: key);
+  const CourseListListItem({Key? key, required this.products}) : super(key: key);
 
   @override
   State<CourseListListItem> createState() => _CourseListListItemState();
@@ -28,9 +27,7 @@ class _CourseListListItemState extends State<CourseListListItem> {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: MyColors.border1, width: 0.5)),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: MyColors.border1, width: 0.5)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -39,27 +36,18 @@ class _CourseListListItemState extends State<CourseListListItem> {
                   Expanded(
                     child: Text(
                       widget.products.name ?? "" "багц",
-                      style: const TextStyle(
-                          color: MyColors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                   Text(
-                    widget.products.opennedDate == ""
-                        ? "Нээлттэй"
-                        : dateTimeFormatter(widget.products.opennedDate ?? ""),
+                    widget.products.opennedDate == "" ? "Нээлттэй" : dateTimeFormatter(widget.products.opennedDate ?? ""),
                     style: const TextStyle(color: MyColors.gray, fontSize: 12),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
               HtmlWidget(widget.products.body ?? "",
-                  textStyle: const TextStyle(
-                      fontSize: 14,
-                      height: 1.8,
-                      color: MyColors.black,
-                      fontFamily: "Gilroy")),
+                  textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.black, fontFamily: "Gilroy")),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -70,34 +58,23 @@ class _CourseListListItemState extends State<CourseListListItem> {
 
                         if (!cart.sameItemCheck) {
                           cart.addProducts(widget.products);
-                          cart.addTotalPrice(
-                              widget.products.price?.toDouble() ?? 0.0);
+                          cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
 
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const CartScreen()));
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
                         } else {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const CartScreen()));
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
                         }
                       },
                       child: Container(
                         height: 40,
                         width: 120,
-                        decoration: BoxDecoration(
-                            color: MyColors.primaryColor,
-                            borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(6)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: const [
                             Text(
                               "Сонгох",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                             Icon(IconlyLight.arrow_right_2, color: Colors.white)
                           ],
@@ -112,8 +89,7 @@ class _CourseListListItemState extends State<CourseListListItem> {
                     ),
                     Text(
                       widget.products.price.toString() + "₮",
-                      style:
-                          const TextStyle(color: MyColors.black, fontSize: 12),
+                      style: const TextStyle(color: MyColors.black, fontSize: 12),
                     ),
                   ])
                 ],

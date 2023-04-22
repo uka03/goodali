@@ -10,7 +10,9 @@ import 'package:goodali/screens/ListItems/video_item.dart';
 import 'package:iconly/iconly.dart';
 
 class VideoList extends StatefulWidget {
-  const VideoList({Key? key}) : super(key: key);
+  final bool isHomeScreen;
+
+  const VideoList({Key? key, this.isHomeScreen = false}) : super(key: key);
 
   @override
   State<VideoList> createState() => _VideoListState();
@@ -121,7 +123,7 @@ class _VideoListState extends State<VideoList> {
             // padding: const EdgeInsets.symmetric(horizontal: 20),
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: videoList.length > 3 ? 3 : videoList.length,
+            itemCount: (!widget.isHomeScreen && videoList.length > 3) ? 3 : videoList.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisSpacing: 15,
               childAspectRatio: 1,

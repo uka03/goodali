@@ -126,7 +126,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
                               } else if (value == 'Подкаст') {
                                 Navigator.push(context, MaterialPageRoute(builder: (_) => Podcast(dataStore: dStore)));
                               } else if (value == 'Видео') {
-                                Navigator.push(context, MaterialPageRoute(builder: (_) => const VideoList()));
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const VideoList(isHomeScreen: true)));
                               } else if (value == 'Бичвэр') {
                                 Navigator.push(context, MaterialPageRoute(builder: (_) => const ArticleScreen()));
                               } else if (value == 'Мүүд') {
@@ -450,7 +450,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
                         SizedBox(height: 15),
                         InkWell(
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => VideoList()));
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => VideoList(isHomeScreen: true)));
                           },
                           child: new Text("Видео",
                               style: TextStyle(
