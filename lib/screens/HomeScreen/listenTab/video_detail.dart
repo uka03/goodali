@@ -4,6 +4,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/video_model.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:goodali/screens/ListItems/video_item.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
@@ -49,70 +50,83 @@ class _VideoDetailState extends State<VideoDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const SimpleAppBar(),
-        body: SingleChildScrollView(
-            child: Column(
+        appBar: kIsWeb ? null : const SimpleAppBar(noCard: true),
+        body: Column(
           children: [
             Visibility(
-              visible: kIsWeb ? true : false,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Text(
-                  widget.videoModel.title ?? "",
-                  style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: MyColors.black),
-                ),
+              visible: kIsWeb,
+              child: HeaderWidget(
+                title: 'Нүүр / Видео /${widget.videoModel.title}',
               ),
             ),
-            kIsWeb
-                ? Container(
-                    height: 700,
-                    child: YoutubePlayerControllerProvider(
-                      controller: _ytbPlayerController ?? YoutubePlayerController(initialVideoId: widget.videoModel.videoUrl ?? ""),
-                      child: const YoutubePlayerIFrame(
-                        aspectRatio: 16 / 9,
-                      ),
-                    ),
-                  )
-                : SizedBox(
-                    height: 200,
-                    width: double.infinity,
-                    child: YoutubePlayerControllerProvider(
-                      controller: _ytbPlayerController ?? YoutubePlayerController(initialVideoId: widget.videoModel.videoUrl ?? ""),
-                      child: const YoutubePlayerIFrame(
-                        aspectRatio: 16 / 9,
+            Expanded(
+              child: SingleChildScrollView(
+                  child: Column(
+                children: [
+                  Visibility(
+                    visible: kIsWeb ? true : false,
+                    child: Container(
+                      padding: const EdgeInsets.only(left: 255, bottom: 60),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.videoModel.title ?? "",
+                        style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: MyColors.black),
                       ),
                     ),
                   ),
-            Visibility(
-              visible: kIsWeb ? false : true,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Text(
-                  widget.videoModel.title ?? "",
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: MyColors.black),
-                ),
-              ),
+                  kIsWeb
+                      ? Container(
+                          height: 700,
+                          child: YoutubePlayerControllerProvider(
+                            controller: _ytbPlayerController ?? YoutubePlayerController(initialVideoId: widget.videoModel.videoUrl ?? ""),
+                            child: const YoutubePlayerIFrame(
+                              aspectRatio: 16 / 9,
+                            ),
+                          ),
+                        )
+                      : SizedBox(
+                          height: 200,
+                          width: double.infinity,
+                          child: YoutubePlayerControllerProvider(
+                            controller: _ytbPlayerController ?? YoutubePlayerController(initialVideoId: widget.videoModel.videoUrl ?? ""),
+                            child: const YoutubePlayerIFrame(
+                              aspectRatio: 16 / 9,
+                            ),
+                          ),
+                        ),
+                  Visibility(
+                    visible: kIsWeb ? false : true,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Text(
+                        widget.videoModel.title ?? "",
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: MyColors.black),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Text(
+                      widget.videoModel.body ?? "",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(height: 1.7, color: MyColors.black),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: kIsWeb ? 255 : 20),
+                      child: Text("Төстэй видео", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  _similarVideo()
+                ],
+              )),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(
-                widget.videoModel.body ?? "",
-                textAlign: TextAlign.center,
-                style: const TextStyle(height: 1.7, color: MyColors.black),
-              ),
-            ),
-            const SizedBox(height: 40),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: kIsWeb ? 255 : 20),
-                child: Text("Төстэй видео", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
-              ),
-            ),
-            const SizedBox(height: 30),
-            _similarVideo()
           ],
-        )));
+        ));
   }
 
   Widget _similarVideo() {

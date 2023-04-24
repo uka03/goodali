@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
+import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/models/video_model.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:goodali/screens/ListItems/video_item.dart';
 import 'package:iconly/iconly.dart';
 
@@ -34,77 +36,90 @@ class _VideoListState extends State<VideoList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        physics: const NeverScrollableScrollPhysics(),
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              pinned: true,
-              floating: true,
-              elevation: 0,
-              iconTheme: const IconThemeData(color: MyColors.black),
-              backgroundColor: Colors.white,
-              bottom: PreferredSize(
-                  preferredSize: const Size(double.infinity, kToolbarHeight - 10),
-                  child: Container(
-                    padding: const EdgeInsets.only(left: kIsWeb ? 255 : 20),
-                    alignment: Alignment.topLeft,
-                    child: Row(
-                      children: [
-                        Text("Видео", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
-                        const Spacer(),
-                        kIsWeb
-                            ? Container(
-                                margin: EdgeInsets.only(right: 255),
-                                child: TextButton.icon(
-                                  onPressed: () {
-                                    showWebModalTag(context, checkedTag);
-                                  },
-                                  icon: Icon(
-                                    IconlyLight.filter,
-                                    size: 24.0,
-                                    color: Color(0xff393837),
-                                  ),
-                                  label: Text(
-                                    'Шүүлтүүр',
-                                    style: TextStyle(color: Color(0xff393837)),
-                                  ),
-                                ),
-                              )
-                            : Container()
-                      ],
-                    ),
-                  )),
-            )
-          ];
-        },
-        body: SingleChildScrollView(
-          child: FutureBuilder(
-            future: getVideoList(),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
-                videoList = snapshot.data;
-
-                if (videoList.isNotEmpty) {
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: kIsWeb ? 60 : 0,
-                      ),
-                      videoListView(filteredList.isNotEmpty ? filteredList : videoList),
-                    ],
-                  );
-                } else {
-                  return Container();
-                }
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(color: MyColors.primaryColor),
-                );
-              }
-            },
+      body: Column(
+        children: [
+          const Visibility(
+            visible: kIsWeb,
+            child: HeaderWidget(
+              title: 'Нүүр / Видео',
+            ),
           ),
-        ),
+          Expanded(
+            child: NestedScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    pinned: true,
+                    floating: true,
+                    automaticallyImplyLeading: kIsWeb ? false : true,
+                    elevation: 0,
+                    iconTheme: const IconThemeData(color: MyColors.black),
+                    backgroundColor: Colors.white,
+                    bottom: PreferredSize(
+                        preferredSize: const Size(double.infinity, kToolbarHeight - 10),
+                        child: Container(
+                          padding: const EdgeInsets.only(left: kIsWeb ? 255 : 20),
+                          alignment: Alignment.topLeft,
+                          child: Row(
+                            children: [
+                              const Text("Видео", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
+                              const Spacer(),
+                              kIsWeb
+                                  ? Container(
+                                      margin: const EdgeInsets.only(right: 255),
+                                      child: TextButton.icon(
+                                        onPressed: () {
+                                          showWebModalTag(context, checkedTag);
+                                        },
+                                        icon: const Icon(
+                                          IconlyLight.filter,
+                                          size: 24.0,
+                                          color: Color(0xff393837),
+                                        ),
+                                        label: const Text(
+                                          'Шүүлтүүр',
+                                          style: TextStyle(color: Color(0xff393837)),
+                                        ),
+                                      ),
+                                    )
+                                  : Container()
+                            ],
+                          ),
+                        )),
+                  )
+                ];
+              },
+              body: SingleChildScrollView(
+                child: FutureBuilder(
+                  future: getVideoList(),
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+                      videoList = snapshot.data;
+
+                      if (videoList.isNotEmpty) {
+                        return Column(
+                          children: [
+                            const SizedBox(
+                              height: kIsWeb ? 60 : 0,
+                            ),
+                            videoListView(filteredList.isNotEmpty ? filteredList : videoList),
+                          ],
+                        );
+                      } else {
+                        return Container();
+                      }
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(color: MyColors.primaryColor),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: kIsWeb
           ? null
@@ -169,7 +184,7 @@ class _VideoListState extends State<VideoList> {
               builder: (BuildContext context, void Function(void Function()) setState) {
                 return Column(
                   children: [
-                    Spacer(),
+                    const Spacer(),
                     Center(
                       child: Container(
                         width: MediaQuery.of(context).size.width / 4,
@@ -239,7 +254,7 @@ class _VideoListState extends State<VideoList> {
                         ),
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                   ],
                 );
               },

@@ -49,69 +49,65 @@ class _PodcastAllState extends State<PodcastAll> with AutomaticKeepAliveClientMi
       Duration(milliseconds: widget.podcastList[index].position!),
     );
     await audioHandler.play();
-    // await audioHandler.seek(
-    //   Duration(milliseconds: widget.podcastList[index].position!),
-    // );
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Stack(children: [
-      RefreshIndicator(
-        color: MyColors.primaryColor,
-        onRefresh: _refresh,
-        child: ValueListenableBuilder<List<String>>(
-          valueListenable: playlistNotifier,
-          builder: (context, playlistTitles, _) {
-            if (kIsWeb && widget.isHomeScreen == true)
-              return GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: 6,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisSpacing: 15,
-                    childAspectRatio: 2,
-                    crossAxisCount: 3,
-                  ),
-                  itemBuilder: (BuildContext context, int index) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: PodcastItem(
-                        onTap: () => onPlayButtonClicked(index),
-                        index: index,
-                        podcastList: widget.podcastList,
-                        podcastItem: widget.podcastList[index],
-                      )));
-            else
-              return ListView.separated(
-                shrinkWrap: true,
+    return RefreshIndicator(
+      color: MyColors.primaryColor,
+      onRefresh: _refresh,
+      child: ValueListenableBuilder<List<String>>(
+        valueListenable: playlistNotifier,
+        builder: (context, playlistTitles, _) {
+          if (kIsWeb && widget.isHomeScreen == true) {
+            return GridView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 15),
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: PodcastItem(
-                        onTap: () => onPlayButtonClicked(index),
-                        index: index,
-                        podcastList: widget.podcastList,
-                        podcastItem: widget.podcastList[index],
-                      ));
-                },
-                itemCount: widget.isHomeScreen == true
-                    ? widget.podcastList.length > 5
-                        ? 5
-                        : widget.podcastList.length
-                    : widget.podcastList.length,
-                separatorBuilder: (BuildContext context, int index) => const Divider(
-                  endIndent: 18,
-                  indent: 18,
+                shrinkWrap: true,
+                itemCount: 6,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisSpacing: 15,
+                  childAspectRatio: 2,
+                  crossAxisCount: 3,
                 ),
-              );
-          },
-        ),
+                itemBuilder: (BuildContext context, int index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: PodcastItem(
+                      onTap: () => onPlayButtonClicked(index),
+                      index: index,
+                      podcastList: widget.podcastList,
+                      podcastItem: widget.podcastList[index],
+                    )));
+          } else {
+            return ListView.separated(
+              shrinkWrap: true,
+              // physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 15),
+              itemBuilder: (BuildContext context, int index) {
+                return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: PodcastItem(
+                      onTap: () => onPlayButtonClicked(index),
+                      index: index,
+                      podcastList: widget.podcastList,
+                      podcastItem: widget.podcastList[index],
+                    ));
+              },
+              itemCount: widget.isHomeScreen == true
+                  ? widget.podcastList.length > 5
+                      ? 5
+                      : widget.podcastList.length
+                  : widget.podcastList.length,
+              separatorBuilder: (BuildContext context, int index) => const Divider(
+                endIndent: 18,
+                indent: 18,
+              ),
+            );
+          }
+        },
       ),
-    ]);
+    );
   }
 
   Future<void> _refresh() async {

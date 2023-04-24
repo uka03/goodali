@@ -15,6 +15,7 @@ import 'package:goodali/controller/default_audio_handler.dart';
 import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/controller/progress_notifier.dart';
 import 'package:goodali/models/products_model.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 
 import 'package:iconly/iconly.dart';
 import 'dart:developer' as developer;
@@ -109,125 +110,140 @@ class _MoodDetailState extends State<MoodDetail> {
     getMoodList(context);
     return Scaffold(
       backgroundColor: const Color.fromRGBO(252, 244, 241, 1),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: false,
-        leading: GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(IconlyLight.arrow_left, color: MyColors.black)),
-        iconTheme: const IconThemeData(color: MyColors.black),
-      ),
-      body: Stack(alignment: Alignment.bottomCenter, children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: moodList.isNotEmpty
-              ? SizedBox(
-                  child: Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * (kIsWeb ? 0.25 : 1),
-                      child: PageView.builder(
-                          controller: _pageController,
-                          itemCount: moodList.length,
-                          onPageChanged: (int page) {
-                            if (page == moodList.length - 1) {
-                              rightButton = const Text("Дуусгах", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold));
-                            } else {
-                              rightButton = const Text(
-                                "Дараах",
-                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                              );
-                            }
-                            setState(() {
-                              _current = page;
-                            });
-                          },
-                          itemBuilder: ((context, index) {
-                            imgUrl = moodList[index].banner == "Image failed to upload" ? "" : moodList[index].banner!;
-                            url = moodList[index].audio == "Audio failed to upload" ? "" : Urls.networkPath + moodList[index].audio!;
+      appBar: kIsWeb == false
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              centerTitle: false,
+              leading: GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(IconlyLight.arrow_left, color: MyColors.black)),
+              iconTheme: const IconThemeData(color: MyColors.black),
+            )
+          : null,
+      body: Column(
+        children: [
+          const Visibility(
+            visible: kIsWeb,
+            child: HeaderWidget(
+              title: '',
+            ),
+          ),
+          Expanded(
+            child: Stack(alignment: Alignment.bottomCenter, children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: moodList.isNotEmpty
+                    ? SizedBox(
+                        child: Center(
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * (kIsWeb ? 0.25 : 1),
+                            child: PageView.builder(
+                                controller: _pageController,
+                                itemCount: moodList.length,
+                                onPageChanged: (int page) {
+                                  if (page == moodList.length - 1) {
+                                    rightButton =
+                                        const Text("Дуусгах", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold));
+                                  } else {
+                                    rightButton = const Text(
+                                      "Дараах",
+                                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                    );
+                                  }
+                                  setState(() {
+                                    _current = page;
+                                  });
+                                },
+                                itemBuilder: ((context, index) {
+                                  imgUrl = moodList[index].banner == "Image failed to upload" ? "" : moodList[index].banner!;
+                                  url = moodList[index].audio == "Audio failed to upload" ? "" : Urls.networkPath + moodList[index].audio!;
 
-                            return Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: kIsWeb ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: kIsWeb ? 20 : 0),
-                                  banner(imgUrl),
-                                  const SizedBox(height: kIsWeb ? 40 : 20),
-                                  HtmlWidget(
-                                    moodList[index].title!,
-                                    textStyle: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: kIsWeb ? 32 : 20),
-                                  ),
-                                  const SizedBox(height: 40),
-                                  HtmlWidget(
-                                    moodList[index].body!,
-                                    textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  if (url != "") audioPlayerWidget(index)
-                                ],
-                              ),
-                            );
-                          })),
-                    ),
-                  ),
-                )
-              : const Center(
-                  child: CircularProgressIndicator(color: MyColors.primaryColor),
-                ),
-        ),
-        _current != 0
-            ? Positioned(
-                bottom: 50,
-                left: 35,
-                child: Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(12)),
-                  child: RawMaterialButton(
-                    onPressed: () {
-                      _pageController.previousPage(curve: _kCurve, duration: _kDuration);
-                    },
-                    child: const Icon(IconlyLight.arrow_left, color: Colors.white),
-                  ),
-                ))
-            : Container(),
-        Positioned(
-            bottom: 50,
-            right: 35,
-            child: Container(
-              height: 50,
-              width: 100,
-              decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(12)),
-              child: RawMaterialButton(
-                onPressed: () async {
-                  _pageController.nextPage(curve: _kCurve, duration: _kDuration);
-                  if (_current == moodList.length - 1) {
-                    Navigator.pop(context);
-                  }
-                },
-                child: rightButton,
+                                  return Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Column(
+                                      crossAxisAlignment: kIsWeb ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: kIsWeb ? 20 : 0),
+                                        banner(imgUrl),
+                                        const SizedBox(height: kIsWeb ? 40 : 20),
+                                        HtmlWidget(
+                                          moodList[index].title!,
+                                          textStyle: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: kIsWeb ? 32 : 20),
+                                        ),
+                                        const SizedBox(height: 40),
+                                        HtmlWidget(
+                                          moodList[index].body!,
+                                          textStyle: const TextStyle(color: MyColors.black, fontSize: 16),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        if (url != "") audioPlayerWidget(index)
+                                      ],
+                                    ),
+                                  );
+                                })),
+                          ),
+                        ),
+                      )
+                    : const Center(
+                        child: CircularProgressIndicator(color: MyColors.primaryColor),
+                      ),
               ),
-            )),
-        Positioned(
-            top: 0,
-            right: 0,
-            left: 0,
-            child: Row(
-              children: moodList
-                  .map((entry) => (moodList.indexOf(entry) - 1 == _current)
-                      ? Container(
-                          width: MediaQuery.of(context).size.width / moodList.length,
-                          height: 2.0,
-                          color: Colors.white,
-                        )
-                      : Container(
-                          width: MediaQuery.of(context).size.width / moodList.length,
-                          height: 2.0,
-                          color: (_current >= moodList.indexOf(entry)) ? MyColors.primaryColor : Colors.white,
-                        ))
-                  .toList(),
-            )),
-      ]),
+              _current != 0
+                  ? Positioned(
+                      bottom: 50,
+                      left: kIsWeb ? MediaQuery.of(context).size.width * 0.39 : 35,
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(12)),
+                        child: RawMaterialButton(
+                          onPressed: () {
+                            _pageController.previousPage(curve: _kCurve, duration: _kDuration);
+                          },
+                          child: const Icon(IconlyLight.arrow_left, color: Colors.white),
+                        ),
+                      ))
+                  : Container(),
+              Positioned(
+                  bottom: 50,
+                  right: kIsWeb ? MediaQuery.of(context).size.width * 0.39 : 35,
+                  child: Container(
+                    height: 50,
+                    width: 100,
+                    decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(12)),
+                    child: RawMaterialButton(
+                      onPressed: () async {
+                        _pageController.nextPage(curve: _kCurve, duration: _kDuration);
+                        if (_current == moodList.length - 1) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: rightButton,
+                    ),
+                  )),
+              Positioned(
+                  top: 0,
+                  right: 0,
+                  left: 0,
+                  child: Row(
+                    children: moodList
+                        .map((entry) => (moodList.indexOf(entry) - 1 == _current)
+                            ? Container(
+                                width: MediaQuery.of(context).size.width / moodList.length,
+                                height: 2.0,
+                                color: Colors.white,
+                              )
+                            : Container(
+                                width: MediaQuery.of(context).size.width / moodList.length,
+                                height: 2.0,
+                                color: (_current >= moodList.indexOf(entry)) ? MyColors.primaryColor : Colors.white,
+                              ))
+                        .toList(),
+                  )),
+            ]),
+          ),
+        ],
+      ),
     );
   }
 

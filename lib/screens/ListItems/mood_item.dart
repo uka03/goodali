@@ -17,7 +17,7 @@ class MoodListItem extends StatelessWidget {
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MoodDetail(moodListId: getMoodList!.id.toString()))),
       child: Column(
         children: [
-          kIsWeb && isHomeScreen == true
+          kIsWeb
               ? CircleAvatar(
                   radius: 75,
                   child: ClipOval(

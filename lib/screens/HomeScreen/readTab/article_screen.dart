@@ -9,6 +9,7 @@ import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/article_model.dart';
 import 'package:goodali/models/tag_model.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_detail.dart';
 import 'package:goodali/screens/ListItems/article_item.dart';
 import 'package:iconly/iconly.dart';
@@ -39,94 +40,106 @@ class _ArticleScreenState extends State<ArticleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(title: "", noCard: true),
-      body: SingleChildScrollView(
-          child: FutureBuilder(
-        future: futureGetArticle,
-        builder: (BuildContext context, AsyncSnapshot<List<ArticleModel>> snapshot) {
-          if (snapshot.hasData) {
-            artcileList = snapshot.data ?? [];
-            List<ArticleModel> searchList = [];
-            if (widget.id != null) {
-              for (var item in artcileList) {
-                if (item.id == widget.id) {
-                  searchList.add(item);
-                }
-              }
-            }
+      appBar: kIsWeb ? null : const SimpleAppBar(noCard: true),
+      body: Column(
+        children: [
+          const Visibility(
+            visible: kIsWeb,
+            child: HeaderWidget(
+              title: 'Нүүр / Бичвэр',
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+                child: FutureBuilder(
+              future: futureGetArticle,
+              builder: (BuildContext context, AsyncSnapshot<List<ArticleModel>> snapshot) {
+                if (snapshot.hasData) {
+                  artcileList = snapshot.data ?? [];
+                  List<ArticleModel> searchList = [];
+                  if (widget.id != null) {
+                    for (var item in artcileList) {
+                      if (item.id == widget.id) {
+                        searchList.add(item);
+                      }
+                    }
+                  }
 
-            return Container(
-              child: Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10),
-                      SizedBox(
-                          height: 40,
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 20),
-                            alignment: Alignment.topLeft,
-                            child: Row(
-                              children: [
-                                Text("Бичвэр", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
-                                const Spacer(),
-                                kIsWeb
-                                    ? Container(
-                                        child: TextButton.icon(
-                                          onPressed: () {
-                                            showWebModalTag(context, checkedTag);
-                                          },
-                                          icon: Icon(
-                                            IconlyLight.filter,
-                                            size: 24.0,
-                                            color: Color(0xff393837),
-                                          ),
-                                          label: Text(
-                                            'Шүүлтүүр',
-                                            style: TextStyle(color: Color(0xff393837)),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(),
-                              ],
+                  return SizedBox(
+                    child: Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 10),
+                            SizedBox(
+                                height: 40,
+                                child: Container(
+                                  padding: const EdgeInsets.only(left: 20),
+                                  alignment: Alignment.topLeft,
+                                  child: Row(
+                                    children: [
+                                      const Text("Бичвэр", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
+                                      const Spacer(),
+                                      kIsWeb
+                                          ? TextButton.icon(
+                                              onPressed: () {
+                                                showWebModalTag(context, checkedTag);
+                                              },
+                                              icon: const Icon(
+                                                IconlyLight.filter,
+                                                size: 24.0,
+                                                color: Color(0xff393837),
+                                              ),
+                                              label: const Text(
+                                                'Шүүлтүүр',
+                                                style: TextStyle(color: Color(0xff393837)),
+                                              ),
+                                            )
+                                          : Container(),
+                                    ],
+                                  ),
+                                )),
+                            ListView.separated(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: filteredList.isNotEmpty
+                                  ? filteredList.length
+                                  : widget.id != null
+                                      ? searchList.length
+                                      : artcileList.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                    onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ArticleDetail(articleItem: widget.id != null ? searchList[index] : artcileList[index]))),
+                                    child: ArtcileItem(
+                                        articleModel: filteredList.isNotEmpty
+                                            ? filteredList[index]
+                                            : widget.id != null
+                                                ? searchList[index]
+                                                : artcileList[index],
+                                        isFromHome: false));
+                              },
+                              separatorBuilder: (BuildContext context, int index) =>
+                                  const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
                             ),
-                          )),
-                      ListView.separated(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: filteredList.isNotEmpty
-                            ? filteredList.length
-                            : widget.id != null
-                                ? searchList.length
-                                : artcileList.length,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                              onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ArticleDetail(articleItem: widget.id != null ? searchList[index] : artcileList[index]))),
-                              child: ArtcileItem(
-                                  articleModel: filteredList.isNotEmpty
-                                      ? filteredList[index]
-                                      : widget.id != null
-                                          ? searchList[index]
-                                          : artcileList[index],
-                                  isFromHome: false));
-                        },
-                        separatorBuilder: (BuildContext context, int index) => const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
+                            const SizedBox(height: 60),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 60),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
-          }
-        },
-      )),
+                    ),
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
+                }
+              },
+            )),
+          ),
+        ],
+      ),
       floatingActionButton: kIsWeb
           ? null
           : FilterButton(onPress: () {
@@ -148,7 +161,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
               builder: (BuildContext context, void Function(void Function()) setState) {
                 return Column(
                   children: [
-                    Spacer(),
+                    const Spacer(),
                     Container(
                       width: MediaQuery.of(context).size.width / 4,
                       color: Colors.white,
@@ -217,7 +230,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                         ],
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                   ],
                 );
               },

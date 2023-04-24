@@ -6,6 +6,8 @@ import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/article_model.dart';
+import 'package:goodali/screens/HomeScreen/footer_widget.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:goodali/screens/ListItems/article_item.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
@@ -44,68 +46,87 @@ class _ArticleDetailState extends State<ArticleDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(title: "", noCard: true),
-      body: Stack(children: [
-        SingleChildScrollView(
-          controller: _scrollController,
-          physics: const ClampingScrollPhysics(),
-          child: SizedBox(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ImageView(
-                  imgPath: widget.articleItem.banner ?? "",
-                  height: kIsWeb ? 512 : 200,
-                  width: double.infinity,
-                ),
-                Center(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
-                    child: Column(children: [
-                      const SizedBox(height: 20),
-                      Align(
-                        alignment: Alignment.center,
-                        child: SizedBox(
-                          width: 300,
-                          child: Text(widget.articleItem.title ?? "",
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold, height: 1.7)),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child:
-                            HtmlWidget(widget.articleItem.body ?? "", textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.black)),
-                      ),
-                      const SizedBox(height: 40),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child:
-                            Text("Төстэй бичвэрүүд", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
-                      ),
-                      const SizedBox(height: 20),
-                      _similarArticle()
-                    ]),
-                  ),
-                ),
-              ],
+      appBar: kIsWeb ? null : const SimpleAppBar(noCard: true),
+      body: Column(
+        children: [
+          const Visibility(
+            visible: kIsWeb,
+            child: HeaderWidget(
+              title: '',
             ),
           ),
-        ),
-        Positioned(
-          top: 0,
-          right: 0,
-          left: 0,
-          child: SfLinearGauge(
-            maximum: maxScrollExtent,
-            axisTrackStyle: const LinearAxisTrackStyle(thickness: 2.5),
-            showLabels: false,
-            showTicks: false,
-            barPointers: [LinearBarPointer(thickness: 2.5, color: MyColors.primaryColor, value: scrollPercent)],
+          Expanded(
+            child: Stack(children: [
+              SingleChildScrollView(
+                controller: _scrollController,
+                physics: const ClampingScrollPhysics(),
+                child: SizedBox(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ImageView(
+                        imgPath: widget.articleItem.banner ?? "",
+                        height: kIsWeb ? 512 : 200,
+                        width: double.infinity,
+                      ),
+                      if (kIsWeb)
+                        Container(
+                            padding: const EdgeInsets.only(left: 255, bottom: 60, top: 30),
+                            alignment: Alignment.centerLeft,
+                            child: Text('Нүүр / Бичвэр / ${widget.articleItem.title}', style: const TextStyle(color: Color(0xff84807D)))),
+                      Center(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                          child: Column(children: [
+                            const SizedBox(height: 20),
+                            Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                width: 300,
+                                child: Text(widget.articleItem.title ?? "",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold, height: 1.7)),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: HtmlWidget(widget.articleItem.body ?? "",
+                                  textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.black)),
+                            ),
+                            const SizedBox(height: 40),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Text("Төстэй бичвэрүүд",
+                                  style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
+                            ),
+                            const SizedBox(height: 20),
+                            _similarArticle(),
+                            const SizedBox(height: 200),
+                          ]),
+                        ),
+                      ),
+                      const FooterWidget(),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                left: 0,
+                child: SfLinearGauge(
+                  maximum: maxScrollExtent,
+                  axisTrackStyle: const LinearAxisTrackStyle(thickness: 2.5),
+                  showLabels: false,
+                  showTicks: false,
+                  barPointers: [LinearBarPointer(thickness: 2.5, color: MyColors.primaryColor, value: scrollPercent)],
+                ),
+              ),
+            ]),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 

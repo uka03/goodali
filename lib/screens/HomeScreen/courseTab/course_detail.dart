@@ -10,6 +10,8 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/products_model.dart';
 
 import 'package:goodali/screens/HomeScreen/courseTab/course_list.dart';
+import 'package:goodali/screens/HomeScreen/footer_widget.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,68 +47,83 @@ class _CourseDetailState extends State<CourseDetail> {
     isAuth = Provider.of<Auth>(context).isAuth;
 
     return Scaffold(
-      appBar: const SimpleAppBar(),
+      appBar: kIsWeb ? null : const SimpleAppBar(),
       body: widget.id != null
           ? searchResult()
-          : SizedBox(
-              child: Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              ImageView(
-                                imgPath: widget.courseProducts?.banner ?? "",
-                                height: kIsWeb ? 378 : 200,
-                                width: double.infinity,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                      child: Column(
-                                        children: [
-                                          const SizedBox(height: 20),
-                                          Text(widget.courseProducts?.name ?? "",
-                                              style: const TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
-                                          const SizedBox(height: 10),
-                                          const Text("Цахим сургалт",
-                                              style: TextStyle(
-                                                color: MyColors.primaryColor,
-                                              )),
-                                          const SizedBox(height: 20),
-                                          HtmlWidget(widget.courseProducts?.body ?? "",
-                                              textStyle: const TextStyle(fontSize: 14, height: 1.8, fontFamily: "Gilroy", color: MyColors.gray)),
-                                          const SizedBox(height: 30),
-                                        ],
-                                      )),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      if (username != "surgalt9@gmail.com" && isAuth)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: CustomElevatedButton(
-                            text: "Худалдаж авах",
-                            onPress: () {
-                              Navigator.push(
-                                  context, MaterialPageRoute(builder: (context) => CourseList(id: widget.courseProducts?.id.toString() ?? "")));
-                            },
-                          ),
-                        ),
-                      const SizedBox(height: 10),
-                    ],
+          : Column(
+              children: [
+                Visibility(
+                  visible: kIsWeb,
+                  child: HeaderWidget(
+                    title: 'Нүүр / Онлайн сургалт / ${widget.courseProducts?.name ?? ""}',
                   ),
                 ),
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Center(
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                            child: Column(
+                              children: [
+                                Column(
+                                  children: [
+                                    ImageView(
+                                      imgPath: widget.courseProducts?.banner ?? "",
+                                      height: kIsWeb ? 378 : 200,
+                                      width: double.infinity,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                            child: Column(
+                                              children: [
+                                                const SizedBox(height: 20),
+                                                Text(widget.courseProducts?.name ?? "",
+                                                    style: const TextStyle(
+                                                        color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
+                                                const SizedBox(height: 10),
+                                                const Text("Цахим сургалт",
+                                                    style: TextStyle(
+                                                      color: MyColors.primaryColor,
+                                                    )),
+                                                const SizedBox(height: 20),
+                                                HtmlWidget(widget.courseProducts?.body ?? "",
+                                                    textStyle:
+                                                        const TextStyle(fontSize: 14, height: 1.8, fontFamily: "Gilroy", color: MyColors.gray)),
+                                                const SizedBox(height: 30),
+                                              ],
+                                            )),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                if (username != "surgalt9@gmail.com" && isAuth)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                    child: CustomElevatedButton(
+                                      text: "Худалдаж авах",
+                                      onPress: () {
+                                        Navigator.push(context,
+                                            MaterialPageRoute(builder: (context) => CourseList(id: widget.courseProducts?.id.toString() ?? "")));
+                                      },
+                                    ),
+                                  ),
+                                const SizedBox(height: 10),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const FooterWidget(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
     );
   }

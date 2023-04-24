@@ -5,6 +5,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/album_detail_web.dart';
 
 class AlbumItem extends StatelessWidget {
   final Products albumData;
@@ -17,12 +18,19 @@ class AlbumItem extends StatelessWidget {
       onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => AlbumDetail(
-                    onTap: (audioObject) {
-                      currentlyPlaying.value = audioObject;
-                    },
-                    albumProduct: albumData,
-                  ))),
+              builder: (context) => kIsWeb
+                  ? AlbumDetailWeb(
+                      onTap: (audioObject) {
+                        currentlyPlaying.value = audioObject;
+                      },
+                      albumProduct: albumData,
+                    )
+                  : AlbumDetail(
+                      onTap: (audioObject) {
+                        currentlyPlaying.value = audioObject;
+                      },
+                      albumProduct: albumData,
+                    ))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
