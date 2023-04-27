@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
-import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/tag_model.dart';
 import 'package:goodali/models/video_model.dart';
@@ -41,7 +40,7 @@ class _VideoListState extends State<VideoList> {
           const Visibility(
             visible: kIsWeb,
             child: HeaderWidget(
-              title: 'Нүүр / Видео',
+              title: 'Видео',
             ),
           ),
           Expanded(
@@ -138,7 +137,7 @@ class _VideoListState extends State<VideoList> {
             // padding: const EdgeInsets.symmetric(horizontal: 20),
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: (!widget.isHomeScreen && videoList.length > 3) ? 3 : videoList.length,
+            itemCount: (widget.isHomeScreen && videoList.length > 3) ? 3 : videoList.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisSpacing: 15,
               childAspectRatio: 1,

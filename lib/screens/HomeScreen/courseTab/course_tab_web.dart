@@ -26,7 +26,7 @@ class _CourseTabbarState extends State<CourseTabbarWeb> {
           const Visibility(
             visible: kIsWeb,
             child: HeaderWidget(
-              title: 'Нүүр / Онлайн сургалт',
+              title: 'Онлайн сургалт',
             ),
           ),
           Expanded(

@@ -44,7 +44,7 @@ class ArtcileItem extends StatelessWidget {
                             )),
                       ),
                       kIsWeb && !isFromHome
-                          ? Icon(
+                          ? const Icon(
                               IconlyLight.arrow_right,
                               size: 24,
                               color: Color(0xff84807D),

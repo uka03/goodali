@@ -9,6 +9,7 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/banner_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
+import 'package:goodali/screens/HomeScreen/courseTab/course_tab_web.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/feel_tab.dart';
 import 'package:goodali/screens/HomeScreen/footer_widget.dart';
 import 'package:goodali/screens/HomeScreen/header_widget.dart';
@@ -17,6 +18,7 @@ import 'package:goodali/screens/HomeScreen/listenTab/banner/banner_lecture.dart'
 import 'package:goodali/screens/HomeScreen/listenTab/listen_tab.dart';
 import 'package:goodali/screens/HomeScreen/readTab/read_tab.dart';
 import 'package:goodali/screens/ListItems/course_products_item_web.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
 class WebHomeScreen extends StatefulWidget {
@@ -59,7 +61,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
       body: CustomScrollView(
         slivers: [
           const SliverToBoxAdapter(
-            child: HeaderWidget(title: ''),
+            child: HeaderWidget(isHome: true),
           ),
           SliverPadding(
             padding: const EdgeInsets.all(10),
@@ -70,7 +72,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
             sliver: SliverToBoxAdapter(
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 155),
-                child: const ListenTabbar(),
+                child: const ListenTabbar(isHomeScreen: true),
               ),
             ),
           ),
@@ -155,8 +157,13 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
             padding: const EdgeInsets.all(20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text("Онлайн сургалт", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+              children: [
+                const Text("Онлайн сургалт", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const CourseTabbarWeb()));
+                    },
+                    child: const Icon(IconlyLight.arrow_right)),
               ],
             )),
         FutureBuilder(
@@ -169,15 +176,16 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: 2,
+                  itemCount: 3,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisSpacing: 15,
                     childAspectRatio: 1,
-                    crossAxisCount: 2,
+                    crossAxisCount: 3,
                   ),
                   itemBuilder: (BuildContext context, int index) => CourseProductsListItemWeb(
                         courseProducts: products[index],
                         courseProductsList: products,
+                        isHomeScreen: true,
                       ));
             } else {
               return const Center(

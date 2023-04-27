@@ -18,7 +18,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CourseDetail extends StatefulWidget {
   final Products? courseProducts;
   final int? id;
-  const CourseDetail({Key? key, this.courseProducts, this.id}) : super(key: key);
+  final bool isHomeScreen;
+
+  const CourseDetail({Key? key, this.courseProducts, this.id, this.isHomeScreen = false}) : super(key: key);
 
   @override
   State<CourseDetail> createState() => _CourseDetailState();
@@ -55,7 +57,9 @@ class _CourseDetailState extends State<CourseDetail> {
                 Visibility(
                   visible: kIsWeb,
                   child: HeaderWidget(
-                    title: 'Нүүр / Онлайн сургалт / ${widget.courseProducts?.name ?? ""}',
+                    title: 'Онлайн сургалт',
+                    subtitle: widget.courseProducts?.name,
+                    isHome: widget.isHomeScreen,
                   ),
                 ),
                 Expanded(

@@ -18,7 +18,8 @@ import 'package:provider/provider.dart';
 import '../../../Providers/local_database.dart';
 
 class ListenTabbar extends StatefulWidget {
-  const ListenTabbar({Key? key}) : super(key: key);
+  final bool isHomeScreen;
+  const ListenTabbar({Key? key, this.isHomeScreen = false}) : super(key: key);
 
   @override
   State<ListenTabbar> createState() => _ListenTabbarState();
@@ -140,7 +141,7 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
                   childAspectRatio: kIsWeb ? 0.5 : 1 / 1.6,
                   crossAxisCount: kIsWeb ? 6 : 2,
                 ),
-                itemBuilder: (BuildContext context, int index) => AlbumItem(albumData: albumList[index]));
+                itemBuilder: (BuildContext context, int index) => AlbumItem(albumData: albumList[index], isHomeScreen: widget.isHomeScreen));
           } else {
             return const Center(
               child: CircularProgressIndicator(color: MyColors.primaryColor),

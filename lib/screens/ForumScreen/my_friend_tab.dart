@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
@@ -46,24 +47,18 @@ class _MyFriendTabState extends State<MyFriendTab> {
               return FutureBuilder(
                   future: getPostList(),
                   builder: (context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData &&
-                        ConnectionState.done == snapshot.connectionState) {
+                    if (snapshot.hasData && ConnectionState.done == snapshot.connectionState) {
                       postList = snapshot.data;
                       if (checkedTag.isNotEmpty) {
                         for (var item in checkedTag) {
-                          filteredList = postList
-                              .where((element) =>
-                                  element.tags!.first.id == item["id"])
-                              .toList();
+                          filteredList = postList.where((element) => element.tags!.first.id == item["id"]).toList();
                         }
                       } else {
                         filteredList.clear();
                       }
                       if (postList.isNotEmpty) {
                         return ListView.separated(
-                            itemCount: filteredList.isNotEmpty
-                                ? filteredList.length
-                                : postList.length,
+                            itemCount: filteredList.isNotEmpty ? filteredList.length : postList.length,
                             itemBuilder: (BuildContext context, int index) {
                               isHearted.add(false);
                               return GestureDetector(
@@ -74,32 +69,24 @@ class _MyFriendTabState extends State<MyFriendTab> {
                                             onRefresh: () {
                                               _refresh();
                                             },
-                                            postItem: filteredList.isNotEmpty
-                                                ? filteredList[index]
-                                                : postList[index],
+                                            postItem: filteredList.isNotEmpty ? filteredList[index] : postList[index],
                                             isHearted: isHearted[index]))),
                                 child: PostItem(
                                     isMySpecial: true,
                                     onRefresh: getPostList,
-                                    postItem: filteredList.isNotEmpty
-                                        ? filteredList[index]
-                                        : postList[index],
+                                    postItem: filteredList.isNotEmpty ? filteredList[index] : postList[index],
                                     isHearted: isHearted[index]),
                               );
                             },
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    const Divider(
-                                      endIndent: 18,
-                                      indent: 18,
-                                    ));
+                            separatorBuilder: (BuildContext context, int index) => const Divider(
+                                  endIndent: 18,
+                                  indent: 18,
+                                ));
                       } else {
                         return Container();
                       }
                     } else {
-                      return const Center(
-                          child: CircularProgressIndicator(
-                              color: MyColors.primaryColor));
+                      return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
                     }
                   });
             } else {
@@ -112,9 +99,11 @@ class _MyFriendTabState extends State<MyFriendTab> {
           },
         ),
       ),
-      floatingActionButton: FilterButton(onPress: () {
-        showModalTag(context, checkedTag);
-      }),
+      floatingActionButton: kIsWeb
+          ? null
+          : FilterButton(onPress: () {
+              showModalTag(context, checkedTag);
+            }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
@@ -137,9 +126,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
           minHeight: MediaQuery.of(context).size.height / 2 + 80,
         ),
         backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => FilterModal(
               onTap: (checked) {
                 setState(() {

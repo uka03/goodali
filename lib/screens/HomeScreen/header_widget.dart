@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Providers/auth_provider.dart';
@@ -19,13 +20,14 @@ import 'package:goodali/screens/ProfileScreen/edit_profile.dart';
 import 'package:goodali/screens/ProfileScreen/faQ.dart';
 import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
+import 'package:goodali/screens/payment/web_cart_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'courseTab/course_tab.dart';
-
 class HeaderWidget extends StatelessWidget {
-  final String title;
-  const HeaderWidget({Key? key, required this.title}) : super(key: key);
+  final bool? isHome;
+  final String? title;
+  final String? subtitle;
+  const HeaderWidget({Key? key, this.title, this.subtitle, this.isHome}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,13 @@ class HeaderWidget extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.only(left: 255),
-              child: Image.asset("assets/images/title_logo.png", width: 113, height: 32),
+              child: InkWell(
+                  onTap: () {
+                    if (isHome == false) {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  },
+                  child: Image.asset("assets/images/title_logo.png", width: 113, height: 32)),
             ),
             Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 60), child: const SearchBar())),
             Builder(
@@ -130,26 +138,7 @@ class HeaderWidget extends StatelessWidget {
               if (value.isAuth == true) {
                 return Row(
                   children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
-                      },
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFFBF9F8),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: SvgPicture.asset(
-                            'assets/images/web_icon_cart.svg',
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
+                    const WebCartPopupButton(),
                     const SizedBox(width: 30),
                     Builder(
                       builder: (BuildContext innerContext) {
@@ -233,11 +222,69 @@ class HeaderWidget extends StatelessWidget {
             }),
           ],
         ),
-        if (title.isNotEmpty)
+        if (title?.isNotEmpty ?? false)
           Container(
-              padding: const EdgeInsets.only(left: 255, bottom: 60),
-              alignment: Alignment.centerLeft,
-              child: Text(title, style: const TextStyle(color: Color(0xff84807D))))
+            padding: const EdgeInsets.only(left: 255, bottom: 60),
+            alignment: Alignment.centerLeft,
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(color: Color(0xff84807D)),
+                children: [
+                  TextSpan(
+                    text: 'Нүүр',
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        if (subtitle?.isNotEmpty ?? false) {
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                        } else {
+                          Navigator.pop(context);
+                        }
+                      },
+                  ),
+                  const TextSpan(text: ' / '),
+                  TextSpan(
+                    text: title,
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        if (subtitle?.isNotEmpty ?? false) {
+                          if (isHome == true) {
+                            switch (title) {
+                              case 'Онлайн сургалт':
+                                Navigator.pop(context);
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const CourseTabbarWeb()));
+                                break;
+                              case 'Цомог':
+                                Navigator.pop(context);
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const AlbumLecture()));
+                                break;
+                              case 'Видео':
+                                Navigator.pop(context);
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const VideoList()));
+                                break;
+                              case 'Бичвэр':
+                                Navigator.pop(context);
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const ArticleScreen()));
+                                break;
+                              default:
+                                Navigator.pop(context);
+                            }
+                          } else {
+                            Navigator.pop(context);
+                          }
+                        }
+                      },
+                  ),
+                  if (subtitle?.isNotEmpty ?? false)
+                    TextSpan(
+                      children: [
+                        const TextSpan(text: ' / '),
+                        TextSpan(text: subtitle),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }

@@ -34,7 +34,7 @@ class _AlbumLectureState extends State<AlbumLecture> {
           const Visibility(
             visible: kIsWeb,
             child: HeaderWidget(
-              title: 'Нүүр / Цомог',
+              title: 'Цомог',
             ),
           ),
           Expanded(

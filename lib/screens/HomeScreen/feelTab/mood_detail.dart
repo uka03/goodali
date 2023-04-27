@@ -123,9 +123,7 @@ class _MoodDetailState extends State<MoodDetail> {
         children: [
           const Visibility(
             visible: kIsWeb,
-            child: HeaderWidget(
-              title: '',
-            ),
+            child: HeaderWidget(),
           ),
           Expanded(
             child: Stack(alignment: Alignment.bottomCenter, children: [

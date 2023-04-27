@@ -84,9 +84,7 @@ class _FeelTabbarState extends State<FeelTabbarWeb> with AutomaticKeepAliveClien
         children: [
           const Visibility(
             visible: kIsWeb,
-            child: HeaderWidget(
-              title: '',
-            ),
+            child: HeaderWidget(),
           ),
           Expanded(
             child: SingleChildScrollView(

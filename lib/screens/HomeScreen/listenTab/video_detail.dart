@@ -10,7 +10,8 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class VideoDetail extends StatefulWidget {
   final VideoModel videoModel;
-  const VideoDetail({Key? key, required this.videoModel}) : super(key: key);
+  final bool isHomeScreen;
+  const VideoDetail({Key? key, required this.videoModel, this.isHomeScreen = false}) : super(key: key);
 
   @override
   State<VideoDetail> createState() => _VideoDetailState();
@@ -42,9 +43,6 @@ class _VideoDetailState extends State<VideoDetail> {
         strictRelatedVideos: true,
       ),
     );
-    // log(_ytbPlayerController?.initialVideoId ?? "", name: "initialVideoId");
-    // log(_ytbPlayerController?.params.origin ?? "", name: "origin");
-    // log(_ytbPlayerController?.value.metaData.videoId ?? "", name: "videoId");
   }
 
   @override
@@ -56,7 +54,9 @@ class _VideoDetailState extends State<VideoDetail> {
             Visibility(
               visible: kIsWeb,
               child: HeaderWidget(
-                title: 'Нүүр / Видео /${widget.videoModel.title}',
+                title: 'Видео',
+                subtitle: widget.videoModel.title,
+                isHome: widget.isHomeScreen,
               ),
             ),
             Expanded(
@@ -75,7 +75,7 @@ class _VideoDetailState extends State<VideoDetail> {
                     ),
                   ),
                   kIsWeb
-                      ? Container(
+                      ? SizedBox(
                           height: 700,
                           child: YoutubePlayerControllerProvider(
                             controller: _ytbPlayerController ?? YoutubePlayerController(initialVideoId: widget.videoModel.videoUrl ?? ""),

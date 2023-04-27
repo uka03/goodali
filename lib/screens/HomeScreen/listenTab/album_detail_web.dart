@@ -32,6 +32,7 @@ typedef OnTap = Function(Products products);
 class AlbumDetailWeb extends StatefulWidget {
   final Products albumProduct;
   final bool? isLecture;
+  final bool? isHomeScreen;
   final int? albumID;
   final OnTap onTap;
 
@@ -40,6 +41,7 @@ class AlbumDetailWeb extends StatefulWidget {
     required this.albumProduct,
     required this.onTap,
     this.isLecture = false,
+    this.isHomeScreen = false,
     this.albumID,
   }) : super(key: key);
 
@@ -105,7 +107,9 @@ class _AlbumDetailState extends State<AlbumDetailWeb> {
             Visibility(
               visible: kIsWeb,
               child: HeaderWidget(
-                title: 'Нүүр / Цомог / ${widget.albumProduct.title}',
+                title: 'Цомог',
+                subtitle: widget.albumProduct.title,
+                isHome: widget.isHomeScreen,
               ),
             ),
             Expanded(

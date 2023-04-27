@@ -13,7 +13,8 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class ArticleDetail extends StatefulWidget {
   final ArticleModel articleItem;
-  const ArticleDetail({Key? key, required this.articleItem}) : super(key: key);
+  final bool isHomeScreen;
+  const ArticleDetail({Key? key, required this.articleItem, this.isHomeScreen = false}) : super(key: key);
 
   @override
   State<ArticleDetail> createState() => _ArticleDetailState();
@@ -49,10 +50,12 @@ class _ArticleDetailState extends State<ArticleDetail> {
       appBar: kIsWeb ? null : const SimpleAppBar(noCard: true),
       body: Column(
         children: [
-          const Visibility(
+          Visibility(
             visible: kIsWeb,
             child: HeaderWidget(
-              title: '',
+              title: 'Бичвэр',
+              subtitle: widget.articleItem.title,
+              isHome: widget.isHomeScreen,
             ),
           ),
           Expanded(
@@ -73,7 +76,7 @@ class _ArticleDetailState extends State<ArticleDetail> {
                         Container(
                             padding: const EdgeInsets.only(left: 255, bottom: 60, top: 30),
                             alignment: Alignment.centerLeft,
-                            child: Text('Нүүр / Бичвэр / ${widget.articleItem.title}', style: const TextStyle(color: Color(0xff84807D)))),
+                            child: Text('Бичвэр / ${widget.articleItem.title}', style: const TextStyle(color: Color(0xff84807D)))),
                       Center(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),

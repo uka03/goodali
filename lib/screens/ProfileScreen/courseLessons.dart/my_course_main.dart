@@ -13,7 +13,8 @@ import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_courses_deta
 class MyCourseMain extends StatefulWidget {
   final Products courseItem;
   final List<Products> courseListItem;
-  const MyCourseMain({Key? key, required this.courseItem, required this.courseListItem}) : super(key: key);
+  final bool isFromHome;
+  const MyCourseMain({Key? key, required this.courseItem, required this.courseListItem, this.isFromHome = false}) : super(key: key);
 
   @override
   State<MyCourseMain> createState() => _MyCourseMainState();
@@ -46,7 +47,9 @@ class _MyCourseMainState extends State<MyCourseMain> {
             Visibility(
               visible: kIsWeb,
               child: HeaderWidget(
-                title: 'Нүүр / Онлайн сургалт / $title',
+                title: 'Онлайн сургалт',
+                subtitle: title,
+                isHome: widget.isFromHome,
               ),
             ),
             Expanded(

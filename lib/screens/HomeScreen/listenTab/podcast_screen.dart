@@ -35,7 +35,7 @@ class _PodcastState extends State<Podcast> {
           const Visibility(
             visible: kIsWeb,
             child: HeaderWidget(
-              title: 'Нүүр / Подкаст',
+              title: 'Подкаст',
             ),
           ),
           Expanded(

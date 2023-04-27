@@ -91,12 +91,12 @@ class _ReadTabbarState extends State<ReadTabbar> with AutomaticKeepAliveClientMi
   }
 
   Widget article(BuildContext context, List<ArticleModel> articleList) {
-    if (kIsWeb)
+    if (kIsWeb) {
       return GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: articleList.length > 6 ? 6 : articleList.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisSpacing: 15,
             childAspectRatio: 2,
             crossAxisCount: 3,
@@ -104,9 +104,10 @@ class _ReadTabbarState extends State<ReadTabbar> with AutomaticKeepAliveClientMi
           itemBuilder: (BuildContext context, int index) => Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GestureDetector(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleDetail(articleItem: articleList[index]))),
+                  onTap: () => Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => ArticleDetail(articleItem: articleList[index], isHomeScreen: true))),
                   child: ArtcileItem(articleModel: articleList[index], isFromHome: true))));
-    else
+    } else {
       return ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -115,6 +116,7 @@ class _ReadTabbarState extends State<ReadTabbar> with AutomaticKeepAliveClientMi
           itemBuilder: (context, index) => GestureDetector(
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleDetail(articleItem: articleList[index]))),
               child: ArtcileItem(articleModel: articleList[index], isFromHome: true)));
+    }
   }
 
   Future<List<ArticleModel>> getArticle() {

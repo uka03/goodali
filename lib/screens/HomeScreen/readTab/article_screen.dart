@@ -46,7 +46,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
           const Visibility(
             visible: kIsWeb,
             child: HeaderWidget(
-              title: 'Нүүр / Бичвэр',
+              title: 'Бичвэр',
             ),
           ),
           Expanded(

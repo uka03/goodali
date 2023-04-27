@@ -7,7 +7,7 @@ import 'package:goodali/models/video_model.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/video_detail.dart';
 
 class VideoItem extends StatefulWidget {
-  final bool? isHomeScreen;
+  final bool isHomeScreen;
   final VideoModel videoModel;
   const VideoItem({Key? key, required this.videoModel, this.isHomeScreen = false}) : super(key: key);
 
@@ -19,7 +19,15 @@ class _VideoItemState extends State<VideoItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => VideoDetail(videoModel: widget.videoModel))),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VideoDetail(
+            videoModel: widget.videoModel,
+            isHomeScreen: widget.isHomeScreen,
+          ),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

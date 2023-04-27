@@ -11,7 +11,9 @@ class CourseProductsListItemWeb extends StatefulWidget {
   final Products courseProducts;
   final List<Products> courseProductsList;
   final bool isBought;
-  const CourseProductsListItemWeb({Key? key, required this.courseProducts, this.isBought = false, required this.courseProductsList})
+  final bool isHomeScreen;
+  const CourseProductsListItemWeb(
+      {Key? key, required this.courseProducts, this.isBought = false, this.isHomeScreen = false, required this.courseProductsList})
       : super(key: key);
 
   @override
@@ -26,12 +28,12 @@ class _CourseProductsListItemState extends State<CourseProductsListItemWeb> {
         borderRadius: BorderRadius.circular(12),
         child: ImageView(
           imgPath: widget.courseProducts.banner ?? "",
-          height: 360,
+          height: widget.isHomeScreen ? 270 : 360,
           width: double.infinity,
         ),
       ),
       Container(
-        height: 360,
+        height: widget.isHomeScreen ? 270 : 360,
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
@@ -50,7 +52,7 @@ class _CourseProductsListItemState extends State<CourseProductsListItemWeb> {
       ),
       Container(
         padding: const EdgeInsets.all(20),
-        height: 360,
+        height: widget.isHomeScreen ? 270 : 360,
         child: Column(
           children: [
             Text(
@@ -66,8 +68,12 @@ class _CourseProductsListItemState extends State<CourseProductsListItemWeb> {
                           ? MyCourseMain(
                               courseItem: widget.courseProducts,
                               courseListItem: widget.courseProductsList,
+                              isFromHome: widget.isHomeScreen,
                             )
-                          : CourseDetail(courseProducts: widget.courseProducts))),
+                          : CourseDetail(
+                              courseProducts: widget.courseProducts,
+                              isHomeScreen: widget.isHomeScreen,
+                            ))),
               child: Container(
                 height: 40,
                 width: 120,

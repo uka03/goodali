@@ -9,8 +9,9 @@ import 'package:goodali/screens/HomeScreen/listenTab/album_detail_web.dart';
 
 class AlbumItem extends StatelessWidget {
   final Products albumData;
+  final bool isHomeScreen;
 
-  const AlbumItem({Key? key, required this.albumData}) : super(key: key);
+  const AlbumItem({Key? key, required this.albumData, this.isHomeScreen = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,7 @@ class AlbumItem extends StatelessWidget {
                         currentlyPlaying.value = audioObject;
                       },
                       albumProduct: albumData,
+                      isHomeScreen: isHomeScreen,
                     )
                   : AlbumDetail(
                       onTap: (audioObject) {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -41,31 +42,24 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
       body: RefreshIndicator(
         color: MyColors.primaryColor,
         onRefresh: _refresh,
-        child: Consumer<ForumTagNotifier>(
-            builder: (BuildContext context, value, Widget? child) {
+        child: Consumer<ForumTagNotifier>(builder: (BuildContext context, value, Widget? child) {
           checkedTag = value.selectedForumNames;
           if (isAuth) {
             return FutureBuilder(
               future: getPostList(),
               builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.hasData &&
-                    ConnectionState.done == snapshot.connectionState) {
+                if (snapshot.hasData && ConnectionState.done == snapshot.connectionState) {
                   postList = snapshot.data;
                   if (checkedTag.isNotEmpty) {
                     for (var item in checkedTag) {
-                      filteredList = postList
-                          .where(
-                              (element) => element.tags!.first.id == item["id"])
-                          .toList();
+                      filteredList = postList.where((element) => element.tags!.first.id == item["id"]).toList();
                     }
                   } else {
                     filteredList.clear();
                   }
                   if (postList.isNotEmpty) {
                     return ListView.separated(
-                        itemCount: filteredList.isNotEmpty
-                            ? filteredList.length
-                            : postList.length,
+                        itemCount: filteredList.isNotEmpty ? filteredList.length : postList.length,
                         itemBuilder: (BuildContext context, int index) {
                           isHearted.add(false);
                           return InkWell(
@@ -80,14 +74,11 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                                         isHearted: isHearted[index]))),
                             child: PostItem(
                                 onRefresh: getPostList,
-                                postItem: filteredList.isNotEmpty
-                                    ? filteredList[index]
-                                    : postList[index],
+                                postItem: filteredList.isNotEmpty ? filteredList[index] : postList[index],
                                 isHearted: isHearted[index]),
                           );
                         },
-                        separatorBuilder: (BuildContext context, int index) =>
-                            const Divider(
+                        separatorBuilder: (BuildContext context, int index) => const Divider(
                               endIndent: 20,
                               indent: 20,
                             ));
@@ -95,9 +86,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                     return Container();
                   }
                 } else {
-                  return const Center(
-                      child: CircularProgressIndicator(
-                          color: MyColors.primaryColor));
+                  return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
                 }
               },
             );
@@ -110,9 +99,11 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
           }
         }),
       ),
-      floatingActionButton: FilterButton(onPress: () {
-        showModalTag(context, checkedTag);
-      }),
+      floatingActionButton: kIsWeb
+          ? null
+          : FilterButton(onPress: () {
+              showModalTag(context, checkedTag);
+            }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
@@ -122,9 +113,7 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => FilterModal(
               onTap: (checked) {
                 setState(() {
