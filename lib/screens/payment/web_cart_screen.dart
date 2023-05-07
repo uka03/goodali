@@ -11,10 +11,12 @@ class WebCartPopupButton extends StatefulWidget {
 
 class _WebCartPopupButtonState extends State<WebCartPopupButton> {
   OverlayEntry? _overlayEntry;
+  final GlobalKey _key = GlobalKey(); // Add GlobalKey
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      key: _key, // Assign the GlobalKey
       onTap: _togglePopup,
       child: Container(
         width: 36,
@@ -45,7 +47,7 @@ class _WebCartPopupButtonState extends State<WebCartPopupButton> {
   }
 
   OverlayEntry _createOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    RenderBox renderBox = _key.currentContext!.findRenderObject() as RenderBox;
     var size = renderBox.size;
     var offset = renderBox.localToGlobal(Offset.zero);
     double screenWidth = MediaQuery.of(context).size.width;
@@ -65,15 +67,26 @@ class _WebCartPopupButtonState extends State<WebCartPopupButton> {
 
     return OverlayEntry(
       builder: (BuildContext context) {
-        return Positioned(
-          left: leftPosition,
-          top: topPosition,
-          child: Material(
-            elevation: 4,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              child: const SizedBox(height: 400, width: 300, child: CartScreen()),
-            ),
+        return GestureDetector(
+          onTap: _togglePopup,
+          behavior: HitTestBehavior.translucent,
+          child: Stack(
+            children: [
+              Positioned(
+                left: leftPosition,
+                top: topPosition,
+                child: GestureDetector(
+                  onTap: () {}, // Prevent GestureDetector from propagating the tap event to its parent
+                  child: Material(
+                    elevation: 4,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: const SizedBox(height: 400, width: 300, child: CartScreen()),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },

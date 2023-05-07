@@ -1,7 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Utils/utils.dart';
-import 'package:goodali/Widgets/custom_readmore_text.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
@@ -9,14 +8,16 @@ import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/course_lessons_model.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
 import 'package:goodali/models/courses_item.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:goodali/screens/ProfileScreen/courseLessons.dart/course_lesson.dart';
 import 'package:iconly/iconly.dart';
 
 class MyCoursesDetail extends StatefulWidget {
   final CoursesItems coursesItems;
   final String lessonName;
+  final String title;
   final String? body;
-  const MyCoursesDetail({Key? key, required this.coursesItems, required this.lessonName, this.body}) : super(key: key);
+  const MyCoursesDetail({Key? key, required this.coursesItems, required this.lessonName, this.body, required this.title}) : super(key: key);
 
   @override
   State<MyCoursesDetail> createState() => _MyCoursesDetailState();
@@ -45,90 +46,98 @@ class _MyCoursesDetailState extends State<MyCoursesDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SimpleAppBar(noCard: true),
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(children: [
-            const SizedBox(height: 20),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: ImageView(imgPath: widget.coursesItems.banner ?? "", width: 190, height: 190),
-              //     Container(
-              //   color: Colors.blueGrey,
-              //   width: 190,
-              //   height: 190,
-              // )
+      appBar: kIsWeb ? null : const SimpleAppBar(noCard: true),
+      body: Column(
+        children: [
+          Visibility(
+            visible: kIsWeb,
+            child: HeaderWidget(
+              title: widget.title,
+              subtitle: widget.lessonName,
+              isProfile: true,
             ),
-            const SizedBox(height: 20),
-            Text(
-              widget.lessonName,
-              style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                child: RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(children: [
+                      const SizedBox(height: 20),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: ImageView(imgPath: widget.coursesItems.banner ?? "", width: 190, height: 190),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        widget.lessonName,
+                        style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+                      FutureBuilder(
+                        future: future,
+                        builder: (context, AsyncSnapshot snapshot) {
+                          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                            List<Lesson?> lessons = snapshot.data;
+
+                            if (lessons.isNotEmpty) {
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: lessons.length,
+                                itemBuilder: (context, index) {
+                                  int allTasks = lessons[index]?.allTask ?? 0;
+                                  int doneTasks = lessons[index]?.done ?? 0;
+
+                                  String tasks = doneTasks.toString() + "/" + allTasks.toString();
+
+                                  return ListTile(
+                                    iconColor: MyColors.black,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                    onTap: () => _openLesson(
+                                      lessons[index]?.name ?? "",
+                                      lessons[index]!.id.toString(),
+                                      lessons[index]!.isBought!,
+                                      lessons[index]!.banner!,
+                                    ),
+                                    subtitle: Row(children: [
+                                      Text(
+                                        tasks,
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ]),
+                                    trailing: const Icon(IconlyLight.arrow_right_2, size: 18, color: MyColors.gray),
+                                    title: Text(
+                                      lessons[index]?.name ?? "",
+                                      style: const TextStyle(
+                                        color: MyColors.black,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return Container();
+                            }
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: MyColors.primaryColor,
+                              ),
+                            );
+                          }
+                        },
+                      )
+                    ]),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 20),
-            FutureBuilder(
-              future: future,
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-                  List<Lesson?> lessons = snapshot.data;
-
-                  if (lessons.isNotEmpty) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: lessons.length,
-                      itemBuilder: (context, index) {
-                        int allTasks = lessons[index]?.allTask ?? 0;
-                        int doneTasks = lessons[index]?.done ?? 0;
-
-                        String tasks = doneTasks.toString() + "/" + allTasks.toString();
-
-                        return ListTile(
-                          iconColor: MyColors.black,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                          onTap: () => _openLesson(
-                            lessons[index]?.name ?? "",
-                            lessons[index]!.id.toString(),
-                            lessons[index]!.isBought!,
-                            lessons[index]!.banner!,
-                          ),
-                          subtitle: Row(children: [
-                            Text(
-                              tasks,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            // const Spacer(),
-                            // Text(lessons[index]?.expiry == null ||
-                            //         lessons[index]?.expiry == ""
-                            //     ? "null"
-                            //     : dateTimeFormatter(
-                            //         lessons[index]?.expiry ?? "")),
-                          ]),
-                          trailing: const Icon(IconlyLight.arrow_right_2, size: 18, color: MyColors.gray),
-                          title: Text(
-                            lessons[index]?.name ?? "",
-                            style: const TextStyle(
-                              color: MyColors.black,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  } else {
-                    return Container();
-                  }
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: MyColors.primaryColor,
-                    ),
-                  );
-                }
-              },
-            )
-          ]),
-        ),
+          ),
+        ],
       ),
     );
   }

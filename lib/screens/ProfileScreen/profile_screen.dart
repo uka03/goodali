@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,7 @@ import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/models/user_info.dart';
 import 'package:goodali/screens/Auth/login.dart';
-import 'package:goodali/screens/Auth/pincode_feild.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:goodali/screens/ProfileScreen/courseLessons.dart/my_bought_courses.dart';
 import 'package:goodali/screens/ProfileScreen/downloaded.dart';
 import 'package:goodali/screens/ProfileScreen/edit_profile.dart';
@@ -57,20 +56,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: 'Би',
-        actionButton1: Consumer<Auth>(
-          builder: (context, value, child) => value.isAuth
-              ? IconButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const Settings()));
-                  },
-                  icon: const Icon(Icons.more_horiz, size: 28, color: MyColors.black))
-              : Container(),
-        ),
-        actionButton2: null,
-        isCartButton: false,
-      ),
+      appBar: kIsWeb
+          ? null
+          : CustomAppBar(
+              title: 'Би',
+              actionButton1: Consumer<Auth>(
+                builder: (context, value, child) => value.isAuth
+                    ? IconButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const Settings()));
+                        },
+                        icon: const Icon(Icons.more_horiz, size: 28, color: MyColors.black))
+                    : Container(),
+              ),
+              actionButton2: null,
+              isCartButton: false,
+            ),
       body: Consumer<Auth>(
         builder: (BuildContext context, value, Widget? child) {
           loginWithBio = Provider.of<Auth>(context).loginWithBio;
@@ -85,91 +86,107 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     userInfo = snapshot.data;
                     return Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: ImageView(
-                                    imgPath: avatarPath != null ? avatarPath! : userInfo.avatarPath ?? "",
-                                    width: 70,
-                                    height: 70,
-                                  )),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      changedName != null ? changedName! : userInfo.nickname ?? "",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      userInfo.email ?? "",
-                                      style: const TextStyle(color: MyColors.gray),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(userInfo: userInfo))).then((value) {
-                                      if (value != null) {
-                                        setState(() {
-                                          changedName = value['name'];
-                                          avatarPath = value["avatar"];
-                                        });
-                                      }
-                                    });
-                                  },
-                                  child: const Text(
-                                    "Засах",
-                                    style: TextStyle(color: MyColors.primaryColor, fontSize: 16),
-                                  ))
-                            ],
-                          ),
+                        const Visibility(
+                          visible: kIsWeb,
+                          child: HeaderWidget(title: ''),
                         ),
-                        const SizedBox(height: 20),
-                        if (!kIsWeb)
-                          Container(
-                            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: MyColors.border1, width: 0.8))),
-                            height: 51,
-                            child: AppBar(
-                              backgroundColor: Colors.white,
-                              elevation: 0,
-                              bottom: const TabBar(
-                                isScrollable: true,
-                                padding: EdgeInsets.symmetric(horizontal: 20),
-                                tabs: [SizedBox(width: 70, child: Tab(text: "Авсан")), SizedBox(width: 70, child: Tab(text: "Татсан"))],
-                                indicatorWeight: 4,
-                                indicator: CustomTabIndicator(color: MyColors.primaryColor),
-                                labelColor: MyColors.primaryColor,
-                                labelStyle: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
-                                unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
-                                unselectedLabelColor: MyColors.gray,
-                                indicatorColor: MyColors.primaryColor,
+                        Expanded(
+                          child: Center(
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        ClipRRect(
+                                            borderRadius: BorderRadius.circular(50),
+                                            child: ImageView(
+                                              imgPath: avatarPath != null ? avatarPath! : userInfo.avatarPath ?? "",
+                                              width: 70,
+                                              height: 70,
+                                            )),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                changedName != null ? changedName! : userInfo.nickname ?? "",
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                userInfo.email ?? "",
+                                                style: const TextStyle(color: MyColors.gray),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfile(userInfo: userInfo)))
+                                                  .then((value) {
+                                                if (value != null) {
+                                                  setState(() {
+                                                    changedName = value['name'];
+                                                    avatarPath = value["avatar"];
+                                                  });
+                                                }
+                                              });
+                                            },
+                                            child: const Text(
+                                              "Засах",
+                                              style: TextStyle(color: MyColors.primaryColor, fontSize: 16),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  if (!kIsWeb)
+                                    Container(
+                                      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: MyColors.border1, width: 0.8))),
+                                      height: 51,
+                                      child: AppBar(
+                                        backgroundColor: Colors.white,
+                                        elevation: 0,
+                                        bottom: const TabBar(
+                                          isScrollable: true,
+                                          padding: EdgeInsets.symmetric(horizontal: 20),
+                                          tabs: [SizedBox(width: 70, child: Tab(text: "Авсан")), SizedBox(width: 70, child: Tab(text: "Татсан"))],
+                                          indicatorWeight: 4,
+                                          indicator: CustomTabIndicator(color: MyColors.primaryColor),
+                                          labelColor: MyColors.primaryColor,
+                                          labelStyle: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                                          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
+                                          unselectedLabelColor: MyColors.gray,
+                                          indicatorColor: MyColors.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  Expanded(
+                                    child: TabBarView(
+                                      children: [
+                                        MyCourses(
+                                          onTap: (audioObject) {
+                                            currentlyPlaying.value = audioObject;
+                                          },
+                                        ),
+                                        if (!kIsWeb)
+                                          Downloaded(
+                                            onTap: (audioObject) {},
+                                          )
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
                           ),
-                        Expanded(
-                          child: TabBarView(
-                            children: [
-                              MyCourses(
-                                onTap: (audioObject) {
-                                  currentlyPlaying.value = audioObject;
-                                },
-                              ),
-                              if (!kIsWeb)
-                                Downloaded(
-                                  onTap: (audioObject) {},
-                                )
-                            ],
-                          ),
-                        )
+                        ),
                       ],
                     );
                   } else {

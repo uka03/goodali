@@ -24,8 +24,7 @@ class _DownloadedState extends State<Downloaded> {
 
   _onPlayButtonTapped(int index) async {
     currentlyPlaying.value = downloadedList[index];
-    if (activeList.last.lectureTitle == downloadedList.last.lectureTitle &&
-        activeList.last.id == downloadedList.last.id) {
+    if (activeList.last.lectureTitle == downloadedList.last.lectureTitle && activeList.last.id == downloadedList.last.id) {
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: downloadedList[index].position!),

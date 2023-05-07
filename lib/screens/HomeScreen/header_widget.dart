@@ -19,15 +19,15 @@ import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
 import 'package:goodali/screens/ProfileScreen/edit_profile.dart';
 import 'package:goodali/screens/ProfileScreen/faQ.dart';
 import 'package:goodali/screens/ProfileScreen/profile_screen.dart';
-import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:goodali/screens/payment/web_cart_screen.dart';
 import 'package:provider/provider.dart';
 
 class HeaderWidget extends StatelessWidget {
   final bool? isHome;
+  final bool? isProfile;
   final String? title;
   final String? subtitle;
-  const HeaderWidget({Key? key, this.title, this.subtitle, this.isHome}) : super(key: key);
+  const HeaderWidget({Key? key, this.title, this.subtitle, this.isHome, this.isProfile}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +231,7 @@ class HeaderWidget extends StatelessWidget {
                 style: const TextStyle(color: Color(0xff84807D)),
                 children: [
                   TextSpan(
-                    text: 'Нүүр',
+                    text: isProfile == true ? 'Би' : 'Нүүр',
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         if (subtitle?.isNotEmpty ?? false) {

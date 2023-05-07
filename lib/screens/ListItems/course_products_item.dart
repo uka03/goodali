@@ -11,12 +11,7 @@ class CourseProductsListItem extends StatefulWidget {
   final Products courseProducts;
   final List<Products> courseProductsList;
   final bool isBought;
-  const CourseProductsListItem(
-      {Key? key,
-      required this.courseProducts,
-      this.isBought = false,
-      required this.courseProductsList})
-      : super(key: key);
+  const CourseProductsListItem({Key? key, required this.courseProducts, this.isBought = false, required this.courseProductsList}) : super(key: key);
 
   @override
   State<CourseProductsListItem> createState() => _CourseProductsListItemState();
@@ -30,17 +25,13 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
       child: Stack(children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: ImageView(
-              imgPath: widget.courseProducts.banner ?? "",
-              height: 170,
-              width: double.infinity),
+          child: ImageView(imgPath: widget.courseProducts.banner ?? "", height: 170, width: double.infinity),
         ),
         Container(
           height: 130,
           width: double.infinity,
           decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
             gradient: LinearGradient(
               colors: [
                 Colors.black.withOpacity(0.5),
@@ -51,34 +42,14 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
             ),
           ),
         ),
-
         Positioned(
           left: 20,
           top: 30,
           child: Text(
             widget.courseProducts.name ?? "",
-            style: const TextStyle(
-                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
-
-        // Positioned(
-        //   left: 20,
-        //   top: 62,
-        //   child: Row(
-        //     children: [
-        //      const Text(
-        //         "Эхлэх огноо:",
-        //         style: TextStyle(color: Colors.white),
-        //       ),
-        //       Text(
-        //         " 2022.06.18",
-        //         style:
-        //             TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        //       ),
-        //     ],
-        //   ),isBought
-        // ),
         Positioned(
           bottom: 20,
           left: 20,
@@ -92,22 +63,16 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
                             courseListItem: widget.courseProductsList,
                           )
                         : CourseDetail(courseProducts: widget.courseProducts))),
-            // MaterialPageRoute(
-            //     builder: (_) =>
-            //         CourseList(id: widget.products.id.toString()))),
             child: Container(
               height: 40,
               width: 120,
-              decoration: BoxDecoration(
-                  color: MyColors.input,
-                  borderRadius: BorderRadius.circular(6)),
+              decoration: BoxDecoration(color: MyColors.input, borderRadius: BorderRadius.circular(6)),
               child: Row(
                 children: const [
                   SizedBox(width: 15),
                   Text(
                     "Цааш үзэх",
-                    style: TextStyle(
-                        color: MyColors.black, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: MyColors.black, fontWeight: FontWeight.bold),
                   ),
                   Spacer(),
                   Icon(IconlyLight.arrow_right_2, size: 18),

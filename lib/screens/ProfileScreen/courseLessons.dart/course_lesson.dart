@@ -1,11 +1,11 @@
-import 'dart:developer';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/models/course_lessons_tasks_model.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:goodali/screens/ProfileScreen/courseLessons.dart/course_lessons_tasks.dart';
 
 class CourseLessonType extends StatefulWidget {
@@ -42,31 +42,50 @@ class _CourseLessonTypeState extends State<CourseLessonType> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: SimpleAppBar(title: widget.title, noCard: true),
+        appBar: kIsWeb ? null : SimpleAppBar(title: widget.title, noCard: true),
         body: isLoading
             ? const Center(child: CircularProgressIndicator(color: MyColors.primaryColor))
             : taskList.isEmpty
                 ? const Center(
                     child: Text("Хичээл хоосон байна", style: TextStyle(color: MyColors.gray)),
                   )
-                : RefreshIndicator(
-                    onRefresh: _refresh,
-                    child: ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: taskList.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                              onTap: () => _onTap(index),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                              title:
-                                  Text((index + 1).toString() + ". " + tasksName[index], style: const TextStyle(color: MyColors.black, fontSize: 16)),
-                              subtitle: taskList[index].isAnswered == 0
-                                  ? const Text("Хийгээгүй", style: TextStyle(fontSize: 12, color: MyColors.gray))
-                                  : const Text("Дууссан", style: TextStyle(fontSize: 12, color: MyColors.gray)),
-                              trailing: taskList[index].isAnswered == 0
-                                  ? SvgPicture.asset("assets/images/undone_icon.svg")
-                                  : SvgPicture.asset("assets/images/done_icon.svg"));
-                        }),
+                : Column(
+                    children: [
+                      Visibility(
+                        visible: kIsWeb,
+                        child: HeaderWidget(
+                          title: widget.lessonName,
+                          subtitle: widget.title,
+                          isProfile: true,
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                            child: RefreshIndicator(
+                              onRefresh: _refresh,
+                              child: ListView.builder(
+                                  physics: const AlwaysScrollableScrollPhysics(),
+                                  itemCount: taskList.length,
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                        onTap: () => _onTap(index),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                        title: Text((index + 1).toString() + ". " + tasksName[index],
+                                            style: const TextStyle(color: MyColors.black, fontSize: 16)),
+                                        subtitle: taskList[index].isAnswered == 0
+                                            ? const Text("Хийгээгүй", style: TextStyle(fontSize: 12, color: MyColors.gray))
+                                            : const Text("Дууссан", style: TextStyle(fontSize: 12, color: MyColors.gray)),
+                                        trailing: taskList[index].isAnswered == 0
+                                            ? SvgPicture.asset("assets/images/undone_icon.svg")
+                                            : SvgPicture.asset("assets/images/done_icon.svg"));
+                                  }),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ));
   }
 

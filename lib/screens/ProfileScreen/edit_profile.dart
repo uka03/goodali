@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/utils.dart';
@@ -11,6 +12,7 @@ import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:goodali/models/user_info.dart';
+import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -49,133 +51,137 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: SimpleAppBar(noCard: true, data: map),
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height - 100,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Align(
-                  alignment: Alignment.center,
-                  child: widget.userInfo?.avatarPath != null && !isImageChanged
-                      ? CircleAvatar(
-                          radius: 70,
-                          child: ClipOval(
-                            child: ImageView(
-                              imgPath: widget.userInfo?.avatarPath ?? "",
-                              height: 160,
-                              width: 160,
-                            ),
-                          ))
-                      : fileImage != null && isImageChanged
-                          ? CircleAvatar(
-                              radius: 70,
-                              child: ClipOval(
-                                child: Image.file(
-                                  fileImage!,
-                                  height: 160,
-                                  width: 160,
-                                  fit: BoxFit.cover,
-                                ),
-                              ))
-                          : const CircleAvatar(
-                              radius: 70,
-                              backgroundColor: MyColors.border1,
-                            )),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.center,
-                child: TextButton(
-                  onPressed: changeProfilePicture,
-                  child: const Text(
-                    "Зураг солих",
-                    style: TextStyle(color: MyColors.primaryColor),
-                  ),
+      appBar: kIsWeb ? null : SimpleAppBar(noCard: true, data: map),
+      body: Column(
+        children: [
+          const Visibility(
+            visible: kIsWeb,
+            child: HeaderWidget(title: ''),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                height: MediaQuery.of(context).size.height - 100,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                        alignment: Alignment.center,
+                        child: widget.userInfo?.avatarPath != null && !isImageChanged
+                            ? CircleAvatar(
+                                radius: 70,
+                                child: ClipOval(
+                                  child: ImageView(
+                                    imgPath: widget.userInfo?.avatarPath ?? "",
+                                    height: 160,
+                                    width: 160,
+                                  ),
+                                ))
+                            : fileImage != null && isImageChanged
+                                ? CircleAvatar(
+                                    radius: 70,
+                                    child: ClipOval(
+                                      child: Image.file(
+                                        fileImage!,
+                                        height: 160,
+                                        width: 160,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ))
+                                : const CircleAvatar(
+                                    radius: 70,
+                                    backgroundColor: MyColors.border1,
+                                  )),
+                    const SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.center,
+                      child: TextButton(
+                        onPressed: changeProfilePicture,
+                        child: const Text(
+                          "Зураг солих",
+                          style: TextStyle(color: MyColors.primaryColor),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    const Text("И-мэйл хаяг", style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.gray)),
+                    const SizedBox(height: 20),
+                    TextField(
+                        controller: emailController,
+                        cursorColor: MyColors.primaryColor,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: MyColors.border1),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                          ),
+                        )),
+                    const SizedBox(height: 24),
+                    const Text("Нууц нэр", style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.gray)),
+                    const SizedBox(height: 20),
+                    TextField(
+                        controller: nicknameController,
+                        cursorColor: MyColors.primaryColor,
+                        onChanged: (value) {
+                          setState(() {
+                            isChanged = true;
+                            isTyping = true;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Нууц нэр",
+                          suffixIcon: isTyping
+                              ? GestureDetector(
+                                  onTap: () => setState(() {
+                                    nicknameController.text = "";
+                                    isTyping = false;
+                                  }),
+                                  child: const Icon(Icons.close, color: MyColors.black),
+                                )
+                              : const SizedBox(),
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: MyColors.border1),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                          ),
+                        )),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Та өөртөө хүссэн нэрээ өгөөрэй",
+                      style: TextStyle(fontSize: 12, color: MyColors.gray),
+                    ),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: TextButton(
+                          onPressed: () {
+                            deleteProfile();
+                          },
+                          child: const Text(
+                            "Профайл устгах",
+                            style: TextStyle(color: MyColors.black),
+                          )),
+                    ),
+                    CustomElevatedButton(
+                        text: "Хадгалах",
+                        onPress: isChanged
+                            ? () {
+                                Utils.showLoaderDialog(context);
+                                editUserData(fileImage);
+                              }
+                            : null),
+                    const SizedBox(height: 30),
+                  ],
                 ),
               ),
-              const SizedBox(height: 30),
-              const Text("И-мэйл хаяг",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: MyColors.gray)),
-              const SizedBox(height: 20),
-              TextField(
-                  controller: emailController,
-                  cursorColor: MyColors.primaryColor,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.border1),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.primaryColor, width: 1.5),
-                    ),
-                  )),
-              const SizedBox(height: 24),
-              const Text("Нууц нэр",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: MyColors.gray)),
-              const SizedBox(height: 20),
-              TextField(
-                  controller: nicknameController,
-                  cursorColor: MyColors.primaryColor,
-                  onChanged: (value) {
-                    setState(() {
-                      isChanged = true;
-                      isTyping = true;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Нууц нэр",
-                    suffixIcon: isTyping
-                        ? GestureDetector(
-                            onTap: () => setState(() {
-                              nicknameController.text = "";
-                              isTyping = false;
-                            }),
-                            child:
-                                const Icon(Icons.close, color: MyColors.black),
-                          )
-                        : const SizedBox(),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: MyColors.border1),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: MyColors.primaryColor, width: 1.5),
-                    ),
-                  )),
-              const SizedBox(height: 10),
-              const Text(
-                "Та өөртөө хүссэн нэрээ өгөөрэй",
-                style: TextStyle(fontSize: 12, color: MyColors.gray),
-              ),
-              const Spacer(),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                    onPressed: () {
-                      deleteProfile();
-                    },
-                    child: const Text(
-                      "Профайл устгах",
-                      style: TextStyle(color: MyColors.black),
-                    )),
-              ),
-              CustomElevatedButton(
-                  text: "Хадгалах",
-                  onPress: isChanged
-                      ? () {
-                          Utils.showLoaderDialog(context);
-                          editUserData(fileImage);
-                        }
-                      : null),
-              const SizedBox(height: 30),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -187,11 +193,7 @@ class _EditProfileState extends State<EditProfile> {
           return AlertDialog(
             title: const Icon(IconlyLight.close_square, color: MyColors.black),
             content: const Text("Профайл устгах уу?",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: MyColors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold)),
+                textAlign: TextAlign.center, style: TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold)),
             actions: [
               TextButton(
                   onPressed: () {
@@ -220,9 +222,7 @@ class _EditProfileState extends State<EditProfile> {
         context: context,
         enableDrag: true,
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (context) {
           return SizedBox(
             height: 300,
@@ -232,16 +232,10 @@ class _EditProfileState extends State<EditProfile> {
                 Container(
                   width: 38,
                   height: 6,
-                  decoration: BoxDecoration(
-                      color: MyColors.gray,
-                      borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(10)),
                 ),
                 const SizedBox(height: 20),
-                const Text("Зураг солих",
-                    style: TextStyle(
-                        color: MyColors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24)),
+                const Text("Зураг солих", style: TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 24)),
                 const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -251,8 +245,7 @@ class _EditProfileState extends State<EditProfile> {
                       GestureDetector(
                         onTap: () async {
                           try {
-                            camerPhoto = await _picker.pickImage(
-                                source: ImageSource.camera);
+                            camerPhoto = await _picker.pickImage(source: ImageSource.camera);
                             Navigator.pop(context);
                             if (camerPhoto != null) {
                               setState(() {
@@ -263,24 +256,20 @@ class _EditProfileState extends State<EditProfile> {
                             }
                           } catch (e) {
                             print(e);
-                            TopSnackBar.errorFactory(msg: "Need permission")
-                                .show(context);
+                            TopSnackBar.errorFactory(msg: "Need permission").show(context);
                           }
                         },
                         child: Container(
                           height: 125,
                           width: 150,
-                          decoration: BoxDecoration(
-                              color: MyColors.border1,
-                              borderRadius: BorderRadius.circular(18)),
+                          decoration: BoxDecoration(color: MyColors.border1, borderRadius: BorderRadius.circular(18)),
                           child: Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: const [
                                 Icon(IconlyLight.camera),
                                 SizedBox(height: 20),
-                                Text("Камер",
-                                    style: TextStyle(color: MyColors.black))
+                                Text("Камер", style: TextStyle(color: MyColors.black))
                               ],
                             ),
                           ),
@@ -289,8 +278,7 @@ class _EditProfileState extends State<EditProfile> {
                       GestureDetector(
                         onTap: () async {
                           try {
-                            image = await _picker.pickImage(
-                                source: ImageSource.gallery);
+                            image = await _picker.pickImage(source: ImageSource.gallery);
                             Navigator.pop(context);
 
                             if (image != null) {
@@ -302,24 +290,20 @@ class _EditProfileState extends State<EditProfile> {
                             }
                           } catch (e) {
                             print(e);
-                            TopSnackBar.errorFactory(msg: "Need permission")
-                                .show(context);
+                            TopSnackBar.errorFactory(msg: "Need permission").show(context);
                           }
                         },
                         child: Container(
                           height: 125,
                           width: 150,
-                          decoration: BoxDecoration(
-                              color: MyColors.border1,
-                              borderRadius: BorderRadius.circular(18)),
+                          decoration: BoxDecoration(color: MyColors.border1, borderRadius: BorderRadius.circular(18)),
                           child: Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: const [
                                 Icon(IconlyLight.image),
                                 SizedBox(height: 20),
-                                Text("Галлерей",
-                                    style: TextStyle(color: MyColors.black))
+                                Text("Галлерей", style: TextStyle(color: MyColors.black))
                               ],
                             ),
                           ),
@@ -350,8 +334,7 @@ class _EditProfileState extends State<EditProfile> {
     var stream = await Connection.accountDeletion(context);
     Navigator.pop(context);
     if (stream == true) {
-      await TopSnackBar.successFactory(title: "Амжилттай устгагдлаа")
-          .show(context);
+      await TopSnackBar.successFactory(title: "Амжилттай устгагдлаа").show(context);
       Provider.of<Auth>(context, listen: false).logOut(context, isDelete: true);
       Navigator.popUntil(context, (route) => route.isFirst);
     } else {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -19,12 +20,7 @@ class PostDetail extends StatefulWidget {
   final PostListModel postItem;
   final bool isHearted;
   final VoidCallback onRefresh;
-  const PostDetail(
-      {Key? key,
-      required this.postItem,
-      required this.isHearted,
-      required this.onRefresh})
-      : super(key: key);
+  const PostDetail({Key? key, required this.postItem, required this.isHearted, required this.onRefresh}) : super(key: key);
 
   @override
   State<PostDetail> createState() => _PostDetailState();
@@ -54,89 +50,118 @@ class _PostDetailState extends State<PostDetail> {
         noCard: true,
         title: "Сэтгэгдэл",
       ),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          PostItem(
-            postItem: widget.postItem,
-            isHearted: widget.isHearted,
-            onRefresh: widget.onRefresh,
-          ),
-          Row(
-            children: [
-              const SizedBox(width: 20),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(50),
-                child: ImageView(
-                    imgPath: widget.postItem.avatar ?? "",
-                    height: 32,
-                    width: 32),
+      body: Center(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+          child: SingleChildScrollView(
+            child: Column(children: [
+              PostItem(
+                postItem: widget.postItem,
+                isHearted: widget.isHearted,
+                onRefresh: widget.onRefresh,
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  height: 40,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    color: MyColors.input,
+              Row(
+                children: [
+                  const SizedBox(width: 20),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: ImageView(imgPath: widget.postItem.avatar ?? "", height: 32, width: 32),
                   ),
-                  child: TextField(
-                    readOnly: true,
-                    onTap: () {
-                      bool isAuth =
-                          Provider.of<Auth>(context, listen: false).isAuth;
-                      if (isAuth) {
-                        showReplyModal();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content:
-                                const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
-                            backgroundColor: MyColors.error,
-                            behavior: SnackBarBehavior.floating,
-                            action: SnackBarAction(
-                                onPressed: () => loginWithBio
-                                    ? Provider.of<Auth>(context, listen: false)
-                                        .authenticateWithBiometrics(context)
-                                    : showLoginModal(),
-                                label: 'Нэвтрэх',
-                                textColor: Colors.white)));
-                      }
-                    },
-                    cursorColor: MyColors.primaryColor,
-                    decoration: const InputDecoration(
-                        border: InputBorder.none, hintText: "Сэтгэгдэл бичих"),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        color: MyColors.input,
+                      ),
+                      child: kIsWeb
+                          ? Row(
+                              children: [
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 70,
+                                    child: Center(
+                                      child: TextField(
+                                        controller: _commentController,
+                                        cursorColor: MyColors.primaryColor,
+                                        maxLines: null,
+                                        onChanged: (value) {},
+                                        decoration: const InputDecoration(
+                                            border: InputBorder.none, hintText: 'Сэтгэгдэл бичих...', hintStyle: TextStyle(color: MyColors.gray)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(IconlyBold.send, color: MyColors.primaryColor),
+                                  onPressed: () {
+                                    if (_commentController.text.length < 30) {
+                                      TopSnackBar.errorFactory(
+                                              title: "Анхаарна уу", msg: "Таны сэтгэгдэл хамгийн багадаа 30 тэмдэгт ашигласан байх шаардлагатай.")
+                                          .show(context);
+                                    } else {
+                                      writeComment();
+                                    }
+                                  },
+                                )
+                              ],
+                            )
+                          : TextField(
+                              readOnly: true,
+                              onTap: () {
+                                bool isAuth = Provider.of<Auth>(context, listen: false).isAuth;
+                                if (isAuth) {
+                                  showReplyModal();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                                      backgroundColor: MyColors.error,
+                                      behavior: SnackBarBehavior.floating,
+                                      action: SnackBarAction(
+                                          onPressed: () => loginWithBio
+                                              ? Provider.of<Auth>(context, listen: false).authenticateWithBiometrics(context)
+                                              : showLoginModal(),
+                                          label: 'Нэвтрэх',
+                                          textColor: Colors.white)));
+                                }
+                              },
+                              cursorColor: MyColors.primaryColor,
+                              decoration: const InputDecoration(border: InputBorder.none, hintText: "Сэтгэгдэл бичих"),
+                            ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+              const SizedBox(height: 30),
+              const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
+              comments.isEmpty
+                  ? Column(
+                      children: [
+                        const SizedBox(height: 60),
+                        Center(
+                          child: SvgPicture.asset("assets/images/no_chat_history.svg", semanticsLabel: 'Acme Logo'),
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Сэтгэгдэл байхгүй байна",
+                          style: TextStyle(color: MyColors.gray),
+                        ),
+                        const SizedBox(height: 40),
+                      ],
+                    )
+                  : ListView.builder(
+                      itemCount: comments.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return ReplyItem(postReplys: comments[index]);
+                      })
+            ]),
           ),
-          const SizedBox(height: 30),
-          const Divider(color: MyColors.border1, endIndent: 20, indent: 20),
-          comments.isEmpty
-              ? Column(
-                  children: [
-                    const SizedBox(height: 60),
-                    Center(
-                      child: SvgPicture.asset(
-                          "assets/images/no_chat_history.svg",
-                          semanticsLabel: 'Acme Logo'),
-                    ),
-                    const SizedBox(height: 15),
-                    const Text(
-                      "Сэтгэгдэл байхгүй байна",
-                      style: TextStyle(color: MyColors.gray),
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                )
-              : ListView.builder(
-                  itemCount: comments.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return ReplyItem(postReplys: comments[index]);
-                  })
-        ]),
+        ),
       ),
     );
   }
@@ -146,12 +171,10 @@ class _PostDetailState extends State<PostDetail> {
         context: context,
         isScrollControlled: true,
         builder: (_) {
-          return StatefulBuilder(builder:
-              (BuildContext context, void Function(void Function()) setState) {
+          return StatefulBuilder(builder: (BuildContext context, void Function(void Function()) setState) {
             return SingleChildScrollView(
                 child: Container(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
               child: Row(
                 children: [
                   const SizedBox(width: 10),
@@ -165,21 +188,15 @@ class _PostDetailState extends State<PostDetail> {
                         maxLines: null,
                         onChanged: (value) {},
                         decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Сэтгэгдэл бичих...',
-                            hintStyle: TextStyle(color: MyColors.gray)),
+                            border: InputBorder.none, hintText: 'Сэтгэгдэл бичих...', hintStyle: TextStyle(color: MyColors.gray)),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(IconlyBold.send,
-                        color: MyColors.primaryColor),
+                    icon: const Icon(IconlyBold.send, color: MyColors.primaryColor),
                     onPressed: () {
                       if (_commentController.text.length < 30) {
-                        TopSnackBar.errorFactory(
-                                title: "Анхаарна уу",
-                                msg:
-                                    "Таны сэтгэгдэл хамгийн багадаа 30 тэмдэгт ашигласан байх шаардлагатай.")
+                        TopSnackBar.errorFactory(title: "Анхаарна уу", msg: "Таны сэтгэгдэл хамгийн багадаа 30 тэмдэгт ашигласан байх шаардлагатай.")
                             .show(context);
                       } else {
                         writeComment();
@@ -201,26 +218,19 @@ class _PostDetailState extends State<PostDetail> {
         enableDrag: true,
         useRootNavigator: true,
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) =>
-            const LoginBottomSheet(isRegistered: true));
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (BuildContext context) => const LoginBottomSheet(isRegistered: true));
   }
 
   writeComment() async {
-    Map commentData = {
-      "body": _commentController.text,
-      "post_id": widget.postItem.id
-    };
+    Map commentData = {"body": _commentController.text, "post_id": widget.postItem.id};
     bool isCommented = await Connection.insertPostReply(context, commentData);
 
     if (isCommented) {
       TopSnackBar.successFactory(title: "Сэтгэгдэл илгээгдлээ").show(context);
       widget.onRefresh();
     } else {
-      TopSnackBar.errorFactory(title: "Алдаа гарлаа", msg: "Дахин оролдоно уу")
-          .show(context);
+      TopSnackBar.errorFactory(title: "Алдаа гарлаа", msg: "Дахин оролдоно уу").show(context);
     }
     return isCommented;
   }

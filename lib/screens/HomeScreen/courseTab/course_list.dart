@@ -21,7 +21,7 @@ class _CourseListState extends State<CourseList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const SimpleAppBar(),
+        appBar: const SimpleAppBar(noCard: true),
         body: SingleChildScrollView(
           child: Column(
             children: [

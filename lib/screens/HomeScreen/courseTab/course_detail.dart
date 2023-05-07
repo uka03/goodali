@@ -146,59 +146,70 @@ class _CourseDetailState extends State<CourseDetail> {
               }
             }
 
-            return SizedBox(
-              child: Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ImageView(
-                                imgPath: courseDetail.banner ?? "",
-                                height: kIsWeb ? 378 : 200,
-                                width: double.infinity,
+            return Column(
+              children: [
+                const Visibility(
+                  visible: kIsWeb,
+                  child: HeaderWidget(title: ''),
+                ),
+                Expanded(
+                  child: SizedBox(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  ImageView(
+                                    imgPath: courseDetail.banner ?? "",
+                                    height: kIsWeb ? 378 : 200,
+                                    width: double.infinity,
+                                  ),
+                                  Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                      child: Column(
+                                        children: [
+                                          const SizedBox(height: 20),
+                                          Text(courseDetail.name ?? "",
+                                              style: const TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
+                                          const SizedBox(height: 10),
+                                          const Text("Цахим сургалт",
+                                              style: TextStyle(
+                                                color: MyColors.primaryColor,
+                                              )),
+                                          const SizedBox(height: 20),
+                                          HtmlWidget(courseDetail.body ?? "",
+                                              textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.gray)),
+                                          const SizedBox(height: 30),
+                                        ],
+                                      )),
+                                ],
                               ),
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                  child: Column(
-                                    children: [
-                                      const SizedBox(height: 20),
-                                      Text(courseDetail.name ?? "",
-                                          style: const TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
-                                      const SizedBox(height: 10),
-                                      const Text("Цахим сургалт",
-                                          style: TextStyle(
-                                            color: MyColors.primaryColor,
-                                          )),
-                                      const SizedBox(height: 20),
-                                      HtmlWidget(courseDetail.body ?? "",
-                                          textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.gray)),
-                                      const SizedBox(height: 30),
-                                    ],
-                                  )),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                      if (username != "surgalt9@gmail.com" && isAuth)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: CustomElevatedButton(
-                            text: "Худалдаж авах",
-                            onPress: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => CourseList(id: courseDetail.id.toString())));
-                            },
+                        if (username != "surgalt9@gmail.com" && isAuth)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                              child: CustomElevatedButton(
+                                text: "Худалдаж авах",
+                                onPress: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => CourseList(id: courseDetail.id.toString())));
+                                },
+                              ),
+                            ),
                           ),
-                        ),
-                      const SizedBox(height: 30),
-                    ],
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             );
           } else {
             return Container();

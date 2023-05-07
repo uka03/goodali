@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
@@ -209,6 +211,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
                 (item) => GestureDetector(
                   onTap: () {
                     // PRODUCT TYPE 0 - ALBUM, 1 - LECTURE, 2 - TRAINING
+                    log('PRODUCT TYPE: ${item.productType}');
                     switch (item.productType) {
                       case 0:
                         Navigator.push(context, MaterialPageRoute(builder: (_) => BannerAlbum(productId: item.productID ?? 0)));
@@ -222,7 +225,13 @@ class _WebHomeScreenState extends State<WebHomeScreen> with SingleTickerProvider
                                     )));
                         break;
                       case 2:
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => CourseDetail(id: item.productID)));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => CourseDetail(
+                                      id: item.productID,
+                                      isHomeScreen: true,
+                                    )));
                         break;
                       default:
                     }

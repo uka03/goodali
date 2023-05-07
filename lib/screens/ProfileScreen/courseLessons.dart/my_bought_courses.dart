@@ -41,23 +41,18 @@ class _MyCoursesState extends State<MyCourses> {
   }
 
   onPlayButtonClicked(int index) async {
-    print("onPlayButtonClicked");
     currentlyPlaying.value = allLectures[index];
     if (activeList.first.title == allLectures.first.title && activeList.first.id == allLectures.first.id && activeList.length == allLectures.length) {
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
       );
-      print(allLectures[index].audio);
-      print("eswel iiisheeeeee orj irj  bnu MyCourses");
       audioHandler.play();
       currentlyPlaying.value = allLectures[index];
     } else if (activeList.first.title != allLectures.first.title ||
         activeList.first.id != allLectures.first.id ||
         activeList.length != allLectures.length) {
-      print("iisheee orj irj  bnu MyCourses");
       activeList = allLectures;
-      print(allLectures[index].audio);
       await initiliazePodcast();
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
@@ -145,7 +140,6 @@ class _MyCoursesState extends State<MyCourses> {
                         albumName: allLectures[index].albumTitle ?? "a",
                         productsList: allLectures,
                         onTap: () async {
-                          print("ene odoo yu bolood bn");
                           onPlayButtonClicked(index);
                         }),
                   ],
