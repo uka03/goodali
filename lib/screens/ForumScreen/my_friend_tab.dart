@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Providers/forum_tag_notifier.dart';
 import 'package:goodali/Utils/styles.dart';
-import 'package:goodali/Widgets/custom_elevated_button.dart';
 import 'package:goodali/Widgets/filter_button.dart';
 import 'package:goodali/Widgets/filter_modal.dart';
 import 'package:goodali/controller/connection_controller.dart';

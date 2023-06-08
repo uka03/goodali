@@ -6,7 +6,7 @@ import 'package:goodali/screens/payment/cart_screen.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
-class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? actionButton1;
   final Widget? actionButton2;
   final bool isCartButton;

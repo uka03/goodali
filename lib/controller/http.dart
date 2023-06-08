@@ -14,7 +14,7 @@ class Http {
   static Http? _instance;
   factory Http() => _instance ?? Http._();
 
-  BaseOptions options = BaseOptions(receiveTimeout: 30000, connectTimeout: 30000);
+  BaseOptions options = BaseOptions(receiveTimeout: const Duration(milliseconds: 30000), connectTimeout: const Duration(milliseconds: 30000));
   Http._() {
     try {
       _dio = Dio(options);
@@ -55,7 +55,7 @@ class Http {
           return;
         }
       }, onError: (e, handler) async {
-        if (e.type == DioErrorType.connectTimeout) {
+        if (e.type == DioErrorType.connectionError) {
           TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
         } else if (e.type == DioErrorType.receiveTimeout) {
           print("DIO RECEIVE TIME OUT");
@@ -91,7 +91,7 @@ class Http {
         return handler.next(e);
       }));
     } on DioError catch (e) {
-      print(e.message + "dioError");
+      print("${e.message} dioError");
     }
 
     // onError: (DioError error, handler) => erroInterceptor(error, context)));

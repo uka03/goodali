@@ -94,10 +94,10 @@ class _SettingsState extends State<Settings> {
                     ),
                     InkWell(
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ResetPassword())),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(20.0),
                         child: Row(
-                          children: const [
+                          children: [
                             Icon(
                               IconlyLight.lock,
                               color: MyColors.black,
@@ -115,10 +115,10 @@ class _SettingsState extends State<Settings> {
                     ),
                     InkWell(
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const FrequentlyQuestions())),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(20.0),
                         child: Row(
-                          children: const [
+                          children: [
                             Icon(
                               IconlyLight.info_square,
                               color: MyColors.black,
@@ -136,10 +136,10 @@ class _SettingsState extends State<Settings> {
                     ),
                     InkWell(
                       onTap: () {},
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(20.0),
                         child: Row(
-                          children: const [
+                          children: [
                             Icon(
                               IconlyLight.paper,
                               color: MyColors.black,
@@ -158,10 +158,10 @@ class _SettingsState extends State<Settings> {
                     const Spacer(),
                     InkWell(
                       onTap: showLogOutDialog,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(20.0),
                         child: Row(
-                          children: const [
+                          children: [
                             Icon(
                               IconlyLight.logout,
                               color: MyColors.black,

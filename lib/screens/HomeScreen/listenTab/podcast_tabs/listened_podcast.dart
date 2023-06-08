@@ -24,10 +24,6 @@ class _ListenedPodcastState extends State<ListenedPodcast>
 
   int currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

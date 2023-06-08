@@ -7,7 +7,7 @@ import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SimpleAppBar extends StatefulWidget with PreferredSizeWidget {
+class SimpleAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String? title;
   final bool noCard;
   final dynamic data;

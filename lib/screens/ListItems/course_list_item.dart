@@ -69,9 +69,9 @@ class _CourseListListItemState extends State<CourseListListItem> {
                         height: 40,
                         width: 120,
                         decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(6)),
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: const [
+                          children: [
                             Text(
                               "Сонгох",
                               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

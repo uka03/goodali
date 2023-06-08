@@ -18,7 +18,6 @@ import 'package:goodali/controller/pray_button_notifier.dart';
 import 'package:goodali/models/get_mood_list.dart';
 
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/screens/HomeScreen/header_widget.dart';
 
 import 'package:goodali/screens/ListItems/mood_item.dart';
 

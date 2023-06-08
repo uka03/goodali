@@ -78,8 +78,8 @@ class _CourseProductsListItemState extends State<CourseProductsListItemWeb> {
                 height: 40,
                 width: 120,
                 decoration: BoxDecoration(color: MyColors.input, borderRadius: BorderRadius.circular(6)),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     SizedBox(width: 15),
                     Text(
                       "Цааш үзэх",

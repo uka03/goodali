@@ -29,7 +29,7 @@ class SearchScreen extends SearchDelegate<String> {
     return ThemeData(
       applyElevationOverlayColor: true,
       textTheme: const TextTheme(
-        headline6: TextStyle(fontSize: 16.0, color: MyColors.gray),
+        titleLarge: TextStyle(fontSize: 16.0, color: MyColors.gray),
       ),
       appBarTheme: const AppBarTheme(
         elevation: 0,

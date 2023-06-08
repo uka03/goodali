@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -17,7 +16,6 @@ import 'package:goodali/models/faq_model.dart';
 import 'package:goodali/models/post_list_model.dart';
 import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/get_mood_list.dart';
-import 'package:goodali/models/mood_main.dart';
 import 'package:goodali/models/qpay.dart';
 import 'package:goodali/models/search_model.dart';
 import 'package:goodali/models/tag_model.dart';
@@ -32,7 +30,7 @@ class Connection {
   static Future<Map<String, dynamic>> userRegister(BuildContext context, dynamic data) async {
     try {
       final response = await Http().getDio(context, headerTypeNone).post(Urls.signup, data: data);
-      print('userRegister: response: ${response}');
+      print('userRegister: response: $response');
       print('userRegister: response data: ${response.data}');
 
       if (response.data["status"] == 1) {
@@ -42,7 +40,7 @@ class Connection {
       }
     } on DioError catch (e) {
       print(e);
-      if (e.type == DioErrorType.other) {
+      if (e.type == DioErrorType.connectionError) {
         TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
         TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа").show(context);
@@ -62,7 +60,7 @@ class Connection {
       }
     } on DioError catch (e) {
       print(e.type);
-      if (e.type == DioErrorType.other) {
+      if (e.type == DioErrorType.connectionError) {
         TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
         TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа").show(context);
@@ -292,7 +290,7 @@ class Connection {
         return {"success": false, "message": response.data["message"]};
       }
     } on DioError catch (e) {
-      if (e.type == DioErrorType.other) {
+      if (e.type == DioErrorType.connectionError) {
         TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       }
       return {};

@@ -35,7 +35,7 @@ class _WebRegisterScreenState extends State<WebRegisterScreen> {
           Expanded(
             child: Stack(
               children: [
-                Container(
+                SizedBox(
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width / 2,
                   child: Image.asset(
@@ -44,7 +44,7 @@ class _WebRegisterScreenState extends State<WebRegisterScreen> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 120, top: 30),
+                  padding: const EdgeInsets.only(left: 120, top: 30),
                   child: Image.asset("assets/images/logo_white.png", width: 126, height: 36),
                 ),
               ],
@@ -55,12 +55,12 @@ class _WebRegisterScreenState extends State<WebRegisterScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   InkWell(
                     child: Container(
                         padding: const EdgeInsets.all(8.0),
                         child: RichText(
-                            text: new TextSpan(children: [
+                            text: const TextSpan(children: [
                           TextSpan(
                               text: "Хаяг байгаа?",
                               style: TextStyle(
@@ -86,7 +86,7 @@ class _WebRegisterScreenState extends State<WebRegisterScreen> {
                   ),
                   const SizedBox(height: 10),
                   Expanded(
-                    child: Container(
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width / 5,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -95,7 +95,7 @@ class _WebRegisterScreenState extends State<WebRegisterScreen> {
                           const SizedBox(height: 20),
                           Container(
                             alignment: Alignment.centerLeft,
-                            child: Text("Бүртгүүлэх",
+                            child: const Text("Бүртгүүлэх",
                                 style: TextStyle(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
@@ -228,8 +228,8 @@ class _WebRegisterScreenState extends State<WebRegisterScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 64),
-                          Container(
+                          const SizedBox(height: 64),
+                          SizedBox(
                             height: 48,
                             child: CustomElevatedButton(
                                 text: "Бүртгүүлэх",

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -34,6 +36,7 @@ class _CourseDetailState extends State<CourseDetail> {
   void initState() {
     getUserName();
     super.initState();
+    log('banner: ${widget.courseProducts?.banner}');
   }
 
   getUserName() async {

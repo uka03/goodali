@@ -46,8 +46,8 @@ class _ChoosePaymentState extends State<ChoosePayment> {
                 decoration: BoxDecoration(
                     color: MyColors.input,
                     borderRadius: BorderRadius.circular(12)),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     SizedBox(width: 20),
                     Icon(
                       IconlyLight.scan,
@@ -77,8 +77,8 @@ class _ChoosePaymentState extends State<ChoosePayment> {
                 decoration: BoxDecoration(
                     color: MyColors.input,
                     borderRadius: BorderRadius.circular(12)),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     SizedBox(width: 20),
                     Icon(
                       IconlyLight.wallet,

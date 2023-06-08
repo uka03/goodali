@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
-import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
 import 'package:provider/provider.dart';

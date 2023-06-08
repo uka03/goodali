@@ -263,10 +263,10 @@ class _EditProfileState extends State<EditProfile> {
                           height: 125,
                           width: 150,
                           decoration: BoxDecoration(color: MyColors.border1, borderRadius: BorderRadius.circular(18)),
-                          child: Center(
+                          child: const Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 Icon(IconlyLight.camera),
                                 SizedBox(height: 20),
                                 Text("Камер", style: TextStyle(color: MyColors.black))
@@ -297,10 +297,10 @@ class _EditProfileState extends State<EditProfile> {
                           height: 125,
                           width: 150,
                           decoration: BoxDecoration(color: MyColors.border1, borderRadius: BorderRadius.circular(18)),
-                          child: Center(
+                          child: const Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 Icon(IconlyLight.image),
                                 SizedBox(height: 20),
                                 Text("Галлерей", style: TextStyle(color: MyColors.black))

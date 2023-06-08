@@ -35,15 +35,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         Row(
                           children: [
                             Container(
-                              padding: EdgeInsets.only(left: 155),
+                              padding: const EdgeInsets.only(left: 155),
                               child: Image.asset("assets/images/title_logo.png", width: 113, height: 32),
                             ),
-                            Spacer(),
+                            const Spacer(),
                             InkWell(
                               child: Container(
                                   padding: const EdgeInsets.all(8.0),
                                   child: RichText(
-                                      text: new TextSpan(children: [
+                                      text: const TextSpan(children: [
                                     TextSpan(
                                         text: "Хаяг байгаа?",
                                         style: TextStyle(
@@ -70,10 +70,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           ],
                         ),
                         Container(
-                          margin: EdgeInsets.only(left: 145, top: 40),
+                          margin: const EdgeInsets.only(left: 145, top: 40),
                           alignment: Alignment.centerLeft,
                           child: IconButton(
-                            icon: new Icon(Icons.arrow_back, color: Colors.black),
+                            icon: const Icon(Icons.arrow_back, color: Colors.black),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
                         )
@@ -137,7 +137,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           ),
                         ),
                         const SizedBox(height: 60),
-                        Container(
+                        SizedBox(
                           width: kIsWeb ? 176 : double.infinity,
                           child: CustomElevatedButton(
                               onPress: () {

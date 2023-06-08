@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,7 +30,6 @@ class _MyCourseMainState extends State<MyCourseMain> {
   @override
   void initState() {
     title = widget.courseItem.name ?? "";
-
     super.initState();
   }
 
@@ -79,6 +80,8 @@ class _MyCourseMainState extends State<MyCourseMain> {
                                     itemBuilder: (context, index) {
                                       allTasks = coursesItemList[index].allTask ?? 0;
                                       doneTasks = coursesItemList[index].done ?? 0;
+
+                                      log('banner: ${coursesItemList[index].banner}');
 
                                       String tasks = doneTasks.toString() + "/" + allTasks.toString() + " даалгавар";
                                       return Padding(

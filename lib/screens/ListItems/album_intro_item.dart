@@ -254,20 +254,20 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
           builder: (BuildContext context, void Function(void Function()) setState) {
             return Column(
               children: [
-                Spacer(),
+                const Spacer(),
                 Center(
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.25,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: const BorderRadius.all(
+                      borderRadius: BorderRadius.all(
                         Radius.circular(12),
                       ),
                     ),
                     child: IntroAudio(products: widget.products, productsList: const []),
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
               ],
             );
           },

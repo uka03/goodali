@@ -1,4 +1,3 @@
-import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
 
@@ -79,12 +78,12 @@ List<Products> removeDuplicates(List<Products> items) {
 
 class Utils {
   static showLoaderDialog(BuildContext context) {
-    AlertDialog alert = AlertDialog(
+    AlertDialog alert = const AlertDialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       content: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           CircularProgressIndicator(
             color: MyColors.primaryColor,
           )

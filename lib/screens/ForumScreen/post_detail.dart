@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Providers/auth_provider.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/image_view.dart';

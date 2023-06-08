@@ -5,7 +5,6 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
 import 'package:goodali/Widgets/simple_appbar.dart';
 import 'package:goodali/models/products_model.dart';
-import 'package:goodali/screens/HomeScreen/footer_widget.dart';
 import 'package:goodali/screens/HomeScreen/header_widget.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/listened_podcast.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_tabs/podcast_all_tab.dart';

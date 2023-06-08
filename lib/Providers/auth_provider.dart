@@ -120,7 +120,7 @@ class Auth with ChangeNotifier {
       }
     } on DioError catch (e) {
       print(e.type);
-      if (e.type == DioErrorType.other) {
+      if (e.type == DioErrorType.connectionError) {
         TopSnackBar.errorFactory(msg: "Интернет холболтоо шалгана уу.").show(context);
       } else if (e.type == DioErrorType.receiveTimeout) {
         TopSnackBar.errorFactory(msg: "Сервертэй холбогдоход алдаа гарлаа.").show(context);
@@ -212,7 +212,7 @@ class Auth with ChangeNotifier {
       _isBiometricEnabled = await preferences.setBool("first_biometric", true);
 
       notifyListeners();
-    } on PlatformException catch (e) {
+    } on PlatformException {
       _canBiometric = false;
       notifyListeners();
       // print(e);
@@ -252,7 +252,7 @@ class Auth with ChangeNotifier {
         _canBiometric = false;
       } else {}
       notifyListeners();
-    } on PlatformException catch (e) {
+    } on PlatformException {
       // print(e);
     }
   }
@@ -286,7 +286,7 @@ class Auth with ChangeNotifier {
         }
       }
       notifyListeners();
-    } on PlatformException catch (e) {
+    } on PlatformException {
       // print(e);
       return;
     }

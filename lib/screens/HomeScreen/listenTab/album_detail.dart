@@ -147,7 +147,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                   }
 
                   return Center(
-                    child: Container(
+                    child: SizedBox(
                       width: kIsWeb ? MediaQuery.of(context).size.width / 2.5 : MediaQuery.of(context).size.width,
                       child: Column(
                         children: [
@@ -364,7 +364,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
       builder: (_) => StatefulBuilder(
         builder: (BuildContext context, void Function(void Function()) setState) {
           return Center(
-            child: Container(
+            child: SizedBox(
               width: kIsWeb ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width,
               child: IntroAudio(products: widget.albumProduct, productsList: const []),
             ),

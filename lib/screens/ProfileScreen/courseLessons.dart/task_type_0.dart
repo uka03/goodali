@@ -1,8 +1,6 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -19,7 +17,7 @@ class TaskType0 extends StatefulWidget {
 }
 
 class _TaskType0State extends State<TaskType0> {
-  GlobalKey _orderFormKey = GlobalKey();
+  final GlobalKey _orderFormKey = GlobalKey();
   bool isTyping = false;
   BoxDecoration? boxSetting;
   TextEditingController _controller = TextEditingController();

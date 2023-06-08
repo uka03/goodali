@@ -42,10 +42,10 @@ class PinCodeChangedSuccess extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          kIsWeb ? SizedBox(height: 64) : const Spacer(),
+          kIsWeb ? const SizedBox(height: 64) : const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Container(
+            child: SizedBox(
               width: kIsWeb ? 109 : double.infinity,
               child: CustomElevatedButton(
                 onPress: () {

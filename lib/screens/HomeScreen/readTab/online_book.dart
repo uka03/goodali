@@ -39,13 +39,13 @@ class _OnlineBookState extends State<OnlineBook> {
               const SizedBox(height: 30),
             ],
           ),
-          Expanded(
+          const Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Text(
                       "Hun doroi bojee. Bolj l ugwul uuriinhoo umnuus uruuliig zarj, bugdiig amarchilj, orligch, tuslagch, asragch, zusen zuilin megrhiehr ksfn kfjdkfj dkjfhkdf kdfhkdfh kdfhkdhf kdbfkhbdf kdjhbf.",
                       style: TextStyle(

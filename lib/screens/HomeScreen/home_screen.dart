@@ -6,7 +6,7 @@ import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_appbar.dart';
 import 'package:goodali/Widgets/image_view.dart';
 import 'package:goodali/Widgets/my_delegate.dart';
-import 'package:goodali/Widgets/search_bar.dart';
+import 'package:goodali/Widgets/search_bar.dart' as s;
 import 'package:goodali/controller/audioplayer_controller.dart';
 import 'package:goodali/controller/connection_controller.dart';
 import 'package:goodali/controller/default_audio_handler.dart';
@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   backgroundColor: Colors.white,
                   flexibleSpace: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [banner(), const SearchBar(), specialProducts()],
+                    children: [banner(), const s.SearchBar(), specialProducts()],
                   )),
               SliverPersistentHeader(
                   floating: false,

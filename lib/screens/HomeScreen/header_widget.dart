@@ -6,7 +6,7 @@ import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/Widgets/custom_elevated_button.dart';
-import 'package:goodali/Widgets/search_bar.dart';
+import 'package:goodali/Widgets/search_bar.dart' as s;
 import 'package:goodali/screens/Auth/login_web.dart';
 import 'package:goodali/screens/Auth/reset_password.dart';
 import 'package:goodali/screens/ForumScreen/forum_screen.dart';
@@ -45,7 +45,7 @@ class HeaderWidget extends StatelessWidget {
                   },
                   child: Image.asset("assets/images/title_logo.png", width: 113, height: 32)),
             ),
-            Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 60), child: const SearchBar())),
+            Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 60), child: const s.SearchBar())),
             Builder(
               builder: (BuildContext innerContext) {
                 return InkWell(

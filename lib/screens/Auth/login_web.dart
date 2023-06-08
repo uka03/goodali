@@ -37,7 +37,7 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
           Expanded(
             child: Stack(
               children: [
-                Container(
+                SizedBox(
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width / 2,
                   child: Image.asset(
@@ -46,7 +46,7 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 120, top: 30),
+                  padding: const EdgeInsets.only(left: 120, top: 30),
                   child: Image.asset("assets/images/logo_white.png", width: 126, height: 36),
                 ),
               ],
@@ -56,13 +56,13 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
             child: Form(
               child: Column(
                 children: [
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   InkWell(
                     child: Container(
                       padding: const EdgeInsets.all(8.0),
                       child: RichText(
-                          text: new TextSpan(children: [
-                        new TextSpan(
+                          text: const TextSpan(children: [
+                        TextSpan(
                             text: "Хаяг байхгүй?",
                             style: TextStyle(
                               fontFamily: 'Gilroy',
@@ -71,7 +71,7 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                               fontWeight: FontWeight.w500,
                               fontStyle: FontStyle.normal,
                             )),
-                        new TextSpan(
+                        TextSpan(
                             text: " Бүртгүүлэх",
                             style: TextStyle(
                               fontFamily: 'Gilroy',
@@ -88,7 +88,7 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                   ),
                   const SizedBox(height: 10),
                   Expanded(
-                    child: Container(
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width / 5,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -97,7 +97,7 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                           const SizedBox(height: 20),
                           Container(
                             alignment: Alignment.centerLeft,
-                            child: Text("Нэвтрэх",
+                            child: const Text("Нэвтрэх",
                                 style: TextStyle(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
@@ -180,7 +180,7 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                                 onPressed: () {
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPassword()));
                                 },
-                                child: Text("Пин код мартсан?",
+                                child: const Text("Пин код мартсан?",
                                     style: TextStyle(
                                       fontFamily: 'Gilroy',
                                       color: Color(0xfff96f5d),
@@ -190,7 +190,7 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                                     ))),
                           ),
                           const SizedBox(height: 100),
-                          Container(
+                          SizedBox(
                             height: 48,
                             child: CustomElevatedButton(
                                 text: "Нэвтрэх",

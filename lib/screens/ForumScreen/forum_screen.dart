@@ -37,10 +37,10 @@ class _ForumScreenState extends State<ForumScreen> {
             ),
       body: Column(
         children: [
-          Visibility(
+          const Visibility(
             visible: kIsWeb,
             child: Column(
-              children: const [
+              children: [
                 HeaderWidget(),
                 Text(
                   'Сэтгэлийн гэр',
