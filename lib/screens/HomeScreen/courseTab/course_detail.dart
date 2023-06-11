@@ -22,7 +22,9 @@ class CourseDetail extends StatefulWidget {
   final int? id;
   final bool isHomeScreen;
 
-  const CourseDetail({Key? key, this.courseProducts, this.id, this.isHomeScreen = false}) : super(key: key);
+  const CourseDetail(
+      {Key? key, this.courseProducts, this.id, this.isHomeScreen = false})
+      : super(key: key);
 
   @override
   State<CourseDetail> createState() => _CourseDetailState();
@@ -71,36 +73,54 @@ class _CourseDetailState extends State<CourseDetail> {
                       children: [
                         Center(
                           child: SizedBox(
-                            width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                            width: MediaQuery.of(context).size.width *
+                                (kIsWeb ? 0.4 : 1),
                             child: Column(
                               children: [
                                 Column(
                                   children: [
                                     ImageView(
-                                      imgPath: widget.courseProducts?.banner ?? "",
+                                      imgPath:
+                                          widget.courseProducts?.banner ?? "",
                                       height: kIsWeb ? 378 : 200,
                                       width: double.infinity,
                                     ),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20.0),
                                             child: Column(
                                               children: [
                                                 const SizedBox(height: 20),
-                                                Text(widget.courseProducts?.name ?? "",
+                                                Text(
+                                                    widget.courseProducts
+                                                            ?.name ??
+                                                        "",
                                                     style: const TextStyle(
-                                                        color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
+                                                        color: MyColors.black,
+                                                        fontSize: 24,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        height: 1.7)),
                                                 const SizedBox(height: 10),
                                                 const Text("Цахим сургалт",
                                                     style: TextStyle(
-                                                      color: MyColors.primaryColor,
+                                                      color:
+                                                          MyColors.primaryColor,
                                                     )),
                                                 const SizedBox(height: 20),
-                                                HtmlWidget(widget.courseProducts?.body ?? "",
-                                                    textStyle:
-                                                        const TextStyle(fontSize: 14, height: 1.8, fontFamily: "Gilroy", color: MyColors.gray)),
+                                                HtmlWidget(
+                                                    widget.courseProducts
+                                                            ?.body ??
+                                                        "",
+                                                    textStyle: const TextStyle(
+                                                        fontSize: 14,
+                                                        height: 1.8,
+                                                        fontFamily: "Gilroy",
+                                                        color: MyColors.gray)),
                                                 const SizedBox(height: 30),
                                               ],
                                             )),
@@ -111,12 +131,21 @@ class _CourseDetailState extends State<CourseDetail> {
                                 const SizedBox(height: 10),
                                 if (username != "surgalt9@gmail.com" && isAuth)
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0),
                                     child: CustomElevatedButton(
                                       text: "Худалдаж авах",
                                       onPress: () {
-                                        Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => CourseList(id: widget.courseProducts?.id.toString() ?? "")));
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CourseList(
+                                                        id: widget
+                                                                .courseProducts
+                                                                ?.id
+                                                                .toString() ??
+                                                            "")));
                                       },
                                     ),
                                   ),
@@ -161,23 +190,51 @@ class _CourseDetailState extends State<CourseDetail> {
                       children: [
                         Expanded(
                           child: SizedBox(
-                            width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                            width: MediaQuery.of(context).size.width *
+                                (kIsWeb ? 0.4 : 1),
                             child: SingleChildScrollView(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  Row(
+                                    children: [
+                                      TextButton.icon(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        icon: const Icon(
+                                          Icons.arrow_back,
+                                          color: MyColors.black,
+                                        ),
+                                        label: const Text(
+                                          'Буцах',
+                                          style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: MyColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
                                   ImageView(
                                     imgPath: courseDetail.banner ?? "",
                                     height: kIsWeb ? 378 : 200,
                                     width: double.infinity,
                                   ),
                                   Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
                                       child: Column(
                                         children: [
                                           const SizedBox(height: 20),
                                           Text(courseDetail.name ?? "",
-                                              style: const TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold, height: 1.7)),
+                                              style: const TextStyle(
+                                                  color: MyColors.black,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 1.7)),
                                           const SizedBox(height: 10),
                                           const Text("Цахим сургалт",
                                               style: TextStyle(
@@ -185,7 +242,10 @@ class _CourseDetailState extends State<CourseDetail> {
                                               )),
                                           const SizedBox(height: 20),
                                           HtmlWidget(courseDetail.body ?? "",
-                                              textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.gray)),
+                                              textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  height: 1.8,
+                                                  color: MyColors.gray)),
                                           const SizedBox(height: 30),
                                         ],
                                       )),
@@ -198,11 +258,16 @@ class _CourseDetailState extends State<CourseDetail> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                              width: MediaQuery.of(context).size.width *
+                                  (kIsWeb ? 0.4 : 1),
                               child: CustomElevatedButton(
                                 text: "Худалдаж авах",
                                 onPress: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => CourseList(id: courseDetail.id.toString())));
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => CourseList(
+                                              id: courseDetail.id.toString())));
                                 },
                               ),
                             ),
