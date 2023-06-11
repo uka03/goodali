@@ -192,14 +192,46 @@ class _EditProfileState extends State<EditProfile> {
                             style: TextStyle(color: MyColors.black),
                           )),
                     ),
-                    CustomElevatedButton(
-                        text: "Хадгалах",
-                        onPress: isChanged
-                            ? () {
-                                Utils.showLoaderDialog(context);
-                                editUserData(fileImage);
-                              }
-                            : null),
+                    Container(
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                                child: const Text("Буцах"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    elevation: 0,
+                                    backgroundColor: MyColors.gray)),
+                          ),
+                          Expanded(
+                            child: ElevatedButton(
+                                child: const Text("Хадгалах"),
+                                onPressed: isChanged
+                                    ? () {
+                                        Utils.showLoaderDialog(context);
+                                        editUserData(fileImage);
+                                      }
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    elevation: 0,
+                                    backgroundColor: MyColors.primaryColor)),
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 30),
                   ],
                 ),
