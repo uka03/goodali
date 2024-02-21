@@ -11,7 +11,9 @@ class CourseProductsListItem extends StatefulWidget {
   final Products courseProducts;
   final List<Products> courseProductsList;
   final bool isBought;
-  const CourseProductsListItem({Key? key, required this.courseProducts, this.isBought = false, required this.courseProductsList}) : super(key: key);
+  const CourseProductsListItem(
+      {Key? key, required this.courseProducts, this.isBought = false, required this.courseProductsList})
+      : super(key: key);
 
   @override
   State<CourseProductsListItem> createState() => _CourseProductsListItemState();
@@ -50,19 +52,32 @@ class _CourseProductsListItemState extends State<CourseProductsListItem> {
             style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
+        Visibility(
+          visible: widget.courseProducts.expireAt != "",
+          child: Positioned(
+            left: 20,
+            top: 60,
+            child: Text(
+              "Огноо: ${widget.courseProducts.createdAt} - ${widget.courseProducts.expireAt}",
+              style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
         Positioned(
           bottom: 20,
           left: 20,
           child: GestureDetector(
             onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => widget.isBought
-                        ? MyCourseMain(
-                            courseItem: widget.courseProducts,
-                            courseListItem: widget.courseProductsList,
-                          )
-                        : CourseDetail(courseProducts: widget.courseProducts))),
+              context,
+              MaterialPageRoute(
+                builder: (_) => widget.isBought
+                    ? MyCourseMain(
+                        courseItem: widget.courseProducts,
+                        courseListItem: widget.courseProductsList,
+                      )
+                    : CourseDetail(courseProducts: widget.courseProducts),
+              ),
+            ),
             child: Container(
               height: 40,
               width: 120,

@@ -1,4 +1,3 @@
-
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:goodali/controller/audioplayer_controller.dart';
@@ -14,6 +13,7 @@ final HiveDataStore dataStore = HiveDataStore();
 final HiveBoughtDataStore dataAlbumStore = HiveBoughtDataStore();
 final HiveMoodDataStore dataMoodStore = HiveMoodDataStore();
 final HiveIntroDataStore dataIntroStore = HiveIntroDataStore();
+
 Future<void> initAudioHandler() async => audioHandler = await AudioService.init(
       builder: () => AudioPlayerHandler(),
       config: const AudioServiceConfig(
@@ -37,12 +37,19 @@ class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler
   AudioPlayerHandler() {
     _init();
   }
+
   Future<void> _init() async {
+    return;
+
+    print("COMING HERE");
+    print(queue);
     if (queue.value.isNotEmpty) return;
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.speech());
     // Activate the audio session before playing audio.
+
     if (await session.setActive(true)) {
+      print("PLAYING");
       play();
     } else {
       // The request was denied and the app should not play audio
@@ -78,15 +85,17 @@ class AudioPlayerHandler extends BaseAudioHandler with QueueHandler, SeekHandler
         buffered: event,
       );
 
-      dataStore.updatePosition(
-          currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, durationStateNotifier.value.progress?.inMilliseconds ?? 0);
+      dataStore.updatePosition(currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0,
+          durationStateNotifier.value.progress?.inMilliseconds ?? 0);
 
-      dataAlbumStore.updatePosition(
-          currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, durationStateNotifier.value.progress?.inMilliseconds ?? 0);
+      dataAlbumStore.updatePosition(currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0,
+          durationStateNotifier.value.progress?.inMilliseconds ?? 0);
 
-      dataMoodStore.updatePosition(currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
+      dataMoodStore.updatePosition(
+          currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
 
-      dataIntroStore.updatePosition(currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
+      dataIntroStore.updatePosition(
+          currentlyPlaying.value?.title! ?? "", currentlyPlaying.value?.id! ?? 0, event.inMilliseconds);
     });
     try {
       // After a cold restart (on Android), _player.load jumps straight from

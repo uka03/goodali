@@ -97,12 +97,14 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                           const SizedBox(height: 20),
                           Container(
                             alignment: Alignment.centerLeft,
-                            child: const Text("Нэвтрэх",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: MyColors.black,
-                                )),
+                            child: const Text(
+                              "Нэвтрэх",
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: MyColors.black,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 40),
                           TextFormField(
@@ -124,9 +126,11 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                                   ? GestureDetector(
                                       onTap: () {
                                         emailController.text = "";
-                                        setState(() {
-                                          isTyping = false;
-                                        });
+                                        setState(
+                                          () {
+                                            isTyping = false;
+                                          },
+                                        );
                                       },
                                       child: const Icon(Icons.close, color: MyColors.black))
                                   : const SizedBox(),
@@ -178,7 +182,8 @@ class _WebLoginScreennState extends State<WebLoginScreen> {
                             alignment: Alignment.centerLeft,
                             child: TextButton(
                                 onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPassword()));
+                                  Navigator.push(
+                                      context, MaterialPageRoute(builder: (context) => const ForgotPassword()));
                                 },
                                 child: const Text("Пин код мартсан?",
                                     style: TextStyle(

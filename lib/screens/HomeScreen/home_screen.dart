@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/local_database.dart';
@@ -103,7 +105,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   )))
             ];
           },
-          body: TabBarView(controller: tabController, children: const [ListenTabbar(), ReadTabbar(), FeelTabbar(), CourseTabbar()]),
+          body: TabBarView(
+              controller: tabController, children: const [ListenTabbar(), ReadTabbar(), FeelTabbar(), CourseTabbar()]),
         ),
       ),
     );
@@ -119,7 +122,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     switch (item.productType) {
                       case 0:
                         // print("banner album orj irle");
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => BannerAlbum(productId: item.productID ?? 0)));
+                        Navigator.push(
+                            context, MaterialPageRoute(builder: (_) => BannerAlbum(productId: item.productID ?? 0)));
                         break;
                       case 1:
                         // print("banner lecuture orj irle");
@@ -160,7 +164,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               width: 8.0,
               height: 8.0,
               margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 6.0),
-              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(_current == entry.key ? 0.9 : 0.4)),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: Colors.white.withOpacity(_current == entry.key ? 0.9 : 0.4)),
             ),
           );
         }).toList(),
@@ -176,7 +181,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             children: [
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: Text("Онцлох", style: TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+                child:
+                    Text("Онцлох", style: TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold)),
               ),
               SizedBox(
                 height: 190,
@@ -194,12 +200,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       return SpecialListItem(
                         specialItem: specialList[index],
                         onTap: () async {
-                          if (activeList.first.title == audioList.first.title && activeList.first.id == audioList.first.id) {
+                          if (activeList.first.title == audioList.first.title &&
+                              activeList.first.id == audioList.first.id) {
                             currentlyPlaying.value = audioList[index];
                             await audioHandler.skipToQueueItem(index);
                             await audioHandler.seek(Duration(milliseconds: audioList[index].position!));
                             await audioHandler.play();
-                          } else if (activeList.first.title != audioList.first.title || activeList.first.id != audioList.first.id) {
+                          } else if (activeList.first.title != audioList.first.title ||
+                              activeList.first.id != audioList.first.id) {
                             activeList = audioList;
                             await initiliazePodcast();
                             await audioHandler.skipToQueueItem(index);
@@ -222,8 +230,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           width: 8.0,
                           height: 8.0,
                           margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 6.0),
-                          decoration:
-                              BoxDecoration(shape: BoxShape.circle, color: MyColors.primaryColor.withOpacity(_pageCurrent == entry.key ? 0.9 : 0.4)),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: MyColors.primaryColor.withOpacity(_pageCurrent == entry.key ? 0.9 : 0.4)),
                         ),
                       );
                     }).toList(),

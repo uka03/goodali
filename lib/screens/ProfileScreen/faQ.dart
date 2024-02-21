@@ -50,7 +50,8 @@ class _FrequentlyQuestionsState extends State<FrequentlyQuestions> {
                             child: Card(
                               elevation: 0,
                               child: Theme(
-                                data: ThemeData().copyWith(dividerColor: Colors.transparent, unselectedWidgetColor: MyColors.primaryColor),
+                                data: ThemeData().copyWith(
+                                    dividerColor: Colors.transparent, unselectedWidgetColor: MyColors.primaryColor),
                                 child: ExpansionTile(
                                   iconColor: MyColors.primaryColor,
                                   textColor: MyColors.black,
@@ -58,8 +59,19 @@ class _FrequentlyQuestionsState extends State<FrequentlyQuestions> {
                                   collapsedTextColor: MyColors.black,
                                   tilePadding: const EdgeInsets.symmetric(horizontal: 10),
                                   childrenPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                  title: HtmlWidget(list[index].question ?? "", textStyle: const TextStyle(fontSize: 16)),
-                                  children: [HtmlWidget(list[index].answer ?? "")],
+                                  title: HtmlWidget(list[index].question ?? "",
+                                      textStyle: const TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: "Gilroy",
+                                      )),
+                                  children: [
+                                    HtmlWidget(
+                                      list[index].answer ?? "",
+                                      textStyle: const TextStyle(
+                                        fontFamily: "Gilroy",
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
                             ),

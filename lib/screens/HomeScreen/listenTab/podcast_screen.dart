@@ -40,73 +40,79 @@ class _PodcastState extends State<Podcast> {
           Expanded(
             child: Center(
               child: SizedBox(
-                width: kIsWeb ? MediaQuery.of(context).size.width * 0.4 : 1,
+                width: kIsWeb ? MediaQuery.of(context).size.width * 0.4 : MediaQuery.of(context).size.width,
                 height: double.infinity,
                 child: DefaultTabController(
-                    length: 3,
-                    child: NestedScrollView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        headerSliverBuilder: (context, innerBoxIsScrolled) {
-                          return [
-                            SliverToBoxAdapter(
-                              child: SizedBox(
-                                  height: 56,
-                                  child: Container(
-                                    padding: const EdgeInsets.only(left: 20),
-                                    alignment: Alignment.topLeft,
-                                    child: const Text("Подкаст", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
-                                  )),
+                  length: 3,
+                  child: NestedScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    headerSliverBuilder: (context, innerBoxIsScrolled) {
+                      return [
+                        SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: 56,
+                            child: Container(
+                              padding: const EdgeInsets.only(left: 20),
+                              alignment: Alignment.topLeft,
+                              child: const Text(
+                                "Подкаст",
+                                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black),
+                              ),
                             ),
-                            SliverPersistentHeader(
-                                floating: false,
-                                pinned: true,
-                                delegate: MyDelegate(const TabBar(
-                                  isScrollable: true,
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  tabs: [
-                                    SizedBox(width: 78, child: Tab(text: "Бүгд")),
-                                    SizedBox(width: 78, child: Tab(text: "Сонсоогүй")),
-                                    SizedBox(width: 78, child: Tab(text: "Сонссон"))
-                                  ],
-                                  indicatorWeight: 4,
-                                  indicator: CustomTabIndicator(color: MyColors.primaryColor),
-                                  labelColor: MyColors.primaryColor,
-                                  labelStyle: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
-                                  unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
-                                  unselectedLabelColor: MyColors.gray,
-                                  indicatorColor: MyColors.primaryColor,
-                                )))
-                          ];
-                        },
-                        body: ValueListenableBuilder(
-                          valueListenable: HiveDataStore.box.listenable(),
-                          builder: (context, Box box, widget) {
-                            if (box.length > 0) {
-                              List<Products> data = [];
-                              for (int a = 0; a < box.length; a++) {
-                                data.add(box.getAt(a));
-                              }
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 20.0),
-                                child: TabBarView(children: [
-                                  PodcastAll(
-                                    podcastList: data,
-                                  ),
-                                  NotListenedPodcast(
-                                    dataStore: dataStore,
-                                  ),
-                                  ListenedPodcast(
-                                    dataStore: dataStore,
-                                  )
-                                ]),
-                              );
-                            } else {
-                              return const Center(
-                                child: CircularProgressIndicator(color: MyColors.primaryColor),
-                              );
-                            }
-                          },
-                        ))),
+                          ),
+                        ),
+                        SliverPersistentHeader(
+                            floating: false,
+                            pinned: true,
+                            delegate: MyDelegate(const TabBar(
+                              isScrollable: true,
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              tabs: [
+                                SizedBox(width: 78, child: Tab(text: "Бүгд")),
+                                SizedBox(width: 78, child: Tab(text: "Сонсоогүй")),
+                                SizedBox(width: 78, child: Tab(text: "Сонссон"))
+                              ],
+                              indicatorWeight: 4,
+                              indicator: CustomTabIndicator(color: MyColors.primaryColor),
+                              labelColor: MyColors.primaryColor,
+                              labelStyle: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                              unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
+                              unselectedLabelColor: MyColors.gray,
+                              indicatorColor: MyColors.primaryColor,
+                            )))
+                      ];
+                    },
+                    body: ValueListenableBuilder(
+                      valueListenable: HiveDataStore.box.listenable(),
+                      builder: (context, Box box, widget) {
+                        if (box.length > 0) {
+                          List<Products> data = [];
+                          for (int a = 0; a < box.length; a++) {
+                            data.add(box.getAt(a));
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 20.0),
+                            child: TabBarView(children: [
+                              PodcastAll(
+                                podcastList: data,
+                              ),
+                              NotListenedPodcast(
+                                dataStore: dataStore,
+                              ),
+                              ListenedPodcast(
+                                dataStore: dataStore,
+                              )
+                            ]),
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(color: MyColors.primaryColor),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

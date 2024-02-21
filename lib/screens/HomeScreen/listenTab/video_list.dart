@@ -62,7 +62,8 @@ class _VideoListState extends State<VideoList> {
                           alignment: Alignment.topLeft,
                           child: Row(
                             children: [
-                              const Text("Видео", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
+                              const Text("Видео",
+                                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
                               const Spacer(),
                               kIsWeb
                                   ? Container(
@@ -155,6 +156,7 @@ class _VideoListState extends State<VideoList> {
           itemBuilder: (context, index) {
             return VideoItem(
               videoModel: videoList[index],
+              isHomeScreen: false,
             );
           });
     }
@@ -201,7 +203,8 @@ class _VideoListState extends State<VideoList> {
                                   }),
                             ),
                             const SizedBox(height: 20),
-                            const Text("Шүүлтүүр", style: TextStyle(fontSize: 22, color: MyColors.black, fontWeight: FontWeight.bold)),
+                            const Text("Шүүлтүүр",
+                                style: TextStyle(fontSize: 22, color: MyColors.black, fontWeight: FontWeight.bold)),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 15),
                               child: Wrap(
@@ -227,8 +230,10 @@ class _VideoListState extends State<VideoList> {
                                                 width: 24,
                                                 child: IgnorePointer(
                                                   child: Checkbox(
-                                                      fillColor: MaterialStateProperty.all<Color>(MyColors.primaryColor),
-                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                                      fillColor:
+                                                          MaterialStateProperty.all<Color>(MyColors.primaryColor),
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(4)),
                                                       side: const BorderSide(color: MyColors.border1),
                                                       splashRadius: 5,
                                                       onChanged: (_) {},
@@ -265,7 +270,8 @@ class _VideoListState extends State<VideoList> {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => StatefulBuilder(
               builder: (BuildContext context, void Function(void Function()) setState) {
                 return Container(
@@ -280,7 +286,8 @@ class _VideoListState extends State<VideoList> {
                         decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(10)),
                       ),
                       const SizedBox(height: 20),
-                      const Text("Шүүлтүүр", style: TextStyle(fontSize: 22, color: MyColors.black, fontWeight: FontWeight.bold)),
+                      const Text("Шүүлтүүр",
+                          style: TextStyle(fontSize: 22, color: MyColors.black, fontWeight: FontWeight.bold)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Wrap(

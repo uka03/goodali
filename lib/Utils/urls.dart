@@ -1,6 +1,6 @@
 class Urls {
-  static String host = 'https://dev.goodali.mn/api';
-  static String networkPath = 'https://dev.goodali.mn';
+  static String host = 'https://goodali.visiontech.asia/api';
+  static String networkPath = 'https://goodali.visiontech.asia';
 
   static final signin = "$host/signin";
   static final signup = "$host/signup";
@@ -43,4 +43,7 @@ class Urls {
   static final accountDeletion = "$host/account_deletion";
   static final specialList = "$host/special_list";
   static final faqList = "$host/faq_list";
+
+  // Daramsenge
+  static final invoiceDetail = "$host/invoice_detail";
 }

@@ -135,7 +135,9 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(borderRadius: BorderRadius.circular(4), child: ImageView(imgPath: widget.products.banner ?? "", width: 40, height: 40)),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: ImageView(imgPath: widget.products.banner ?? "", width: 40, height: 40)),
             const SizedBox(width: 15),
             Expanded(
               child: Column(
@@ -159,52 +161,61 @@ class _AlbumDetailItemState extends State<AlbumDetailItem> {
         ),
         const SizedBox(height: 14),
         ValueListenableBuilder(
-            valueListenable: durationStateNotifier,
-            builder: (context, DurationState value, child) {
-              var buttonState = buttonNotifier.value;
-              var currently = currentlyPlaying.value;
-              bool isPlaying = currently?.title == widget.products.title && buttonState == ButtonState.playing ? true : false;
+          valueListenable: durationStateNotifier,
+          builder: (context, DurationState value, child) {
+            var buttonState = buttonNotifier.value;
+            var currently = currentlyPlaying.value;
+            bool isPlaying =
+                currently?.title == widget.products.title && buttonState == ButtonState.playing ? true : false;
 
-              return Row(
-                children: [
-                  AudioPlayerButton(
-                    id: widget.products.id!,
-                    onPlay: () async {
-                      widget.onTap();
-                    },
-                    onPause: () {
-                      audioHandler.pause();
-                    },
-                    title: widget.products.title ?? "",
-                  ),
-                  const SizedBox(width: 10),
-                  isLoading
-                      ? const SizedBox(
-                          width: 30, child: LinearProgressIndicator(backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
-                      : Row(
-                          children: [
-                            (savedPosition > 0 || isPlaying)
-                                ? AudioProgressBar(
-                                    totalDuration: duration,
-                                    title: widget.products.title ?? "",
-                                    savedPostion: Duration(milliseconds: savedPosition),
-                                  )
-                                : Container(),
-                            const SizedBox(width: 10),
-                            AudioplayerTimer(
-                              id: widget.products.id!,
-                              title: widget.products.title ?? "",
-                              totalDuration: _totalduration,
-                              savedDuration: Duration(milliseconds: savedPosition),
-                            ),
-                          ],
-                        ),
-                  const Spacer(),
-                  if (!kIsWeb) DownloadButton(products: widget.products),
-                  IconButton(splashRadius: 20, onPressed: () {}, icon: const Icon(Icons.more_horiz, color: MyColors.gray)),
-                ],
-              );
-            }),
+            return Row(
+              children: [
+                AudioPlayerButton(
+                  id: widget.products.id!,
+                  onPlay: () async {
+                    widget.onTap();
+                  },
+                  onPause: () {
+                    audioHandler.pause();
+                  },
+                  title: widget.products.title ?? "",
+                ),
+                const SizedBox(width: 10),
+                isLoading
+                    ? const SizedBox(
+                        width: 30,
+                        child: LinearProgressIndicator(
+                            backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black),
+                      )
+                    : Row(
+                        children: [
+                          (savedPosition > 0 || isPlaying)
+                              ? AudioProgressBar(
+                                  totalDuration: duration,
+                                  title: widget.products.title ?? "",
+                                  savedPostion: Duration(milliseconds: savedPosition),
+                                )
+                              : Container(),
+                          const SizedBox(width: 10),
+                          AudioplayerTimer(
+                            id: widget.products.id!,
+                            title: widget.products.title ?? "",
+                            totalDuration: _totalduration,
+                            savedDuration: Duration(milliseconds: savedPosition),
+                          ),
+                        ],
+                      ),
+                const Spacer(),
+                if (!kIsWeb) DownloadButton(products: widget.products),
+                IconButton(
+                  splashRadius: 20,
+                  onPressed: () {},
+                  icon: const Icon(Icons.more_horiz, color: MyColors.gray),
+                ),
+              ],
+            );
+          },
+        ),
         const SizedBox(height: 12)
       ],
     );

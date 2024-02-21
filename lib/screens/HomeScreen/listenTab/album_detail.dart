@@ -66,6 +66,22 @@ class _AlbumDetailState extends State<AlbumDetail> {
   List<Products> buyList = [];
   List<Products> introList = [];
   AudioPlayer audioPlayer = AudioPlayer();
+
+  bool _isBought = false;
+
+  void _getInitialData() async {
+    var data = await Connection.getAllLectures(context);
+
+    for (Products cur in data) {
+      if (cur.albumTitle == widget.albumProduct.title) {
+        setState(() {
+          _isBought = true;
+        });
+      }
+    }
+    log(widget.albumProduct.toJson().toString());
+  }
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +94,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
       getAlbumLectures();
     }
 
+    _getInitialData();
     imageSize = initialSize;
 
     _controller = ScrollController()
@@ -124,8 +141,9 @@ class _AlbumDetailState extends State<AlbumDetail> {
         body: Consumer<Auth>(
           builder: (context, value, child) {
             return ValueListenableBuilder(
-              valueListenable:
-                  value.isAuth || widget.albumProduct.isBought == true ? HiveBoughtDataStore.box.listenable() : HiveIntroDataStore.box.listenable(),
+              valueListenable: value.isAuth || widget.albumProduct.isBought == true
+                  ? HiveBoughtDataStore.box.listenable()
+                  : HiveIntroDataStore.box.listenable(),
               builder: (context, Box box, boxWidgets) {
                 if (box.length > 0) {
                   List<Products> lectureList = [];
@@ -135,6 +153,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
 
                     if (products.albumTitle == widget.albumProduct.title) {
                       lectureList.add(products);
+
+                      // log(products.toJson().toString());
                     }
                   }
                   // print(lectureList.length);
@@ -203,7 +223,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
                                   SizedBox(height: initialSize + 32),
                                   Text(
                                     widget.albumProduct.title ?? "" "",
-                                    style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 20),
                                   Padding(
@@ -226,11 +247,14 @@ class _AlbumDetailState extends State<AlbumDetail> {
                                   color: Theme.of(context).scaffoldBackgroundColor,
                                   child: Padding(
                                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                                    child: CustomElevatedButton(
-                                        text: "Худалдаж авах",
-                                        onPress: () {
-                                          _onBuyClicked(cart, isAuth);
-                                        }),
+                                    child: Visibility(
+                                      visible: _isBought == false,
+                                      child: CustomElevatedButton(
+                                          text: "Худалдаж авах",
+                                          onPress: () {
+                                            _onBuyClicked(cart, isAuth);
+                                          }),
+                                    ),
                                   ),
                                 ),
                         ],
@@ -336,7 +360,8 @@ class _AlbumDetailState extends State<AlbumDetail> {
         albumProductsList.add(item.productId!);
       }
     }
-    cart.addItemsIndex((widget.albumProduct.productId ?? widget.albumProduct.id ?? 0), albumProductIDs: albumProductsList);
+    cart.addItemsIndex((widget.albumProduct.productId ?? widget.albumProduct.id ?? 0),
+        albumProductIDs: albumProductsList);
     if (!cart.sameItemCheck) {
       cart.addProducts(widget.albumProduct);
       cart.addTotalPrice(widget.albumProduct.price?.toDouble() ?? 0.0);

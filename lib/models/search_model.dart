@@ -3,14 +3,16 @@ class SearchModel {
   String? module;
   int? id;
   String? body;
+  int? album;
 
-  SearchModel({this.body, this.id, this.module, this.title});
+  SearchModel({this.body, this.id, this.module, this.title, this.album});
 
   SearchModel.fromJson(Map<String, dynamic> json) {
     body = json['body'];
     id = json['id'];
     title = json['title'];
     module = json['module'];
+    album = json['album'] ?? 0;
   }
 
   Map<String, dynamic> toJson() {
@@ -19,6 +21,7 @@ class SearchModel {
     data['module'] = module;
     data['title'] = title;
     data['id'] = id;
+    data['album'] = album;
     return data;
   }
 }

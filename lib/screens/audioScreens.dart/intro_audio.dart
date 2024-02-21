@@ -115,7 +115,11 @@ class _IntroAudioState extends State<IntroAudio> {
                           children: [
                             Text(
                               widget.products.title ?? "",
-                              style: const TextStyle(fontSize: kIsWeb ? 24 : 16, height: 1.6, fontWeight: FontWeight.bold, color: Colors.black),
+                              style: const TextStyle(
+                                  fontSize: kIsWeb ? 24 : 16,
+                                  height: 1.6,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
                             ),
                             const SizedBox(height: 15),
                             Text(
@@ -133,7 +137,8 @@ class _IntroAudioState extends State<IntroAudio> {
                                     "Үргэлжлэх хугацаа: ",
                                     style: TextStyle(fontSize: 12, color: MyColors.gray),
                                   ),
-                                  Text(formatTime(audioPosition) + " мин", style: const TextStyle(fontSize: 12, color: MyColors.black))
+                                  Text(formatTime(audioPosition) + " мин",
+                                      style: const TextStyle(fontSize: 12, color: MyColors.black))
                                 ]),
                                 const SizedBox(width: 20),
                                 Wrap(children: [
@@ -195,7 +200,10 @@ class _IntroAudioState extends State<IntroAudio> {
                           "assets/images/replay_5.svg",
                         ),
                       ),
-                      CircleAvatar(radius: 36, backgroundColor: MyColors.primaryColor, child: PlayerButtons(title: widget.products.title ?? "")),
+                      CircleAvatar(
+                          radius: 36,
+                          backgroundColor: MyColors.primaryColor,
+                          child: PlayerButtons(title: widget.products.title ?? "")),
                       InkWell(
                         onTap: () {
                           buttonForward15Seconds();
@@ -212,19 +220,21 @@ class _IntroAudioState extends State<IntroAudio> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         SizedBox(
-                            width: MediaQuery.of(context).size.width / 2 + 70,
-                            child: CustomElevatedButton(
-                                text: "Худалдаж авах",
-                                onPress: () {
-                                  cart.addItemsIndex(widget.products.productId!);
-                                  if (!cart.sameItemCheck) {
-                                    cart.addProducts(widget.products);
-                                    cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
-                                  } else {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
-                                  }
-                                })),
+                          width: MediaQuery.of(context).size.width / 2 + 70,
+                          child: CustomElevatedButton(
+                            text: "Худалдаж авах",
+                            onPress: () {
+                              cart.addItemsIndex(widget.products.productId!);
+                              if (!cart.sameItemCheck) {
+                                cart.addProducts(widget.products);
+                                cart.addTotalPrice(widget.products.price?.toDouble() ?? 0.0);
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
+                              } else {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
+                              }
+                            },
+                          ),
+                        ),
                         GestureDetector(
                           onTap: () {
                             cart.addItemsIndex(widget.products.productId!);
@@ -290,7 +300,8 @@ class _IntroAudioState extends State<IntroAudio> {
           Text(
             widget.products.title ?? "",
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: kIsWeb ? 24 : 16, height: 1.6, fontWeight: FontWeight.bold, color: Colors.black),
+            style: const TextStyle(
+                fontSize: kIsWeb ? 24 : 16, height: 1.6, fontWeight: FontWeight.bold, color: Colors.black),
           ),
           const SizedBox(height: 15),
           Padding(
@@ -370,7 +381,10 @@ class _IntroAudioState extends State<IntroAudio> {
               "assets/images/replay_5.svg",
             ),
           ),
-          CircleAvatar(radius: 36, backgroundColor: MyColors.primaryColor, child: PlayerButtons(title: widget.products.title ?? "")),
+          CircleAvatar(
+              radius: 36,
+              backgroundColor: MyColors.primaryColor,
+              child: PlayerButtons(title: widget.products.title ?? "")),
           InkWell(
             onTap: () {
               buttonForward15Seconds();

@@ -1,15 +1,20 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goodali/Providers/local_database.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/controller/connection_controller.dart';
+import 'package:goodali/models/products_model.dart';
 import 'package:goodali/models/search_model.dart';
 import 'package:goodali/screens/HomeScreen/courseTab/course_detail.dart';
 import 'package:goodali/screens/HomeScreen/feelTab/mood_detail.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/album.dart';
+import 'package:goodali/screens/HomeScreen/listenTab/album_detail.dart';
 import 'package:goodali/screens/HomeScreen/listenTab/podcast_screen.dart';
 import 'package:goodali/screens/HomeScreen/readTab/article_screen.dart';
+import 'package:goodali/screens/ListItems/album_item.dart';
 import 'package:goodali/screens/blank.dart';
 
 typedef OnSearchChanged = Future<List<String>> Function(String);
@@ -63,6 +68,35 @@ class SearchScreen extends SearchDelegate<String> {
         icon: const Icon(Icons.arrow_back));
   }
 
+  void _navigateToAlbum(BuildContext context, int id) async {
+    List<Products> result = await Connection.getalbumListLogged(context);
+
+    for (Products cur in result) {
+      if (cur.id == id) {
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (_) => AlbumItem(
+        //       albumData: cur,
+        //     ),
+        //   ),
+        // );
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AlbumDetail(
+              onTap: (audioObject) {
+                // currentlyPlaying.value = audioObject;
+              },
+              albumProduct: cur,
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget buildResults(BuildContext context) {
     return FutureBuilder(
@@ -98,33 +132,63 @@ class SearchScreen extends SearchDelegate<String> {
                           switch (searchResult[index].module) {
                             case 'post':
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => ArticleScreen(
-                                            id: searchResult[index].id,
-                                          )));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ArticleScreen(
+                                    id: searchResult[index].id,
+                                  ),
+                                ),
+                              );
                               break;
                             case 'training':
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => CourseDetail(id: searchResult[index].id)));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CourseDetail(id: searchResult[index].id),
+                                ),
+                              );
                               break;
                             case 'album':
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => AlbumLecture(id: searchResult[index].id)));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => AlbumLecture(id: searchResult[index].id),
+                                ),
+                              );
                               break;
                             case 'mood':
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => MoodDetail(moodListId: searchResult[index].id.toString())));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MoodDetail(
+                                    moodListId: searchResult[index].id.toString(),
+                                  ),
+                                ),
+                              );
                               break;
                             case 'podcast':
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => Podcast(
-                                            id: searchResult[index].id,
-                                            dataStore: dataStore,
-                                          )));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Podcast(
+                                    id: searchResult[index].id,
+                                    dataStore: dataStore,
+                                  ),
+                                ),
+                              );
+                              break;
+                            case 'lecture':
+                              log(searchResult[index].toJson().toString());
+                              _navigateToAlbum(context, searchResult[index].album ?? 0);
                               break;
 
                             default:
-                              Navigator.push(context, MaterialPageRoute(builder: (_) => const Blank()));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const Blank(),
+                                ),
+                              );
                               break;
                           }
                         },

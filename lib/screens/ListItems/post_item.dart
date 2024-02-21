@@ -13,12 +13,7 @@ class PostItem extends StatefulWidget {
   final bool isHearted;
   final bool? isMySpecial;
   final VoidCallback? onRefresh;
-  const PostItem(
-      {Key? key,
-      required this.postItem,
-      required this.isHearted,
-      this.isMySpecial = false,
-      this.onRefresh})
+  const PostItem({Key? key, required this.postItem, required this.isHearted, this.isMySpecial = false, this.onRefresh})
       : super(key: key);
 
   @override
@@ -51,10 +46,7 @@ class _PostItemState extends State<PostItem> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(50),
-                child: ImageView(
-                    imgPath: widget.postItem.avatar ?? "",
-                    height: 24,
-                    width: 24),
+                child: ImageView(imgPath: widget.postItem.avatar ?? "", height: 24, width: 24),
               ),
               const SizedBox(width: 10),
               Text(
@@ -73,8 +65,7 @@ class _PostItemState extends State<PostItem> {
                   onTap: () {
                     showModal();
                   },
-                  child: const Icon(Icons.more_horiz,
-                      color: MyColors.gray, size: 20)),
+                  child: const Icon(Icons.more_horiz, color: MyColors.gray, size: 20)),
             ],
           ),
           const SizedBox(height: 23),
@@ -86,23 +77,18 @@ class _PostItemState extends State<PostItem> {
                 child: Text(
                   widget.postItem.title ?? "",
                   maxLines: 2,
-                  style: const TextStyle(
-                      color: MyColors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 height: 26,
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: MyColors.primaryColor)),
+                    borderRadius: BorderRadius.circular(4), border: Border.all(color: MyColors.primaryColor)),
                 child: Center(
                   child: Text(
                     widget.postItem.tags?[0].name ?? "",
-                    style: const TextStyle(
-                        color: MyColors.primaryColor, fontSize: 11),
+                    style: const TextStyle(color: MyColors.primaryColor, fontSize: 11),
                   ),
                 ),
               ),
@@ -113,8 +99,7 @@ class _PostItemState extends State<PostItem> {
             alignment: Alignment.centerLeft,
             child: Text(
               widget.postItem.body ?? "",
-              style: const TextStyle(
-                  height: 1.35, fontSize: 16, color: MyColors.black),
+              style: const TextStyle(height: 1.35, fontSize: 16, color: MyColors.black),
             ),
           ),
           const SizedBox(height: 30),
@@ -134,17 +119,11 @@ class _PostItemState extends State<PostItem> {
                             }
                           },
                           child: isLiked
-                              ? const Icon(IconlyBold.heart,
-                                  color: MyColors.primaryColor)
-                              : const Icon(IconlyLight.heart,
-                                  color: MyColors.gray),
+                              ? const Icon(IconlyBold.heart, color: MyColors.primaryColor)
+                              : const Icon(IconlyLight.heart, color: MyColors.gray),
                         ),
                         Text(likeCount.toString(),
-                            style: TextStyle(
-                                color: isLiked
-                                    ? MyColors.primaryColor
-                                    : MyColors.gray,
-                                fontSize: 16))
+                            style: TextStyle(color: isLiked ? MyColors.primaryColor : MyColors.gray, fontSize: 16))
                       ],
                     )
                   : const SizedBox(),
@@ -155,8 +134,7 @@ class _PostItemState extends State<PostItem> {
                 children: [
                   const Icon(IconlyLight.chat, color: MyColors.gray),
                   Text(comments.isEmpty ? "0" : comments.length.toString(),
-                      style:
-                          const TextStyle(color: MyColors.gray, fontSize: 16))
+                      style: const TextStyle(color: MyColors.gray, fontSize: 16))
                 ],
               ),
               const Spacer(),
@@ -199,8 +177,7 @@ class _PostItemState extends State<PostItem> {
         context: context,
         backgroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -212,20 +189,13 @@ class _PostItemState extends State<PostItem> {
                     child: Container(
                       width: 40,
                       height: 6,
-                      decoration: BoxDecoration(
-                          color: MyColors.gray,
-                          borderRadius: BorderRadius.circular(3)),
+                      decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(3)),
                     ),
                   ),
                   const SizedBox(height: 30),
+                  TextButton(onPressed: share, child: const Text("Хуваалцах", style: TextStyle(color: MyColors.black))),
                   TextButton(
-                      onPressed: share,
-                      child: const Text("Хуваалцах",
-                          style: TextStyle(color: MyColors.black))),
-                  TextButton(
-                      onPressed: () {},
-                      child: const Text("Линк хуулах",
-                          style: TextStyle(color: MyColors.black))),
+                      onPressed: () {}, child: const Text("Линк хуулах", style: TextStyle(color: MyColors.black))),
                   TextButton(
                       onPressed: () {
                         TopSnackBar.successFactory(
@@ -233,8 +203,7 @@ class _PostItemState extends State<PostItem> {
                                     "Постыг админд мэдэгдлээ. Зохисгүй үг агуулгатай пост байвал бид арга хэмжээ авах болно. Баярлалаа")
                             .show(context);
                       },
-                      child: const Text("Мэдэгдэх",
-                          style: TextStyle(color: MyColors.primaryColor)))
+                      child: const Text("Мэдэгдэх", style: TextStyle(color: MyColors.primaryColor)))
                 ],
               ),
             ));

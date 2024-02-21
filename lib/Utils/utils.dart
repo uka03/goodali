@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:developer' as dev;
 
+import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/styles.dart';
 import 'package:goodali/models/products_model.dart';
@@ -8,8 +10,7 @@ import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 
 Color getRandomColors() {
-  final colors =
-      List<int>.generate(15, (i) => generateRandomCode(0xdd98FFFD, 0xee32E7E4));
+  final colors = List<int>.generate(15, (i) => generateRandomCode(0xdd98FFFD, 0xee32E7E4));
   Color generatedColor = const Color(0xFF32E7E4);
 
   for (var i = 0; i < 15; i++) {
@@ -24,8 +25,7 @@ extension StringExtension on String {
   }
 }
 
-double valueFromPercentageInRange(
-    {required final double min, max, percentage}) {
+double valueFromPercentageInRange({required final double min, max, percentage}) {
   return percentage * (max - min) + min;
 }
 
@@ -40,8 +40,7 @@ String dateTimeFormatter(String date) {
 }
 
 int generateRandomCode(int minValue, int maxValue) {
-  return Random().nextInt((maxValue - minValue).abs() + 1) +
-      min(minValue, maxValue);
+  return Random().nextInt((maxValue - minValue).abs() + 1) + min(minValue, maxValue);
 }
 
 bool isEmailCorrect(String value) {
@@ -68,8 +67,7 @@ String formatTime(Duration duration) {
 
 List<Products> removeDuplicates(List<Products> items) {
   List<Products> uniqueItems = []; // uniqueList
-  var uniqueIDs =
-      items.map((e) => e.title).toSet(); //list if UniqueID to remove duplicates
+  var uniqueIDs = items.map((e) => e.title).toSet(); //list if UniqueID to remove duplicates
   for (var e in uniqueIDs) {
     uniqueItems.add(items.firstWhere((i) => i.title == e));
   } // populate uniqueItems with equivalent original Batch items
@@ -90,9 +88,30 @@ class Utils {
         ],
       ),
     );
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) => alert);
+    showDialog(barrierDismissible: false, context: context, builder: (BuildContext context) => alert);
   }
+}
+
+Future<Duration> getTotalDuration(Products product, String url) async {
+  Duration totalDuration;
+  try {
+    if (product.duration == null || product.duration == 0) {
+      totalDuration = await getFileDuration(url);
+    } else {
+      totalDuration = Duration(milliseconds: product.duration!);
+    }
+  } catch (e) {
+    dev.log(e.toString(), name: "utils: getTotalDuration");
+    totalDuration = Duration.zero;
+  }
+
+  return totalDuration;
+}
+
+Future<Duration> getFileDuration(String mediaPath) async {
+  final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
+  final mediaInfo = mediaInfoSession.getMediaInformation()!;
+  final double duration = double.parse(mediaInfo.getDuration()!);
+
+  return Duration(milliseconds: (duration * 1000).toInt());
 }

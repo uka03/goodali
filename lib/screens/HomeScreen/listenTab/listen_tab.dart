@@ -57,7 +57,8 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Цомог лекц", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+                  const Text("Цомог лекц",
+                      style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
                   GestureDetector(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => const AlbumLecture()));
@@ -72,15 +73,18 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Подкаст", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+                    const Text("Подкаст",
+                        style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
                     GestureDetector(
                         onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => Podcast(
-                                        dataStore: dataStore,
-                                      )));
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => Podcast(
+                                dataStore: dataStore,
+                              ),
+                            ),
+                          );
                         },
                         child: const Icon(IconlyLight.arrow_right))
                   ],
@@ -109,7 +113,8 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Видео", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+                    const Text("Видео",
+                        style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
                     GestureDetector(
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const VideoList()));
@@ -132,16 +137,18 @@ class _ListenTabbarState extends State<ListenTabbar> with AutomaticKeepAliveClie
           if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
             List<Products> albumList = snapshot.data;
             return GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: kIsWeb ? 6 : 4,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisSpacing: 15,
-                  childAspectRatio: kIsWeb ? 0.5 : 1 / 1.6,
-                  crossAxisCount: kIsWeb ? 6 : 2,
-                ),
-                itemBuilder: (BuildContext context, int index) => AlbumItem(albumData: albumList[index], isHomeScreen: widget.isHomeScreen));
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: kIsWeb ? 6 : 4,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisSpacing: 15,
+                childAspectRatio: kIsWeb ? 0.5 : 1 / 1.6,
+                crossAxisCount: kIsWeb ? 6 : 2,
+              ),
+              itemBuilder: (BuildContext context, int index) =>
+                  AlbumItem(albumData: albumList[index], isHomeScreen: widget.isHomeScreen),
+            );
           } else {
             return const Center(
               child: CircularProgressIndicator(color: MyColors.primaryColor),

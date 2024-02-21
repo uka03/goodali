@@ -31,7 +31,9 @@ class SearchBar extends StatelessWidget {
               readOnly: true,
               cursorColor: MyColors.primaryColor,
               decoration: InputDecoration(
-                  border: InputBorder.none, hintText: title ?? "Хайх..."),
+                border: InputBorder.none,
+                hintText: title ?? "Хайх...",
+              ),
             ),
           ),
         ],
@@ -52,16 +54,14 @@ class SearchBar extends StatelessWidget {
   Future<List<String>> _getRecentSearchesLike(String query) async {
     final pref = await SharedPreferences.getInstance();
     final allSearches = pref.getStringList("recentSearches");
-    return allSearches?.where((search) => search.startsWith(query)).toList() ??
-        [];
+    return allSearches?.where((search) => search.startsWith(query)).toList() ?? [];
   }
 
   Future<void> _saveToRecentSearches(String? searchText) async {
     if (searchText == null || searchText == "") return;
     final pref = await SharedPreferences.getInstance();
 
-    Set<String> allSearches =
-        pref.getStringList("recentSearches")?.toSet() ?? {};
+    Set<String> allSearches = pref.getStringList("recentSearches")?.toSet() ?? {};
 
     allSearches = {searchText, ...allSearches};
     pref.setStringList("recentSearches", allSearches.toList());

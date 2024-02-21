@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:goodali/screens/ForumScreen/forum_screen.dart';
 import 'package:goodali/screens/HomeScreen/web_home_screen.dart';
 import 'Utils/downloader_stub.dart' if (dart.library.io) 'Utils/downloader.dart';
 
@@ -91,7 +92,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       providers: [
         ChangeNotifierProvider<Auth>(create: (_) => Auth()),
         ChangeNotifierProvider<CartProvider>(create: (_) => CartProvider()),
-        ChangeNotifierProvider<AudioPlayerProvider>(create: (_) => AudioPlayerProvider()),
+        // ChangeNotifierProvider<AudioPlayerProvider>(create: (_) => AudioPlayerProvider()),
         ChangeNotifierProvider<AudioDownloadProvider>(create: (_) => AudioDownloadProvider()),
         ChangeNotifierProvider<ForumTagNotifier>(create: (_) => ForumTagNotifier()),
         if (!kIsWeb)
@@ -103,21 +104,26 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       child: Consumer<Auth>(
         builder: (context, value, child) {
           return MaterialApp(
+              routes: {
+                '/forum': (context) => const ForumScreen(),
+              },
               title: 'Goodali',
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
-                  fontFamily: "Gilroy",
-                  scaffoldBackgroundColor: Colors.white,
-                  visualDensity: VisualDensity.adaptivePlatformDensity,
-                  primaryColor: MyColors.primaryColor,
-                  primarySwatch: Colors.blue,
-                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                      backgroundColor: Colors.white,
-                      type: BottomNavigationBarType.fixed,
-                      selectedItemColor: MyColors.primaryColor,
-                      unselectedItemColor: Colors.black,
-                      unselectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
-                      selectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w300))),
+                fontFamily: "Gilroy",
+                scaffoldBackgroundColor: Colors.white,
+                visualDensity: VisualDensity.adaptivePlatformDensity,
+                primaryColor: MyColors.primaryColor,
+                primarySwatch: Colors.blue,
+                bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                  backgroundColor: Colors.white,
+                  type: BottomNavigationBarType.fixed,
+                  selectedItemColor: MyColors.primaryColor,
+                  unselectedItemColor: Colors.black,
+                  unselectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
+                  selectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
+                ),
+              ),
               home: Consumer<Auth>(builder: (context, value, _) {
                 if (kIsWeb) {
                   return const WebHomeScreen();

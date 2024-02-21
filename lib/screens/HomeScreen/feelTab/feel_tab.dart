@@ -89,7 +89,9 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                     ? const Center(child: CircularProgressIndicator(color: MyColors.primaryColor))
                     : (kIsWeb)
                         ? Container(
-                            padding: widget.isHomeScreen == false ? const EdgeInsets.only(left: 255, right: 255) : EdgeInsets.zero,
+                            padding: widget.isHomeScreen == false
+                                ? const EdgeInsets.only(left: 255, right: 255)
+                                : EdgeInsets.zero,
                             color: widget.isHomeScreen == true ? Colors.white : const Color(0xfffcf4f1),
                             child: Row(
                               children: [
@@ -122,7 +124,8 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                               children: [
                                                 Text(
                                                   moodMain[0].title ?? "",
-                                                  style: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                                                  style: const TextStyle(
+                                                      color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 16),
                                                 ),
                                                 const SizedBox(height: 5),
                                                 CustomReadMoreText(text: moodMain[0].body ?? "")
@@ -137,15 +140,18 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                           builder: (context, DurationState value, child) {
                                             var buttonState = buttonNotifier.value;
                                             var currently = currentlyPlaying.value;
-                                            bool isPlaying =
-                                                currently?.title == moodMain[0].title && buttonState == ButtonState.playing ? true : false;
+                                            bool isPlaying = currently?.title == moodMain[0].title &&
+                                                    buttonState == ButtonState.playing
+                                                ? true
+                                                : false;
                                             return Row(
                                               children: [
                                                 AudioPlayerButton(
                                                   id: moodMain[0].id!,
                                                   onPlay: () async {
                                                     currentlyPlaying.value = moodMain.first;
-                                                    if (activeList.first.title == moodMain.first.title && activeList.first.id == moodMain.first.id) {
+                                                    if (activeList.first.title == moodMain.first.title &&
+                                                        activeList.first.id == moodMain.first.id) {
                                                       currentlyPlaying.value = moodMain.first;
                                                       await audioHandler.skipToQueueItem(0);
                                                       await audioHandler.seek(
@@ -173,7 +179,9 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                                     ? const SizedBox(
                                                         width: 30,
                                                         child: LinearProgressIndicator(
-                                                            backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                                                            backgroundColor: Colors.transparent,
+                                                            minHeight: 2,
+                                                            color: MyColors.black))
                                                     : Row(
                                                         children: [
                                                           (savedPosition > 0 || isPlaying)
@@ -214,7 +222,8 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                       mainAxisSpacing: 20,
                                     ),
                                     itemBuilder: (BuildContext context, int index) {
-                                      return MoodListItem(getMoodList: moodList[index], isHomeScreen: widget.isHomeScreen);
+                                      return MoodListItem(
+                                          getMoodList: moodList[index], isHomeScreen: widget.isHomeScreen);
                                     },
                                   ),
                                 )
@@ -225,7 +234,8 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                             children: [
                               const Padding(
                                 padding: EdgeInsets.only(top: 30.0, bottom: 20, right: 20, left: 20),
-                                child: Text("Мүүд", style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+                                child: Text("Мүүд",
+                                    style: TextStyle(color: MyColors.black, fontSize: 24, fontWeight: FontWeight.bold)),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(right: 20, left: 20),
@@ -245,7 +255,8 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                             children: [
                                               Text(
                                                 moodMain[0].title ?? "",
-                                                style: const TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 16),
+                                                style: const TextStyle(
+                                                    color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 16),
                                               ),
                                               const SizedBox(height: 5),
                                               CustomReadMoreText(text: moodMain[0].body ?? "")
@@ -260,7 +271,10 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                         builder: (context, DurationState value, child) {
                                           var buttonState = buttonNotifier.value;
                                           var currently = currentlyPlaying.value;
-                                          bool isPlaying = currently?.title == moodMain[0].title && buttonState == ButtonState.playing ? true : false;
+                                          bool isPlaying = currently?.title == moodMain[0].title &&
+                                                  buttonState == ButtonState.playing
+                                              ? true
+                                              : false;
 
                                           return Row(
                                             children: [
@@ -268,7 +282,8 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                                 id: moodMain[0].id!,
                                                 onPlay: () async {
                                                   currentlyPlaying.value = moodMain.first;
-                                                  if (activeList.first.title == moodMain.first.title && activeList.first.id == moodMain.first.id) {
+                                                  if (activeList.first.title == moodMain.first.title &&
+                                                      activeList.first.id == moodMain.first.id) {
                                                     currentlyPlaying.value = moodMain.first;
                                                     await audioHandler.skipToQueueItem(0);
                                                     await audioHandler.seek(
@@ -296,7 +311,9 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                                   ? const SizedBox(
                                                       width: 30,
                                                       child: LinearProgressIndicator(
-                                                          backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                                                          backgroundColor: Colors.transparent,
+                                                          minHeight: 2,
+                                                          color: MyColors.black))
                                                   : Row(
                                                       children: [
                                                         (savedPosition > 0 || isPlaying)
@@ -322,20 +339,23 @@ class _FeelTabbarState extends State<FeelTabbar> with AutomaticKeepAliveClientMi
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              GridView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: moodList.length,
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  childAspectRatio: 1 / 1.4,
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: 15,
+                              Expanded(
+                                child: GridView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: moodList.length,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    childAspectRatio: 1 / 1.4,
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: 15,
+                                  ),
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return MoodListItem(
+                                        getMoodList: moodList[index], isHomeScreen: widget.isHomeScreen);
+                                  },
                                 ),
-                                itemBuilder: (BuildContext context, int index) {
-                                  return MoodListItem(getMoodList: moodList[index], isHomeScreen: widget.isHomeScreen);
-                                },
-                              )
+                              ),
                             ],
                           );
               } else {

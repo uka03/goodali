@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/auth_provider.dart';
@@ -64,14 +66,16 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
                           isHearted.add(false);
                           return InkWell(
                             onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => PostDetail(
-                                        onRefresh: () {
-                                          _refresh();
-                                        },
-                                        postItem: postList[index],
-                                        isHearted: isHearted[index]))),
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PostDetail(
+                                    onRefresh: () {
+                                      _refresh();
+                                    },
+                                    postItem: filteredList.isNotEmpty ? filteredList[index] : postList[index],
+                                    isHearted: isHearted[index]),
+                              ),
+                            ),
                             child: PostItem(
                                 onRefresh: getPostList,
                                 postItem: filteredList.isNotEmpty ? filteredList[index] : postList[index],
@@ -110,20 +114,27 @@ class _NatureOfHumanState extends State<NatureOfHuman> {
 
   showModalTag(BuildContext context, List<Map<String, dynamic>> checkedTag) {
     showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (_) => FilterModal(
-              onTap: (checked) {
-                setState(() {
-                  checkedTag = checked;
-                });
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+        ),
+      ),
+      builder: (_) => FilterModal(
+        onTap: (checked) {
+          log(checked.toString());
+          setState(() {
+            checkedTag = checked;
+          });
 
-                Navigator.pop(context);
-              },
-              tagList: tagList,
-            ));
+          Navigator.pop(context);
+        },
+        tagList: tagList,
+      ),
+    );
   }
 
   Future<void> _refresh() async {

@@ -64,13 +64,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 builder: (context, value, child) => value.isAuth
                     ? IconButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const Settings()));
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const Settings()));
                         },
-                        icon: const Icon(Icons.more_horiz,
-                            size: 28, color: MyColors.black))
+                        icon: const Icon(Icons.more_horiz, size: 28, color: MyColors.black))
                     : Container(),
               ),
               actionButton2: null,
@@ -86,8 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: FutureBuilder(
                 future: userData(),
                 builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
                     userInfo = snapshot.data;
                     return Column(
                       children: [
@@ -98,74 +93,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Expanded(
                           child: Center(
                             child: SizedBox(
-                              width: MediaQuery.of(context).size.width *
-                                  (kIsWeb ? 0.4 : 1),
+                              width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
                               child: Column(
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
                                     child: Row(
                                       children: [
                                         ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            child: ImageView(
-                                              imgPath: avatarPath != null
-                                                  ? avatarPath!
-                                                  : userInfo.avatarPath ?? "",
-                                              width: 70,
-                                              height: 70,
-                                            )),
+                                          borderRadius: BorderRadius.circular(50),
+                                          child: ImageView(
+                                            imgPath: avatarPath != null
+                                                ? avatarPath!
+                                                : userInfo.avatarPath ??
+                                                    "https://sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png", // TODO change path & find some image
+                                            width: 70,
+                                            height: 70,
+                                            isQpay: (avatarPath == null && userInfo.avatarPath == null) ? true : false,
+                                          ),
+                                        ),
                                         const SizedBox(width: 16),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                changedName != null
-                                                    ? changedName!
-                                                    : userInfo.nickname ?? "",
+                                                changedName != null ? changedName! : userInfo.nickname ?? "",
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
-                                                    fontSize: 20,
-                                                    color: MyColors.black,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                    fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
                                                 userInfo.email ?? "",
-                                                style: const TextStyle(
-                                                    color: MyColors.gray),
+                                                style: const TextStyle(color: MyColors.gray),
                                               ),
                                             ],
                                           ),
                                         ),
                                         TextButton(
                                             onPressed: () {
-                                              Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const EditProfile()))
+                                              Navigator.push(context,
+                                                      MaterialPageRoute(builder: (context) => const EditProfile()))
                                                   .then((value) {
                                                 if (value != null) {
                                                   setState(() {
                                                     changedName = value['name'];
-                                                    avatarPath =
-                                                        value["avatar"];
+                                                    avatarPath = value["avatar"];
                                                   });
                                                 }
                                               });
                                             },
                                             child: const Text(
                                               "Засах",
-                                              style: TextStyle(
-                                                  color: MyColors.primaryColor,
-                                                  fontSize: 16),
+                                              style: TextStyle(color: MyColors.primaryColor, fontSize: 16),
                                             ))
                                       ],
                                     ),
@@ -174,36 +156,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   if (!kIsWeb)
                                     Container(
                                       decoration: const BoxDecoration(
-                                          border: Border(
-                                              bottom: BorderSide(
-                                                  color: MyColors.border1,
-                                                  width: 0.8))),
+                                          border: Border(bottom: BorderSide(color: MyColors.border1, width: 0.8))),
                                       height: 51,
                                       child: AppBar(
                                         backgroundColor: Colors.white,
                                         elevation: 0,
                                         bottom: const TabBar(
                                           isScrollable: true,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20),
+                                          padding: EdgeInsets.symmetric(horizontal: 20),
                                           tabs: [
-                                            SizedBox(
-                                                width: 70,
-                                                child: Tab(text: "Авсан")),
-                                            SizedBox(
-                                                width: 70,
-                                                child: Tab(text: "Татсан"))
+                                            SizedBox(width: 70, child: Tab(text: "Авсан")),
+                                            SizedBox(width: 70, child: Tab(text: "Татсан"))
                                           ],
                                           indicatorWeight: 4,
-                                          indicator: CustomTabIndicator(
-                                              color: MyColors.primaryColor),
+                                          indicator: CustomTabIndicator(color: MyColors.primaryColor),
                                           labelColor: MyColors.primaryColor,
-                                          labelStyle: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'Gilroy'),
-                                          unselectedLabelStyle: TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontFamily: 'Gilroy'),
+                                          labelStyle: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gilroy'),
+                                          unselectedLabelStyle:
+                                              TextStyle(fontWeight: FontWeight.normal, fontFamily: 'Gilroy'),
                                           unselectedLabelColor: MyColors.gray,
                                           indicatorColor: MyColors.primaryColor,
                                         ),
@@ -214,8 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       children: [
                                         MyCourses(
                                           onTap: (audioObject) {
-                                            currentlyPlaying.value =
-                                                audioObject;
+                                            currentlyPlaying.value = audioObject;
                                           },
                                         ),
                                         if (!kIsWeb)
@@ -233,9 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     );
                   } else {
-                    return const Center(
-                        child: CircularProgressIndicator(
-                            color: MyColors.primaryColor));
+                    return const Center(child: CircularProgressIndicator(color: MyColors.primaryColor));
                   }
                 },
               ),
@@ -244,8 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return Column(
               children: [
                 const SizedBox(height: 100),
-                Image.asset("assets/images/splash_screen.png",
-                    height: 48, width: 169),
+                Image.asset("assets/images/splash_screen.png", height: 48, width: 169),
                 const SizedBox(height: 30),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 56),
@@ -261,9 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: CustomElevatedButton(
                     text: "Нэвтрэх",
                     onPress: () {
-                      loginWithBio
-                          ? value.authenticateWithBiometrics(context)
-                          : showLoginModal(true);
+                      loginWithBio ? value.authenticateWithBiometrics(context) : showLoginModal(true);
                     },
                   ),
                 ),
@@ -275,8 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: ElevatedButton(
                           child: const Text(
                             "Бүртгүүлэх",
-                            style:
-                                TextStyle(fontSize: 16, color: MyColors.black),
+                            style: TextStyle(fontSize: 16, color: MyColors.black),
                           ),
                           onPressed: () {
                             showLoginModal(false);
@@ -305,9 +268,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         enableDrag: true,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) =>
-            LoginBottomSheet(isRegistered: isRegistered));
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (BuildContext context) => LoginBottomSheet(isRegistered: isRegistered));
   }
 }

@@ -17,11 +17,7 @@ class _IntroScreenState extends State<IntroScreen> {
   final _kCurve = Curves.easeIn;
   Widget rightButton = const Icon(IconlyLight.arrow_right, color: Colors.white);
   double _current = 0;
-  final List<String> imgPath = [
-    "assets/images/intro1.png",
-    "assets/images/intro2.png",
-    "assets/images/intro3.png"
-  ];
+  final List<String> imgPath = ["assets/images/intro1.png", "assets/images/intro2.png", "assets/images/intro3.png"];
 
   final List<String> titles = ["Гоодаль", "Аудио лекц", "Онлайн сургалт"];
 
@@ -38,11 +34,8 @@ class _IntroScreenState extends State<IntroScreen> {
         _current = _pageController.page!;
       });
       if (_current == 2.0) {
-        rightButton = const Text("Эхлэх",
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold));
+        rightButton =
+            const Text("Эхлэх", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold));
       } else {
         rightButton = const Icon(IconlyLight.arrow_right, color: Colors.white);
       }
@@ -75,9 +68,7 @@ class _IntroScreenState extends State<IntroScreen> {
                     const SizedBox(height: 24),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 28),
-                      child: Text(titles[index],
-                          style: const TextStyle(
-                              fontSize: 32, fontWeight: FontWeight.bold)),
+                      child: Text(titles[index], style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(height: 24),
                     Padding(
@@ -112,16 +103,12 @@ class _IntroScreenState extends State<IntroScreen> {
                 child: Container(
                   height: 50,
                   width: 50,
-                  decoration: BoxDecoration(
-                      color: MyColors.primaryColor,
-                      borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(12)),
                   child: RawMaterialButton(
                     onPressed: () {
-                      _pageController.previousPage(
-                          curve: _kCurve, duration: _kDuration);
+                      _pageController.previousPage(curve: _kCurve, duration: _kDuration);
                     },
-                    child:
-                        const Icon(IconlyLight.arrow_left, color: Colors.white),
+                    child: const Icon(IconlyLight.arrow_left, color: Colors.white),
                   ),
                 ))
             : Container(),
@@ -132,16 +119,12 @@ class _IntroScreenState extends State<IntroScreen> {
             child: Container(
               height: 50,
               width: _current == 2.0 ? 80 : 50,
-              decoration: BoxDecoration(
-                  color: MyColors.primaryColor,
-                  borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(12)),
               child: RawMaterialButton(
                 onPressed: () async {
-                  _pageController.nextPage(
-                      curve: _kCurve, duration: _kDuration);
+                  _pageController.nextPage(curve: _kCurve, duration: _kDuration);
                   if (_current == 2.0) {
-                    Provider.of<Auth>(context, listen: false)
-                        .removeIntroScreen(context);
+                    Provider.of<Auth>(context, listen: false).removeIntroScreen(context);
                   }
                 },
                 child: rightButton,
@@ -153,17 +136,15 @@ class _IntroScreenState extends State<IntroScreen> {
             mainAxisSize: MainAxisSize.min,
             children: imgPath.asMap().entries.map((entry) {
               return GestureDetector(
-                onTap: () => _pageController.nextPage(
-                    curve: _kCurve, duration: _kDuration),
+                onTap: () => _pageController.nextPage(curve: _kCurve, duration: _kDuration),
                 child: Container(
                   width: _current.toInt() == entry.key ? 8.0 : 6,
                   height: _current.toInt() == entry.key ? 8.0 : 6,
-                  margin: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 6.0),
+                  margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 6.0),
                   decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: MyColors.primaryColor.withOpacity(
-                          _current.toInt() == entry.key ? 0.9 : 0.4)),
+                    shape: BoxShape.circle,
+                    color: MyColors.primaryColor.withOpacity(_current.toInt() == entry.key ? 0.9 : 0.4),
+                  ),
                 ),
               );
             }).toList(),

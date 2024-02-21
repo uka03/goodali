@@ -16,6 +16,7 @@ class ImageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print(imgPath);
     return kIsWeb
         ? CachedNetworkImage(
             imageUrl: isQpay == true
@@ -40,13 +41,20 @@ class ImageView extends StatelessWidget {
                 return const Text("404");
               }
 
-              return const SizedBox(
-                  width: 270,
-                  height: 270,
-                  child: Text(
-                    "No Image",
-                    style: TextStyle(fontSize: 12),
-                  ));
+              try {
+                print("TRYING");
+                return CachedNetworkImage(
+                  imageUrl: "https://sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png",
+                );
+              } catch (e) {
+                return const SizedBox(
+                    width: 270,
+                    height: 270,
+                    child: Text(
+                      "No Image",
+                      style: TextStyle(fontSize: 12),
+                    ));
+              }
             },
           )
         : ExtendedImage.network(
@@ -71,20 +79,33 @@ class ImageView extends StatelessWidget {
                     width: width,
                     child: Center(
                       child: CircularProgressIndicator(
-                          color: MyColors.primaryColor, strokeWidth: 2, value: state.loadingProgress?.expectedTotalBytes?.toDouble()),
+                          color: MyColors.primaryColor,
+                          strokeWidth: 2,
+                          value: state.loadingProgress?.expectedTotalBytes?.toDouble()),
                     ),
                   );
 
                 case LoadState.completed:
                   return null;
                 case LoadState.failed:
-                  return SizedBox(
-                      width: width,
-                      height: height,
-                      child: const Text(
-                        "No Image",
-                        style: TextStyle(fontSize: 12),
-                      ));
+                  {
+                    try {
+                      return CachedNetworkImage(
+                        imageUrl: 'https://sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png',
+                        width: width,
+                        height: height,
+                      );
+                    } catch (e) {
+                      return SizedBox(
+                        width: width,
+                        height: height,
+                        child: const Text(
+                          "No Image",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      );
+                    }
+                  }
               }
             },
           );

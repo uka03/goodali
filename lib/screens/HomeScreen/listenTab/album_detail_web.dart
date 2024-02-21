@@ -65,6 +65,8 @@ class _AlbumDetailState extends State<AlbumDetailWeb> {
   List<Products> buyList = [];
   List<Products> introList = [];
   AudioPlayer audioPlayer = AudioPlayer();
+
+  void _getInitial() async {}
   @override
   void initState() {
     super.initState();
@@ -109,7 +111,7 @@ class _AlbumDetailState extends State<AlbumDetailWeb> {
               child: HeaderWidget(
                 title: 'Цомог',
                 subtitle: widget.albumProduct.title,
-                isHome: widget.isHomeScreen,
+                isHome: widget.isHomeScreen ?? false,
               ),
             ),
             Expanded(
@@ -179,7 +181,8 @@ class _AlbumDetailState extends State<AlbumDetailWeb> {
                                       const SizedBox(height: 80),
                                       Text(
                                         widget.albumProduct.title ?? "" "",
-                                        style: const TextStyle(fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                            fontSize: 20, color: MyColors.black, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 20),
                                       Padding(
@@ -313,7 +316,8 @@ class _AlbumDetailState extends State<AlbumDetailWeb> {
         albumProductsList.add(item.productId!);
       }
     }
-    cart.addItemsIndex((widget.albumProduct.productId ?? widget.albumProduct.id ?? 0), albumProductIDs: albumProductsList);
+    cart.addItemsIndex((widget.albumProduct.productId ?? widget.albumProduct.id ?? 0),
+        albumProductIDs: albumProductsList);
     if (!cart.sameItemCheck) {
       cart.addProducts(widget.albumProduct);
       cart.addTotalPrice(widget.albumProduct.price?.toDouble() ?? 0.0);
