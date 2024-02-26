@@ -71,14 +71,6 @@ class _CartScreenState extends State<CartScreen> {
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
                               color: MyColors.black)),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                        child: Text('${productIds.length} ширхэг',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: MyColors.gray)),
-                      ),
                     ],
                   ),
                 ),
