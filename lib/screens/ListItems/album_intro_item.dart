@@ -40,12 +40,7 @@ class AlbumIntroItem extends StatefulWidget {
   final AudioPlayer audioPlayer;
 
   const AlbumIntroItem(
-      {Key? key,
-      required this.products,
-      required this.albumName,
-      required this.audioPlayer,
-      this.albumProducts,
-      required this.onTap})
+      {Key? key, required this.products, required this.albumName, required this.audioPlayer, this.albumProducts, required this.onTap})
       : super(key: key);
   @override
   State<AlbumIntroItem> createState() => _AlbumIntroItemState();
@@ -69,8 +64,6 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
   void initState() {
     getUserName();
     getTotalDuration(Urls.networkPath + widget.products.audio!);
-
-    log(widget.products.toJson().toString(), name: "asfa");
     super.initState();
   }
 
@@ -136,9 +129,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: ImageView(imgPath: widget.products.banner ?? "", width: 40, height: 40)),
+                ClipRRect(borderRadius: BorderRadius.circular(4), child: ImageView(imgPath: widget.products.banner ?? "", width: 40, height: 40)),
                 const SizedBox(width: 15),
                 Expanded(
                   child: Column(
@@ -169,8 +160,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
               builder: (context, DurationState value, child) {
                 var buttonState = buttonNotifier.value;
                 var currently = currentlyPlaying.value;
-                bool isPlaying =
-                    currently?.title == widget.products.title && buttonState == ButtonState.playing ? true : false;
+                bool isPlaying = currently?.title == widget.products.title && buttonState == ButtonState.playing ? true : false;
 
                 return Row(
                   children: [
@@ -187,9 +177,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
                     const SizedBox(width: 10),
                     isLoading
                         ? const SizedBox(
-                            width: 30,
-                            child: LinearProgressIndicator(
-                                backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                            width: 30, child: LinearProgressIndicator(backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
                         : Row(
                             children: [
                               (savedPosition > 0 || isPlaying)
@@ -292,8 +280,7 @@ class _AlbumIntroItemState extends State<AlbumIntroItem> {
           enableDrag: true,
           backgroundColor: Colors.white,
           isScrollControlled: true,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
           builder: (_) => StatefulBuilder(
                 builder: (BuildContext _, void Function(void Function()) setState) {
                   // setState(() {});

@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Utils/constans.dart';
 import 'package:goodali/Widgets/top_snack_bar.dart';
@@ -16,19 +14,10 @@ class Http {
   static Http? _instance;
   factory Http() => _instance ?? Http._();
 
-  BaseOptions options = BaseOptions(
-    receiveTimeout: const Duration(milliseconds: 30000),
-    connectTimeout: const Duration(milliseconds: 30000),
-  );
+  BaseOptions options = BaseOptions(receiveTimeout: const Duration(milliseconds: 30000), connectTimeout: const Duration(milliseconds: 30000));
   Http._() {
     try {
       _dio = Dio(options);
-
-      // (_dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
-      //   client.findProxy = (uri) => "PROXY 192.168.1.197:9060;";
-      //   client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-      // };
-
       _dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) async {
         // print("URL ${options.path} \n DATA : ${options.data}");
         options.headers = {'Content-Type': 'application/json'};
@@ -36,7 +25,7 @@ class Http {
           var prefs = await SharedPreferences.getInstance();
           var token = prefs.getString('token');
           if (token != null && token.isNotEmpty) {
-            print("token $token");
+            // print("token $token");
             options.headers = {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',

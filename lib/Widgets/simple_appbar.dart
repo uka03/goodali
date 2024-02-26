@@ -1,5 +1,4 @@
 import 'package:badges/badges.dart' as badges;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/Utils/styles.dart';
@@ -43,15 +42,12 @@ class _SimpleAppBarState extends State<SimpleAppBar> {
       backgroundColor: Colors.white,
       elevation: 0,
       centerTitle: false,
-      leading: IconButton(
-          splashRadius: 20,
-          icon: const Icon(IconlyLight.arrow_left),
-          onPressed: () => Navigator.pop(context, widget.data)),
+      leading: IconButton(splashRadius: 20, icon: const Icon(IconlyLight.arrow_left), onPressed: () => Navigator.pop(context, widget.data)),
       actions: [
         widget.noCard || username == "surgalt9@gmail.com"
             ? Container()
             : Padding(
-                padding: EdgeInsets.only(right: 10.0),
+                padding: const EdgeInsets.only(right: 10.0),
                 child: CircleAvatar(
                   radius: 22,
                   backgroundColor: MyColors.input,

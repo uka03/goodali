@@ -48,7 +48,7 @@ class Auth with ChangeNotifier {
   }
 
   Auth() {
-    print("ene ehend bnuu");
+    // print("ene ehend bnuu");
     checkIntroScreen();
     checkBiometric();
   }

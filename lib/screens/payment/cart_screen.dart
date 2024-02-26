@@ -13,12 +13,7 @@ import 'package:goodali/screens/ListItems/cart_product_item.dart';
 import 'package:provider/provider.dart';
 
 class CartScreen extends StatefulWidget {
-  final bool isWebPadding = false;
-
-  const CartScreen({
-    Key? key,
-    isWebPadding,
-  }) : super(key: key);
+  const CartScreen({Key? key}) : super(key: key);
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -35,17 +30,8 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     bool isAuth = context.watch<Auth>().isAuth;
 
-    Size size = MediaQuery.of(context).size;
-
     return Scaffold(
-      appBar: kIsWeb
-          ? null
-          : context.watch<CartProvider>().cartItem.isEmpty
-              ? SimpleAppBar(
-                  noCard: true,
-                  title: 'Таны сагс',
-                )
-              : null,
+      appBar: kIsWeb ? null : const SimpleAppBar(noCard: true),
       body: Consumer<CartProvider>(
         builder: (context, value, child) {
           if (value.cartItem.isEmpty) {
@@ -55,7 +41,8 @@ class _CartScreenState extends State<CartScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 100),
-                  SvgPicture.asset("assets/images/empty_cart.svg", semanticsLabel: 'Acme Logo'),
+                  SvgPicture.asset("assets/images/empty_cart.svg",
+                      semanticsLabel: 'Acme Logo'),
                   const SizedBox(height: 20),
                   const Text(
                     "Таны сагс хоосон байна...",
@@ -66,42 +53,43 @@ class _CartScreenState extends State<CartScreen> {
             );
           } else {
             productIds = value.cartItemId;
-            return SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: kIsWeb && widget.isWebPadding == true ? size.width / 4 : 0),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 56,
-                      padding: EdgeInsets.only(left: 20),
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          IconButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              icon: Icon(Icons.arrow_back)),
-                          const Text("Таны сагс",
-                              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                            child: Text('${productIds.length} ширхэг',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: MyColors.gray)),
-                          ),
-                        ],
+            return Column(
+              children: [
+                Container(
+                  height: 56,
+                  padding: const EdgeInsets.only(left: 20),
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: Icon(Icons.arrow_back)),
+                      const Text("Таны сагс",
+                          style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: MyColors.black)),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                        child: Text('${productIds.length} ширхэг',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: MyColors.gray)),
                       ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                          itemCount: value.cartItem.length,
-                          itemBuilder: (context, index) {
-                            return CartProductItem(products: value.cartItem[index]);
-                          }),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: ListView.builder(
+                      itemCount: value.cartItem.length,
+                      itemBuilder: (context, index) {
+                        return CartProductItem(products: value.cartItem[index]);
+                      }),
+                ),
+              ],
             );
           }
         },
@@ -115,37 +103,43 @@ class _CartScreenState extends State<CartScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Нийт төлөх дүн: ", style: TextStyle(color: MyColors.gray)),
+                const Text("Нийт төлөх дүн: ",
+                    style: TextStyle(color: MyColors.gray)),
                 Consumer<CartProvider>(
                   builder: (context, value, child) => Text(
-                    value.getTotalPrice().toInt().toString() + "₮",
-                    style: const TextStyle(color: MyColors.primaryColor, fontWeight: FontWeight.bold),
-                  ),
+                      value.getTotalPrice().toInt().toString() + "₮",
+                      style: const TextStyle(
+                          color: MyColors.primaryColor,
+                          fontWeight: FontWeight.bold)),
                 )
               ],
             ),
             const SizedBox(height: 20),
             Visibility(
-              visible: !(kIsWeb && context.watch<CartProvider>().cartItem.isEmpty),
+              visible:
+                  (kIsWeb && context.watch<CartProvider>().cartItem.isEmpty),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: kIsWeb ? size.width / 4 : 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: CustomElevatedButton(
                   onPress: context.watch<CartProvider>().cartItem.isEmpty
                       ? null
                       : () {
                           if (isAuth == true) {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => ChoosePayment(productIDs: productIds)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ChoosePayment(productIDs: productIds)));
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: const Text(
+                                    "Та нэвтэрч орон үргэлжлүүлнэ үү"),
                                 backgroundColor: MyColors.error,
                                 behavior: SnackBarBehavior.floating,
                                 action: SnackBarAction(
-                                    onPressed: () => showLoginModal(), label: 'Нэвтрэх', textColor: Colors.white),
-                              ),
-                            );
+                                    onPressed: () => showLoginModal(),
+                                    label: 'Нэвтрэх',
+                                    textColor: Colors.white)));
                           }
                         },
                   text: "Худалдаж авах",
@@ -166,7 +160,9 @@ class _CartScreenState extends State<CartScreen> {
         enableDrag: true,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) => const LoginBottomSheet(isRegistered: true));
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (BuildContext context) =>
+            const LoginBottomSheet(isRegistered: true));
   }
 }

@@ -10,29 +10,19 @@ class ForumTagNotifier with ChangeNotifier {
   List<int> get selectedTagId => _selectedTagId;
 
   void setTags(Map<String, dynamic> tagName) {
-    // List<Map<String, dynamic>> tagList = _selectedForumNames;
-    // tagList.add(tagName);
+    List<Map<String, dynamic>> tagList = [];
+    tagList.add(tagName);
     _selectedTagId.add(tagName["id"]);
 
-    _selectedForumNames.add(tagName);
+    _selectedForumNames = tagList;
 
     notifyListeners();
   }
 
   void removeTags(Map<String, dynamic> tagName) {
-    log(tagName.toString());
-    _selectedForumNames.removeWhere((item) => item['name'] == tagName['name']);
-
-    // int idx = 0;
-    // for (var cur in _selectedForumNames) {
-    //   if (cur['id'] == tagName['id']) {
-    //     _selectedForumNames.removeAt(idx);
-    //   }
-    //   idx++;
-    // }
+    _selectedForumNames.remove(tagName);
     _selectedTagId.remove(tagName["id"]);
     log(_selectedForumNames.length.toString(), name: 'removetags');
-    log(_selectedForumNames.toString());
     notifyListeners();
   }
 

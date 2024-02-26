@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:goodali/Providers/cart_provider.dart';
 import 'package:goodali/screens/payment/cart_screen.dart';
-import 'package:provider/provider.dart';
 
 class WebCartPopupButton extends StatefulWidget {
   const WebCartPopupButton({Key? key}) : super(key: key);
@@ -17,28 +15,24 @@ class _WebCartPopupButtonState extends State<WebCartPopupButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CartProvider>(
-      builder: (context, value, child) {
-        return GestureDetector(
-          key: _key, // Assign the GlobalKey
-          onTap: _togglePopup,
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: value.counter != 0 ? Color(0xfff96f5d) : Color(0xFFFBF9F8),
-              shape: BoxShape.circle,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: SvgPicture.asset(
-                'assets/images/web_icon_cart.svg',
-                color: value.counter != 0 ? Colors.white : Colors.black,
-              ),
-            ),
+    return GestureDetector(
+      key: _key, // Assign the GlobalKey
+      onTap: _togglePopup,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: const BoxDecoration(
+          color: Color(0xFFFBF9F8),
+          shape: BoxShape.circle,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: SvgPicture.asset(
+            'assets/images/web_icon_cart.svg',
+            color: Colors.black,
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

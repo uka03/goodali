@@ -23,12 +23,11 @@ import 'package:goodali/screens/payment/web_cart_screen.dart';
 import 'package:provider/provider.dart';
 
 class HeaderWidget extends StatelessWidget {
-  final bool isHome;
+  final bool? isHome;
   final bool? isProfile;
   final String? title;
   final String? subtitle;
-
-  const HeaderWidget({Key? key, this.title, this.subtitle, this.isHome = false, this.isProfile}) : super(key: key);
+  const HeaderWidget({Key? key, this.title, this.subtitle, this.isHome, this.isProfile}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +38,12 @@ class HeaderWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.only(left: 255),
               child: InkWell(
-                onTap: () {
-                  // if (isHome != true) {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                  // }
-                  print('there');
-                },
-                child: Image.asset("assets/images/title_logo.png", width: 113, height: 32),
-              ),
+                  onTap: () {
+                    if (isHome == false) {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  },
+                  child: Image.asset("assets/images/title_logo.png", width: 113, height: 32)),
             ),
             Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 60), child: const s.SearchBar())),
             Builder(
@@ -85,11 +82,9 @@ class HeaderWidget extends StatelessWidget {
                         if (value == 'Цомог') {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const AlbumLecture()));
                         } else if (value == 'Подкаст') {
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (_) => Podcast(dataStore: HiveDataStore())));
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => Podcast(dataStore: HiveDataStore())));
                         } else if (value == 'Видео') {
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (_) => const VideoList(isHomeScreen: true)));
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const VideoList(isHomeScreen: true)));
                         } else if (value == 'Бичвэр') {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const ArticleScreen()));
                         } else if (value == 'Мүүд') {
@@ -105,24 +100,15 @@ class HeaderWidget extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Сэтгэл",
-                          style: TextStyle(
-                            fontFamily: 'Gilroy',
-                            color: Color(0xff778089),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            fontStyle: FontStyle.normal,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: SvgPicture.asset(
-                            "assets/images/chevron_down.svg",
-                            color: const Color(0xff778089),
-                          ),
-                        ),
+                        const Text("Сэтгэл",
+                            style: TextStyle(
+                              fontFamily: 'Gilroy',
+                              color: Color(0xff778089),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              fontStyle: FontStyle.normal,
+                            )),
+                        SizedBox(height: 24, width: 24, child: SvgPicture.asset("assets/images/chevron_down.svg", color: const Color(0xff778089))),
                       ],
                     ),
                   ),
@@ -133,10 +119,7 @@ class HeaderWidget extends StatelessWidget {
               padding: const EdgeInsets.only(left: 30, right: 60),
               child: InkWell(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ForumScreen()),
-                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ForumScreen()));
                 },
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
@@ -169,10 +152,7 @@ class HeaderWidget extends StatelessWidget {
                               position: RelativeRect.fromLTRB(
                                 rowPosition.dx,
                                 rowPosition.dy + rowSize.height,
-                                MediaQuery.of(context).size.width -
-                                    rowPosition.dx -
-                                    rowSize.width -
-                                    (rowSize.width / 1.25),
+                                MediaQuery.of(context).size.width - rowPosition.dx - rowSize.width - (rowSize.width / 1.25),
                                 rowPosition.dy,
                               ),
                               items: [
@@ -199,8 +179,7 @@ class HeaderWidget extends StatelessWidget {
                                 } else if (value == 'Пин код солих') {
                                   Navigator.push(context, MaterialPageRoute(builder: (_) => const ResetPassword()));
                                 } else if (value == 'Нийтлэг асуулт хариулт') {
-                                  Navigator.push(
-                                      context, MaterialPageRoute(builder: (_) => const FrequentlyQuestions()));
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) => const FrequentlyQuestions()));
                                 } else if (value == 'Гарах') {
                                   showLogOutDialog(context);
                                 }
@@ -235,12 +214,7 @@ class HeaderWidget extends StatelessWidget {
                   height: 36,
                   child: CustomElevatedButton(
                       onPress: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const WebLoginScreen(),
-                          ),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const WebLoginScreen()));
                       },
                       text: "Нэвтрэх"),
                 );
@@ -320,8 +294,7 @@ class HeaderWidget extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: const Text("Та гарахдаа итгэлтэй байна уу?",
-                textAlign: TextAlign.center, style: TextStyle(color: MyColors.black, fontSize: 18)),
+            content: const Text("Та гарахдаа итгэлтэй байна уу?", textAlign: TextAlign.center, style: TextStyle(color: MyColors.black, fontSize: 18)),
             actions: [
               TextButton(
                   onPressed: () {

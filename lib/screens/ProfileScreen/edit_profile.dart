@@ -86,7 +86,8 @@ class _EditProfileState extends State<EditProfile> {
                   children: [
                     Align(
                         alignment: Alignment.center,
-                        child: widget.userInfo?.avatarPath != null && !isImageChanged
+                        child: widget.userInfo?.avatarPath != null &&
+                                !isImageChanged
                             ? CircleAvatar(
                                 radius: 70,
                                 child: ClipOval(
@@ -123,7 +124,9 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    const Text("И-мэйл хаяг", style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.gray)),
+                    const Text("И-мэйл хаяг",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: MyColors.gray)),
                     const SizedBox(height: 20),
                     TextField(
                         controller: emailController,
@@ -134,11 +137,14 @@ class _EditProfileState extends State<EditProfile> {
                             borderSide: BorderSide(color: MyColors.border1),
                           ),
                           focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                            borderSide: BorderSide(
+                                color: MyColors.primaryColor, width: 1.5),
                           ),
                         )),
                     const SizedBox(height: 24),
-                    const Text("Нууц нэр", style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.gray)),
+                    const Text("Нууц нэр",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: MyColors.gray)),
                     const SizedBox(height: 20),
                     TextField(
                         controller: nicknameController,
@@ -157,14 +163,16 @@ class _EditProfileState extends State<EditProfile> {
                                     nicknameController.text = "";
                                     isTyping = false;
                                   }),
-                                  child: const Icon(Icons.close, color: MyColors.black),
+                                  child: const Icon(Icons.close,
+                                      color: MyColors.black),
                                 )
                               : const SizedBox(),
                           enabledBorder: const UnderlineInputBorder(
                             borderSide: BorderSide(color: MyColors.border1),
                           ),
                           focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                            borderSide: BorderSide(
+                                color: MyColors.primaryColor, width: 1.5),
                           ),
                         )),
                     const SizedBox(height: 10),
@@ -198,30 +206,28 @@ class _EditProfileState extends State<EditProfile> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
                                     elevation: 0,
                                     backgroundColor: MyColors.gray)),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
                           Expanded(
                             child: ElevatedButton(
-                              child: const Text("Хадгалах"),
-                              onPressed: isChanged
-                                  ? () {
-                                      Utils.showLoaderDialog(context);
-                                      editUserData(fileImage);
-                                    }
-                                  : null,
-                              style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  elevation: 0,
-                                  backgroundColor: MyColors.primaryColor),
-                            ),
+                                child: const Text("Хадгалах"),
+                                onPressed: isChanged
+                                    ? () {
+                                        Utils.showLoaderDialog(context);
+                                        editUserData(fileImage);
+                                      }
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    elevation: 0,
+                                    backgroundColor: MyColors.primaryColor)),
                           ),
                         ],
                       ),
@@ -245,7 +251,10 @@ class _EditProfileState extends State<EditProfile> {
             title: const Icon(IconlyLight.close_square, color: MyColors.black),
             content: const Text("Профайл устгах уу?",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: MyColors.black, fontSize: 16, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    color: MyColors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold)),
             actions: [
               TextButton(
                   onPressed: () {
@@ -275,7 +284,8 @@ class _EditProfileState extends State<EditProfile> {
         enableDrag: true,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (context) {
           return SizedBox(
             height: 300,
@@ -285,11 +295,16 @@ class _EditProfileState extends State<EditProfile> {
                 Container(
                   width: 38,
                   height: 6,
-                  decoration: BoxDecoration(color: MyColors.gray, borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(
+                      color: MyColors.gray,
+                      borderRadius: BorderRadius.circular(10)),
                 ),
                 const SizedBox(height: 20),
                 const Text("Зураг солих",
-                    style: TextStyle(color: MyColors.black, fontWeight: FontWeight.bold, fontSize: 24)),
+                    style: TextStyle(
+                        color: MyColors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24)),
                 const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -299,7 +314,8 @@ class _EditProfileState extends State<EditProfile> {
                       GestureDetector(
                         onTap: () async {
                           try {
-                            camerPhoto = await _picker.pickImage(source: ImageSource.camera);
+                            camerPhoto = await _picker.pickImage(
+                                source: ImageSource.camera);
                             Navigator.pop(context);
                             if (camerPhoto != null) {
                               setState(() {
@@ -310,20 +326,24 @@ class _EditProfileState extends State<EditProfile> {
                             }
                           } catch (e) {
                             print(e);
-                            TopSnackBar.errorFactory(msg: "Need permission").show(context);
+                            TopSnackBar.errorFactory(msg: "Need permission")
+                                .show(context);
                           }
                         },
                         child: Container(
                           height: 125,
                           width: 150,
-                          decoration: BoxDecoration(color: MyColors.border1, borderRadius: BorderRadius.circular(18)),
+                          decoration: BoxDecoration(
+                              color: MyColors.border1,
+                              borderRadius: BorderRadius.circular(18)),
                           child: const Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(IconlyLight.camera),
                                 SizedBox(height: 20),
-                                Text("Камер", style: TextStyle(color: MyColors.black))
+                                Text("Камер",
+                                    style: TextStyle(color: MyColors.black))
                               ],
                             ),
                           ),
@@ -332,7 +352,8 @@ class _EditProfileState extends State<EditProfile> {
                       GestureDetector(
                         onTap: () async {
                           try {
-                            image = await _picker.pickImage(source: ImageSource.gallery);
+                            image = await _picker.pickImage(
+                                source: ImageSource.gallery);
                             Navigator.pop(context);
 
                             if (image != null) {
@@ -344,20 +365,24 @@ class _EditProfileState extends State<EditProfile> {
                             }
                           } catch (e) {
                             print(e);
-                            TopSnackBar.errorFactory(msg: "Need permission").show(context);
+                            TopSnackBar.errorFactory(msg: "Need permission")
+                                .show(context);
                           }
                         },
                         child: Container(
                           height: 125,
                           width: 150,
-                          decoration: BoxDecoration(color: MyColors.border1, borderRadius: BorderRadius.circular(18)),
+                          decoration: BoxDecoration(
+                              color: MyColors.border1,
+                              borderRadius: BorderRadius.circular(18)),
                           child: const Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(IconlyLight.image),
                                 SizedBox(height: 20),
-                                Text("Галлерей", style: TextStyle(color: MyColors.black))
+                                Text("Галлерей",
+                                    style: TextStyle(color: MyColors.black))
                               ],
                             ),
                           ),
@@ -388,7 +413,8 @@ class _EditProfileState extends State<EditProfile> {
     var stream = await Connection.accountDeletion(context);
     Navigator.pop(context);
     if (stream == true) {
-      await TopSnackBar.successFactory(title: "Амжилттай устгагдлаа").show(context);
+      await TopSnackBar.successFactory(title: "Амжилттай устгагдлаа")
+          .show(context);
       Provider.of<Auth>(context, listen: false).logOut(context, isDelete: true);
       Navigator.popUntil(context, (route) => route.isFirst);
     } else {

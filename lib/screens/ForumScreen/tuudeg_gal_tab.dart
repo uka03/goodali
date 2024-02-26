@@ -36,7 +36,6 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
     isAuth = Provider.of<Auth>(context, listen: false).isAuth;
     hasTraining = Provider.of<Auth>(context, listen: false).hasTraining;
 
-    getTagList();
     super.initState();
   }
 
@@ -119,8 +118,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                       ),
                       onPressed: () {
                         if (isAuth) {
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (_) => const CourseTabbar(isHomeScreen: false)));
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const CourseTabbar(isHomeScreen: false)));
                         } else {
                           login.loginWithBio
                               ? login.authenticateWithBiometrics(context)
@@ -130,8 +128,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
                                   enableDrag: true,
                                   isScrollControlled: true,
                                   shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
                                   builder: (BuildContext context) => const LoginBottomSheet(isRegistered: true));
                         }
                       },
@@ -154,7 +151,7 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
           },
         ),
       ),
-      floatingActionButton: (kIsWeb || !hasTraining)
+      floatingActionButton: kIsWeb
           ? null
           : FilterButton(onPress: () {
               showModalTag(context, checkedTag);
@@ -175,30 +172,19 @@ class _NuutsBulgemState extends State<NuutsBulgem> {
 
   showModalTag(BuildContext context, List<Map<String, dynamic>> checkedTag) {
     showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-      builder: (_) => FilterModal(
-        onTap: (checked) {
-          setState(() {
-            checkedTag = checked;
-          });
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (_) => FilterModal(
+              onTap: (checked) {
+                setState(() {
+                  checkedTag = checked;
+                });
 
-          Navigator.pop(context);
-        },
-        tagList: tagList,
-      ),
-    );
-  }
-
-  Future<void> getTagList() async {
-    var data = await Connection.getTagList(context);
-    if (mounted) {
-      setState(() {
-        tagList = data;
-      });
-    }
+                Navigator.pop(context);
+              },
+              tagList: tagList,
+            ));
   }
 }

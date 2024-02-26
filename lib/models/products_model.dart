@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:goodali/Utils/urls.dart';
 import 'package:hive/hive.dart';
@@ -58,46 +56,37 @@ class Products extends HiveObject {
   int? isSpecial;
   @HiveField(24)
   String? downloadedPath;
-  @HiveField(25)
-  String? type = '';
-  @HiveField(26)
+  String? type;
   int? albumId;
-  @HiveField(27)
-  String? expireAt = '';
-  @HiveField(28)
-  String? createdAt = '';
 
-  Products({
-    this.audio,
-    this.banner,
-    this.id,
-    this.price,
-    this.productId,
-    this.title,
-    this.body,
-    this.intro,
-    this.name,
-    this.order,
-    this.status,
-    this.traingName,
-    this.albumTitle,
-    this.moodListId,
-    this.lectureTitle,
-    this.audioCount,
-    this.isBought = false,
-    this.trainingBanner,
-    this.opennedDate,
-    this.isSpecial,
-    this.downloadedPath,
-    this.duration,
-    this.position,
-    this.played,
-    this.type,
-    this.albumId,
-    this.isDownloaded = false,
-    this.expireAt,
-    this.createdAt,
-  });
+  Products(
+      {this.audio,
+      this.banner,
+      this.id,
+      this.price,
+      this.productId,
+      this.title,
+      this.body,
+      this.intro,
+      this.name,
+      this.order,
+      this.status,
+      this.traingName,
+      this.albumTitle,
+      this.moodListId,
+      this.lectureTitle,
+      this.audioCount,
+      this.isBought = false,
+      this.trainingBanner,
+      this.opennedDate,
+      this.isSpecial,
+      this.downloadedPath,
+      this.duration,
+      this.position,
+      this.played,
+      this.type,
+      this.albumId,
+      this.isDownloaded = false});
 
   Products.fromJson(Map<String, dynamic> json) {
     audio = json['audio'] ?? "";
@@ -128,8 +117,6 @@ class Products extends HiveObject {
     downloadedPath = json['downloaded_ath'] ?? "";
     type = json['type'] ?? "";
     albumId = json['album_id'];
-    expireAt = json['expire_at'] ?? '';
-    createdAt = json['created_at'] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -161,9 +148,6 @@ class Products extends HiveObject {
     data['downloaded_ath'] = downloadedPath;
     data['type'] = type;
     data['album_id'] = albumId;
-
-    data['expire_at'] = expireAt;
-    data['created_at'] = createdAt;
 
     return data;
   }

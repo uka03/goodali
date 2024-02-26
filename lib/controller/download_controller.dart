@@ -47,15 +47,12 @@ class DownloadController with ChangeNotifier {
     }
 
     _port.listen((dynamic data) {
-      print(data);
       String? id = data[0];
-      int statusAsInt = data[1];
-      DownloadTaskStatus status = DownloadTaskStatus(statusAsInt);
-
+      DownloadTaskStatus? status = data[1];
       int? progress = data[2];
 
       try {
-        for (TaskInfo episodeTask in _episodeTasks) {
+        for (var episodeTask in _episodeTasks) {
           if (episodeTask.taskId == id) {
             episodeTask.status = status;
             episodeTask.progress = progress;

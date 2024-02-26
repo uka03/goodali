@@ -42,9 +42,7 @@ class _MyCoursesState extends State<MyCourses> {
 
   onPlayButtonClicked(int index) async {
     currentlyPlaying.value = allLectures[index];
-    if (activeList.first.title == allLectures.first.title &&
-        activeList.first.id == allLectures.first.id &&
-        activeList.length == allLectures.length) {
+    if (activeList.first.title == allLectures.first.title && activeList.first.id == allLectures.first.id && activeList.length == allLectures.length) {
       await audioHandler.skipToQueueItem(index);
       await audioHandler.seek(
         Duration(milliseconds: allLectures[index].position!),
@@ -71,7 +69,6 @@ class _MyCoursesState extends State<MyCourses> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
           myCourses = snapshot.data;
-          print(myCourses);
 
           return SingleChildScrollView(
             child: Padding(
@@ -134,8 +131,7 @@ class _MyCoursesState extends State<MyCourses> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (empty != "") const SizedBox(height: 30),
-                    Text(empty,
-                        style: const TextStyle(color: MyColors.black, fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(empty, style: const TextStyle(color: MyColors.black, fontSize: 18, fontWeight: FontWeight.bold)),
                     if (empty != "") const SizedBox(height: 30),
                     AlbumDetailItem(
                         index: index,
@@ -178,16 +174,14 @@ class _MyCoursesState extends State<MyCourses> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
-          const Text("Онлайн сургалт",
-              style: TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text("Онлайн сургалт", style: TextStyle(color: MyColors.black, fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
           ListView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: myCourses.length,
               itemBuilder: (BuildContext context, int index) {
-                return CourseProductsListItem(
-                    isBought: true, courseProducts: myCourses[index], courseProductsList: myCourses);
+                return CourseProductsListItem(isBought: true, courseProducts: myCourses[index], courseProductsList: myCourses);
               }),
         ],
       );

@@ -18,14 +18,6 @@ class CourseListListItem extends StatefulWidget {
 }
 
 class _CourseListListItemState extends State<CourseListListItem> {
-  bool _isCheckboxChecked = false;
-
-  void _onCheckboxChange() {
-    setState(() {
-      _isCheckboxChecked = !_isCheckboxChecked;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
@@ -35,8 +27,7 @@ class _CourseListListItemState extends State<CourseListListItem> {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8), border: Border.all(color: MyColors.border1, width: 0.5)),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: MyColors.border1, width: 0.5)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -49,9 +40,7 @@ class _CourseListListItemState extends State<CourseListListItem> {
                     ),
                   ),
                   Text(
-                    widget.products.opennedDate == ""
-                        ? "Нээлттэй"
-                        : dateTimeFormatter(widget.products.opennedDate ?? ""),
+                    widget.products.opennedDate == "" ? "Нээлттэй" : dateTimeFormatter(widget.products.opennedDate ?? ""),
                     style: const TextStyle(color: MyColors.gray, fontSize: 12),
                   ),
                 ],
@@ -60,25 +49,11 @@ class _CourseListListItemState extends State<CourseListListItem> {
               HtmlWidget(widget.products.body ?? "",
                   textStyle: const TextStyle(fontSize: 14, height: 1.8, color: MyColors.black, fontFamily: "Gilroy")),
               const SizedBox(height: 20),
-              GestureDetector(
-                onTap: _onCheckboxChange,
-                child: Row(children: [
-                  Checkbox(
-                      value: _isCheckboxChecked,
-                      onChanged: (val) {
-                        _onCheckboxChange();
-                      }),
-                  const Text('Гэрээтэй танилцан, зөвшөөрсөн'),
-                ]),
-              ),
               Row(
                 children: [
                   if (widget.products.isBought == false)
                     GestureDetector(
                       onTap: () {
-                        if (_isCheckboxChecked == false) {
-                          return;
-                        }
                         cart.addItemsIndex(widget.products.productId!);
 
                         if (!cart.sameItemCheck) {
@@ -93,9 +68,7 @@ class _CourseListListItemState extends State<CourseListListItem> {
                       child: Container(
                         height: 40,
                         width: 120,
-                        decoration: BoxDecoration(
-                            color: _isCheckboxChecked ? MyColors.primaryColor : Colors.grey,
-                            borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: MyColors.primaryColor, borderRadius: BorderRadius.circular(6)),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [

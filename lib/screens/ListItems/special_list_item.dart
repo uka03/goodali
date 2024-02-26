@@ -39,11 +39,8 @@ class _SpecialListItemState extends State<SpecialListItem> {
   @override
   void initState() {
     if (widget.specialItem.type == "article") {
-      articleModel = ArticleModel(
-          banner: widget.specialItem.banner,
-          body: widget.specialItem.body,
-          id: widget.specialItem.id,
-          title: widget.specialItem.title);
+      articleModel =
+          ArticleModel(banner: widget.specialItem.banner, body: widget.specialItem.body, id: widget.specialItem.id, title: widget.specialItem.title);
     }
     if (widget.specialItem.audio != "Audio failed to upload") {
       audioURL = widget.specialItem.audio ?? "";
@@ -59,7 +56,6 @@ class _SpecialListItemState extends State<SpecialListItem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // log(widget.specialItem.toJson().toString(), name: "hive result");
         onSpecialClicked(widget.specialItem.type!);
       },
       child: Padding(
@@ -74,8 +70,7 @@ class _SpecialListItemState extends State<SpecialListItem> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: ImageView(imgPath: widget.specialItem.banner ?? "", width: 40, height: 40)),
+                          borderRadius: BorderRadius.circular(4), child: ImageView(imgPath: widget.specialItem.banner ?? "", width: 40, height: 40)),
                       const SizedBox(width: 15),
                       Expanded(
                         child: Column(
@@ -100,8 +95,7 @@ class _SpecialListItemState extends State<SpecialListItem> {
                       )
                     ],
                   ),
-                  if (widget.specialItem.type == "lecture" || widget.specialItem.type == "album")
-                    const SizedBox(height: 14),
+                  if (widget.specialItem.type == "lecture" || widget.specialItem.type == "album") const SizedBox(height: 14),
                   if (widget.specialItem.type == "lecture" || widget.specialItem.type == "album")
                     ValueListenableBuilder(
                         valueListenable: durationStateNotifier,
@@ -109,10 +103,7 @@ class _SpecialListItemState extends State<SpecialListItem> {
                           var buttonState = buttonNotifier.value;
                           var currently = currentlyPlaying.value;
 
-                          bool isPlaying =
-                              currently?.title == widget.specialItem.title && buttonState == ButtonState.playing
-                                  ? true
-                                  : false;
+                          bool isPlaying = currently?.title == widget.specialItem.title && buttonState == ButtonState.playing ? true : false;
 
                           return Row(
                             children: [
@@ -130,8 +121,7 @@ class _SpecialListItemState extends State<SpecialListItem> {
                               isLoading
                                   ? const SizedBox(
                                       width: 30,
-                                      child: LinearProgressIndicator(
-                                          backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
+                                      child: LinearProgressIndicator(backgroundColor: Colors.transparent, minHeight: 2, color: MyColors.black))
                                   : Row(
                                       children: [
                                         (savedPosition > 0 || isPlaying)
@@ -200,25 +190,17 @@ class _SpecialListItemState extends State<SpecialListItem> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) => AlbumDetail(
-                    albumProduct: widget.specialItem,
-                    onTap: (value) {},
-                    isLecture: true,
-                    albumID: widget.specialItem.albumId)));
+                builder: (_) =>
+                    AlbumDetail(albumProduct: widget.specialItem, onTap: (value) {}, isLecture: true, albumID: widget.specialItem.albumId)));
         break;
       case "album":
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => AlbumDetail(albumProduct: widget.specialItem, onTap: (value) {})));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => AlbumDetail(albumProduct: widget.specialItem, onTap: (value) {})));
         break;
       case "article":
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => ArtcileItem(articleModel: articleModel, isFromHome: true)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ArtcileItem(articleModel: articleModel, isFromHome: true)));
         break;
       case "training":
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => CourseDetail(courseProducts: widget.specialItem, id: widget.specialItem.id)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CourseDetail(courseProducts: widget.specialItem, id: widget.specialItem.id)));
         break;
       default:
     }

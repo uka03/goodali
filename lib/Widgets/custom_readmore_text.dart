@@ -6,24 +6,28 @@ import 'package:readmore/readmore.dart';
 class CustomReadMoreText extends StatelessWidget {
   final String text;
   final TextAlign? textAlign;
-  const CustomReadMoreText({
-    Key? key,
-    required this.text,
-    this.textAlign = TextAlign.start,
-  }) : super(key: key);
+  const CustomReadMoreText(
+      {Key? key, required this.text, this.textAlign = TextAlign.start})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ReadMoreText(
-      parseHtmlString(text) + ' ',
+      parseHtmlString(text),
       trimLines: 3,
       trimMode: TrimMode.Line,
       trimCollapsedText: 'Цааш унших',
       trimExpandedText: 'Хураах',
       textAlign: textAlign,
       style: const TextStyle(fontSize: 14, height: 1.6, color: MyColors.gray),
-      moreStyle: const TextStyle(fontSize: 14, decoration: TextDecoration.underline, color: MyColors.black),
-      lessStyle: const TextStyle(fontSize: 14, decoration: TextDecoration.underline, color: MyColors.black),
+      moreStyle: const TextStyle(
+          fontSize: 14,
+          decoration: TextDecoration.underline,
+          color: MyColors.black),
+      lessStyle: const TextStyle(
+          fontSize: 14,
+          decoration: TextDecoration.underline,
+          color: MyColors.black),
     );
   }
 }

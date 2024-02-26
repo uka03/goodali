@@ -98,7 +98,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
           },
         ),
       ),
-      floatingActionButton: (kIsWeb || postList.isEmpty)
+      floatingActionButton: kIsWeb
           ? null
           : FilterButton(onPress: () {
               showModalTag(context, checkedTag);
@@ -125,8 +125,7 @@ class _MyFriendTabState extends State<MyFriendTab> {
           minHeight: MediaQuery.of(context).size.height / 2 + 80,
         ),
         backgroundColor: Colors.white,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
         builder: (_) => FilterModal(
               onTap: (checked) {
                 setState(() {

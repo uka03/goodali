@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:developer';
 
 import 'package:goodali/Utils/urls.dart';
 import 'package:goodali/models/products_model.dart';
@@ -82,9 +81,7 @@ class HiveBoughtDataStore {
 
   /// Add new user
   Future<void> addProduct({required Products products}) async {
-    var datas = box.values
-        .where((c) => c.title == products.title && c.id == products.id && c.albumTitle == products.albumTitle)
-        .toList();
+    var datas = box.values.where((c) => c.title == products.title && c.id == products.id && c.albumTitle == products.albumTitle).toList();
 
     if (datas.isEmpty) {
       await box.add(products);
@@ -230,9 +227,7 @@ class HiveIntroDataStore {
 
   /// Add new user
   Future<void> addProduct({required Products products}) async {
-    var datas = box.values
-        .where((c) => c.title == products.title && c.id == products.id && c.albumTitle == products.albumTitle)
-        .toList();
+    var datas = box.values.where((c) => c.title == products.title && c.id == products.id && c.albumTitle == products.albumTitle).toList();
 
     if (datas.isEmpty) {
       await box.add(products);
@@ -274,8 +269,6 @@ class HiveSpecialDataStore {
   Future<void> addProduct({required Products products}) async {
     var datas = specialListBox.values.where((c) => c.id == products.id).toList();
     // print("data hooson bnu uguu yu ${datas.length}");
-
-    // log(datas[0].toJson().toString(), name: "datas");
 
     if (datas.isEmpty) {
       await specialListBox.add(products);

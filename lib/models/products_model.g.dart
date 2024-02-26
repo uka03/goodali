@@ -38,21 +38,17 @@ class ProductsAdapter extends TypeAdapter<Products> {
       opennedDate: fields[22] as String?,
       isSpecial: fields[23] as int?,
       downloadedPath: fields[24] as String?,
-      duration: fields[16] as int?,
-      position: fields[15] as int?,
-      played: fields[13] as bool?,
-      type: fields[25] as String?,
-      albumId: fields[26] as int?,
       isDownloaded: fields[21] as bool?,
-      expireAt: fields[27] as String?,
-      createdAt: fields[28] as String?,
-    );
+    )
+      ..played = fields[13] as bool?
+      ..position = fields[15] as int?
+      ..duration = fields[16] as int?;
   }
 
   @override
   void write(BinaryWriter writer, Products obj) {
     writer
-      ..writeByte(29)
+      ..writeByte(25)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -102,15 +98,7 @@ class ProductsAdapter extends TypeAdapter<Products> {
       ..writeByte(23)
       ..write(obj.isSpecial)
       ..writeByte(24)
-      ..write(obj.downloadedPath)
-      ..writeByte(25)
-      ..write(obj.type)
-      ..writeByte(26)
-      ..write(obj.albumId)
-      ..writeByte(27)
-      ..write(obj.expireAt)
-      ..writeByte(28)
-      ..write(obj.createdAt);
+      ..write(obj.downloadedPath);
   }
 
   @override

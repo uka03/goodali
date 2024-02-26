@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -72,8 +71,7 @@ class Connection {
 
   static Future<List<Products>> getTrainingDetail(BuildContext context, String id) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypeNone).post(Urls.getTrainingDetail, data: {"training_id": id});
+      final response = await Http().getDio(context, headerTypeNone).post(Urls.getTrainingDetail, data: {"training_id": id});
 
       if (response.data != null) {
         return (response.data as List).map((e) => Products.fromJson(e)).toList();
@@ -131,25 +129,18 @@ class Connection {
     }
   }
 
-  static Future<Map<String, dynamic>> createOrderRequest(
-      BuildContext context, int invoiceType, List<int> productIDs) async {
+  static Future<Map<String, dynamic>> createOrderRequest(BuildContext context, int invoiceType, List<int> productIDs) async {
     var data = {"invoice_type": invoiceType, "product_ids": productIDs};
     print("data $data");
     try {
       final response = await Http().getDio(context, headerTypebearer).post(Urls.orderRequest, data: data);
 
-      print(response.data);
-
       if (response.statusCode == 200) {
-        // print("success");
-        // log(response.data.toString());
+        print("success");
+        print(response.data);
         return {
           "success": true,
-          'goodali_order_id': response.data['goodali_order_id'],
-          'image_url': response.data['qr_text'],
-          "data": invoiceType == 0
-              ? (response.data['urls'] as List).map((e) => QpayURLS.fromJson(e)).toList()
-              : response.data['url']
+          "data": invoiceType == 0 ? (response.data['urls'] as List).map((e) => QpayURLS.fromJson(e)).toList() : response.data
         };
       } else {
         print("error");
@@ -197,8 +188,7 @@ class Connection {
 
   static Future<Map<String, dynamic>> editUserData(BuildContext context, String nickname) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypebearer).post(Urls.editUserData, data: {"nickname": nickname});
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.editUserData, data: {"nickname": nickname});
 
       if (response.data['status'] == 1) {
         return {'success': true, 'name': response.data['name']['data'], 'avatar': response.data['name']["avatar"]};
@@ -311,9 +301,10 @@ class Connection {
     try {
       final response = await Http().getDio(context, headerTypebearer).get(Urls.getCourses);
 
+      // print("getBoughtCourses ${response.data}");
+
       if (response.statusCode == 200) {
-        List<Products> lll = (response.data as List).map((e) => Products.fromJson(e)).toList();
-        return lll;
+        return (response.data as List).map((e) => Products.fromJson(e)).toList();
       } else if (response.statusCode == 401) {
         return [];
       } else {
@@ -328,7 +319,6 @@ class Connection {
   }
 
   static Future<List<CoursesItems>> getBoughtCoursesItems(BuildContext context, String id) async {
-    print("CALLING ITEMS");
     try {
       final response = await Http().getDio(context, headerTypebearer).get(Urls.getCoursesItem + id);
 
@@ -371,8 +361,7 @@ class Connection {
 
   static Future<List<Products>> getLectureListLogged(BuildContext context, String id) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypebearer).post(Urls.lectureListLogged, data: {"album_id": id});
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.lectureListLogged, data: {"album_id": id});
 
       if (response.statusCode == 200) {
         return (response.data as List).map((e) => Products.fromJson(e)).toList();
@@ -391,8 +380,7 @@ class Connection {
 
   static Future<List<Products>> getTrainingDetailLogged(BuildContext context, String id) async {
     try {
-      final response =
-          await Http().getDio(context, headerTypebearer).post(Urls.trainingDetailLogged, data: {"training_id": id});
+      final response = await Http().getDio(context, headerTypebearer).post(Urls.trainingDetailLogged, data: {"training_id": id});
 
       if (response.statusCode == 200) {
         return (response.data as List).map((e) => Products.fromJson(e)).toList();
@@ -431,7 +419,6 @@ class Connection {
 
   static Future<List<CourseLessonsTasksModel>> getCoursesTasks(BuildContext context, String id) async {
     try {
-      print(id);
       final response = await Http().getDio(context, headerTypebearer).get(Urls.getCoursesTasks + id);
 
       if (response.statusCode == 200) {
@@ -741,27 +728,6 @@ class Connection {
     } catch (error) {
       developer.log("special list error $error");
       return [];
-    }
-  }
-
-  // Daramsenge
-  static Future<bool> getInvoiceStatus(BuildContext context, String invoiceNumber) async {
-    try {
-      final response = await Http().getDio(context, headerTypebearer).get(
-        Urls.invoiceDetail,
-        data: {"invoice_number": invoiceNumber},
-      );
-
-      log(response.data.toString());
-
-      if (response.data['data']['status'] == true) {
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      log(error.toString());
-      return false;
     }
   }
 }
