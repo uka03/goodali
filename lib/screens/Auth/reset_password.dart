@@ -27,7 +27,9 @@ class _ResetPasswordState extends State<ResetPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: kIsWeb ? null : const SimpleAppBar(title: "Пин код солих", noCard: true),
+      appBar: kIsWeb
+          ? null
+          : const SimpleAppBar(title: "Пин код солих", noCard: true),
       body: Column(
         children: [
           const Visibility(
@@ -57,7 +59,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                             decoration: InputDecoration(
                               suffixIcon: GestureDetector(
                                 child: Icon(
-                                  _showPassword1 ? Icons.visibility : Icons.visibility_off,
+                                  _showPassword1
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                   color: MyColors.primaryColor,
                                 ),
                                 onTap: () {
@@ -71,7 +75,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                                 borderSide: BorderSide(color: MyColors.border1),
                               ),
                               focusedBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                                borderSide: BorderSide(
+                                    color: MyColors.primaryColor, width: 1.5),
                               ),
                             ),
                             validator: (value) {
@@ -91,7 +96,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                             decoration: InputDecoration(
                               suffixIcon: GestureDetector(
                                 child: Icon(
-                                  _showPassword2 ? Icons.visibility : Icons.visibility_off,
+                                  _showPassword2
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                   color: MyColors.primaryColor,
                                 ),
                                 onTap: () {
@@ -105,7 +112,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                                 borderSide: BorderSide(color: MyColors.border1),
                               ),
                               focusedBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                                borderSide: BorderSide(
+                                    color: MyColors.primaryColor, width: 1.5),
                               ),
                             ),
                             validator: (value) {
@@ -124,7 +132,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                             decoration: InputDecoration(
                               suffixIcon: GestureDetector(
                                 child: Icon(
-                                  _showPassword3 ? Icons.visibility : Icons.visibility_off,
+                                  _showPassword3
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                   color: MyColors.primaryColor,
                                 ),
                                 onTap: () {
@@ -138,7 +148,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                                 borderSide: BorderSide(color: MyColors.border1),
                               ),
                               focusedBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: MyColors.primaryColor, width: 1.5),
+                                borderSide: BorderSide(
+                                    color: MyColors.primaryColor, width: 1.5),
                               ),
                             ),
                             validator: (value) {
@@ -162,7 +173,8 @@ class _ResetPasswordState extends State<ResetPassword> {
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(
+            horizontal: (MediaQuery.of(context).size.width * 0.3)),
         child: CustomElevatedButton(
           onPress: () {
             if (_formKey.currentState!.validate()) {
@@ -178,7 +190,10 @@ class _ResetPasswordState extends State<ResetPassword> {
   }
 
   reset() async {
-    var sendData = {"new_password": newPassController.text, 'old_password': oldPassController.text};
+    var sendData = {
+      "new_password": newPassController.text,
+      'old_password': oldPassController.text
+    };
 
     var data = await Connection.resetPassword(context, sendData);
     Navigator.pop(context);
