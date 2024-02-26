@@ -41,8 +41,7 @@ class _CartScreenState extends State<CartScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 100),
-                  SvgPicture.asset("assets/images/empty_cart.svg",
-                      semanticsLabel: 'Acme Logo'),
+                  SvgPicture.asset("assets/images/empty_cart.svg", semanticsLabel: 'Acme Logo'),
                   const SizedBox(height: 20),
                   const Text(
                     "Таны сагс хоосон байна...",
@@ -59,20 +58,7 @@ class _CartScreenState extends State<CartScreen> {
                   height: 56,
                   padding: const EdgeInsets.only(left: 20),
                   alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          icon: Icon(Icons.arrow_back)),
-                      const Text("Таны сагс",
-                          style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: MyColors.black)),
-                    ],
-                  ),
+                  child: const Text("Таны сагс", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: MyColors.black)),
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -95,21 +81,16 @@ class _CartScreenState extends State<CartScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Нийт төлөх дүн: ",
-                    style: TextStyle(color: MyColors.gray)),
+                const Text("Нийт төлөх дүн: ", style: TextStyle(color: MyColors.gray)),
                 Consumer<CartProvider>(
-                  builder: (context, value, child) => Text(
-                      value.getTotalPrice().toInt().toString() + "₮",
-                      style: const TextStyle(
-                          color: MyColors.primaryColor,
-                          fontWeight: FontWeight.bold)),
+                  builder: (context, value, child) => Text(value.getTotalPrice().toInt().toString() + "₮",
+                      style: const TextStyle(color: MyColors.primaryColor, fontWeight: FontWeight.bold)),
                 )
               ],
             ),
             const SizedBox(height: 20),
             Visibility(
-              visible:
-                  (kIsWeb && context.watch<CartProvider>().cartItem.isEmpty),
+              visible: (kIsWeb && context.watch<CartProvider>().cartItem.isEmpty),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: CustomElevatedButton(
@@ -117,21 +98,13 @@ class _CartScreenState extends State<CartScreen> {
                       ? null
                       : () {
                           if (isAuth == true) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        ChoosePayment(productIDs: productIds)));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ChoosePayment(productIDs: productIds)));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: const Text(
-                                    "Та нэвтэрч орон үргэлжлүүлнэ үү"),
+                                content: const Text("Та нэвтэрч орон үргэлжлүүлнэ үү"),
                                 backgroundColor: MyColors.error,
                                 behavior: SnackBarBehavior.floating,
-                                action: SnackBarAction(
-                                    onPressed: () => showLoginModal(),
-                                    label: 'Нэвтрэх',
-                                    textColor: Colors.white)));
+                                action: SnackBarAction(onPressed: () => showLoginModal(), label: 'Нэвтрэх', textColor: Colors.white)));
                           }
                         },
                   text: "Худалдаж авах",
@@ -151,10 +124,7 @@ class _CartScreenState extends State<CartScreen> {
         isDismissible: false,
         enableDrag: true,
         isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12))),
-        builder: (BuildContext context) =>
-            const LoginBottomSheet(isRegistered: true));
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12))),
+        builder: (BuildContext context) => const LoginBottomSheet(isRegistered: true));
   }
 }
