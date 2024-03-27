@@ -1,14 +1,5 @@
-package com.goodali.mn
+package com.example.goodali
 
-import io.flutter.embedding.android.FlutterFragmentActivity
-import com.ryanheise.audioservice.AudioServiceFragmentActivity;
-import io.flutter.embedding.engine.FlutterEngine
-import com.ryanheise.audioservice.AudioServicePlugin
-import android.content.Context
+import io.flutter.embedding.android.FlutterActivity
 
-
-  class MainActivity: AudioServiceFragmentActivity() {
-        override fun provideFlutterEngine(context:Context):FlutterEngine {
-            return AudioServicePlugin.getFlutterEngine(context);
-    }
-  }
+class MainActivity: FlutterActivity()
