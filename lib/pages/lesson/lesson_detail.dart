@@ -70,7 +70,6 @@ class _LessonDetailState extends State<LessonDetail> {
           textFontSize: 16,
           onPressed: () {
             if (authProvider.token?.isNotEmpty == true) {
-              cartProvider.addProduct(data);
               Navigator.push(
                 context,
                 MaterialPageRoute(

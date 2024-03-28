@@ -35,8 +35,8 @@ class ProductResponseData {
   int? totalTime;
   @JsonKey(name: "paused_time")
   int? pausedTime;
-  ProductResponseData(
-    this.name, {
+  ProductResponseData({
+    required this.name,
     required this.audio,
     required this.audioCount,
     required this.banner,

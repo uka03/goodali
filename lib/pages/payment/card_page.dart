@@ -27,6 +27,7 @@ class _CardPageState extends State<CardPage> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000));
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final response = await cartProvider.createOrder(invoiceType: 1);
       final uriUrl = Uri.parse(response.url ?? "");

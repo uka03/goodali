@@ -22,6 +22,8 @@ class CartProvider extends ChangeNotifier {
           }
           products.removeWhere((item) => itemsToRemove.contains(item));
           products.add(data);
+          notifyListeners();
+          return true;
         } else {
           for (var item in products) {
             if (item.productId == data.albumId) {

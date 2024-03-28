@@ -126,7 +126,7 @@ class _MembershipPageState extends State<MembershipPage> {
                                         if (isAgreed) {
                                           cartProvider
                                               .addProduct(ProductResponseData(
-                                            course.name,
+                                            name: course.name,
                                             audio: null,
                                             audioCount: 0,
                                             banner: course.tBanner,
@@ -146,7 +146,7 @@ class _MembershipPageState extends State<MembershipPage> {
                                             expireAt: null,
                                             lectureTitle: null,
                                             albumTitle: null,
-                                            albumId: null,
+                                            albumId: course.price,
                                           ));
                                           Navigator.pushNamed(
                                               context, CartPage.routeName);

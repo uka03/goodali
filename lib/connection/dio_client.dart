@@ -20,7 +20,8 @@ import 'package:goodali/connection/network_interceptor.dart';
 class DioClient {
   final _dioClient = Dio()..interceptors.add(NetworkInterceptor());
 
-  String host = 'https://dev.goodali.mn/api';
+  // String host = 'https://dev.goodali.mn/api';
+  String host = 'https://goodali.visiontech.asia/api';
 
   static const loginUrl = "/signin";
   static const logupUrl = "/signup";

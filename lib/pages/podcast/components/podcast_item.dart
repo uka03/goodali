@@ -42,8 +42,10 @@ class _PodcastItemState extends State<PodcastItem> {
       if (widget.podcast != null && (widget.podcast?.totalTime ?? 0) <= 0) {
         await audioTime(widget.podcast);
       }
-      totalDuration = Duration(minutes: widget.podcast?.totalTime ?? 0);
-      print(widget.podcast?.totalTime);
+
+      setState(() {
+        totalDuration = Duration(minutes: widget.podcast?.totalTime ?? 0);
+      });
     });
   }
 
