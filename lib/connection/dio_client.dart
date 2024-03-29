@@ -46,6 +46,7 @@ class DioClient {
   static const tagUrl = "/tag_list";
   static const trainingUrl = "/get_trainings";
   static const boughtLecturesUrl = "/all_lectures";
+  static const boughtAlbumsUrl = "/get_albums";
   static const orderUrl = "/order";
   static const createPostUrl = "/insert_post";
   static const faqUrl = "/faq_list";
@@ -177,6 +178,25 @@ class DioClient {
       final dioFailure = e as DioException?;
       final error = BannerResponse.fromJson(dioFailure?.response?.data);
       return BannerResponse(msg: error.msg);
+    }
+  }
+
+  Future<List<ProductResponseData?>> getBoughtAlbums() async {
+    try {
+      final response = await _dioClient.get("$host$boughtAlbumsUrl");
+      if (response.statusCode == 200) {
+        List<ProductResponseData?> productList = (response.data as List)
+            .map((item) => ProductResponseData.fromJson(item))
+            .toList();
+
+        return productList;
+      } else {
+        print("Failed to fetch products: ${response.statusCode}");
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching products: $e");
+      return [];
     }
   }
 

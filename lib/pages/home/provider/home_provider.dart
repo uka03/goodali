@@ -4,7 +4,6 @@ import 'package:goodali/connection/models/banner_response.dart';
 import 'package:goodali/connection/models/article_response.dart';
 import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/connection/models/video_response.dart';
-import 'package:goodali/pages/profile/provider/profile_provider.dart';
 import 'package:goodali/utils/globals.dart';
 
 class HomeProvider extends ChangeNotifier {
@@ -20,28 +19,26 @@ class HomeProvider extends ChangeNotifier {
   List<ArticleResponseData?>? articles = List.empty(growable: true);
   List<ProductResponseData?>? moodMain = List.empty(growable: true);
   List<ProductResponseData?>? moodList = List.empty(growable: true);
-  List<BoughtDatas> boughtDatas = [];
+  List<ProductResponseData?> boughtDatas = [];
 
   getHomeData({
     bool refresh = false,
     required bool? isAuth,
   }) async {
-    if (loading || refresh) {
-      showLoader();
-      if (isAuth == true) {
-        await getBoughtLectures();
-      }
-      await getArticle();
-      await getBanners();
-      await getLesson();
-      await getPodcasts();
-      await getlecture();
-      await getVideos();
-      await getMoodMain();
-      await getMoonList();
-      loading = false;
-      dismissLoader();
+    showLoader();
+    if (isAuth == true) {
+      await getBoughtLectures();
     }
+    await getArticle();
+    await getBanners();
+    await getLesson();
+    await getPodcasts();
+    await getlecture();
+    await getVideos();
+    await getMoodMain();
+    await getMoonList();
+    loading = false;
+    dismissLoader();
     notifyListeners();
   }
 
@@ -49,53 +46,28 @@ class HomeProvider extends ChangeNotifier {
     boughtDatas = [];
     final response = await _dioClient.getTraining();
     if (response.isNotEmpty == true) {
-      boughtDatas.add(BoughtDatas(
-        lectureName: "Онлайн сургалт",
-        items: response,
-        isOnline: true,
-      ));
+      boughtDatas.addAll(response);
     }
     final responseBought = await _dioClient.getBoughtLectures();
     if (responseBought.isNotEmpty == true) {
-      final Map<String, List<ProductResponseData?>> result = {};
-      for (var item in responseBought) {
-        if (result[item?.albumTitle] == null) {
-          result[item?.albumTitle ?? ""] = [item];
-        } else {
-          result[item?.albumTitle]?.add(item);
-        }
-      }
-      for (var i = 0; i < result.keys.length; i++) {
-        boughtDatas.add(BoughtDatas(
-          lectureName: result.keys.toList()[i],
-          items: result.values.toList()[i],
-          isOnline: false,
-        ));
-      }
+      boughtDatas.addAll(responseBought);
     }
     notifyListeners();
   }
 
   getLectureList(ProductResponseData? data) async {
-    print("object");
     albumLectures = [];
-    final response = await _dioClient.getLectureList(data?.id);
+    List<ProductResponseData?> response =
+        await _dioClient.getLectureList(data?.id);
 
     if (response.isNotEmpty == true) {
       for (var element in boughtDatas) {
-        if (data?.title == element.lectureName) {
-          for (var item in element.items) {
-            for (var resItem in response) {
-              if (item?.productId == resItem?.productId) {
-                albumLectures?.add(item);
-              } else {
-                albumLectures?.add(resItem);
-              }
-            }
+        response = response.map((e) {
+          if (element?.productId == e?.productId) {
+            element?.isBought = true;
           }
-          notifyListeners();
-          return;
-        }
+          return e;
+        }).toList();
       }
       albumLectures = response;
       notifyListeners();
@@ -113,19 +85,14 @@ class HomeProvider extends ChangeNotifier {
 
   Future<List<ProductResponseData?>> getlecture({int? id}) async {
     final response = await _dioClient.getProduct("0");
+    final boughtResponse = await _dioClient.getBoughtAlbums();
     if (response.isNotEmpty == true) {
       lectures = response.map((e) {
-        BoughtDatas? matchRes;
-        for (var element in boughtDatas) {
-          if (element.lectureName == e?.title) {
-            matchRes = element;
+        for (var element in boughtResponse) {
+          if (element?.productId == e?.productId) {
+            e?.isBought = true;
             break;
           }
-        }
-        if (matchRes?.items.length == e?.audioCount) {
-          e?.isBought = true;
-        } else {
-          e?.isBought = false;
         }
         return e;
       }).toList();
@@ -147,34 +114,12 @@ class HomeProvider extends ChangeNotifier {
     lessons = [];
     List<ProductResponseData?> response = await _dioClient.getProduct("2");
     if (response.isNotEmpty == true) {
-      final element = boughtDatas
-          .where((element) => element.lectureName == "Онлайн сургалт")
-          .toList();
-      if (element.isNotEmpty == true) {
-        for (var item in element.first.items) {
-          response = response.map((e) {
-            if (item?.productId == e?.productId) {
-              e?.isBought = true;
-            } else {
-              e?.isBought = false;
-            }
-            return e;
-          }).toList();
-        }
-        lessons = response;
-        if (id != null) {
-          return response.where((e) => e?.id == id).toList().firstOrNull;
-        }
-        notifyListeners();
-        return null;
-      } else {
-        lessons = response;
-        if (id != null) {
-          return response.where((e) => e?.id == id).toList().firstOrNull;
-        }
-        notifyListeners();
-        return null;
+      lessons = response;
+      if (id != null) {
+        return response.where((e) => e?.id == id).toList().firstOrNull;
       }
+      notifyListeners();
+      return null;
     }
     return null;
   }

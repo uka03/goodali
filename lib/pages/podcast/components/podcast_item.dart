@@ -20,9 +20,11 @@ class PodcastItem extends StatefulWidget {
   const PodcastItem({
     super.key,
     required this.podcast,
+    this.isbought = false,
   });
 
   final ProductResponseData? podcast;
+  final bool isbought;
 
   @override
   State<PodcastItem> createState() => _PodcastItemState();
@@ -115,7 +117,7 @@ class _PodcastItemState extends State<PodcastItem> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.podcast?.isBought == true
+                        widget.isbought
                             ? widget.podcast?.lectureTitle ?? ""
                             : widget.podcast?.title ?? "",
                         style: GoodaliTextStyles.titleText(context),

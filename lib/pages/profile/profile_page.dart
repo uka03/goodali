@@ -178,7 +178,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                                       lesson: item,
                                                       isBought: true,
                                                     )
-                                                  : PodcastItem(podcast: item);
+                                                  : PodcastItem(
+                                                      podcast: item,
+                                                      isbought: true,
+                                                    );
                                             },
                                           )
                                         : ListView.separated(
@@ -200,7 +203,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                                       lesson: item,
                                                       isBought: true,
                                                     )
-                                                  : PodcastItem(podcast: item);
+                                                  : PodcastItem(
+                                                      podcast: item,
+                                                      isbought: true,
+                                                    );
                                             },
                                           )
                                   ],
