@@ -97,6 +97,15 @@ class _SearchPageState extends State<SearchPage> {
                                                 ),
                                               ));
                                           break;
+                                        case "lecture":
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => AlbumPage(
+                                                  id: item?.album,
+                                                ),
+                                              ));
+                                          break;
                                         case "mood":
                                           Navigator.push(
                                               context,

@@ -20,6 +20,7 @@ class HomeProvider extends ChangeNotifier {
   List<ProductResponseData?>? moodMain = List.empty(growable: true);
   List<ProductResponseData?>? moodList = List.empty(growable: true);
   List<ProductResponseData?> boughtDatas = [];
+  List<ProductResponseData?> specialList = [];
 
   getHomeData({
     bool refresh = false,
@@ -30,6 +31,7 @@ class HomeProvider extends ChangeNotifier {
       await getBoughtLectures();
     }
     await getArticle();
+    await getSpecialList();
     await getBanners();
     await getLesson();
     await getPodcasts();
@@ -149,6 +151,13 @@ class HomeProvider extends ChangeNotifier {
     final response = await _dioClient.getMoodList();
     if (response.isNotEmpty == true) {
       moodList = response;
+    }
+  }
+
+  getSpecialList() async {
+    final response = await _dioClient.getSpecialList();
+    if (response.data?.isNotEmpty == true) {
+      specialList = response.data ?? [];
     }
   }
 }

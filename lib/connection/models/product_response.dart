@@ -1,5 +1,18 @@
+import 'package:goodali/connection/models/base_response.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'product_response.g.dart';
+
+@JsonSerializable()
+class ProductResponse extends BaseResponse {
+  List<ProductResponseData?>? data;
+
+  ProductResponse({this.data, super.message, super.status, super.msg});
+
+  factory ProductResponse.fromJson(Map<String, dynamic> json) =>
+      _$ProductResponseFromJson(json);
+  @override
+  Map<String, dynamic> toJson() => _$ProductResponseToJson(this);
+}
 
 @JsonSerializable()
 class ProductResponseData {
@@ -26,6 +39,7 @@ class ProductResponseData {
   final String? name;
   @JsonKey(name: "lecture_title")
   final String? lectureTitle;
+  final String? type;
   @JsonKey(name: "album_title")
   final String? albumTitle;
   @JsonKey(name: "mood_id")
@@ -57,6 +71,7 @@ class ProductResponseData {
     required this.lectureTitle,
     required this.albumTitle,
     required this.albumId,
+    this.type,
   });
 
   factory ProductResponseData.fromJson(Map<String, dynamic> json) =>

@@ -6,6 +6,26 @@ part of 'product_response.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+ProductResponse _$ProductResponseFromJson(Map<String, dynamic> json) =>
+    ProductResponse(
+      data: (json['data'] as List<dynamic>?)
+          ?.map((e) => e == null
+              ? null
+              : ProductResponseData.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      message: json['message'] as String?,
+      status: json['status'] as int?,
+      msg: json['msg'] as String?,
+    );
+
+Map<String, dynamic> _$ProductResponseToJson(ProductResponse instance) =>
+    <String, dynamic>{
+      'status': instance.status,
+      'msg': instance.msg,
+      'message': instance.message,
+      'data': instance.data,
+    };
+
 ProductResponseData _$ProductResponseDataFromJson(Map<String, dynamic> json) =>
     ProductResponseData(
       name: json['name'] as String?,
@@ -29,6 +49,7 @@ ProductResponseData _$ProductResponseDataFromJson(Map<String, dynamic> json) =>
       lectureTitle: json['lecture_title'] as String?,
       albumTitle: json['album_title'] as String?,
       albumId: json['albumId'] as int?,
+      type: json['type'] as String?,
     );
 
 Map<String, dynamic> _$ProductResponseDataToJson(
@@ -50,6 +71,7 @@ Map<String, dynamic> _$ProductResponseDataToJson(
       'title': instance.title,
       'name': instance.name,
       'lecture_title': instance.lectureTitle,
+      'type': instance.type,
       'album_title': instance.albumTitle,
       'mood_id': instance.moodId,
       'albumId': instance.albumId,

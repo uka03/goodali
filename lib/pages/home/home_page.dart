@@ -19,6 +19,7 @@ import 'package:goodali/pages/home/components/type_bar.dart';
 import 'package:goodali/pages/home/provider/home_provider.dart';
 import 'package:goodali/pages/home/read_page.dart';
 import 'package:goodali/pages/lesson/components/Lesson_item.dart';
+import 'package:goodali/pages/lesson/lesson_detail.dart';
 import 'package:goodali/pages/podcast/components/podcast_item.dart';
 import 'package:goodali/pages/podcast/podcast_page.dart';
 import 'package:goodali/pages/search/search_page.dart';
@@ -126,6 +127,74 @@ class _HomePageState extends State<HomePage> {
                           );
                         },
                       ),
+                      provider.specialList.isNotEmpty
+                          ? Container(
+                              height: 160,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 10),
+                              child: PageView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: provider.specialList.length,
+                                itemBuilder: (context, index) {
+                                  final item = provider.specialList[index];
+                                  return PodcastItem(
+                                    podcast: item,
+                                    ontap: () {
+                                      switch (item?.type) {
+                                        case "post":
+                                          Navigator.pushNamed(
+                                              context, ArticlePage.routeName,
+                                              arguments: {"id": item?.id});
+                                          break;
+                                        case "training":
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LessonDetail(
+                                                  id: item?.id,
+                                                ),
+                                              ));
+                                          break;
+                                        case "album":
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => AlbumPage(
+                                                  id: item?.id,
+                                                ),
+                                              ));
+                                          break;
+                                        case "lecture":
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => AlbumPage(
+                                                  id: item?.albumId,
+                                                ),
+                                              ));
+                                          break;
+                                        case "mood":
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    FeelDetail(
+                                                  id: item?.id,
+                                                ),
+                                              ));
+                                          break;
+                                        case "podcast":
+                                          Navigator.pushNamed(
+                                              context, PodcastPage.routeName);
+                                          break;
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                            )
+                          : SizedBox(),
                       VSpacer(size: 14),
                       kIsWeb
                           ? Column(

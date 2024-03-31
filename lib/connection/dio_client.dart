@@ -57,6 +57,7 @@ class DioClient {
   static const tasksUrl = "/tasks";
   static const setAnswerUrl = "/set_answer_api";
   static const searchUrl = "/search_text";
+  static const specialListUrl = "/special_list";
 
   Future<LoginResponse> login(
       {required String email, required String password}) async {
@@ -663,6 +664,19 @@ class DioClient {
     } catch (e) {
       print(e);
       return SearchResponse();
+    }
+  }
+
+  Future<ProductResponse> getSpecialList({String? text}) async {
+    try {
+      final data = {"value": text};
+      final response =
+          await _dioClient.post("$host$specialListUrl", data: data);
+      final model = ProductResponse.fromJson(response.data);
+      return model;
+    } catch (e) {
+      print(e);
+      return ProductResponse(data: []);
     }
   }
 }

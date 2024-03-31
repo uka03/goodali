@@ -22,9 +22,11 @@ class PodcastItem extends StatefulWidget {
     super.key,
     required this.podcast,
     this.isbought = false,
+    this.ontap,
   });
 
   final ProductResponseData? podcast;
+  final Function()? ontap;
   final bool isbought;
 
   @override
@@ -90,14 +92,15 @@ class _PodcastItemState extends State<PodcastItem> {
     final totalTime = parseDuration(totalDuration);
     return Consumer<AudioProvider>(builder: (context, provider, _) {
       return CustomButton(
-        onPressed: () {
-          showModalSheet(
-            context,
-            isScrollControlled: true,
-            height: MediaQuery.of(context).size.height * 0.85,
-            child: AudioPage(data: widget.podcast),
-          );
-        },
+        onPressed: widget.ontap ??
+            () {
+              showModalSheet(
+                context,
+                isScrollControlled: true,
+                height: MediaQuery.of(context).size.height * 0.85,
+                child: AudioPage(data: widget.podcast),
+              );
+            },
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 10),
           child: Column(
