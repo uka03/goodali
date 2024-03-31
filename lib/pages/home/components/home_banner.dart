@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/connection/models/banner_response.dart';
+import 'package:goodali/pages/lesson/lesson_detail.dart';
 import 'package:goodali/shared/components/custom_button.dart';
 import 'package:goodali/shared/components/custom_indicator.dart';
 import 'package:goodali/extensions/string_extensions.dart';
@@ -27,6 +28,15 @@ class HomeBanner extends StatelessWidget {
           items: banners.map(
             (banner) {
               return CustomButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LessonDetail(
+                          id: banner.id,
+                        ),
+                      ));
+                },
                 child: Padding(
                   padding: kIsWeb
                       ? EdgeInsets.symmetric(horizontal: 30.0)

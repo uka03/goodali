@@ -71,7 +71,8 @@ class _ProfileEditState extends State<ProfileEdit> {
                                 child: fileImage == null
                                     ? CachedNetworkImage(
                                         imageUrl:
-                                            me?.avatar.toUrl() ?? placeholder,
+                                            me?.avatar.toUrl(isUser: true) ??
+                                                placeholder,
                                         width: 170,
                                         height: 170,
                                         fit: BoxFit.cover,
