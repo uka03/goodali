@@ -255,7 +255,10 @@ class _HomePageState extends State<HomePage> {
                                         final podcast =
                                             provider.podcasts?[index];
                                         return podcast != null
-                                            ? PodcastItem(podcast: podcast)
+                                            ? PodcastItem(
+                                                podcast: podcast,
+                                                isSaved: true,
+                                              )
                                             : SizedBox();
                                       },
                                     ),

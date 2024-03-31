@@ -14,10 +14,11 @@ import 'package:goodali/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class AudioPage extends StatefulWidget {
-  const AudioPage({super.key, this.data});
+  const AudioPage({super.key, this.data, this.isSaved = false});
 
   static String routeName = "/audio_page";
   final ProductResponseData? data;
+  final bool isSaved;
 
   @override
   State<AudioPage> createState() => _AudioPageState();
@@ -37,10 +38,8 @@ class _AudioPageState extends State<AudioPage> {
   }
 
   _init() async {
-    await audioProvider.setAudioPlayer(
-      context,
-      widget.data,
-    );
+    await audioProvider.setAudioPlayer(context, widget.data,
+        save: widget.isSaved);
   }
 
   @override

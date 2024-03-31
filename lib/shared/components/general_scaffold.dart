@@ -103,7 +103,10 @@ class _GeneralScaffoldState extends State<GeneralScaffold> {
           context,
           isScrollControlled: true,
           height: MediaQuery.of(context).size.height * 0.85,
-          child: AudioPage(data: audioProvider.product),
+          child: AudioPage(
+            data: audioProvider.product,
+            isSaved: audioProvider.isSaved,
+          ),
         );
       },
       child: SizedBox(

@@ -87,7 +87,10 @@ class _PodcastPageState extends State<PodcastPage> {
               separatorBuilder: (context, index) => Divider(),
               itemBuilder: (context, index) {
                 final podcast = podcasts[index];
-                return PodcastItem(podcast: podcast);
+                return PodcastItem(
+                  podcast: podcast,
+                  isSaved: true,
+                );
               },
             ),
           )

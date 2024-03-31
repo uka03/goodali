@@ -23,11 +23,13 @@ class PodcastItem extends StatefulWidget {
     required this.podcast,
     this.isbought = false,
     this.ontap,
+    this.isSaved = false,
   });
 
   final ProductResponseData? podcast;
   final Function()? ontap;
   final bool isbought;
+  final bool isSaved;
 
   @override
   State<PodcastItem> createState() => _PodcastItemState();
@@ -97,7 +99,10 @@ class _PodcastItemState extends State<PodcastItem> {
                 context,
                 isScrollControlled: true,
                 height: MediaQuery.of(context).size.height * 0.85,
-                child: AudioPage(data: widget.podcast),
+                child: AudioPage(
+                  data: widget.podcast,
+                  isSaved: widget.isSaved,
+                ),
               );
             },
         child: Container(
@@ -155,7 +160,8 @@ class _PodcastItemState extends State<PodcastItem> {
                             context, GoodaliPlayerState.paused);
                       } else {
                         await audioProvider.setAudioPlayer(
-                            context, widget.podcast);
+                            context, widget.podcast,
+                            save: widget.isSaved);
                         if (context.mounted) {
                           audioProvider.setPlayerState(
                               context, GoodaliPlayerState.playing);

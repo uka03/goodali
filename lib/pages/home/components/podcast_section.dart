@@ -34,7 +34,10 @@ class PodcastSection extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final podcast = podcasts[index];
                   return podcast != null
-                      ? PodcastItem(podcast: podcast)
+                      ? PodcastItem(
+                          podcast: podcast,
+                          isSaved: true,
+                        )
                       : SizedBox();
                 },
               ),

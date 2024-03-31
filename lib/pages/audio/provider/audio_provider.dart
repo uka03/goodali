@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AudioProvider extends ChangeNotifier {
   bool _initiated = false;
+  bool isSaved = false;
   GoodaliPlayerState? playerState;
   AudioPlayer? audioPlayer;
   StreamSubscription? sub;
@@ -16,9 +17,10 @@ class AudioProvider extends ChangeNotifier {
   BehaviorSubject<SeekBarData>? streamController;
   ProductResponseData? product;
 
-  Future<void> setAudioPlayer(
-      BuildContext context, ProductResponseData? data) async {
+  Future<void> setAudioPlayer(BuildContext context, ProductResponseData? data,
+      {bool save = false}) async {
     if (!_initiated || data?.id != product?.id) {
+      isSaved = save;
       await setPlayerState(context, GoodaliPlayerState.disposed);
       init(data);
       product = data;
@@ -67,7 +69,9 @@ class AudioProvider extends ChangeNotifier {
   }
 
   Future<void> setPlayerState(
-      BuildContext context, GoodaliPlayerState state) async {
+    BuildContext context,
+    GoodaliPlayerState state,
+  ) async {
     playerState = state;
     switch (state) {
       case GoodaliPlayerState.playing:
@@ -80,7 +84,9 @@ class AudioProvider extends ChangeNotifier {
         audioPlayer?.stop();
         break;
       case GoodaliPlayerState.disposed:
-        saveSearchHistory(product?.id.toString() ?? "");
+        if (isSaved) {
+          saveSearchHistory(product?.id.toString() ?? "");
+        }
         audioPlayer?.stop();
         await audioPlayer?.dispose();
         await sub?.cancel();
