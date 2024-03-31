@@ -35,7 +35,6 @@ class PodcastItem extends StatefulWidget {
 
 class _PodcastItemState extends State<PodcastItem> {
   bool isLoading = false;
-  bool isPlaying = false;
   Duration totalDuration = Duration.zero;
   late CartProvider cartProvider;
   late AudioProvider audioProvider;
@@ -150,12 +149,10 @@ class _PodcastItemState extends State<PodcastItem> {
                 children: [
                   CustomButton(
                     onPressed: () async {
-                      if (isPlaying) {
+                      if (provider.playerState == GoodaliPlayerState.playing &&
+                          provider.product?.id == widget.podcast?.id) {
                         audioProvider.setPlayerState(
                             context, GoodaliPlayerState.paused);
-                        setState(() {
-                          isPlaying = false;
-                        });
                       } else {
                         await audioProvider.setAudioPlayer(
                             context, widget.podcast);
@@ -163,9 +160,6 @@ class _PodcastItemState extends State<PodcastItem> {
                           audioProvider.setPlayerState(
                               context, GoodaliPlayerState.playing);
                         }
-                        setState(() {
-                          isPlaying = true;
-                        });
                       }
                     },
                     child: Container(
@@ -175,7 +169,10 @@ class _PodcastItemState extends State<PodcastItem> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Icon(
-                        isPlaying ? Icons.pause : Icons.play_arrow_rounded,
+                        provider.playerState == GoodaliPlayerState.playing &&
+                                provider.product?.id == widget.podcast?.id
+                            ? Icons.pause
+                            : Icons.play_arrow_rounded,
                       ),
                     ),
                   ),

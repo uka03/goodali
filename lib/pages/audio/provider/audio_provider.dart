@@ -5,6 +5,7 @@ import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/utils/utils.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AudioProvider extends ChangeNotifier {
   bool _initiated = false;
@@ -79,6 +80,7 @@ class AudioProvider extends ChangeNotifier {
         audioPlayer?.stop();
         break;
       case GoodaliPlayerState.disposed:
+        saveSearchHistory(product?.id.toString() ?? "");
         audioPlayer?.stop();
         await audioPlayer?.dispose();
         await sub?.cancel();
@@ -95,5 +97,19 @@ class AudioProvider extends ChangeNotifier {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
+  }
+
+  saveSearchHistory(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final values = prefs.getStringList('listen_podcasts') ?? [];
+    if (!values.contains(value)) {
+      values.add(value);
+      prefs.setStringList('listen_podcasts', values);
+    } else {
+      values.remove(value);
+      values.add(value);
+      prefs.setStringList('listen_podcasts', values);
+    }
   }
 }

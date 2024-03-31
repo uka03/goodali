@@ -9,6 +9,7 @@ import 'package:goodali/connection/models/faq_response.dart';
 import 'package:goodali/connection/models/login_response.dart';
 import 'package:goodali/utils/globals.dart';
 import 'package:goodali/utils/toasts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   final _dioClient = DioClient();
@@ -74,11 +75,14 @@ class AuthProvider extends ChangeNotifier {
   logout() async {
     showLoader();
     final storage = FlutterSecureStorage();
+    final prefs = await SharedPreferences.getInstance();
     me = null;
     token = null;
     await storage.delete(key: 'user');
     await storage.delete(key: 'pincode');
     await storage.delete(key: 'token');
+    await prefs.remove('search_history');
+    await prefs.remove('listen_podcasts');
     dismissLoader();
     notifyListeners();
   }

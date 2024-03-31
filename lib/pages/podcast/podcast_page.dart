@@ -79,14 +79,17 @@ class _PodcastPageState extends State<PodcastPage> {
   Widget buildPodcast(List<ProductResponseData?> podcasts,
       {String? emptyStateText}) {
     return podcasts.isNotEmpty
-        ? ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            itemCount: podcasts.length,
-            separatorBuilder: (context, index) => Divider(),
-            itemBuilder: (context, index) {
-              final podcast = podcasts[index];
-              return PodcastItem(podcast: podcast);
-            },
+        ? RefreshIndicator(
+            onRefresh: () => podcastProvider.getPodcasts(),
+            child: ListView.separated(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              itemCount: podcasts.length,
+              separatorBuilder: (context, index) => Divider(),
+              itemBuilder: (context, index) {
+                final podcast = podcasts[index];
+                return PodcastItem(podcast: podcast);
+              },
+            ),
           )
         : EmptyState(
             title: "${emptyStateText ?? ""} Подкаст байхгүй байна.",
