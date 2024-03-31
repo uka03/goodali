@@ -118,68 +118,35 @@ class _AuthPageState extends State<AuthPage> {
               });
               _controller.jumpToPage(0);
             },
-            onRegister: (nameValue, emailValue) {
-              FocusScope.of(context).unfocus();
+            onRegister: (nameValue, emailValue, pincode) async {
               setState(() {
                 email = emailValue;
-                name = nameValue;
               });
-              _controller.nextPage(
-                  duration: Duration(microseconds: 1), curve: Curves.linear);
-            },
-          ),
-          Pincode(
-            onleading: () {
-              _controller.previousPage(
-                  duration: Duration(microseconds: 1), curve: Curves.linear);
-            },
-            onCompleted: (pincode) {
-              setState(() {
-                firstPincode = pincode;
-              });
-              _controller.nextPage(
-                  duration: Duration(microseconds: 1), curve: Curves.linear);
-            },
-            title: 'Шинэ пин код оруулна уу',
-            withLeading: false,
-          ),
-          Pincode(
-            onleading: () {
-              _controller.previousPage(
-                  duration: Duration(microseconds: 1), curve: Curves.linear);
-            },
-            onCompleted: (pincode) async {
-              if (firstPincode == pincode) {
-                showLoader();
-                final response = await authProvider.logup(
-                    email: email, password: pincode, name: name);
-                if (response.status == 1) {
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  if (context.mounted) {
-                    prefs.setString("email", email);
-                    prefs.remove("saved");
-                    email = "";
-                    name = "";
-                    firstPincode = "";
-                    Toast.success(context, description: response.msg);
-                    setState(() {
-                      page = "login";
-                    });
-                    _controller.jumpToPage(0);
-                  }
-                } else {
-                  if (context.mounted) {
-                    Toast.error(context, description: response.msg);
-                  }
+              showLoader();
+              print(nameValue);
+              final response = await authProvider.logup(
+                  email: emailValue, password: pincode, name: nameValue);
+              if (response.status == 1) {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                if (context.mounted) {
+                  prefs.setString("email", email);
+                  prefs.remove("saved");
+                  email = "";
+                  name = "";
+                  firstPincode = "";
+                  Toast.success(context, description: response.msg);
+                  setState(() {
+                    page = "login";
+                  });
+                  _controller.jumpToPage(0);
                 }
-                dismissLoader();
               } else {
-                Toast.error(context, description: "Пин код тохирохгүй байна.");
+                if (context.mounted) {
+                  Toast.error(context, description: response.msg);
+                }
               }
+              dismissLoader();
             },
-            title: 'Пин код давтан оруулна уу',
-            withLeading: true,
           ),
         ];
         break;

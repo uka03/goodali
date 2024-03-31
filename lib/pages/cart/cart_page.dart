@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/extensions/string_extensions.dart';
+import 'package:goodali/pages/audio/provider/audio_provider.dart';
 import 'package:goodali/pages/cart/provider/cart_provider.dart';
 import 'package:goodali/pages/payment/payment_page.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
@@ -11,6 +12,7 @@ import 'package:goodali/utils/constants.dart';
 import 'package:goodali/utils/primary_button.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
+import 'package:goodali/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +31,14 @@ String formatNumber(int number) {
 }
 
 class _CartPageState extends State<CartPage> {
+  late final AudioProvider audioProvider;
+  @override
+  void initState() {
+    super.initState();
+    audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    audioProvider.setPlayerState(context, GoodaliPlayerState.disposed);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<CartProvider>(
@@ -164,6 +174,8 @@ class _CartPageState extends State<CartPage> {
                     VSpacer(),
                     PrimaryButton(
                       text: "Худалдаж авах",
+                      height: 50,
+                      isEnable: provider.products.isNotEmpty,
                       onPressed: () {
                         Navigator.pushNamed(context, PaymentPage.routeName);
                       },

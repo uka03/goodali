@@ -11,6 +11,7 @@ import 'package:goodali/pages/profile/provider/profile_provider.dart';
 import 'package:goodali/shared/components/action_item.dart';
 import 'package:goodali/shared/components/custom_appbar.dart';
 import 'package:goodali/shared/components/custom_button.dart';
+import 'package:goodali/shared/components/general_scaffold.dart';
 import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/constants.dart';
 import 'package:goodali/utils/globals.dart';
@@ -67,10 +68,10 @@ class _ProfilePageState extends State<ProfilePage> {
               HSpacer(size: 8)
             ],
           ) as PreferredSizeWidget;
-    return Scaffold(
+    return GeneralScaffold(
       backgroundColor: GoodaliColors.primaryBGColor,
       appBar: appbar,
-      body: Consumer<AuthProvider>(
+      child: Consumer<AuthProvider>(
         builder: (context, provider, _) {
           return Consumer<ProfileProvider>(builder: (context, proProvider, _) {
             return RefreshIndicator(

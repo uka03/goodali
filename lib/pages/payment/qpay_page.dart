@@ -4,6 +4,7 @@ import 'package:goodali/pages/payment/components/payment_item.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
 import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/constants.dart';
+import 'package:goodali/utils/globals.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
 import 'package:goodali/utils/toasts.dart';
@@ -32,6 +33,7 @@ class _QpayPageState extends State<QpayPage> {
   }
 
   openBankApp(String url) async {
+    showLoader();
     final bool canLaunchApp = await launchUrlString(url);
     if (canLaunchApp) {
       await launchUrlString(url);
@@ -41,6 +43,7 @@ class _QpayPageState extends State<QpayPage> {
             description: "Тухайн банкны аппликейшн олдсонгүй.");
       }
     }
+    dismissLoader();
   }
 
   @override

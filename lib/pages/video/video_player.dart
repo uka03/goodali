@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:goodali/connection/models/video_response.dart';
 import 'package:goodali/pages/audio/provider/audio_provider.dart';
 import 'package:goodali/pages/video/components/video_item.dart';
@@ -67,11 +66,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
   Widget build(BuildContext context) {
     return Consumer<VideoProvider>(builder: (context, provider, _) {
       return YoutubePlayerBuilder(
-        onExitFullScreen: () {
-          SystemChrome.setPreferredOrientations(DeviceOrientation.values);
-        },
+        onExitFullScreen: () {},
         player: YoutubePlayer(
-          aspectRatio: 16 / 6,
+          aspectRatio: 16 / 9,
           controller: _controller,
           bottomActions: [
             CurrentPosition(),
@@ -119,13 +116,16 @@ class _VideoPlayerState extends State<VideoPlayer> {
                       itemCount: provider.similarVideos?.length ?? 0,
                       separatorBuilder: (context, index) => VSpacer(),
                       itemBuilder: (context, index) {
-                        final video = provider.similarVideos?[index];
+                        final videoItem = provider.similarVideos?[index];
                         return VideoItem(
-                          video: video,
-                          onItemPressed: (video) async {
-                            _controller.load(video?.videoUrl ?? "");
-                            await provider
-                                .getVideosSimilar(video?.id.toString() ?? "");
+                          video: videoItem,
+                          onItemPressed: (videoVal) async {
+                            _controller.load(videoVal?.videoUrl ?? "");
+                            setState(() {
+                              video = videoVal;
+                            });
+                            await provider.getVideosSimilar(
+                                videoVal?.id.toString() ?? "");
                           },
                         );
                       },

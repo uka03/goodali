@@ -6,12 +6,13 @@ import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/primary_button.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
+import 'package:goodali/utils/toasts.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage(
       {super.key, required this.onLogin, required this.onRegister});
   final Function() onLogin;
-  final Function(String name, String email) onRegister;
+  final Function(String name, String email, String pincode) onRegister;
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -20,8 +21,13 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isTyping = false;
+  bool isNameTyping = false;
+  bool passwordTyping = false;
+  bool confirmTyping = false;
 
   @override
   Widget build(BuildContext context) {
@@ -72,18 +78,18 @@ class _RegisterPageState extends State<RegisterPage> {
                       AuthInput(
                         keyboardType: TextInputType.name,
                         isEmail: false,
-                        isTyping: isTyping,
+                        isTyping: isNameTyping,
                         hintText: "Нэр",
                         onClose: () {
-                          emailController.clear();
+                          nameController.clear();
                           setState(() {
-                            isTyping = false;
+                            isNameTyping = false;
                           });
                         },
                         controller: nameController,
                         onChanged: (value) {
                           setState(() {
-                            isTyping = true;
+                            isNameTyping = true;
                           });
                         },
                       ),
@@ -91,7 +97,45 @@ class _RegisterPageState extends State<RegisterPage> {
                       Text(
                         "Та өөртөө хүссэн нэрээ өгөөрэй",
                         style: GoodaliTextStyles.bodyText(context),
-                      )
+                      ),
+                      AuthInput(
+                        keyboardType: TextInputType.number,
+                        isEmail: false,
+                        isTyping: passwordTyping,
+                        hintText: "Пинкод",
+                        onClose: () {
+                          passwordController.clear();
+                          setState(() {
+                            passwordTyping = false;
+                          });
+                        },
+                        maxLength: 4,
+                        controller: passwordController,
+                        onChanged: (value) {
+                          setState(() {
+                            passwordTyping = true;
+                          });
+                        },
+                      ),
+                      AuthInput(
+                        keyboardType: TextInputType.number,
+                        isEmail: false,
+                        isTyping: confirmTyping,
+                        hintText: "Пинкод давтах",
+                        maxLength: 4,
+                        onClose: () {
+                          confirmController.clear();
+                          setState(() {
+                            confirmTyping = false;
+                          });
+                        },
+                        controller: confirmController,
+                        onChanged: (value) {
+                          setState(() {
+                            confirmTyping = true;
+                          });
+                        },
+                      ),
                     ],
                   ),
                   Column(
@@ -102,8 +146,20 @@ class _RegisterPageState extends State<RegisterPage> {
                         text: "Бүртгүүлэх",
                         onPressed: () {
                           if (_formKey.currentState?.validate() == true) {
-                            widget.onRegister(
-                                nameController.text, emailController.text);
+                            if (confirmController.text.length < 4 ||
+                                passwordController.text.length < 4) {
+                              Toast.error(context,
+                                  description:
+                                      "Пин код 4 оронтой байх хэрэгтэй.");
+                            }
+                            if (confirmController.text ==
+                                passwordController.text) {
+                              widget.onRegister(nameController.text,
+                                  emailController.text, confirmController.text);
+                            } else {
+                              Toast.error(context,
+                                  description: "Пин код тохирохгүй байна.");
+                            }
                           }
                         },
                       ),
