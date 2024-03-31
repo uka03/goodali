@@ -37,6 +37,7 @@ class _QpayPageState extends State<QpayPage> {
     final bool canLaunchApp = await launchUrlString(url);
     if (canLaunchApp) {
       await launchUrlString(url);
+      cartProvider.removeProductAll();
     } else {
       if (mounted) {
         Toast.error(context,

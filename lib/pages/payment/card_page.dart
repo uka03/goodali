@@ -26,7 +26,13 @@ class _CardPageState extends State<CardPage> {
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000));
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(NavigationDelegate(
+        onPageFinished: (url) {
+          // cartProvider.removeProductAll();
+          print(url);
+        },
+      ));
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final response = await cartProvider.createOrder(invoiceType: 1);

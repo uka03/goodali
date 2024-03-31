@@ -52,6 +52,12 @@ class CartProvider extends ChangeNotifier {
     return false;
   }
 
+  bool removeProductAll() {
+    products.clear();
+    notifyListeners();
+    return true;
+  }
+
   bool containsProduct(ProductResponseData? data) {
     if (data != null) {
       if (products.any((e) => e.productId == data.productId)) {
