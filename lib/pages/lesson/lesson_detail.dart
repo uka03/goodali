@@ -48,6 +48,7 @@ class _LessonDetailState extends State<LessonDetail> {
         data = widget.data;
       } else if (widget.id != null) {
         showLoader();
+        print(widget.id);
         data = await Provider.of<HomeProvider>(context, listen: false)
             .getLesson(id: widget.id);
         dismissLoader();

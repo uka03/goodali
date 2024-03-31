@@ -33,7 +33,7 @@ class HomeBanner extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => LessonDetail(
-                          id: banner.id,
+                          id: banner.productId,
                         ),
                       ));
                 },
