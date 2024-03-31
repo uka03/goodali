@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:goodali/pages/album/album_page.dart';
 import 'package:goodali/pages/article/article_page.dart';
 import 'package:goodali/pages/feel/feel_detail.dart';
@@ -19,6 +18,7 @@ import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -32,6 +32,64 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   Timer? timer;
   final searchController = TextEditingController();
+  List<String> searchHistory = [];
+  @override
+  initState() {
+    super.initState();
+    getSearchHistory();
+  }
+
+  saveSearchHistory(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final values = prefs.getStringList('search_history') ?? [];
+    if (!values.contains(value)) {
+      values.add(value);
+      prefs.setStringList('search_history', values);
+    } else {
+      values.remove(value);
+      values.add(value);
+      prefs.setStringList('search_history', values);
+    }
+
+    setState(() {
+      searchHistory = values.reversed.toList();
+    });
+  }
+
+  getSearchHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final values = prefs.getStringList('search_history') ?? [];
+
+    setState(() {
+      searchHistory = values;
+    });
+  }
+
+  removeSearchHistory(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final values = prefs.getStringList('search_history') ?? [];
+    if (values.contains(value)) {
+      values.remove(value);
+      prefs.setStringList('search_history', values);
+    }
+
+    setState(() {
+      searchHistory = values.reversed.toList();
+    });
+  }
+
+  searchItem(String value, SearchProvider provider) async {
+    timer?.cancel();
+    timer = Timer(Duration(milliseconds: 500), () async {
+      if (value.isNotEmpty) {
+        saveSearchHistory(value);
+        await provider.searchItem(value);
+      }
+    });
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +108,7 @@ class _SearchPageState extends State<SearchPage> {
                   hintText: "Нэрээр хайх",
                   onTap: () {},
                   onChanged: (value) {
-                    timer?.cancel();
-                    timer = Timer(Duration(milliseconds: 500), () async {
-                      if (value.isNotEmpty) {
-                        await provider.searchItem(value);
-                      }
-                    });
-                    setState(() {});
+                    searchItem(value, provider);
                   },
                   controller: searchController,
                 ),
@@ -168,10 +220,104 @@ class _SearchPageState extends State<SearchPage> {
                           : EmptyState(
                               title: "Уучлаарай, өөр үгээр хайна уу?",
                             )
-                  : EmptyState(
-                      imagePath: "assets/images/file_empty.png",
-                      title: "Хайлтын түүх байхгүй",
-                    ),
+                  : searchHistory.isNotEmpty
+                      ? Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              VSpacer(),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Text(
+                                  "Сүүлд хайсан",
+                                  style: GoodaliTextStyles.titleText(
+                                    context,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: ListView.separated(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 16),
+                                  itemCount: searchHistory.length,
+                                  separatorBuilder: (context, index) =>
+                                      Divider(height: 0),
+                                  itemBuilder: (context, index) {
+                                    final item = searchHistory[index];
+                                    return Dismissible(
+                                      key: Key(item),
+                                      onDismissed: (direction) {
+                                        removeSearchHistory(item);
+                                      },
+                                      background: Container(
+                                        color: Colors.red,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: const [
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Icon(
+                                                Icons.delete_rounded,
+                                                color: GoodaliColors
+                                                    .primaryBGColor,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Icon(
+                                                Icons.delete_rounded,
+                                                color: GoodaliColors
+                                                    .primaryBGColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      child: CustomButton(
+                                        onPressed: () {
+                                          searchController.text = item;
+                                          searchItem(item, provider);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 16, horizontal: 8),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  item,
+                                                  style: GoodaliTextStyles
+                                                      .bodyText(
+                                                    context,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ),
+                                              HSpacer(),
+                                              Icon(
+                                                Icons
+                                                    .keyboard_arrow_right_rounded,
+                                                color: GoodaliColors.grayColor,
+                                                size: 26,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : EmptyState(
+                          imagePath: "assets/images/file_empty.png",
+                          title: "Хайлтын түүх байхгүй",
+                        ),
             ],
           ),
         ),
