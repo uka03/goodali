@@ -38,7 +38,7 @@ class PostResponseData {
   final String? title; // Define tags as List<TagResponse?>
   dynamic replys; // Define replys as dynamic type
   @JsonKey(includeToJson: false, includeFromJson: false)
-  List<ReplyResponse?>? get replyList {
+  List<ReplyResponse?> get replyList {
     // Convert replys to List<ReplyResponse?> if it's a String
     if (replys == null || replys == "") {
       return [];

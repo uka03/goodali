@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/connection/models/post_response.dart';
-import 'package:goodali/connection/models/tag_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/pages/community/post_detail.dart';
 import 'package:goodali/pages/community/provider/community_provider.dart';
@@ -11,6 +10,7 @@ import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/constants.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
+import 'package:goodali/utils/utils.dart';
 import 'package:intl/intl.dart';
 
 class PostItem extends StatefulWidget {
@@ -25,11 +25,7 @@ class PostItem extends StatefulWidget {
 class _PostItemState extends State<PostItem> {
   @override
   Widget build(BuildContext context) {
-    TagResponseData? firstTag;
     String? purchaseDate;
-    if (widget.post?.tags?.isNotEmpty == true) {
-      firstTag = widget.post?.tags?.first;
-    }
 
     if (widget.post?.createdAt?.isNotEmpty == true) {
       final parsedDate =
@@ -93,6 +89,39 @@ class _PostItemState extends State<PostItem> {
             ],
           ),
           VSpacer(),
+          widget.post?.tags?.isNotEmpty == true
+              ? SizedBox(
+                  height: 28,
+                  child: ListView.separated(
+                    reverse: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount:
+                        getListViewlength(widget.post?.tags?.length, max: 3),
+                    separatorBuilder: (context, index) => HSpacer(),
+                    itemBuilder: (context, index) {
+                      final tag = widget.post?.tags?[index];
+                      return Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 12),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: GoodaliColors.primaryColor,
+                                )),
+                            child: Text(
+                              tag?.name ?? "",
+                              style: GoodaliTextStyles.bodyText(context,
+                                  textColor: GoodaliColors.primaryColor),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                )
+              : SizedBox(),
           Row(
             children: [
               Expanded(
@@ -103,19 +132,6 @@ class _PostItemState extends State<PostItem> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(
-                      color: GoodaliColors.primaryColor,
-                    )),
-                child: Text(
-                  firstTag?.name ?? "",
-                  style: GoodaliTextStyles.bodyText(context,
-                      textColor: GoodaliColors.primaryColor),
-                ),
-              )
             ],
           ),
           VSpacer(),
@@ -157,7 +173,7 @@ class _PostItemState extends State<PostItem> {
               HSpacer(),
               actionBtn(
                 context,
-                count: widget.post?.replyList?.length,
+                count: widget.post?.replyList.length,
                 iconPath: "assets/icons/ic_chat.png",
                 onPressed: () {},
               ),

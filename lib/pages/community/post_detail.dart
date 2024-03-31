@@ -16,6 +16,7 @@ import 'package:goodali/utils/globals.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
 import 'package:goodali/utils/toasts.dart';
+import 'package:goodali/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -31,6 +32,7 @@ class _PostDetailState extends State<PostDetail> {
   late CommunityProvider communityProvider;
   late AuthProvider authProvider;
   final focus = FocusNode();
+  List<ReplyResponse?> replies = [];
   LoginResponse? me;
 
   @override
@@ -38,6 +40,7 @@ class _PostDetailState extends State<PostDetail> {
     super.initState();
     communityProvider = Provider.of<CommunityProvider>(context, listen: false);
     authProvider = Provider.of<AuthProvider>(context, listen: false);
+    replies = widget.post?.replyList ?? [];
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final res = await authProvider.getMe();
       setState(() {
@@ -117,6 +120,41 @@ class _PostDetailState extends State<PostDetail> {
                   ],
                 ),
                 VSpacer(),
+                widget.post?.tags?.isNotEmpty == true
+                    ? SizedBox(
+                        height: 28,
+                        child: ListView.separated(
+                          reverse: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: getListViewlength(
+                              widget.post?.tags?.length,
+                              max: 3),
+                          separatorBuilder: (context, index) => HSpacer(),
+                          itemBuilder: (context, index) {
+                            final tag = widget.post?.tags?[index];
+                            return Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 4, horizontal: 12),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: GoodaliColors.primaryColor,
+                                      )),
+                                  child: Text(
+                                    tag?.name ?? "",
+                                    style: GoodaliTextStyles.bodyText(context,
+                                        textColor: GoodaliColors.primaryColor),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      )
+                    : SizedBox(),
+                VSpacer(),
                 Row(
                   children: [
                     Expanded(
@@ -127,20 +165,6 @@ class _PostDetailState extends State<PostDetail> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: GoodaliColors.primaryColor,
-                          )),
-                      child: Text(
-                        firstTag?.name ?? "",
-                        style: GoodaliTextStyles.bodyText(context,
-                            textColor: GoodaliColors.primaryColor),
-                      ),
-                    )
                   ],
                 ),
                 VSpacer(),
@@ -181,7 +205,7 @@ class _PostDetailState extends State<PostDetail> {
                     HSpacer(),
                     actionBtn(
                       context,
-                      count: widget.post?.replyList?.length,
+                      count: replies.length,
                       iconPath: "assets/icons/ic_chat.png",
                       onPressed: () {},
                     ),
@@ -218,15 +242,15 @@ class _PostDetailState extends State<PostDetail> {
                 ),
                 VSpacer(),
                 Divider(),
-                widget.post?.replyList?.isNotEmpty == true
+                replies.isNotEmpty == true
                     ? ListView.separated(
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount: widget.post?.replyList?.length ?? 0,
+                        itemCount: replies.length,
                         separatorBuilder: (BuildContext context, int index) =>
                             Divider(),
                         itemBuilder: (context, index) {
-                          final comment = widget.post?.replyList?[index];
+                          final comment = replies[index];
 
                           return Container(
                             padding: EdgeInsets.symmetric(vertical: 16),
@@ -334,24 +358,22 @@ class _PostDetailState extends State<PostDetail> {
   }
 
   postReply(String text) async {
-    if (text.length < 30) {
-      Toast.error(context,
-          description:
-              "Таны сэтгэгдэл хамгийн багадаа 30 тэмдэгт ашигласан байх шаардлагатай.",
-          title: "Анхаарна уу");
-    } else {
-      showLoader();
-      final response = await communityProvider.postReply(
-        body: text,
-        postId: widget.post?.id,
-      );
-      if (response && context.mounted) {
-        Toast.success(context, description: "Амжилтай");
-      }
-      dismissLoader();
-      if (context.mounted) {
-        Navigator.pop(context);
-      }
+    showLoader();
+    final response = await communityProvider.postReply(
+      body: text,
+      postId: widget.post?.id,
+    );
+    if (response && mounted) {
+      print("objectasda");
+      setState(() {
+        replies.add(ReplyResponse(nickname: me?.nickname, text: text));
+      });
+
+      Toast.success(context, description: "Амжилтай");
+    }
+    dismissLoader();
+    if (mounted) {
+      Navigator.pop(context);
     }
   }
 

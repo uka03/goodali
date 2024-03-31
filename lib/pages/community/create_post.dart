@@ -137,6 +137,7 @@ class _CreatePostState extends State<CreatePost> {
     showModalSheet(
       context,
       withExpanded: false,
+      isScrollControlled: true,
       child: StatefulBuilder(
         builder: (context, setState) {
           return Column(
