@@ -66,8 +66,9 @@ class HomeProvider extends ChangeNotifier {
       for (var element in boughtDatas) {
         response = response.map((e) {
           if (element?.productId == e?.productId) {
-            element?.isBought = true;
+            e?.isBought = true;
           }
+
           return e;
         }).toList();
       }

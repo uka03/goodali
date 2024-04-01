@@ -155,7 +155,7 @@ class _PodcastItemState extends State<PodcastItem> {
                   CustomButton(
                     onPressed: () async {
                       if (provider.playerState == GoodaliPlayerState.playing &&
-                          provider.product?.id == widget.podcast?.id) {
+                          provider.product?.audio == widget.podcast?.audio) {
                         audioProvider.setPlayerState(
                             context, GoodaliPlayerState.paused);
                       } else {
@@ -176,7 +176,7 @@ class _PodcastItemState extends State<PodcastItem> {
                       ),
                       child: Icon(
                         provider.playerState == GoodaliPlayerState.playing &&
-                                provider.product?.id == widget.podcast?.id
+                                provider.product?.audio == widget.podcast?.audio
                             ? Icons.pause
                             : Icons.play_arrow_rounded,
                       ),

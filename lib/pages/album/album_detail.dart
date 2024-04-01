@@ -133,6 +133,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                     if (lecture?.isBought == true) {
                       podcast?.isBought = true;
                     }
+                    print(podcast?.isBought);
                     return podcast != null
                         ? PodcastItem(podcast: podcast)
                         : SizedBox();
