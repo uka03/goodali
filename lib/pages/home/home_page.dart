@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       provider.specialList.isNotEmpty
                           ? Container(
-                              height: 160,
+                              height: 170,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 10),
                               child: PageView.builder(

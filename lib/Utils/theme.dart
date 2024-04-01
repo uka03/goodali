@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:goodali/utils/colors.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-ThemeData theme() {
+ThemeData theme(BuildContext context) {
   return ThemeData(
     splashFactory: NoSplash.splashFactory,
     appBarTheme: appBarTheme(),
     inputDecorationTheme: inputDecorationTheme(),
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-    textTheme: GoogleFonts.poppinsTextTheme(),
     dialogTheme: DialogTheme(
         elevation: 0, backgroundColor: GoodaliColors.primaryBGColor),
   );

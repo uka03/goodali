@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
         title: 'goodali',
         debugShowCheckedModeBanner: false,
         builder: EasyLoading.init(),
-        theme: theme(),
+        theme: theme(context),
         routes: routes,
       ),
     );
