@@ -63,30 +63,33 @@ class _LessonDetailState extends State<LessonDetail> {
   Widget build(BuildContext context) {
     return GeneralScaffold(
       appBar: AppbarWithBackButton(),
-      actionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: PrimaryButton(
-          height: 50,
-          text: "Худалдаж авах",
-          textFontSize: 16,
-          onPressed: () {
-            if (authProvider.token?.isNotEmpty == true) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MembershipPage(
-                    data: data,
-                  ),
-                ),
-              );
-            } else {
-              Toast.error(context,
-                  description:
-                      "Та уг үйлдэлийг хийхийн тулд нэвтрэх хэрэгтэй.");
-            }
-          },
-        ),
-      ),
+      actionButton: authProvider.token.isEmpty == true ||
+              authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
+          ? SizedBox()
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: PrimaryButton(
+                height: 50,
+                text: "Худалдаж авах",
+                textFontSize: 16,
+                onPressed: () {
+                  if (authProvider.token.isNotEmpty == true) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MembershipPage(
+                          data: data,
+                        ),
+                      ),
+                    );
+                  } else {
+                    Toast.error(context,
+                        description:
+                            "Та уг үйлдэлийг хийхийн тулд нэвтрэх хэрэгтэй.");
+                  }
+                },
+              ),
+            ),
       child: SingleChildScrollView(
         child: Column(
           children: [

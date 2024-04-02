@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:goodali/pages/auth/login_pincode.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
+import 'package:goodali/pages/cart/provider/cart_provider.dart';
 import 'package:goodali/pages/menu/change_password.dart';
 import 'package:goodali/pages/menu/faq_page.dart';
 import 'package:goodali/pages/menu/term_page.dart';
@@ -26,10 +27,12 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   late final AuthProvider authProvider;
+  late final CartProvider cartProvider;
   @override
   void initState() {
     super.initState();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
+    cartProvider = Provider.of<CartProvider>(context, listen: false);
   }
 
   @override
@@ -111,6 +114,7 @@ class _MenuPageState extends State<MenuPage> {
                                     await authProvider.accountDelete();
                                 if (response && context.mounted) {
                                   authProvider.logout();
+                                  cartProvider.removeProductAll();
                                   Navigator.popUntil(
                                       context, (route) => route.isFirst);
                                   Toast.success(context,
@@ -135,13 +139,14 @@ class _MenuPageState extends State<MenuPage> {
             ),
             Column(
               children: [
-                authProvider.token?.isNotEmpty == true
+                authProvider.token.isNotEmpty == true
                     ? menuItem(
                         iconPath: "assets/icons/ic_logout.png",
                         title: "Гарах",
                         isLogout: true,
                         onPressed: () {
                           authProvider.logout();
+                          cartProvider.removeProductAll();
                           Navigator.pop(context);
                         },
                       )

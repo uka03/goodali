@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
+import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/cart/cart_page.dart';
 import 'package:goodali/pages/cart/provider/cart_provider.dart';
 import 'package:goodali/pages/home/provider/home_provider.dart';
@@ -29,24 +30,30 @@ class AlbumDetail extends StatefulWidget {
 class _AlbumDetailState extends State<AlbumDetail> {
   late HomeProvider homeProvider;
   late CartProvider cartProvider;
+  late AuthProvider authProvider;
   ProductResponseData? lecture;
+  int boughtItemsLenght = 0;
   @override
   void initState() {
     homeProvider = Provider.of<HomeProvider>(context, listen: false);
     cartProvider = Provider.of<CartProvider>(context, listen: false);
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      authProvider.getMe();
       _fecthData();
     });
     super.initState();
   }
 
-  _fecthData() {
+  _fecthData() async {
     lecture =
         ModalRoute.of(context)?.settings.arguments as ProductResponseData?;
     lecture?.albumId = lecture?.productId;
-    homeProvider.getLectureList(lecture);
+    await homeProvider.getLectureList(lecture);
 
-    setState(() {});
+    setState(() {
+      boughtItemsLenght = getBoughtItems();
+    });
   }
 
   onAddToCart() {
@@ -57,35 +64,50 @@ class _AlbumDetailState extends State<AlbumDetail> {
     );
   }
 
+  int getBoughtItems() {
+    return homeProvider.albumLectures
+            ?.where((element) => element?.isBought == true)
+            .length ??
+        0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GeneralScaffold(
       backgroundColor: GoodaliColors.primaryBGColor,
-      bottomBar: lecture?.isBought == false
-          ? Container(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
-              child: PrimaryButton(
-                height: 50,
-                text: "Худалдаж авах",
-                textFontSize: 16,
-                onPressed: () {
-                  onAddToCart();
-                },
-              ),
-            )
-          : SizedBox(),
+      bottomBar: lecture?.isBought == true ||
+              (lecture?.audioCount ?? 0) <= boughtItemsLenght
+          ? SizedBox()
+          : authProvider.token.isEmpty == true ||
+                  authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
+              ? SizedBox()
+              : Container(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
+                  child: PrimaryButton(
+                    height: 50,
+                    text: "Худалдаж авах",
+                    textFontSize: 16,
+                    onPressed: () {
+                      onAddToCart();
+                    },
+                  ),
+                ),
       appBar: AppbarWithBackButton(
         actions: [
-          Consumer<CartProvider>(builder: (context, cartProviderConsumer, _) {
-            return ActionItem(
-              iconPath: 'assets/icons/ic_cart.png',
-              onPressed: () {
-                Navigator.of(context).pushNamed(CartPage.routeName);
-              },
-              isDot: cartProviderConsumer.products.isNotEmpty,
-              count: cartProviderConsumer.products.length,
-            );
-          }),
+          authProvider.token.isEmpty == true ||
+                  authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
+              ? SizedBox()
+              : Consumer<CartProvider>(
+                  builder: (context, cartProviderConsumer, _) {
+                  return ActionItem(
+                    iconPath: 'assets/icons/ic_cart.png',
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(CartPage.routeName);
+                    },
+                    isDot: cartProviderConsumer.products.isNotEmpty,
+                    count: cartProviderConsumer.products.length,
+                  );
+                }),
           HSpacer()
         ],
       ),

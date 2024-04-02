@@ -68,6 +68,7 @@ class HomeProvider extends ChangeNotifier {
           if (element?.productId == e?.productId) {
             e?.isBought = true;
           }
+          e?.albumId = data?.productId;
 
           return e;
         }).toList();

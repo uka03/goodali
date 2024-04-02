@@ -36,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
     authProvider = Provider.of<AuthProvider>(context, listen: false);
     profileProvider = Provider.of<ProfileProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      if (authProvider.token?.isNotEmpty == true) {
+      if (authProvider.token.isNotEmpty == true) {
         showLoader();
         await profileProvider.getLectures();
         dismissLoader();

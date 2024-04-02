@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
     authProvider = Provider.of<AuthProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await authProvider.getMe();
-      homeProvider.getHomeData(isAuth: authProvider.token?.isNotEmpty);
+      homeProvider.getHomeData(isAuth: authProvider.token.isNotEmpty);
     });
 
     super.initState();
@@ -82,17 +82,22 @@ class _HomePageState extends State<HomePage> {
             : CustomAppbar(
                 title: "Сэтгэл",
                 actions: [
-                  Consumer<CartProvider>(
-                      builder: (context, cartProviderConsumer, _) {
-                    return ActionItem(
-                      iconPath: 'assets/icons/ic_cart.png',
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(CartPage.routeName);
-                      },
-                      isDot: cartProviderConsumer.products.isNotEmpty,
-                      count: cartProviderConsumer.products.length,
-                    );
-                  }),
+                  authProvider.token.isEmpty == true ||
+                          authProvider.me?.email?.toLowerCase() ==
+                              "surgalt9@gmail.com"
+                      ? SizedBox()
+                      : Consumer<CartProvider>(
+                          builder: (context, cartProviderConsumer, _) {
+                          return ActionItem(
+                            iconPath: 'assets/icons/ic_cart.png',
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushNamed(CartPage.routeName);
+                            },
+                            isDot: cartProviderConsumer.products.isNotEmpty,
+                            count: cartProviderConsumer.products.length,
+                          );
+                        }),
                   HSpacer()
                 ],
               ) as PreferredSizeWidget;
@@ -108,7 +113,7 @@ class _HomePageState extends State<HomePage> {
               child: RefreshIndicator(
                 onRefresh: () async {
                   await homeProvider.getHomeData(
-                      refresh: true, isAuth: authProvider.token?.isNotEmpty);
+                      refresh: true, isAuth: authProvider.token.isNotEmpty);
                 },
                 color: GoodaliColors.primaryColor,
                 child: SingleChildScrollView(

@@ -28,7 +28,6 @@ class _MainScaffoldState extends State<MainScaffold> {
   void initState() {
     super.initState();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {});
   }
 
   @override
@@ -38,7 +37,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         List<Widget> widgetOptions = <Widget>[
           HomePage(),
           CommunityPage(),
-          authprovider.token?.isNotEmpty == true ? ProfilePage() : NotUser(),
+          authprovider.token.isNotEmpty == true ? ProfilePage() : NotUser(),
         ];
         return Scaffold(
           backgroundColor: GoodaliColors.primaryBGColor,

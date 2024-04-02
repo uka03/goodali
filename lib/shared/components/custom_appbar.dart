@@ -195,7 +195,7 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
               ),
               HSpacer(),
               Consumer<AuthProvider>(builder: (context, provider, _) {
-                if (provider.token?.isNotEmpty == true) {
+                if (provider.token.isNotEmpty == true) {
                   return Row(
                     children: [
                       Consumer<CartProvider>(

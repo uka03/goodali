@@ -12,6 +12,7 @@ import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/constants.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
+import 'package:goodali/utils/toasts.dart';
 import 'package:provider/provider.dart';
 
 class CourseItems extends StatefulWidget {
@@ -73,14 +74,19 @@ class _CourseItemsState extends State<CourseItems> {
                         final lesson = provider.coursesLessons[index];
                         return CustomButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CourseTasks(
-                                  lesson: lesson,
+                            if (lesson.isBought == 1) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CourseTasks(
+                                    lesson: lesson,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              Toast.error(context,
+                                  description: "Түгжээтэй контент");
+                            }
                           },
                           child: Row(
                             children: [

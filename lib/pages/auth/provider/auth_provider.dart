@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   final _dioClient = DioClient();
-  String? token;
+  String token = "";
   LoginResponse? me;
 
   Future<LoginResponse> login(
@@ -22,7 +22,7 @@ class AuthProvider extends ChangeNotifier {
     final response = await _dioClient.login(email: email, password: password);
 
     if (response.token != null) {
-      token = response.token;
+      token = response.token ?? "";
       me = response;
       final meString = jsonEncode(response);
       await storage.write(key: 'token', value: response.token);
@@ -77,7 +77,7 @@ class AuthProvider extends ChangeNotifier {
     final storage = FlutterSecureStorage();
     final prefs = await SharedPreferences.getInstance();
     me = null;
-    token = null;
+    token = "";
     await storage.delete(key: 'user');
     await storage.delete(key: 'pincode');
     await storage.delete(key: 'token');
@@ -119,12 +119,12 @@ class AuthProvider extends ChangeNotifier {
   Future<LoginResponse?> getMe() async {
     final storage = FlutterSecureStorage();
     final userString = await storage.read(key: 'user');
-    final tokenRes = await storage.read(key: 'token');
+    // final tokenRes = await storage.read(key: 'token');
     if (userString?.isNotEmpty == true) {
       final response = LoginResponse.fromJson(jsonDecode(userString!));
       if (response.token?.isNotEmpty == true) {
         me = response;
-        token = tokenRes;
+        // token = tokenRes;
       }
       notifyListeners();
       return response;

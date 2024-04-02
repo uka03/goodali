@@ -4,6 +4,7 @@ import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/pages/audio/audio_page.dart';
 import 'package:goodali/pages/audio/provider/audio_provider.dart';
+import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/cart/provider/cart_provider.dart';
 import 'package:goodali/shared/components/custom_button.dart';
 import 'package:goodali/shared/components/general_scaffold.dart';
@@ -40,6 +41,7 @@ class _PodcastItemState extends State<PodcastItem> {
   Duration totalDuration = Duration.zero;
   late CartProvider cartProvider;
   late AudioProvider audioProvider;
+  late AuthProvider authProvider;
   final player = AudioPlayer();
 
   @override
@@ -47,10 +49,12 @@ class _PodcastItemState extends State<PodcastItem> {
     super.initState();
     cartProvider = Provider.of<CartProvider>(context, listen: false);
     audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    authProvider = Provider.of<AuthProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if (widget.podcast != null && (widget.podcast?.totalTime ?? 0) <= 0) {
         await audioTime(widget.podcast);
       }
+      authProvider.getMe();
 
       setState(() {
         totalDuration = Duration(minutes: widget.podcast?.totalTime ?? 0);
@@ -239,26 +243,31 @@ class _PodcastItemState extends State<PodcastItem> {
                   ),
                   HSpacer(),
                   widget.podcast?.isBought == false
-                      ? CustomButton(
-                          onPressed: () {
-                            final result =
-                                cartProvider.addProduct(widget.podcast);
-                            if (result) {
-                              Toast.success(context,
-                                  description: "Лекц сагсанд нэмэгдлээ.");
-                            } else {
-                              Toast.error(context,
-                                  description: "Лекц сагсанд нэмэгдсэн байна.");
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            child: Image.asset(
-                              "assets/icons/ic_cart.png",
-                              width: 24,
-                            ),
-                          ),
-                        )
+                      ? authProvider.token.isEmpty == true ||
+                              authProvider.me?.email?.toLowerCase() ==
+                                  "surgalt9@gmail.com"
+                          ? SizedBox()
+                          : CustomButton(
+                              onPressed: () {
+                                final result =
+                                    cartProvider.addProduct(widget.podcast);
+                                if (result) {
+                                  Toast.success(context,
+                                      description: "Лекц сагсанд нэмэгдлээ.");
+                                } else {
+                                  Toast.error(context,
+                                      description:
+                                          "Лекц сагсанд нэмэгдсэн байна.");
+                                }
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Image.asset(
+                                  "assets/icons/ic_cart.png",
+                                  width: 24,
+                                ),
+                              ),
+                            )
                       : SizedBox(),
                 ],
               ),

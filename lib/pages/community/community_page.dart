@@ -42,7 +42,7 @@ class _CommunityPageState extends State<CommunityPage> {
     authProvider = Provider.of<AuthProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final me = await authProvider.getMe();
-      if (authProvider.token?.isNotEmpty == true) {
+      if (authProvider.token.isNotEmpty == true) {
         setState(() {
           this.me = me;
         });
@@ -62,7 +62,7 @@ class _CommunityPageState extends State<CommunityPage> {
     return Consumer<CommunityProvider>(
       builder: (context, provider, _) {
         return Selector<AuthProvider, bool>(
-          selector: (context, auth) => auth.token?.isNotEmpty == true,
+          selector: (context, auth) => auth.token.isNotEmpty == true,
           builder: (context, isAuth, _) {
             return DefaultTabController(
               length: fireTypes.length,

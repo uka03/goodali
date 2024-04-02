@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/connection/models/login_response.dart';
 import 'package:goodali/connection/models/post_response.dart';
-import 'package:goodali/connection/models/tag_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/community/provider/community_provider.dart';
@@ -51,11 +50,7 @@ class _PostDetailState extends State<PostDetail> {
 
   @override
   Widget build(BuildContext context) {
-    TagResponseData? firstTag;
     String? purchaseDate;
-    if (widget.post?.tags?.isNotEmpty == true) {
-      firstTag = widget.post?.tags?.first;
-    }
 
     if (widget.post?.createdAt?.isNotEmpty == true) {
       final parsedDate =
