@@ -56,11 +56,14 @@ class _PincodeState extends State<Pincode> {
               children: [
                 Column(
                   children: [
-                    Text(
-                      widget.title,
-                      style: GoodaliTextStyles.titleText(
-                        context,
-                        fontSize: 24,
+                    Center(
+                      child: Text(
+                        widget.title,
+                        style: GoodaliTextStyles.titleText(
+                          context,
+                          fontSize: 24,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     widget.description?.isNotEmpty == true

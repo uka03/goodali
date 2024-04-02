@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goodali/utils/colors.dart';
+import 'package:goodali/utils/primary_button.dart';
+import 'package:goodali/utils/spacer.dart';
 
 showModalSheet(
   BuildContext context, {
@@ -52,6 +54,75 @@ showModalSheet(
             ),
           ),
         ),
+      );
+    },
+  );
+}
+
+showAlertDialog(BuildContext context,
+    {String? image,
+    required Widget title,
+    Widget? content,
+    List<Widget>? actions,
+    VoidCallback? onCancel,
+    VoidCallback? onOk,
+    String? okText,
+    String? cancelText,
+    bool dismissible = true,
+    EdgeInsets? titlePadding,
+    Color? backgroundColor,
+    Color? barrierColor}) {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: dismissible,
+    barrierColor: barrierColor,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: GoodaliColors.primaryBGColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        actionsAlignment: MainAxisAlignment.center,
+        contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        insetPadding: EdgeInsets.zero,
+        title: title,
+        content: content,
+        actions: actions ??
+            <Widget>[
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: PrimaryButton(
+                            width: double.infinity,
+                            backgroundColor: GoodaliColors.grayColor,
+                            text: cancelText ?? "",
+                            onPressed: () {
+                              if (onCancel != null) {
+                                onCancel();
+                              }
+                            },
+                          ),
+                        ),
+                        HSpacer.sm(),
+                        Expanded(
+                          child: PrimaryButton(
+                            width: double.infinity,
+                            text: okText ?? "Ok",
+                            onPressed: () {
+                              if (onOk != null) {
+                                onOk();
+                              }
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            ],
       );
     },
   );

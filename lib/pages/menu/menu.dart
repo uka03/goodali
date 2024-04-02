@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goodali/pages/auth/login_pincode.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/menu/change_password.dart';
 import 'package:goodali/pages/menu/faq_page.dart';
@@ -6,6 +7,7 @@ import 'package:goodali/shared/components/appbar_with_back.dart';
 import 'package:goodali/shared/components/custom_button.dart';
 import 'package:goodali/shared/components/general_scaffold.dart';
 import 'package:goodali/utils/colors.dart';
+import 'package:goodali/utils/modals.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
 import 'package:provider/provider.dart';
@@ -66,6 +68,43 @@ class _MenuPageState extends State<MenuPage> {
                   iconPath: "assets/icons/ic_paper.png",
                   title: "Үйлчилгээний нөхцөл",
                   onPressed: () {},
+                ),
+                menuItem(
+                  iconPath: "assets/icons/ic_trash.png",
+                  title: "Бүртгэл устгах",
+                  isLogout: true,
+                  onPressed: () {
+                    showAlertDialog(
+                      context,
+                      title: Text(
+                        "Та бүртгэлээ устгах",
+                      ),
+                      okText: "Устгах",
+                      cancelText: "Буцах",
+                      onCancel: () {
+                        Navigator.pop(context);
+                      },
+                      content: Text(
+                        "Та бүртгэлээ устгахдаа итгэлтэй байна ?",
+                        style:
+                            GoodaliTextStyles.bodyText(context, fontSize: 14),
+                      ),
+                      onOk: () {
+                        Navigator.pop(context);
+                        showModalSheet(
+                          context,
+                          isScrollControlled: true,
+                          height: MediaQuery.of(context).size.height * 0.88,
+                          child: Pincode(
+                            onleading: () {},
+                            onCompleted: (value) {},
+                            title: "Бүртгэлээ устгахын тулд Пинкод оруулна уу?",
+                            withLeading: false,
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ],
             ),
