@@ -140,4 +140,9 @@ class AuthProvider extends ChangeNotifier {
     }
     return [];
   }
+
+  Future<bool> accountDelete() async {
+    final response = await _dioClient.deleteAccount();
+    return response.status == 1;
+  }
 }

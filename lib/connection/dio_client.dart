@@ -58,6 +58,7 @@ class DioClient {
   static const setAnswerUrl = "/set_answer_api";
   static const searchUrl = "/search_text";
   static const specialListUrl = "/special_list";
+  static const accountDeletionUrl = "/account_deletion";
 
   Future<LoginResponse> login(
       {required String email, required String password}) async {
@@ -677,6 +678,18 @@ class DioClient {
     } catch (e) {
       print(e);
       return ProductResponse(data: []);
+    }
+  }
+
+  Future<BaseResponse> deleteAccount() async {
+    try {
+      final response = await _dioClient.post("$host$accountDeletionUrl");
+      print(response);
+      final model = BaseResponse.fromJson(response.data);
+      return model;
+    } catch (e) {
+      print(e);
+      return BaseResponse();
     }
   }
 }

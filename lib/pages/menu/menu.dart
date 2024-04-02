@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:goodali/pages/auth/login_pincode.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/menu/change_password.dart';
@@ -10,6 +11,7 @@ import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/modals.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
+import 'package:goodali/utils/toasts.dart';
 import 'package:provider/provider.dart';
 
 class MenuPage extends StatefulWidget {
@@ -97,7 +99,27 @@ class _MenuPageState extends State<MenuPage> {
                           height: MediaQuery.of(context).size.height * 0.88,
                           child: Pincode(
                             onleading: () {},
-                            onCompleted: (value) {},
+                            onCompleted: (value) async {
+                              final storage = FlutterSecureStorage();
+                              final pincode =
+                                  await storage.read(key: 'pincode');
+                              if (pincode == value) {
+                                final response =
+                                    await authProvider.accountDelete();
+                                if (response && context.mounted) {
+                                  authProvider.logout();
+                                  Navigator.popUntil(
+                                      context, (route) => route.isFirst);
+                                  Toast.success(context,
+                                      description: "Амжилттай устгагдлаа.");
+                                }
+                              } else {
+                                if (context.mounted) {
+                                  Toast.error(context,
+                                      description: "Пинкод буруу байна.");
+                                }
+                              }
+                            },
                             title: "Бүртгэлээ устгахын тулд Пинкод оруулна уу?",
                             withLeading: false,
                           ),
