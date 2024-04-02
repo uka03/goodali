@@ -59,6 +59,7 @@ class DioClient {
   static const searchUrl = "/search_text";
   static const specialListUrl = "/special_list";
   static const accountDeletionUrl = "/account_deletion";
+  static const invoiceUrl = "/invoice_detail";
 
   Future<LoginResponse> login(
       {required String email, required String password}) async {
@@ -503,6 +504,21 @@ class DioClient {
     } catch (e) {
       print(e);
       return PaymentResponse();
+    }
+  }
+
+  Future<InvoiceResponse> checkOrder({required String? id}) async {
+    try {
+      final data = {
+        "invoice_number": id,
+      };
+      final response = await _dioClient.get("$host$invoiceUrl", data: data);
+      final model = InvoiceResponse.fromJson(response.data);
+
+      return model;
+    } catch (e) {
+      print(e);
+      return InvoiceResponse();
     }
   }
 

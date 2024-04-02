@@ -44,3 +44,34 @@ Map<String, dynamic> _$OrderUrlsToJson(OrderUrls instance) => <String, dynamic>{
       'logo': instance.logo,
       'name': instance.name,
     };
+
+InvoiceResponse _$InvoiceResponseFromJson(Map<String, dynamic> json) =>
+    InvoiceResponse(
+      data: json['data'] == null
+          ? null
+          : InvoiceResponseData.fromJson(json['data'] as Map<String, dynamic>),
+      message: json['message'] as String?,
+      status: json['status'] as int?,
+      msg: json['msg'] as String?,
+    );
+
+Map<String, dynamic> _$InvoiceResponseToJson(InvoiceResponse instance) =>
+    <String, dynamic>{
+      'status': instance.status,
+      'msg': instance.msg,
+      'message': instance.message,
+      'data': instance.data,
+    };
+
+InvoiceResponseData _$InvoiceResponseDataFromJson(Map<String, dynamic> json) =>
+    InvoiceResponseData(
+      invoiceNumber: json['invoice_number'] as String?,
+      status: json['status'] as bool?,
+    );
+
+Map<String, dynamic> _$InvoiceResponseDataToJson(
+        InvoiceResponseData instance) =>
+    <String, dynamic>{
+      'invoice_number': instance.invoiceNumber,
+      'status': instance.status,
+    };

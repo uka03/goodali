@@ -12,6 +12,7 @@ import 'package:goodali/pages/lesson/lessons_page.dart';
 import 'package:goodali/pages/menu/change_password.dart';
 import 'package:goodali/pages/menu/faq_page.dart';
 import 'package:goodali/pages/menu/menu.dart';
+import 'package:goodali/pages/menu/term_page.dart';
 import 'package:goodali/pages/payment/card_page.dart';
 import 'package:goodali/pages/payment/payment_page.dart';
 import 'package:goodali/pages/payment/qpay_page.dart';
@@ -45,4 +46,5 @@ final Map<String, WidgetBuilder> routes = {
   FaqPage.routeName: (context) => FaqPage(),
   SearchPage.routeName: (context) => SearchPage(),
   AuthWebPage.routeName: (context) => AuthWebPage(),
+  TermPage.routeName: (context) => TermPage(),
 };

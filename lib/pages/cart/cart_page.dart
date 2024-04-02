@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/pages/audio/provider/audio_provider.dart';
 import 'package:goodali/pages/cart/provider/cart_provider.dart';
+import 'package:goodali/pages/menu/term_page.dart';
 import 'package:goodali/pages/payment/payment_page.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
 import 'package:goodali/shared/components/custom_button.dart';
@@ -32,6 +33,7 @@ String formatNumber(int number) {
 
 class _CartPageState extends State<CartPage> {
   late final AudioProvider audioProvider;
+  bool isAgreed = false;
   @override
   void initState() {
     super.initState();
@@ -172,10 +174,65 @@ class _CartPageState extends State<CartPage> {
                       ],
                     ),
                     VSpacer(),
+                    CustomButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, TermPage.routeName);
+                        setState(() {
+                          isAgreed = !isAgreed;
+                        });
+                      },
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: isAgreed
+                                  ? GoodaliColors.primaryColor
+                                  : GoodaliColors.borderColor,
+                              width: 2),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: isAgreed
+                                    ? GoodaliColors.primaryColor
+                                    : GoodaliColors.whiteColor,
+                                border: Border.all(
+                                    color: isAgreed
+                                        ? GoodaliColors.primaryColor
+                                        : GoodaliColors.borderColor,
+                                    width: 2),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.check,
+                                  size: 12,
+                                  color: GoodaliColors.whiteColor,
+                                ),
+                              ),
+                            ),
+                            HSpacer(size: 10),
+                            Expanded(
+                              child: Text(
+                                "Гэрээтэй танилцан, зөвшөөрсөн",
+                                style: GoodaliTextStyles.bodyText(context,
+                                    textColor: Colors.lightBlue,
+                                    decoration: TextDecoration.underline),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    VSpacer(),
                     PrimaryButton(
                       text: "Худалдаж авах",
                       height: 50,
-                      isEnable: provider.products.isNotEmpty,
+                      isEnable: provider.products.isNotEmpty && isAgreed,
                       onPressed: () {
                         Navigator.pushNamed(context, PaymentPage.routeName);
                       },

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:goodali/pages/cart/provider/cart_provider.dart';
+import 'package:goodali/pages/home/provider/home_provider.dart';
 import 'package:goodali/pages/payment/components/payment_item.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
 import 'package:goodali/utils/colors.dart';
@@ -22,13 +25,30 @@ class QpayPage extends StatefulWidget {
 
 class _QpayPageState extends State<QpayPage> {
   late CartProvider cartProvider;
+  late HomeProvider homeProvider;
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
     cartProvider = Provider.of<CartProvider>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      cartProvider.createOrder(invoiceType: 0);
+    homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      final response = await cartProvider.createOrder(invoiceType: 0);
+      timer?.cancel();
+      timer = Timer.periodic(Duration(seconds: 5), (timer) async {
+        if (response.goodaliOrderId?.isNotEmpty == true) {
+          final checkRes =
+              await cartProvider.checkOrder(response.goodaliOrderId);
+          if (checkRes && mounted) {
+            timer.cancel();
+            cartProvider.removeProductAll();
+            Toast.success(context, description: "Худалдан авалт амжилттай.");
+            homeProvider.getHomeData(isAuth: true);
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          }
+        }
+      });
     });
   }
 
@@ -37,7 +57,6 @@ class _QpayPageState extends State<QpayPage> {
     final bool canLaunchApp = await launchUrlString(url);
     if (canLaunchApp) {
       await launchUrlString(url);
-      cartProvider.removeProductAll();
     } else {
       if (mounted) {
         Toast.error(context,
@@ -45,6 +64,12 @@ class _QpayPageState extends State<QpayPage> {
       }
     }
     dismissLoader();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timer?.cancel();
   }
 
   @override

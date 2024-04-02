@@ -1,3 +1,4 @@
+import 'package:goodali/connection/models/base_response.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'payment_response.g.dart';
@@ -49,4 +50,37 @@ class OrderUrls {
   factory OrderUrls.fromJson(Map<String, dynamic> json) =>
       _$OrderUrlsFromJson(json);
   Map<String, dynamic> toJson() => _$OrderUrlsToJson(this);
+}
+
+@JsonSerializable()
+class InvoiceResponse extends BaseResponse {
+  InvoiceResponseData? data;
+
+  InvoiceResponse({
+    this.data,
+    super.message,
+    super.status,
+    super.msg,
+  });
+
+  factory InvoiceResponse.fromJson(Map<String, dynamic> json) =>
+      _$InvoiceResponseFromJson(json);
+  @override
+  Map<String, dynamic> toJson() => _$InvoiceResponseToJson(this);
+}
+
+@JsonSerializable()
+class InvoiceResponseData {
+  @JsonKey(name: "invoice_number")
+  String? invoiceNumber;
+  bool? status;
+
+  InvoiceResponseData({
+    this.invoiceNumber,
+    this.status,
+  });
+
+  factory InvoiceResponseData.fromJson(Map<String, dynamic> json) =>
+      _$InvoiceResponseDataFromJson(json);
+  Map<String, dynamic> toJson() => _$InvoiceResponseDataToJson(this);
 }

@@ -4,6 +4,7 @@ import 'package:goodali/pages/auth/login_pincode.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/menu/change_password.dart';
 import 'package:goodali/pages/menu/faq_page.dart';
+import 'package:goodali/pages/menu/term_page.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
 import 'package:goodali/shared/components/custom_button.dart';
 import 'package:goodali/shared/components/general_scaffold.dart';
@@ -69,7 +70,9 @@ class _MenuPageState extends State<MenuPage> {
                 menuItem(
                   iconPath: "assets/icons/ic_paper.png",
                   title: "Үйлчилгээний нөхцөл",
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, TermPage.routeName);
+                  },
                 ),
                 menuItem(
                   iconPath: "assets/icons/ic_trash.png",
@@ -79,7 +82,7 @@ class _MenuPageState extends State<MenuPage> {
                     showAlertDialog(
                       context,
                       title: Text(
-                        "Та бүртгэлээ устгах",
+                        "Та бүртгэлээ устгахдаа итгэлтэй байна уу?",
                       ),
                       okText: "Устгах",
                       cancelText: "Буцах",

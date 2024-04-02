@@ -25,9 +25,9 @@ class AudioControls extends StatelessWidget {
           onPressed: () {
             if (positionData?.duration != null &&
                 positionData?.position != null) {
-              if (positionData!.position > Duration(seconds: 5)) {
+              if (positionData!.position > Duration(seconds: 15)) {
                 audioProvider.audioPlayer?.seek(
-                  positionData!.position - Duration(seconds: 5),
+                  positionData!.position - Duration(seconds: 15),
                 );
               }
             }
@@ -38,7 +38,7 @@ class AudioControls extends StatelessWidget {
                 borderRadius: BorderRadius.circular(50)),
             padding: EdgeInsets.all(15),
             child: Image.asset(
-              "assets/icons/ic_replay_5.png",
+              "assets/icons/ic_replay_15.png",
               width: 30,
               height: 30,
               color: GoodaliColors.blackColor,

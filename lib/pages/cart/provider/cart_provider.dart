@@ -82,7 +82,7 @@ class CartProvider extends ChangeNotifier {
     final productIDs = getProductIds();
     final response = await _dioClient.createOrder(
         invoiceType: invoiceType, productIDs: productIDs);
-
+    print(response.goodaliOrderId);
     paymentDetail = response;
 
     dismissLoader();
@@ -96,5 +96,15 @@ class CartProvider extends ChangeNotifier {
     }).toList();
 
     return response;
+  }
+
+  Future<bool> checkOrder(String? orderId) async {
+    final response = await _dioClient.checkOrder(id: orderId);
+    print(response.toString().toString());
+    if (response.data?.status == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
