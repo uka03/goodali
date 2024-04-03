@@ -65,7 +65,7 @@ class _CourseItemsState extends State<CourseItems> {
                       style: GoodaliTextStyles.titleText(context, fontSize: 26),
                     ),
                     ListView.separated(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, 150),
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: provider.coursesLessons.length,

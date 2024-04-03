@@ -17,12 +17,16 @@ class AuthProvider extends ChangeNotifier {
   LoginResponse? me;
 
   Future<LoginResponse> login(
-      {required String email, required String password}) async {
+      {required String email,
+      required String password,
+      bool tokenRelout = true}) async {
     final storage = FlutterSecureStorage();
     final response = await _dioClient.login(email: email, password: password);
 
     if (response.token != null) {
-      token = response.token ?? "";
+      if (tokenRelout) {
+        token = response.token ?? "";
+      }
       me = response;
       final meString = jsonEncode(response);
       await storage.write(key: 'token', value: response.token);
@@ -116,18 +120,32 @@ class AuthProvider extends ChangeNotifier {
     login(email: response.email ?? "", password: pincode ?? "");
   }
 
-  Future<LoginResponse?> getMe() async {
+  Future<LoginResponse?> getMe({bool isPodcast = false}) async {
     final storage = FlutterSecureStorage();
     final userString = await storage.read(key: 'user');
+    final pincode = await storage.read(key: 'pincode');
     // final tokenRes = await storage.read(key: 'token');
     if (userString?.isNotEmpty == true) {
-      final response = LoginResponse.fromJson(jsonDecode(userString!));
-      if (response.token?.isNotEmpty == true) {
-        me = response;
-        // token = tokenRes;
+      final responseMe = LoginResponse.fromJson(jsonDecode(userString!));
+      if (isPodcast) {
+        if (responseMe.token?.isNotEmpty == true) {
+          me = responseMe;
+          // token = tokenRes;
+        }
+        notifyListeners();
+        return responseMe;
+      } else {
+        final response = await login(
+            email: responseMe.email ?? "",
+            password: pincode ?? "",
+            tokenRelout: false);
+        if (response.token?.isNotEmpty == true) {
+          me = response;
+          // token = tokenRes;
+        }
+        notifyListeners();
+        return response;
       }
-      notifyListeners();
-      return response;
     }
     return null;
   }

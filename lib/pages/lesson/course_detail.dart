@@ -141,7 +141,7 @@ class _CourseDetailState extends State<CourseDetail> {
               return KeyboardHider(
                 child: SingleChildScrollView(
                   child: Container(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 150),
                     child: Column(
                       children: [
                         if (task?.banner?.isNotEmpty == true &&

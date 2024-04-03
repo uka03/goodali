@@ -19,7 +19,7 @@ class AudioProvider extends ChangeNotifier {
 
   Future<void> setAudioPlayer(BuildContext context, ProductResponseData? data,
       {bool save = false}) async {
-    if (!_initiated || data?.id != product?.id) {
+    if (!_initiated || data?.audio != product?.audio) {
       isSaved = save;
       await setPlayerState(context, GoodaliPlayerState.disposed);
       init(data);

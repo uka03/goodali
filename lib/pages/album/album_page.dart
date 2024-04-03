@@ -80,7 +80,8 @@ class _AlbumPageState extends State<AlbumPage> {
                       },
                     ),
                   ),
-                )
+                ),
+                VSpacer.xl(),
               ],
             ),
           ),

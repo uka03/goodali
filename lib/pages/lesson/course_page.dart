@@ -53,6 +53,7 @@ class _CoursePageState extends State<CoursePage> {
                 ListView.separated(
                   physics: NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 150),
                   itemCount: provider.courseItems.length,
                   separatorBuilder: (context, index) => VSpacer(size: 20),
                   itemBuilder: (context, index) {

@@ -54,7 +54,7 @@ class _PodcastItemState extends State<PodcastItem> {
       if (widget.podcast != null && (widget.podcast?.totalTime ?? 0) <= 0) {
         await audioTime(widget.podcast);
       }
-      authProvider.getMe();
+      authProvider.getMe(isPodcast: true);
 
       setState(() {
         totalDuration = Duration(minutes: widget.podcast?.totalTime ?? 0);
@@ -104,6 +104,7 @@ class _PodcastItemState extends State<PodcastItem> {
                 isScrollControlled: true,
                 height: MediaQuery.of(context).size.height * 0.85,
                 child: AudioPage(
+                  isBought: widget.isbought,
                   data: widget.podcast,
                   isSaved: widget.isSaved,
                 ),

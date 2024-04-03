@@ -14,11 +14,17 @@ import 'package:goodali/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class AudioPage extends StatefulWidget {
-  const AudioPage({super.key, this.data, this.isSaved = false});
+  const AudioPage({
+    super.key,
+    this.data,
+    this.isSaved = false,
+    this.isBought = false,
+  });
 
   static String routeName = "/audio_page";
   final ProductResponseData? data;
   final bool isSaved;
+  final bool isBought;
 
   @override
   State<AudioPage> createState() => _AudioPageState();
@@ -98,7 +104,9 @@ class _AudioPageState extends State<AudioPage> {
                                 ),
                                 VSpacer.sm(),
                                 Text(
-                                  podcast?.title ?? "",
+                                  widget.isBought
+                                      ? podcast?.lectureTitle ?? ""
+                                      : podcast?.title ?? "",
                                   textAlign: TextAlign.center,
                                   style: GoodaliTextStyles.titleText(context,
                                       fontSize: 24),
