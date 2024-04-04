@@ -56,6 +56,7 @@ class _AlbumPageState extends State<AlbumPage> {
                       setState(() {});
                     },
                     child: GridView.builder(
+                      padding: EdgeInsets.only(bottom: 70),
                       itemCount: widget.id == null
                           ? provider.lectures?.length ?? 0
                           : lectures.length,
@@ -81,7 +82,6 @@ class _AlbumPageState extends State<AlbumPage> {
                     ),
                   ),
                 ),
-                VSpacer.xl(),
               ],
             ),
           ),
