@@ -1,4 +1,4 @@
-package com.goodali.mn
+package com.goodali.goodali
 
 import io.flutter.embedding.android.FlutterActivity
 
