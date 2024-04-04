@@ -86,7 +86,6 @@ class AuthProvider extends ChangeNotifier {
     await storage.delete(key: 'pincode');
     await storage.delete(key: 'token');
     await prefs.remove('search_history');
-    await prefs.remove('listen_podcasts');
     dismissLoader();
     notifyListeners();
   }
