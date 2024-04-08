@@ -61,6 +61,7 @@ dependencies:
   url_launcher: ^6.2.5
   webview_flutter: ^4.7.0
   dropdown_button2: ^2.3.9
+  skeletons: ^0.0.3
 
 dev_dependencies:
   flutter_test:

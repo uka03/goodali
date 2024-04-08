@@ -8,7 +8,6 @@ import 'package:goodali/utils/globals.dart';
 
 class HomeProvider extends ChangeNotifier {
   final _dioClient = DioClient();
-  bool loading = true;
 
   List<BannerResponseData>? banners = List.empty(growable: true);
   List<ProductResponseData?>? lectures = List.empty(growable: true);
@@ -23,23 +22,20 @@ class HomeProvider extends ChangeNotifier {
   List<ProductResponseData?> specialList = [];
 
   getHomeData({
-    bool refresh = false,
     required bool? isAuth,
   }) async {
-    showLoader();
     if (isAuth == true) {
-      await getBoughtLectures();
+      getBoughtLectures();
     }
-    await getArticle();
-    await getSpecialList();
-    await getBanners();
-    await getLesson();
-    await getPodcasts();
-    await getlecture();
-    await getVideos();
-    await getMoodMain();
-    await getMoonList();
-    loading = false;
+    getArticle();
+    getSpecialList();
+    getBanners();
+    getLesson();
+    getPodcasts();
+    getlecture();
+    getVideos();
+    getMoodMain();
+    getMoonList();
     dismissLoader();
     notifyListeners();
   }
