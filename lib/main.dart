@@ -15,12 +15,18 @@ import 'package:goodali/routes/routes.dart';
 import 'package:goodali/shared/components/custom_animation.dart';
 import 'package:goodali/shared/provider/navigator_provider.dart';
 import 'package:goodali/utils/theme.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:goodali/utils/globals.dart' as globals;
 
-void main() {
+void main() async {
   configLoading();
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
   runApp(const MyApp());
 }
 

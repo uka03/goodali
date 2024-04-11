@@ -4,6 +4,7 @@ import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/utils/utils.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,8 +18,7 @@ class AudioProvider extends ChangeNotifier {
   BehaviorSubject<SeekBarData>? streamController;
   ProductResponseData? product;
 
-  Future<void> setAudioPlayer(BuildContext context, ProductResponseData? data,
-      {bool save = false}) async {
+  Future<void> setAudioPlayer(BuildContext context, ProductResponseData? data, {bool save = false}) async {
     if (!_initiated || data?.audio != product?.audio) {
       isSaved = save;
       await setPlayerState(context, GoodaliPlayerState.disposed);
@@ -33,8 +33,7 @@ class AudioProvider extends ChangeNotifier {
     _initiated = true;
   }
 
-  Stream<SeekBarData> get _seekBarDataStream =>
-      Rx.combineLatest3<Duration, Duration, Duration?, SeekBarData>(
+  Stream<SeekBarData> get _seekBarDataStream => Rx.combineLatest3<Duration, Duration, Duration?, SeekBarData>(
         audioPlayer?.positionStream ?? Stream.empty(),
         audioPlayer?.bufferedPositionStream ?? Stream.empty(),
         audioPlayer?.durationStream ?? Stream.empty(),
@@ -62,9 +61,21 @@ class AudioProvider extends ChangeNotifier {
     if (audioPlayer == null || data == null) {
       return;
     }
-    if (data.audio?.isNotEmpty == true ||
-        data.audio != "Audio failed to upload") {
-      await audioPlayer?.setUrl(data.audio!.toUrl());
+    if (data.audio?.isNotEmpty == true || data.audio != "Audio failed to upload") {
+      await audioPlayer?.setAudioSource(
+        AudioSource.uri(
+          Uri.parse(
+            data.audio!.toUrl(),
+          ),
+          tag: MediaItem(
+            id: data.audio ?? "",
+            title: data.title ?? "",
+            artist: "Goodali",
+            artUri: Uri.parse(data.banner.toUrl()),
+          ),
+        ),
+      );
+      // await audioPlayer?.setUrl(data.audio!.toUrl());
     }
   }
 
