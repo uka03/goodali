@@ -4,7 +4,6 @@ import 'package:goodali/connection/models/banner_response.dart';
 import 'package:goodali/connection/models/article_response.dart';
 import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/connection/models/video_response.dart';
-import 'package:goodali/utils/globals.dart';
 
 class HomeProvider extends ChangeNotifier {
   final _dioClient = DioClient();
@@ -36,8 +35,6 @@ class HomeProvider extends ChangeNotifier {
     getVideos();
     getMoodMain();
     getMoonList();
-    dismissLoader();
-    notifyListeners();
   }
 
   Future<void> getBoughtLectures() async {
@@ -55,8 +52,7 @@ class HomeProvider extends ChangeNotifier {
 
   getLectureList(ProductResponseData? data) async {
     albumLectures = [];
-    List<ProductResponseData?> response =
-        await _dioClient.getLectureList(data?.id);
+    List<ProductResponseData?> response = await _dioClient.getLectureList(data?.id);
 
     if (response.isNotEmpty == true) {
       for (var element in boughtDatas) {
@@ -81,6 +77,7 @@ class HomeProvider extends ChangeNotifier {
     if (response.data?.isNotEmpty == true) {
       banners = response.data;
     }
+    notifyListeners();
   }
 
   Future<List<ProductResponseData?>> getlecture({int? id}) async {
@@ -100,6 +97,7 @@ class HomeProvider extends ChangeNotifier {
         return lectures?.where((element) => element?.id == id).toList() ?? [];
       }
     }
+    notifyListeners();
     return [];
   }
 
@@ -108,6 +106,7 @@ class HomeProvider extends ChangeNotifier {
     if (response.isNotEmpty == true) {
       podcasts = response;
     }
+    notifyListeners();
   }
 
   Future<ProductResponseData?> getLesson({int? id}) async {
@@ -129,6 +128,8 @@ class HomeProvider extends ChangeNotifier {
     if (response.isNotEmpty == true) {
       videos = response;
     }
+
+    notifyListeners();
   }
 
   getArticle() async {
@@ -136,6 +137,7 @@ class HomeProvider extends ChangeNotifier {
     if (response.isNotEmpty == true) {
       articles = response;
     }
+    notifyListeners();
   }
 
   getMoodMain() async {
@@ -150,6 +152,7 @@ class HomeProvider extends ChangeNotifier {
     if (response.isNotEmpty == true) {
       moodList = response;
     }
+    notifyListeners();
   }
 
   getSpecialList() async {
@@ -157,5 +160,6 @@ class HomeProvider extends ChangeNotifier {
     if (response.data?.isNotEmpty == true) {
       specialList = response.data ?? [];
     }
+    notifyListeners();
   }
 }

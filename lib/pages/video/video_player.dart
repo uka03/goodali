@@ -97,7 +97,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: CustomButton(
                     onPressed: () async {
-                      final videoId = _controller.initialVideoId; // Using the initialVideoId property
+                      final videoId = _controller.initialVideoId;
                       final youtubeUrl = Uri.parse("https://www.youtube.com/watch?v=$videoId");
                       if (await canLaunchUrl(youtubeUrl)) {
                         await launchUrl(youtubeUrl, mode: LaunchMode.externalApplication);

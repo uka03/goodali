@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/community/community_page.dart';
 import 'package:goodali/pages/home/home_page.dart';
+import 'package:goodali/pages/home/home_page_web.dart';
 import 'package:goodali/pages/profile/not_login_page.dart';
 import 'package:goodali/pages/profile/profile_page.dart';
 import 'package:goodali/shared/components/custom_button.dart';
@@ -35,7 +36,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     return Consumer<AuthProvider>(builder: (context, authprovider, _) {
       return Consumer<NavigationProvider>(builder: (context, provider, _) {
         List<Widget> widgetOptions = <Widget>[
-          HomePage(),
+          kIsWeb ? HomePageWeb() : HomePage(),
           CommunityPage(),
           authprovider.token.isNotEmpty == true ? ProfilePage() : NotUser(),
         ];
@@ -99,9 +100,7 @@ class _MainScaffoldState extends State<MainScaffold> {
               Image.asset(
                 icon,
                 height: 30,
-                color: provider.selectedTab == index
-                    ? GoodaliColors.primaryColor
-                    : GoodaliColors.grayColor,
+                color: provider.selectedTab == index ? GoodaliColors.primaryColor : GoodaliColors.grayColor,
               ),
               VSpacer.sm(),
               Text(
@@ -109,9 +108,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                 style: GoodaliTextStyles.bodyText(
                   context,
                   fontWeight: FontWeight.w500,
-                  textColor: provider.selectedTab == index
-                      ? GoodaliColors.primaryColor
-                      : GoodaliColors.grayColor,
+                  textColor: provider.selectedTab == index ? GoodaliColors.primaryColor : GoodaliColors.grayColor,
                 ),
               )
             ],
