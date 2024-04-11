@@ -69,7 +69,7 @@ class AudioProvider extends ChangeNotifier {
           ),
           tag: MediaItem(
             id: data.audio ?? "",
-            title: data.title ?? "",
+            title: data.title ?? data.lectureTitle ?? "",
             artist: "Goodali",
             artUri: Uri.parse(data.banner.toUrl()),
           ),
