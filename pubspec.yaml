@@ -63,8 +63,6 @@ dependencies:
   dropdown_button2: ^2.3.9
   skeletons: ^0.0.3
   just_audio_background: ^0.0.1-beta.11
-  flutter_sound: ^9.2.13
-  logger: ^1.4.0
   audioplayers: ^6.0.0
 
 dev_dependencies:

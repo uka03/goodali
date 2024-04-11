@@ -89,14 +89,12 @@ class _CartPageState extends State<CartPage> {
                                     color: GoodaliColors.inputColor,
                                   ),
                                   child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(5),
                                         child: CachedNetworkImage(
-                                          imageUrl: item.banner?.toUrl() ??
-                                              placeholder,
+                                          imageUrl: item.banner?.toUrl() ?? placeholder,
                                           width: 40,
                                           height: 40,
                                           fit: BoxFit.cover,
@@ -108,10 +106,8 @@ class _CartPageState extends State<CartPage> {
                                       ),
                                       HSpacer(),
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           CustomButton(
                                             onPressed: () {
@@ -125,9 +121,7 @@ class _CartPageState extends State<CartPage> {
                                           VSpacer.sm(),
                                           Text(
                                             "${formatNumber(item.price ?? 0)}₮",
-                                            style: GoodaliTextStyles.bodyText(
-                                                context,
-                                                fontSize: 16),
+                                            style: GoodaliTextStyles.bodyText(context, fontSize: 16),
                                           ),
                                         ],
                                       )
@@ -167,30 +161,24 @@ class _CartPageState extends State<CartPage> {
                         ),
                         Text(
                           "${formatNumber(provider.getTotalPrice())}₮",
-                          style: GoodaliTextStyles.bodyText(context,
-                              fontSize: 16,
-                              textColor: GoodaliColors.primaryColor),
+                          style: GoodaliTextStyles.bodyText(context, fontSize: 16, textColor: GoodaliColors.primaryColor),
                         ),
                       ],
                     ),
                     VSpacer(),
                     CustomButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, TermPage.routeName);
                         setState(() {
                           isAgreed = !isAgreed;
                         });
                       },
                       child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                        ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                              color: isAgreed
-                                  ? GoodaliColors.primaryColor
-                                  : GoodaliColors.borderColor,
-                              width: 2),
+                          border: Border.all(color: isAgreed ? GoodaliColors.primaryColor : GoodaliColors.borderColor, width: 2),
                         ),
                         child: Row(
                           children: [
@@ -198,14 +186,8 @@ class _CartPageState extends State<CartPage> {
                               padding: EdgeInsets.all(2),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                color: isAgreed
-                                    ? GoodaliColors.primaryColor
-                                    : GoodaliColors.whiteColor,
-                                border: Border.all(
-                                    color: isAgreed
-                                        ? GoodaliColors.primaryColor
-                                        : GoodaliColors.borderColor,
-                                    width: 2),
+                                color: isAgreed ? GoodaliColors.primaryColor : GoodaliColors.whiteColor,
+                                border: Border.all(color: isAgreed ? GoodaliColors.primaryColor : GoodaliColors.borderColor, width: 2),
                               ),
                               child: Center(
                                 child: Icon(
@@ -216,12 +198,16 @@ class _CartPageState extends State<CartPage> {
                               ),
                             ),
                             HSpacer(size: 10),
-                            Expanded(
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, TermPage.routeName);
+                                setState(() {
+                                  isAgreed = !isAgreed;
+                                });
+                              },
                               child: Text(
                                 "Гэрээтэй танилцан, зөвшөөрсөн",
-                                style: GoodaliTextStyles.bodyText(context,
-                                    textColor: Colors.lightBlue,
-                                    decoration: TextDecoration.underline),
+                                style: GoodaliTextStyles.bodyText(context, textColor: Colors.lightBlue, decoration: TextDecoration.underline),
                               ),
                             ),
                           ],
