@@ -13,8 +13,10 @@ class CustomInput extends StatelessWidget {
     this.withIcon = true,
     this.iconColor,
     this.onChanged,
+    this.suffixIcon,
   });
   final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final String? hintText;
   final TextEditingController controller;
   final TextInputAction? textInputAction;
@@ -43,6 +45,7 @@ class CustomInput extends StatelessWidget {
             style: BorderStyle.none,
           ),
         ),
+        suffixIcon: suffixIcon,
         prefixIcon: withIcon
             ? prefixIcon ??
                 Padding(

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/connection/models/login_response.dart';
 import 'package:goodali/connection/models/post_response.dart';
@@ -34,6 +35,8 @@ class _PostDetailState extends State<PostDetail> {
   List<ReplyResponse?> replies = [];
   LoginResponse? me;
 
+  final TextEditingController _commentController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -53,8 +56,7 @@ class _PostDetailState extends State<PostDetail> {
     String? purchaseDate;
 
     if (widget.post?.createdAt?.isNotEmpty == true) {
-      final parsedDate =
-          DateFormat('E, d MMM yyyy HH:mm:ss').parse(widget.post!.createdAt!);
+      final parsedDate = DateFormat('E, d MMM yyyy HH:mm:ss').parse(widget.post!.createdAt!);
       purchaseDate = DateFormat('yyyy.MM.dd').format(parsedDate);
     }
 
@@ -64,231 +66,235 @@ class _PostDetailState extends State<PostDetail> {
       ),
       child: SingleChildScrollView(
         child: SafeArea(
-          child: Container(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Row(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                padding: EdgeInsets.all(16),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: CachedNetworkImage(
-                              imageUrl:
-                                  widget.post?.avatar?.toUrl(isUser: true) ??
-                                      userPlaceholder,
-                              width: 30,
-                              height: 30,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          HSpacer(size: 10),
-                          Text(
-                            widget.post?.nickname ?? "",
-                            style: GoodaliTextStyles.bodyText(context,
-                                fontSize: 14),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(3),
-                            child: Text(
-                              "•",
-                              style: GoodaliTextStyles.bodyText(
-                                context,
-                                textColor: GoodaliColors.grayColor,
-                                fontSize: 16,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: CachedNetworkImage(
+                                  imageUrl: widget.post?.avatar?.toUrl(isUser: true) ?? userPlaceholder,
+                                  width: 30,
+                                  height: 30,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                          ),
-                          Text(
-                            purchaseDate ?? "",
-                            style: GoodaliTextStyles.bodyText(
-                              context,
-                              fontSize: 14,
-                              textColor: GoodaliColors.grayColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                VSpacer(),
-                widget.post?.tags?.isNotEmpty == true
-                    ? SizedBox(
-                        height: 28,
-                        child: ListView.separated(
-                          reverse: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: getListViewlength(
-                              widget.post?.tags?.length,
-                              max: 3),
-                          separatorBuilder: (context, index) => HSpacer(),
-                          itemBuilder: (context, index) {
-                            final tag = widget.post?.tags?[index];
-                            return Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 4, horizontal: 12),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: GoodaliColors.primaryColor,
-                                      )),
-                                  child: Text(
-                                    tag?.name ?? "",
-                                    style: GoodaliTextStyles.bodyText(context,
-                                        textColor: GoodaliColors.primaryColor),
+                              HSpacer(size: 10),
+                              Text(
+                                widget.post?.nickname ?? "",
+                                style: GoodaliTextStyles.bodyText(context, fontSize: 14),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(3),
+                                child: Text(
+                                  "•",
+                                  style: GoodaliTextStyles.bodyText(
+                                    context,
+                                    textColor: GoodaliColors.grayColor,
+                                    fontSize: 16,
                                   ),
                                 ),
-                              ],
-                            );
+                              ),
+                              Text(
+                                purchaseDate ?? "",
+                                style: GoodaliTextStyles.bodyText(
+                                  context,
+                                  fontSize: 14,
+                                  textColor: GoodaliColors.grayColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    VSpacer(),
+                    widget.post?.tags?.isNotEmpty == true
+                        ? SizedBox(
+                            height: 28,
+                            child: ListView.separated(
+                              reverse: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: getListViewlength(widget.post?.tags?.length, max: 3),
+                              separatorBuilder: (context, index) => HSpacer(),
+                              itemBuilder: (context, index) {
+                                final tag = widget.post?.tags?[index];
+                                return Column(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(4),
+                                          border: Border.all(
+                                            color: GoodaliColors.primaryColor,
+                                          )),
+                                      child: Text(
+                                        tag?.name ?? "",
+                                        style: GoodaliTextStyles.bodyText(context, textColor: GoodaliColors.primaryColor),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          )
+                        : SizedBox(),
+                    VSpacer(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.post?.title ?? "",
+                            style: GoodaliTextStyles.titleText(context),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    VSpacer(),
+                    Text(widget.post?.body ?? ""),
+                    VSpacer(),
+                    Row(
+                      children: [
+                        actionBtn(
+                          context,
+                          count: widget.post?.likes,
+                          iconPath: "assets/icons/ic_heart${widget.post?.selfLike == true ? "_active" : ""}.png",
+                          onPressed: () async {
+                            if (widget.post?.id == null) return;
+                            if (widget.post?.selfLike == true) {
+                              final isresp = await communityProvider.postDisLike(id: widget.post!.id!);
+                              if (isresp) {
+                                setState(() {
+                                  widget.post?.selfLike = false;
+                                  widget.post?.likes = (widget.post?.likes ?? 0) - 1;
+                                });
+                              }
+                            } else {
+                              final isresp = await communityProvider.postLike(id: widget.post!.id!);
+                              if (isresp) {
+                                setState(() {
+                                  widget.post!.selfLike = true;
+                                  widget.post?.likes = (widget.post?.likes ?? 0) + 1;
+                                });
+                              }
+                            }
                           },
                         ),
-                      )
-                    : SizedBox(),
-                VSpacer(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        widget.post?.title ?? "",
-                        style: GoodaliTextStyles.titleText(context),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                        HSpacer(),
+                        actionBtn(
+                          context,
+                          count: replies.length,
+                          iconPath: "assets/icons/ic_chat.png",
+                          onPressed: () {},
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                VSpacer(),
-                Text(widget.post?.body ?? ""),
-                VSpacer(),
-                Row(
-                  children: [
-                    actionBtn(
-                      context,
-                      count: widget.post?.likes,
-                      iconPath:
-                          "assets/icons/ic_heart${widget.post?.selfLike == true ? "_active" : ""}.png",
-                      onPressed: () async {
-                        if (widget.post?.id == null) return;
-                        if (widget.post?.selfLike == true) {
-                          final isresp = await communityProvider.postDisLike(
-                              id: widget.post!.id!);
-                          if (isresp) {
-                            setState(() {
-                              widget.post?.selfLike = false;
-                              widget.post?.likes =
-                                  (widget.post?.likes ?? 0) - 1;
-                            });
-                          }
-                        } else {
-                          final isresp = await communityProvider.postLike(
-                              id: widget.post!.id!);
-                          if (isresp) {
-                            setState(() {
-                              widget.post!.selfLike = true;
-                              widget.post?.likes =
-                                  (widget.post?.likes ?? 0) + 1;
-                            });
-                          }
-                        }
-                      },
+                    VSpacer(size: 40),
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: CachedNetworkImage(
+                            imageUrl: me?.avatar?.toUrl(isUser: true) ?? userPlaceholder,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        HSpacer(),
+                        Expanded(
+                          child: CustomInput(
+                            prefixIcon: null,
+                            withIcon: false,
+                            readOnly: !kIsWeb,
+                            suffixIcon: kIsWeb
+                                ? IconButton(
+                                    icon: const Icon(Icons.send, color: GoodaliColors.primaryColor),
+                                    onPressed: () {
+                                      if (_commentController.text.isNotEmpty) {
+                                        postReply(_commentController.text);
+                                      }
+                                    },
+                                  )
+                                : SizedBox(),
+                            hintText: "Сэтгэгдэл бичих",
+                            controller: _commentController,
+                            onTap: () {
+                              if (kIsWeb) {
+                              } else {
+                                showReplyModal();
+                                FocusScope.of(context).requestFocus(focus);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    HSpacer(),
-                    actionBtn(
-                      context,
-                      count: replies.length,
-                      iconPath: "assets/icons/ic_chat.png",
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-                VSpacer(size: 40),
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            me?.avatar?.toUrl(isUser: true) ?? userPlaceholder,
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    HSpacer(),
-                    Expanded(
-                      child: CustomInput(
-                        prefixIcon: null,
-                        withIcon: false,
-                        readOnly: true,
-                        hintText: "Сэтгэгдэл бичих",
-                        controller: TextEditingController(),
-                        onTap: () {
-                          showReplyModal();
-                          FocusScope.of(context).requestFocus(focus);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                VSpacer(),
-                Divider(),
-                replies.isNotEmpty == true
-                    ? ListView.separated(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: replies.length,
-                        separatorBuilder: (BuildContext context, int index) =>
-                            Divider(),
-                        itemBuilder: (context, index) {
-                          final comment = replies[index];
+                    VSpacer(),
+                    Divider(),
+                    replies.isNotEmpty == true
+                        ? ListView.separated(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: replies.length,
+                            separatorBuilder: (BuildContext context, int index) => Divider(),
+                            itemBuilder: (context, index) {
+                              final comment = replies[index];
 
-                          return Container(
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                              return Container(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      comment?.nickname ?? "",
+                                      style: GoodaliTextStyles.titleText(
+                                        context,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    VSpacer(size: 10),
+                                    Text(
+                                      comment?.text ?? "",
+                                      style: GoodaliTextStyles.bodyText(context),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          )
+                        : Center(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  comment?.nickname ?? "",
-                                  style: GoodaliTextStyles.titleText(
-                                    context,
-                                    fontSize: 14,
-                                  ),
+                                Image.asset(
+                                  "assets/images/chat_empty.png",
+                                  height: 150,
                                 ),
-                                VSpacer(size: 10),
+                                VSpacer(size: 30),
                                 Text(
-                                  comment?.text ?? "",
-                                  style: GoodaliTextStyles.bodyText(context),
-                                ),
+                                  "Сэтгэгдэл байхгүй байна.",
+                                  style: GoodaliTextStyles.bodyText(context, fontSize: 14),
+                                  textAlign: TextAlign.center,
+                                )
                               ],
                             ),
-                          );
-                        },
-                      )
-                    : Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              "assets/images/chat_empty.png",
-                              height: 150,
-                            ),
-                            VSpacer(size: 30),
-                            Text(
-                              "Сэтгэгдэл байхгүй байна.",
-                              style: GoodaliTextStyles.bodyText(context,
-                                  fontSize: 14),
-                              textAlign: TextAlign.center,
-                            )
-                          ],
-                        ),
-                      ),
-              ],
-            ),
+                          ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -302,12 +308,10 @@ class _PostDetailState extends State<PostDetail> {
         context: context,
         isScrollControlled: true,
         builder: (_) {
-          return StatefulBuilder(builder:
-              (BuildContext context, void Function(void Function()) setState) {
+          return StatefulBuilder(builder: (BuildContext context, void Function(void Function()) setState) {
             return SingleChildScrollView(
                 child: Container(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
               decoration: BoxDecoration(color: GoodaliColors.primaryBGColor),
               child: Row(
                 children: [
@@ -327,20 +331,12 @@ class _PostDetailState extends State<PostDetail> {
                         maxLines: null,
                         textInputAction: TextInputAction.send,
                         onChanged: (value) {},
-                        decoration: const InputDecoration(
-                            filled: false,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            border: InputBorder.none,
-                            hintText: 'Сэтгэгдэл бичих...',
-                            hintStyle:
-                                TextStyle(color: GoodaliColors.grayColor)),
+                        decoration: const InputDecoration(filled: false, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none, border: InputBorder.none, hintText: 'Сэтгэгдэл бичих...', hintStyle: TextStyle(color: GoodaliColors.grayColor)),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.send,
-                        color: GoodaliColors.primaryColor),
+                    icon: const Icon(Icons.send, color: GoodaliColors.primaryColor),
                     onPressed: () {
                       postReply(commtentController.text);
                     },
@@ -359,7 +355,7 @@ class _PostDetailState extends State<PostDetail> {
       postId: widget.post?.id,
     );
     if (response && mounted) {
-      print("objectasda");
+      _commentController.clear();
       setState(() {
         replies.add(ReplyResponse(nickname: me?.nickname, text: text));
       });
@@ -367,9 +363,6 @@ class _PostDetailState extends State<PostDetail> {
       Toast.success(context, description: "Амжилтай");
     }
     dismissLoader();
-    if (mounted) {
-      Navigator.pop(context);
-    }
   }
 
   Row actionBtn(

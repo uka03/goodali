@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:goodali/Utils/colors.dart';
 import 'package:goodali/connection/models/tag_response.dart';
 import 'package:goodali/pages/auth/components/auth_input.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
@@ -7,7 +9,6 @@ import 'package:goodali/shared/components/appbar_with_back.dart';
 import 'package:goodali/shared/components/custom_button.dart';
 import 'package:goodali/shared/components/general_scaffold.dart';
 import 'package:goodali/shared/components/keyboard_hider.dart';
-import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/modals.dart';
 import 'package:goodali/utils/primary_button.dart';
 import 'package:goodali/utils/spacer.dart';
@@ -48,82 +49,120 @@ class _CreatePostState extends State<CreatePost> {
     return Consumer<CommunityProvider>(builder: (context, provider, _) {
       return GeneralScaffold(
         appBar: AppbarWithBackButton(title: "Пост нэмэх"),
-        bottomBar: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
-          child: PrimaryButton(
-            text: "Нийтлэх",
-            height: 50,
-            textFontSize: 16,
-            onPressed: () {
-              if (_formKey.currentState?.validate() == true) {
-                onTagModal(tag: provider.tags);
-              }
-            },
-          ),
-        ),
+        bottomBar: kIsWeb
+            ? SizedBox()
+            : Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+                child: PrimaryButton(
+                  text: "Нийтлэх",
+                  isEnable: authProvider.token.isNotEmpty == true,
+                  height: 50,
+                  textFontSize: 16,
+                  onPressed: () {
+                    if (_formKey.currentState?.validate() == true) {
+                      onTagModal(tag: provider.tags);
+                    }
+                  },
+                ),
+              ),
         child: KeyboardHider(
           child: SingleChildScrollView(
             child: SafeArea(
-              child: Container(
-                padding: EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Та юу бодож байна?",
-                        style: GoodaliTextStyles.titleText(
-                          context,
-                          fontSize: 26,
-                        ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * (kIsWeb ? 0.4 : 1),
+                    height: MediaQuery.of(context).size.height * 0.95,
+                    padding: EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              Text(
+                                "Та юу бодож байна?",
+                                style: GoodaliTextStyles.titleText(
+                                  context,
+                                  fontSize: 26,
+                                ),
+                              ),
+                              VSpacer(size: 32),
+                              AuthInput(
+                                keyboardType: TextInputType.text,
+                                textInputAction: TextInputAction.next,
+                                isEmail: false,
+                                isTyping: titleTyping,
+                                hintText: "Гарчиг",
+                                onClose: () {
+                                  titleController.clear();
+                                  setState(() {
+                                    titleTyping = false;
+                                  });
+                                },
+                                maxLength: 30,
+                                controller: titleController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    titleTyping = true;
+                                  });
+                                },
+                              ),
+                              VSpacer(size: 32),
+                              AuthInput(
+                                keyboardType: TextInputType.text,
+                                textInputAction: TextInputAction.done,
+                                isEmail: false,
+                                isTyping: descTyping,
+                                hintText: "Үндсэн хэсэг",
+                                onClose: () {
+                                  descController.clear();
+                                  setState(() {
+                                    descTyping = false;
+                                  });
+                                },
+                                maxLength: 1200,
+                                isExpand: true,
+                                controller: descController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    descTyping = true;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          kIsWeb
+                              ? Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: PrimaryButton(
+                                        text: "Нийтлэх",
+                                        height: 50,
+                                        isEnable: authProvider.token.isNotEmpty == true,
+                                        textFontSize: 16,
+                                        onPressed: () {
+                                          if (_formKey.currentState?.validate() == true) {
+                                            onTagModal(tag: provider.tags);
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text("Та өдөрт 2 удаа пост оруулах эрхтэй.", style: TextStyle(fontSize: 12, color: GoodaliColors.grayColor)),
+                                    const SizedBox(height: 30)
+                                  ],
+                                )
+                              : SizedBox(),
+                        ],
                       ),
-                      VSpacer(size: 32),
-                      AuthInput(
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.next,
-                        isEmail: false,
-                        isTyping: titleTyping,
-                        hintText: "Гарчиг",
-                        onClose: () {
-                          titleController.clear();
-                          setState(() {
-                            titleTyping = false;
-                          });
-                        },
-                        maxLength: 30,
-                        controller: titleController,
-                        onChanged: (value) {
-                          setState(() {
-                            titleTyping = true;
-                          });
-                        },
-                      ),
-                      VSpacer(size: 32),
-                      AuthInput(
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.done,
-                        isEmail: false,
-                        isTyping: descTyping,
-                        hintText: "Үндсэн хэсэг",
-                        onClose: () {
-                          descController.clear();
-                          setState(() {
-                            descTyping = false;
-                          });
-                        },
-                        maxLength: 1200,
-                        isExpand: true,
-                        controller: descController,
-                        onChanged: (value) {
-                          setState(() {
-                            descTyping = true;
-                          });
-                        },
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -170,13 +209,10 @@ class _CreatePostState extends State<CreatePost> {
                       });
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: isSelected
-                              ? GoodaliColors.primaryColor
-                              : GoodaliColors.borderColor,
+                          color: isSelected ? GoodaliColors.primaryColor : GoodaliColors.borderColor,
                         ),
                         borderRadius: BorderRadius.circular(8),
                         color: isSelected ? GoodaliColors.primaryColor : null,
@@ -186,9 +222,7 @@ class _CreatePostState extends State<CreatePost> {
                         style: GoodaliTextStyles.titleText(
                           context,
                           fontSize: 16,
-                          textColor: isSelected
-                              ? GoodaliColors.whiteColor
-                              : GoodaliColors.grayColor,
+                          textColor: isSelected ? GoodaliColors.whiteColor : GoodaliColors.grayColor,
                         ),
                       ),
                     ),
@@ -201,8 +235,7 @@ class _CreatePostState extends State<CreatePost> {
                 height: 50,
                 onPressed: () {
                   if (selectedTags.isEmpty) {
-                    Toast.error(context,
-                        description: "Холбогдох сэдэв сонгоно уу?");
+                    Toast.error(context, description: "Холбогдох сэдэв сонгоно уу?");
                   } else {
                     Navigator.pop(context);
                     onWherePostModal(selectedTags: selectedTags);
@@ -261,14 +294,8 @@ class _CreatePostState extends State<CreatePost> {
                             padding: EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
-                              color: selectedItem?.index == e.index
-                                  ? GoodaliColors.primaryColor
-                                  : GoodaliColors.whiteColor,
-                              border: Border.all(
-                                  color: selectedItem?.index == e.index
-                                      ? GoodaliColors.primaryColor
-                                      : GoodaliColors.borderColor,
-                                  width: 2),
+                              color: selectedItem?.index == e.index ? GoodaliColors.primaryColor : GoodaliColors.whiteColor,
+                              border: Border.all(color: selectedItem?.index == e.index ? GoodaliColors.primaryColor : GoodaliColors.borderColor, width: 2),
                             ),
                             child: Center(
                               child: Icon(
@@ -302,16 +329,13 @@ class _CreatePostState extends State<CreatePost> {
                   );
                   if (respone.status == 1) {
                     if (context.mounted) {
-                      Toast.success(context,
-                          description: "Амжилттай пост нийтлэгдлээ.");
+                      Toast.success(context, description: "Амжилттай пост нийтлэгдлээ.");
                       Navigator.pop(context);
                       Navigator.pop(context);
                     }
                   } else {
                     if (context.mounted) {
-                      Toast.error(context,
-                          description:
-                              "Уучилаарай. Пост нийтлэх явцад алдаа гарлаа.");
+                      Toast.error(context, description: "Уучилаарай. Пост нийтлэх явцад алдаа гарлаа.");
                     }
                   }
                 }

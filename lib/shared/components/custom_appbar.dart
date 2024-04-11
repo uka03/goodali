@@ -35,9 +35,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final bool hasPresident;
 
   @override
-  get preferredSize => bottom != null
-      ? Size.fromHeight(hasPresident ? 90 : 60 + bottom!.preferredSize.height)
-      : Size.fromHeight(hasPresident ? 90 : 60);
+  get preferredSize => bottom != null ? Size.fromHeight(hasPresident ? 90 : 60 + bottom!.preferredSize.height) : Size.fromHeight(hasPresident ? 90 : 60);
 
   @override
   Widget build(BuildContext context) {
@@ -80,9 +78,7 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
   final bool? haveNotification;
 
   @override
-  get preferredSize => bottom != null
-      ? Size.fromHeight(64 + bottom!.preferredSize.height)
-      : Size.fromHeight(64);
+  get preferredSize => bottom != null ? Size.fromHeight(64 + bottom!.preferredSize.height) : Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {
@@ -131,14 +127,12 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                 child: DropdownButton2(
                   customButton: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    decoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                     child: Row(
                       children: [
                         Text(
                           "Сэтгэл",
-                          style: GoodaliTextStyles.titleText(context,
-                              fontSize: 14),
+                          style: GoodaliTextStyles.titleText(context, fontSize: 14),
                         ),
                         HSpacer(),
                         Icon(
@@ -155,8 +149,7 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                         (item) => DropdownMenuItem<String>(
                           value: item,
                           child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8)),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
                             child: Text(
                               item,
                               style: GoodaliTextStyles.bodyText(context),
@@ -177,17 +170,17 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               CustomButton(
-                onPressed: () {},
+                onPressed: () {
+                  navigtation.selectTab(1);
+                },
                 child: Container(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                   child: Row(
                     children: [
                       Text(
                         "Түүдэг гал",
-                        style:
-                            GoodaliTextStyles.titleText(context, fontSize: 14),
+                        style: GoodaliTextStyles.titleText(context, fontSize: 14),
                       ),
                     ],
                   ),
@@ -198,8 +191,7 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                 if (provider.token.isNotEmpty == true) {
                   return Row(
                     children: [
-                      Consumer<CartProvider>(
-                          builder: (context, cartProviderConsumer, _) {
+                      Consumer<CartProvider>(builder: (context, cartProviderConsumer, _) {
                         return ActionItem(
                           iconPath: 'assets/icons/ic_cart.png',
                           onPressed: () {
@@ -210,16 +202,13 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                         );
                       }),
                       HSpacer(),
-                      Consumer<AuthProvider>(
-                          builder: (context, authProvider, _) {
+                      Consumer<AuthProvider>(builder: (context, authProvider, _) {
                         return DropdownButtonHideUnderline(
                           child: DropdownButton2(
                             customButton: Container(
                               margin: EdgeInsets.symmetric(horizontal: 8),
                               padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  color: GoodaliColors.inputColor,
-                                  borderRadius: BorderRadius.circular(20)),
+                              decoration: BoxDecoration(color: GoodaliColors.inputColor, borderRadius: BorderRadius.circular(20)),
                               child: Image.asset(
                                 'assets/icons/ic_profile.png',
                                 width: 24,
@@ -232,8 +221,7 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                                   navigtation.selectTab(2);
                                   break;
                                 case "миний мэдээлэл":
-                                  Navigator.pushNamed(
-                                      context, ProfileEdit.routeName);
+                                  Navigator.pushNamed(context, ProfileEdit.routeName);
                                   break;
                                 case "гарах":
                                   authProvider.logout();
@@ -246,17 +234,10 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                                   (item) => DropdownMenuItem<String>(
                                     value: item,
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
+                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
                                       child: Text(
                                         item,
-                                        style: GoodaliTextStyles.bodyText(
-                                            context,
-                                            textColor:
-                                                item.toLowerCase() == "гарах"
-                                                    ? GoodaliColors.errorColor
-                                                    : GoodaliColors.blackColor),
+                                        style: GoodaliTextStyles.bodyText(context, textColor: item.toLowerCase() == "гарах" ? GoodaliColors.errorColor : GoodaliColors.blackColor),
                                       ),
                                     ),
                                   ),
@@ -282,14 +263,11 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                     Navigator.pushNamed(context, AuthWebPage.routeName);
                   },
                   child: Container(
-                    decoration: BoxDecoration(
-                        color: GoodaliColors.primaryColor,
-                        borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: GoodaliColors.primaryColor, borderRadius: BorderRadius.circular(8)),
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Text(
                       "Нэвтрэх",
-                      style: GoodaliTextStyles.bodyText(context,
-                          fontSize: 14, textColor: GoodaliColors.whiteColor),
+                      style: GoodaliTextStyles.bodyText(context, fontSize: 14, textColor: GoodaliColors.whiteColor),
                     ),
                   ),
                 );
