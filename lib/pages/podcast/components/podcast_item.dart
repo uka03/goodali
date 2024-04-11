@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/connection/models/product_response.dart';
@@ -15,7 +18,6 @@ import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
 import 'package:goodali/utils/toasts.dart';
 import 'package:goodali/utils/utils.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class PodcastItem extends StatefulWidget {
@@ -42,7 +44,6 @@ class _PodcastItemState extends State<PodcastItem> {
   late CartProvider cartProvider;
   late AudioProvider audioProvider;
   late AuthProvider authProvider;
-  final player = AudioPlayer();
 
   @override
   void initState() {
@@ -70,9 +71,9 @@ class _PodcastItemState extends State<PodcastItem> {
     final url = podcast?.audio ?? "";
     if (url != "Audio failed to upload") {
       try {
-        final resp = await player.setUrl(url.toUrl());
-        duration = resp ?? Duration.zero;
+        duration = await _getAudioDuration(url);
       } catch (e) {
+        print(e);
         duration = Duration.zero;
       }
     }
@@ -84,10 +85,22 @@ class _PodcastItemState extends State<PodcastItem> {
     });
   }
 
+  Future<Duration> _getAudioDuration(String url) async {
+    Duration duration = Duration.zero;
+    try {
+      final player = AudioPlayer();
+      await player.setSourceUrl(url.toUrl());
+      duration = await player.getDuration() ?? Duration.zero;
+      player.dispose();
+    } catch (e) {
+      log("Error retrieving audio duration: $e");
+    }
+    return duration;
+  }
+
   @override
   void dispose() {
     super.dispose();
-    player.dispose();
   }
 
   @override
@@ -123,8 +136,7 @@ class _PodcastItemState extends State<PodcastItem> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
                       child: CachedNetworkImage(
-                        imageUrl:
-                            widget.podcast?.banner?.toUrl() ?? placeholder,
+                        imageUrl: widget.podcast?.banner?.toUrl() ?? placeholder,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -135,9 +147,7 @@ class _PodcastItemState extends State<PodcastItem> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.isbought
-                              ? widget.podcast?.lectureTitle ?? ""
-                              : widget.podcast?.title ?? "",
+                          widget.isbought ? widget.podcast?.lectureTitle ?? "" : widget.podcast?.title ?? "",
                           style: GoodaliTextStyles.titleText(context),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -159,17 +169,12 @@ class _PodcastItemState extends State<PodcastItem> {
                 children: [
                   CustomButton(
                     onPressed: () async {
-                      if (provider.playerState == GoodaliPlayerState.playing &&
-                          provider.product?.audio == widget.podcast?.audio) {
-                        audioProvider.setPlayerState(
-                            context, GoodaliPlayerState.paused);
+                      if (provider.playerState == GoodaliPlayerState.playing && provider.product?.audio == widget.podcast?.audio) {
+                        audioProvider.setPlayerState(context, GoodaliPlayerState.paused);
                       } else {
-                        await audioProvider.setAudioPlayer(
-                            context, widget.podcast,
-                            save: widget.isSaved);
+                        await audioProvider.setAudioPlayer(context, widget.podcast, save: widget.isSaved);
                         if (context.mounted) {
-                          audioProvider.setPlayerState(
-                              context, GoodaliPlayerState.playing);
+                          audioProvider.setPlayerState(context, GoodaliPlayerState.playing);
                         }
                       }
                     },
@@ -180,10 +185,7 @@ class _PodcastItemState extends State<PodcastItem> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Icon(
-                        provider.playerState == GoodaliPlayerState.playing &&
-                                provider.product?.audio == widget.podcast?.audio
-                            ? Icons.pause
-                            : Icons.play_arrow_rounded,
+                        provider.playerState == GoodaliPlayerState.playing && provider.product?.audio == widget.podcast?.audio ? Icons.pause : Icons.play_arrow_rounded,
                       ),
                     ),
                   ),
@@ -244,21 +246,15 @@ class _PodcastItemState extends State<PodcastItem> {
                   ),
                   HSpacer(),
                   widget.podcast?.isBought == false
-                      ? authProvider.token.isEmpty == true ||
-                              authProvider.me?.email?.toLowerCase() ==
-                                  "surgalt9@gmail.com"
+                      ? authProvider.token.isEmpty == true || authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
                           ? SizedBox()
                           : CustomButton(
                               onPressed: () {
-                                final result =
-                                    cartProvider.addProduct(widget.podcast);
+                                final result = cartProvider.addProduct(widget.podcast);
                                 if (result) {
-                                  Toast.success(context,
-                                      description: "Лекц сагсанд нэмэгдлээ.");
+                                  Toast.success(context, description: "Лекц сагсанд нэмэгдлээ.");
                                 } else {
-                                  Toast.error(context,
-                                      description:
-                                          "Лекц сагсанд нэмэгдсэн байна.");
+                                  Toast.error(context, description: "Лекц сагсанд нэмэгдсэн байна.");
                                 }
                               },
                               child: Container(
