@@ -15,10 +15,6 @@ PODS:
     - OrderedSet (~> 5.0)
   - flutter_secure_storage (6.0.0):
     - Flutter
-  - flutter_sound (9.2.13):
-    - Flutter
-    - flutter_sound_core (= 9.2.13)
-  - flutter_sound_core (9.2.13)
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
@@ -56,7 +52,6 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
-  - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
@@ -71,7 +66,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - flutter_sound_core
     - OrderedSet
     - Toast
 
@@ -88,8 +82,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_inappwebview_ios/ios"
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
-  flutter_sound:
-    :path: ".symlinks/plugins/flutter_sound/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
   image_picker_ios:
@@ -120,8 +112,6 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_inappwebview_ios: 97215cf7d4677db55df76782dbd2930c5e1c1ea0
   flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
-  flutter_sound: c60effa2a350fb977885f0db2fbc4c1ad5160900
-  flutter_sound_core: 26c10e5832e76aaacfae252d8925232281c486ae
   fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
   image_picker_ios: b545a5f16c0fa88e3ecbbce3ed4de45567a8ec18
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa

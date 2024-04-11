@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:goodali/connection/models/video_response.dart';
 import 'package:goodali/pages/audio/provider/audio_provider.dart';
 import 'package:goodali/pages/video/components/video_item.dart';
 import 'package:goodali/pages/video/provider/video_provider.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
+import 'package:goodali/shared/components/custom_button.dart';
 import 'package:goodali/shared/components/custom_read_more.dart';
 import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/spacer.dart';
@@ -11,6 +13,7 @@ import 'package:goodali/utils/text_styles.dart';
 import 'package:goodali/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class VideoPlayer extends StatefulWidget {
   const VideoPlayer({super.key, this.video});
@@ -86,7 +89,42 @@ class _VideoPlayerState extends State<VideoPlayer> {
           ],
         ),
         builder: (context, player) => Scaffold(
-          appBar: AppbarWithBackButton(),
+          appBar: AppbarWithBackButton(
+            actions: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomButton(
+                    onPressed: () async {
+                      final videoId = _controller.initialVideoId; // Using the initialVideoId property
+                      final youtubeUrl = Uri.parse("https://www.youtube.com/watch?v=$videoId");
+                      if (await canLaunchUrl(youtubeUrl)) {
+                        await launchUrl(youtubeUrl, mode: LaunchMode.externalApplication);
+                      } else {
+                        throw 'Could not launch $youtubeUrl';
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        "Youtube-ээр үзэх",
+                        style: GoodaliTextStyles.titleText(
+                          context,
+                          fontSize: 12,
+                          textColor: GoodaliColors.whiteColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           body: SingleChildScrollView(
             child: Column(
               children: [
@@ -94,14 +132,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
                 Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.only(bottom: 8.0),
                       child: Column(
                         children: [
                           VSpacer(),
                           Text(
                             video?.title ?? "",
-                            style: GoodaliTextStyles.titleText(context,
-                                fontSize: 24),
+                            style: GoodaliTextStyles.titleText(context, fontSize: 24),
                           ),
                           CustomReadMore(
                             text: removeHtmlTags(video?.body ?? ""),
@@ -124,8 +161,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
                             setState(() {
                               video = videoVal;
                             });
-                            await provider.getVideosSimilar(
-                                videoVal?.id.toString() ?? "");
+                            await provider.getVideosSimilar(videoVal?.id.toString() ?? "");
                           },
                         );
                       },
