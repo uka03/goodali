@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -20,8 +21,7 @@ import 'package:goodali/utils/toasts.dart';
 import 'package:provider/provider.dart';
 
 class CourseDetail extends StatefulWidget {
-  const CourseDetail(
-      {super.key, this.task, this.lesson, required this.initialPage});
+  const CourseDetail({super.key, this.task, this.lesson, required this.initialPage});
   final TaskResponse? task;
   final LessonResponse? lesson;
   final int initialPage;
@@ -31,8 +31,7 @@ class CourseDetail extends StatefulWidget {
 }
 
 class _CourseDetailState extends State<CourseDetail> {
-  late final PageController controller =
-      PageController(initialPage: widget.initialPage);
+  late final PageController controller = PageController(initialPage: widget.initialPage);
   int selectedPage = 0;
   int totalPage = 0;
   TaskResponse? task;
@@ -67,6 +66,7 @@ class _CourseDetailState extends State<CourseDetail> {
               : null,
           bottomBar: !isFullScreen
               ? Container(
+                  margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
                   padding: EdgeInsets.fromLTRB(16, 16, 16, 32),
                   child: Row(
                     children: [
@@ -76,8 +76,7 @@ class _CourseDetailState extends State<CourseDetail> {
                               color: GoodaliColors.grayColor,
                             ),
                             borderRadius: BorderRadius.circular(10)),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         child: Text(
                           "${selectedPage + 1}/$itemLenght",
                           style: GoodaliTextStyles.bodyText(context),
@@ -87,31 +86,24 @@ class _CourseDetailState extends State<CourseDetail> {
                       Expanded(
                         child: PrimaryButton(
                           height: 50,
-                          text: selectedPage + 1 >= provider.coursesTasks.length
-                              ? "Дуусгах"
-                              : "Дараах",
+                          text: selectedPage + 1 >= provider.coursesTasks.length ? "Дуусгах" : "Дараах",
                           textFontSize: 16,
                           onPressed: () async {
                             if (task?.type == 4 && task?.watchVideo != true) {
-                              Toast.error(context,
-                                  description:
-                                      "Та видеог дуустал нь үзсэн дараагүй байна.");
+                              Toast.error(context, description: "Та видеог дуустал нь үзсэн дараагүй байна.");
                               return;
                             }
                             if (task?.isAnswer == 1) {
                               if (task?.answerData?.isEmpty == true) {
-                                Toast.error(context,
-                                    description: "Та хариулт бичээгүй байна.");
+                                Toast.error(context, description: "Та хариулт бичээгүй байна.");
                                 return;
                               }
 
-                              provider.setAnswer(
-                                  id: task?.id, answer: task?.answerData ?? "");
+                              provider.setAnswer(id: task?.id, answer: task?.answerData ?? "");
                             } else {
                               provider.setAnswer(id: task?.id, answer: "");
                             }
-                            if (selectedPage + 1 >=
-                                provider.coursesTasks.length) {
+                            if (selectedPage + 1 >= provider.coursesTasks.length) {
                               await provider.getTasks(widget.lesson?.id);
                               if (context.mounted) {
                                 Navigator.pop(context);
@@ -135,17 +127,16 @@ class _CourseDetailState extends State<CourseDetail> {
             physics: NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               task = provider.coursesTasks[index];
-              final answerController =
-                  TextEditingController(text: task?.answerData ?? "");
+              final answerController = TextEditingController(text: task?.answerData ?? "");
 
               return KeyboardHider(
                 child: SingleChildScrollView(
                   child: Container(
+                    margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
                     padding: EdgeInsets.fromLTRB(16, 16, 16, 150),
                     child: Column(
                       children: [
-                        if (task?.banner?.isNotEmpty == true &&
-                            task?.banner != "Image failed to upload")
+                        if (task?.banner?.isNotEmpty == true && task?.banner != "Image failed to upload")
                           Padding(
                             padding: const EdgeInsets.only(top: 20, bottom: 20),
                             child: Center(
@@ -159,8 +150,7 @@ class _CourseDetailState extends State<CourseDetail> {
                               ),
                             ),
                           ),
-                        if (task?.type == 4 &&
-                            task?.videoUrl?.isNotEmpty == true)
+                        if (task?.type == 4 && task?.videoUrl?.isNotEmpty == true)
                           Column(
                             children: [
                               TaskVideoPlayer(
@@ -184,8 +174,7 @@ class _CourseDetailState extends State<CourseDetail> {
                               CustomButton(
                                 onPressed: () {
                                   setState(() {
-                                    task?.watchVideo =
-                                        !(task?.watchVideo ?? false);
+                                    task?.watchVideo = !(task?.watchVideo ?? false);
                                   });
                                 },
                                 child: Container(
@@ -195,27 +184,16 @@ class _CourseDetailState extends State<CourseDetail> {
                                   ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        color: task?.watchVideo == true
-                                            ? GoodaliColors.successColor
-                                            : GoodaliColors.borderColor,
-                                        width: 2),
+                                    border: Border.all(color: task?.watchVideo == true ? GoodaliColors.successColor : GoodaliColors.borderColor, width: 2),
                                   ),
                                   child: Row(
                                     children: [
                                       Container(
                                         padding: EdgeInsets.all(4),
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          color: task?.watchVideo == true
-                                              ? GoodaliColors.successColor
-                                              : GoodaliColors.whiteColor,
-                                          border: Border.all(
-                                              color: task?.watchVideo == true
-                                                  ? GoodaliColors.successColor
-                                                  : GoodaliColors.borderColor,
-                                              width: 2),
+                                          borderRadius: BorderRadius.circular(20),
+                                          color: task?.watchVideo == true ? GoodaliColors.successColor : GoodaliColors.whiteColor,
+                                          border: Border.all(color: task?.watchVideo == true ? GoodaliColors.successColor : GoodaliColors.borderColor, width: 2),
                                         ),
                                         child: Center(
                                           child: Icon(
@@ -246,8 +224,7 @@ class _CourseDetailState extends State<CourseDetail> {
                             children: [
                               Text(
                                 task?.question ?? "",
-                                style: GoodaliTextStyles.titleText(context,
-                                    fontSize: 20),
+                                style: GoodaliTextStyles.titleText(context, fontSize: 20),
                               ),
                               AuthInput(
                                 isTyping: true,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/pages/lesson/components/Lesson_item.dart';
 import 'package:goodali/pages/lesson/provider/lecture_provider.dart';
@@ -31,30 +32,32 @@ class _LessonsPageState extends State<LessonsPage> {
     return Consumer<LessonProvider>(builder: (context, provider, _) {
       return GeneralScaffold(
         appBar: AppbarWithBackButton(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-              child: Text(
-                "Онлайн сургалт",
-                style: GoodaliTextStyles.titleText(context, fontSize: 32),
+        child: Container(
+          margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+                child: Text(
+                  "Онлайн сургалт",
+                  style: GoodaliTextStyles.titleText(context, fontSize: 32),
+                ),
               ),
-            ),
-            Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.all(16),
-                shrinkWrap: true,
-                itemCount: provider.lessons.length,
-                separatorBuilder: (context, index) => Divider(height: 0),
-                itemBuilder: (context, index) {
-                  final lesson = provider.lessons[index];
-                  return LessonItem(lesson: lesson);
-                },
-              ),
-            )
-          ],
+              Expanded(
+                child: ListView.separated(
+                  padding: EdgeInsets.all(16),
+                  shrinkWrap: true,
+                  itemCount: provider.lessons.length,
+                  separatorBuilder: (context, index) => Divider(height: 0),
+                  itemBuilder: (context, index) {
+                    final lesson = provider.lessons[index];
+                    return LessonItem(lesson: lesson);
+                  },
+                ),
+              )
+            ],
+          ),
         ),
       );
     });

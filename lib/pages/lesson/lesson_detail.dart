@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/connection/models/product_response.dart';
@@ -48,9 +49,7 @@ class _LessonDetailState extends State<LessonDetail> {
         data = widget.data;
       } else if (widget.id != null) {
         showLoader();
-        print(widget.id);
-        data = await Provider.of<HomeProvider>(context, listen: false)
-            .getLesson(id: widget.id);
+        data = await Provider.of<HomeProvider>(context, listen: false).getLesson(id: widget.id);
         dismissLoader();
       }
       setState(() {});
@@ -63,8 +62,7 @@ class _LessonDetailState extends State<LessonDetail> {
   Widget build(BuildContext context) {
     return GeneralScaffold(
       appBar: AppbarWithBackButton(),
-      actionButton: authProvider.token.isEmpty == true ||
-              authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
+      actionButton: authProvider.token.isEmpty == true || authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
           ? SizedBox()
           : Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -83,29 +81,30 @@ class _LessonDetailState extends State<LessonDetail> {
                       ),
                     );
                   } else {
-                    Toast.error(context,
-                        description:
-                            "Та уг үйлдэлийг хийхийн тулд нэвтрэх хэрэгтэй.");
+                    Toast.error(context, description: "Та уг үйлдэлийг хийхийн тулд нэвтрэх хэрэгтэй.");
                   }
                 },
               ),
             ),
       child: SingleChildScrollView(
-        child: Column(
-          children: [
-            ClipRRect(
-              child: CachedNetworkImage(
-                imageUrl: data?.banner.toUrl() ?? placeholder,
+        child: Container(
+          margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155, vertical: 20) : null,
+          child: Column(
+            children: [
+              ClipRRect(
+                child: CachedNetworkImage(
+                  imageUrl: data?.banner.toUrl() ?? placeholder,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: HtmlWidget(
-                data?.body ?? "",
-                textStyle: GoodaliTextStyles.bodyText(context),
-              ),
-            )
-          ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: HtmlWidget(
+                  data?.body ?? "",
+                  textStyle: GoodaliTextStyles.bodyText(context),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

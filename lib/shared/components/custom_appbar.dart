@@ -1,10 +1,14 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:goodali/pages/album/album_page.dart';
+import 'package:goodali/pages/article/article_page.dart';
 import 'package:goodali/pages/auth/auth_web_page.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/cart/cart_page.dart';
 import 'package:goodali/pages/cart/provider/cart_provider.dart';
+import 'package:goodali/pages/podcast/podcast_page.dart';
 import 'package:goodali/pages/profile/profile_edit.dart';
+import 'package:goodali/pages/video/videos_page.dart';
 import 'package:goodali/shared/components/action_item.dart';
 import 'package:goodali/shared/components/custom_button.dart';
 import 'package:goodali/shared/components/custom_input.dart';
@@ -87,8 +91,6 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
       'Подкаст',
       'Видео',
       'Бичвэр',
-      'Мүүд',
-      "Онлайн сургалт",
     ];
     final itemsProfile = <String>[
       'Би',
@@ -143,7 +145,23 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                       ],
                     ),
                   ),
-                  onChanged: (value) {},
+                  onChanged: (value) {
+                    switch (value) {
+                      case "Цомог":
+                        Navigator.pushNamed(context, AlbumPage.routeName);
+                        break;
+                      case "Подкаст":
+                        Navigator.pushNamed(context, PodcastPage.routeName);
+                        break;
+                      case "Видео":
+                        Navigator.pushNamed(context, VideosPage.routeName);
+                        break;
+                      case "Бичвэр":
+                        Navigator.pushNamed(context, ArticlePage.routeName);
+                        break;
+                      default:
+                    }
+                  },
                   items: items
                       .map(
                         (item) => DropdownMenuItem<String>(

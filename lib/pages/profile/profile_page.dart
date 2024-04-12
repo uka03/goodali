@@ -82,6 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: SingleChildScrollView(
                 child: Container(
                   padding: EdgeInsets.all(16),
+                  margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155, vertical: 20) : null,
                   child: Column(
                     children: [
                       Row(
@@ -89,8 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(50),
                             child: CachedNetworkImage(
-                              imageUrl:
-                                  provider.me?.avatar.toUrl() ?? placeholder,
+                              imageUrl: provider.me?.avatar.toUrl() ?? placeholder,
                               width: 72,
                               height: 72,
                               fit: BoxFit.cover,
@@ -123,8 +123,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           HSpacer(),
                           CustomButton(
                             onPressed: () {
-                              Navigator.pushNamed(
-                                  context, ProfileEdit.routeName);
+                              Navigator.pushNamed(context, ProfileEdit.routeName);
                             },
                             child: Text(
                               "Засах",
@@ -159,16 +158,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                     kIsWeb
                                         ? GridView.builder(
                                             padding: EdgeInsets.all(16),
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
+                                            physics: NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemCount: data.items.length,
-                                            gridDelegate:
-                                                SliverGridDelegateWithFixedCrossAxisCount(
-                                              childAspectRatio:
-                                                  data.isOnline ? 2 : 16 / 8,
-                                              crossAxisCount:
-                                                  data.isOnline ? 2 : 3,
+                                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                              childAspectRatio: data.isOnline ? 2 : 16 / 8,
+                                              crossAxisCount: data.isOnline ? 2 : 3,
                                               mainAxisSpacing: 10,
                                               crossAxisSpacing: 10,
                                             ),
@@ -186,17 +181,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                             },
                                           )
                                         : ListView.separated(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 12),
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
+                                            padding: EdgeInsets.symmetric(vertical: 12),
+                                            physics: NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemCount: data.items.length,
-                                            separatorBuilder:
-                                                (context, index) =>
-                                                    data.isOnline
-                                                        ? SizedBox()
-                                                        : Divider(),
+                                            separatorBuilder: (context, index) => data.isOnline ? SizedBox() : Divider(),
                                             itemBuilder: (context, index) {
                                               final item = data.items[index];
                                               return data.isOnline
@@ -227,8 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   VSpacer(),
                                   Text(
                                     "Авсан бүтээгдэхүүн байхгүй...",
-                                    style: GoodaliTextStyles.bodyText(context,
-                                        fontSize: 14),
+                                    style: GoodaliTextStyles.bodyText(context, fontSize: 14),
                                     textAlign: TextAlign.center,
                                   )
                                 ],

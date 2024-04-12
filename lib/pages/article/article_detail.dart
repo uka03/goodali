@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:goodali/connection/models/article_response.dart';
@@ -42,56 +43,59 @@ class _ArticleDetailState extends State<ArticleDetail> {
         return GeneralScaffold(
           appBar: AppbarWithBackButton(),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CachedNetworkImage(
-                  imageUrl: article?.banner.toUrl() ?? placeholder,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-                Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        article?.title ?? "",
-                        textAlign: TextAlign.center,
-                        style: GoodaliTextStyles.titleText(
-                          context,
-                          fontSize: 20,
-                        ),
-                      ),
-                      VSpacer(),
-                      HtmlWidget(
-                        article?.body ?? "",
-                        textStyle: GoodaliTextStyles.bodyText(
-                          context,
-                          fontSize: 14,
-                        ),
-                      )
-                    ],
+            child: Container(
+              margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: article?.banner.toUrl() ?? placeholder,
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    "Төстэй бичвэрүүд",
-                    style: GoodaliTextStyles.titleText(context, fontSize: 24),
+                  Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          article?.title ?? "",
+                          textAlign: TextAlign.center,
+                          style: GoodaliTextStyles.titleText(
+                            context,
+                            fontSize: 20,
+                          ),
+                        ),
+                        VSpacer(),
+                        HtmlWidget(
+                          article?.body ?? "",
+                          textStyle: GoodaliTextStyles.bodyText(
+                            context,
+                            fontSize: 14,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                ListView.separated(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: provider.articleList.length,
-                  separatorBuilder: (context, index) => Divider(height: 0),
-                  itemBuilder: (context, index) {
-                    final article = provider.articleList[index];
-                    return ArticleItem(article: article);
-                  },
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      "Төстэй бичвэрүүд",
+                      style: GoodaliTextStyles.titleText(context, fontSize: 24),
+                    ),
+                  ),
+                  ListView.separated(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: provider.articleList.length,
+                    separatorBuilder: (context, index) => Divider(height: 0),
+                    itemBuilder: (context, index) {
+                      final article = provider.articleList[index];
+                      return ArticleItem(article: article);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:goodali/connection/models/course_response.dart';
@@ -41,85 +42,84 @@ class _CourseItemsState extends State<CourseItems> {
       return GeneralScaffold(
         appBar: AppbarWithBackButton(),
         child: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: () =>
-                lessonProvider.getCoursesLessons(id: widget.item?.id),
-            child: ListView(
-              children: [
-                Column(
-                  children: [
-                    Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: CachedNetworkImage(
-                          imageUrl: widget.item?.banner.toUrl() ?? placeholder,
-                          width: 190,
-                          height: 190,
-                          fit: BoxFit.cover,
+          child: Container(
+            margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
+            child: RefreshIndicator(
+              onRefresh: () => lessonProvider.getCoursesLessons(id: widget.item?.id),
+              child: ListView(
+                children: [
+                  Column(
+                    children: [
+                      Center(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: CachedNetworkImage(
+                            imageUrl: widget.item?.banner.toUrl() ?? placeholder,
+                            width: 190,
+                            height: 190,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    ),
-                    VSpacer(),
-                    Text(
-                      widget.item?.name ?? "",
-                      style: GoodaliTextStyles.titleText(context, fontSize: 26),
-                    ),
-                    ListView.separated(
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 150),
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: provider.coursesLessons.length,
-                      separatorBuilder: (context, index) => VSpacer(),
-                      itemBuilder: (context, index) {
-                        final lesson = provider.coursesLessons[index];
-                        return CustomButton(
-                          onPressed: () {
-                            if (lesson.isBought == 1) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CourseTasks(
-                                    lesson: lesson,
+                      VSpacer(),
+                      Text(
+                        widget.item?.name ?? "",
+                        style: GoodaliTextStyles.titleText(context, fontSize: 26),
+                      ),
+                      ListView.separated(
+                        padding: EdgeInsets.fromLTRB(16, 16, 16, 150),
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: provider.coursesLessons.length,
+                        separatorBuilder: (context, index) => VSpacer(),
+                        itemBuilder: (context, index) {
+                          final lesson = provider.coursesLessons[index];
+                          return CustomButton(
+                            onPressed: () {
+                              if (lesson.isBought == 1) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CourseTasks(
+                                      lesson: lesson,
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                Toast.error(context, description: "Түгжээтэй контент");
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        lesson.name ?? "",
+                                        style: GoodaliTextStyles.titleText(context),
+                                      ),
+                                      Text(
+                                        "${lesson.done ?? 0}/${lesson.allTasks ?? 0}",
+                                        style: GoodaliTextStyles.bodyText(context, textColor: GoodaliColors.grayColor),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            } else {
-                              Toast.error(context,
-                                  description: "Түгжээтэй контент");
-                            }
-                          },
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      lesson.name ?? "",
-                                      style:
-                                          GoodaliTextStyles.titleText(context),
-                                    ),
-                                    Text(
-                                      "${lesson.done ?? 0}/${lesson.allTasks ?? 0}",
-                                      style: GoodaliTextStyles.bodyText(context,
-                                          textColor: GoodaliColors.grayColor),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Icon(
-                                Icons.keyboard_arrow_right_rounded,
-                                color: GoodaliColors.grayColor,
-                                size: 26,
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                    )
-                  ],
-                ),
-              ],
+                                Icon(
+                                  Icons.keyboard_arrow_right_rounded,
+                                  color: GoodaliColors.grayColor,
+                                  size: 26,
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

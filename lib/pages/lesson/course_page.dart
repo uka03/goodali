@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:goodali/connection/models/product_response.dart';
@@ -41,6 +42,7 @@ class _CoursePageState extends State<CoursePage> {
         appBar: AppbarWithBackButton(),
         child: SingleChildScrollView(
           child: Container(
+            margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
             padding: EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,8 +93,7 @@ class _CoursePageState extends State<CoursePage> {
                                 ),
                                 Text(
                                   "${item.done ?? 0}/${item.allTasks ?? 0} даалгавар",
-                                  style: GoodaliTextStyles.bodyText(context,
-                                      textColor: GoodaliColors.grayColor),
+                                  style: GoodaliTextStyles.bodyText(context, textColor: GoodaliColors.grayColor),
                                 )
                               ],
                             ),
@@ -102,14 +103,8 @@ class _CoursePageState extends State<CoursePage> {
                             padding: EdgeInsets.all(4),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
-                              color: item.allTasks == item.done
-                                  ? GoodaliColors.successColor
-                                  : GoodaliColors.whiteColor,
-                              border: Border.all(
-                                  color: item.allTasks == item.done
-                                      ? GoodaliColors.successColor
-                                      : GoodaliColors.borderColor,
-                                  width: 2),
+                              color: item.allTasks == item.done ? GoodaliColors.successColor : GoodaliColors.whiteColor,
+                              border: Border.all(color: item.allTasks == item.done ? GoodaliColors.successColor : GoodaliColors.borderColor, width: 2),
                             ),
                             child: Center(
                               child: Icon(

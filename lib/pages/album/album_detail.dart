@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
@@ -46,8 +47,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   _fecthData() async {
-    lecture =
-        ModalRoute.of(context)?.settings.arguments as ProductResponseData?;
+    lecture = ModalRoute.of(context)?.settings.arguments as ProductResponseData?;
     lecture?.albumId = lecture?.productId;
     await homeProvider.getLectureList(lecture);
 
@@ -65,21 +65,16 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   int getBoughtItems() {
-    return homeProvider.albumLectures
-            ?.where((element) => element?.isBought == true)
-            .length ??
-        0;
+    return homeProvider.albumLectures?.where((element) => element?.isBought == true).length ?? 0;
   }
 
   @override
   Widget build(BuildContext context) {
     return GeneralScaffold(
       backgroundColor: GoodaliColors.primaryBGColor,
-      bottomBar: lecture?.isBought == true ||
-              (lecture?.audioCount ?? 0) <= boughtItemsLenght
+      bottomBar: lecture?.isBought == true || (lecture?.audioCount ?? 0) <= boughtItemsLenght
           ? SizedBox()
-          : authProvider.token.isEmpty == true ||
-                  authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
+          : authProvider.token.isEmpty == true || authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
               ? SizedBox()
               : Container(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
@@ -94,11 +89,9 @@ class _AlbumDetailState extends State<AlbumDetail> {
                 ),
       appBar: AppbarWithBackButton(
         actions: [
-          authProvider.token.isEmpty == true ||
-                  authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
+          authProvider.token.isEmpty == true || authProvider.me?.email?.toLowerCase() == "surgalt9@gmail.com"
               ? SizedBox()
-              : Consumer<CartProvider>(
-                  builder: (context, cartProviderConsumer, _) {
+              : Consumer<CartProvider>(builder: (context, cartProviderConsumer, _) {
                   return ActionItem(
                     iconPath: 'assets/icons/ic_cart.png',
                     onPressed: () {
@@ -114,55 +107,78 @@ class _AlbumDetailState extends State<AlbumDetail> {
       child: SafeArea(
         child: Consumer<HomeProvider>(builder: (context, provider, _) {
           return SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(
-                  width: 200,
-                  height: 200,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: CachedNetworkImage(
-                      imageUrl: lecture?.banner.toUrl() ?? placeholder,
-                      fit: BoxFit.cover,
+            child: Container(
+              margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedNetworkImage(
+                        imageUrl: lecture?.banner.toUrl() ?? placeholder,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                VSpacer(size: 30),
-                Text(
-                  lecture?.title ?? "",
-                  style: GoodaliTextStyles.titleText(
-                    context,
-                    fontSize: 20,
+                  VSpacer(size: 30),
+                  Text(
+                    lecture?.title ?? "",
+                    style: GoodaliTextStyles.titleText(
+                      context,
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-                VSpacer(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: CustomReadMore(
-                    text: removeHtmlTags(lecture?.body ?? ""),
+                  VSpacer(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: CustomReadMore(
+                      text: removeHtmlTags(lecture?.body ?? ""),
+                    ),
                   ),
-                ),
-                VSpacer(),
-                Divider(height: 0),
-                ListView.separated(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: provider.albumLectures?.length ?? 0,
-                  separatorBuilder: (context, index) => Divider(),
-                  itemBuilder: (context, index) {
-                    final podcast = provider.albumLectures?[index];
-                    if (lecture?.isBought == true) {
-                      podcast?.isBought = true;
-                    }
-                    print(podcast?.isBought);
-                    return podcast != null
-                        ? PodcastItem(podcast: podcast)
-                        : SizedBox();
-                  },
-                ),
-                VSpacer(size: lecture?.isBought == false ? 100 : 50),
-              ],
+                  VSpacer(),
+                  Divider(height: 0),
+                  !kIsWeb
+                      ? ListView.separated(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: provider.albumLectures?.length ?? 0,
+                          separatorBuilder: (context, index) => Divider(),
+                          itemBuilder: (context, index) {
+                            final podcast = provider.albumLectures?[index];
+                            if (lecture?.isBought == true) {
+                              podcast?.isBought = true;
+                            }
+                            print(podcast?.isBought);
+                            return podcast != null ? PodcastItem(podcast: podcast) : SizedBox();
+                          },
+                        )
+                      : GridView.builder(
+                          padding: EdgeInsets.all(16),
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: provider.moodList?.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            childAspectRatio: 2,
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                          ),
+                          itemBuilder: (context, index) {
+                            final podcast = provider.podcasts?[index];
+                            return podcast != null
+                                ? PodcastItem(
+                                    podcast: podcast,
+                                    isSaved: true,
+                                  )
+                                : SizedBox();
+                          },
+                        ),
+                  VSpacer(size: lecture?.isBought == false ? 100 : 50),
+                ],
+              ),
             ),
           );
         }),

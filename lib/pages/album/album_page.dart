@@ -4,6 +4,7 @@ import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/pages/home/components/lecture_card.dart';
 import 'package:goodali/pages/home/provider/home_provider.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
+import 'package:goodali/shared/components/custom_appbar.dart';
 import 'package:goodali/shared/components/general_scaffold.dart';
 import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/spacer.dart';
@@ -38,8 +39,9 @@ class _AlbumPageState extends State<AlbumPage> {
       builder: (context, provider, _) {
         return GeneralScaffold(
           backgroundColor: GoodaliColors.primaryBGColor,
-          appBar: AppbarWithBackButton(),
+          appBar: kIsWeb ? CustomWebAppbar() : AppbarWithBackButton() as PreferredSizeWidget,
           child: Container(
+            margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,11 +59,9 @@ class _AlbumPageState extends State<AlbumPage> {
                     },
                     child: GridView.builder(
                       padding: EdgeInsets.only(bottom: 70),
-                      itemCount: widget.id == null
-                          ? provider.lectures?.length ?? 0
-                          : lectures.length,
+                      itemCount: widget.id == null ? provider.lectures?.length ?? 0 : lectures.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio: kIsWeb ? 1.3 : 0.75,
+                        childAspectRatio: kIsWeb ? 1 : 0.75,
                         crossAxisCount: kIsWeb ? 4 : 2,
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,

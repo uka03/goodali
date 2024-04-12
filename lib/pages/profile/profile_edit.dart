@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:goodali/extensions/string_extensions.dart';
@@ -56,6 +57,7 @@ class _ProfileEditState extends State<ProfileEdit> {
             appBar: AppbarWithBackButton(),
             child: SingleChildScrollView(
               child: Container(
+                margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155, vertical: 20) : null,
                 padding: EdgeInsets.symmetric(horizontal: 26, vertical: 10),
                 height: MediaQuery.of(context).size.height - 150,
                 child: Column(
@@ -70,9 +72,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                                 borderRadius: BorderRadius.circular(100),
                                 child: fileImage == null
                                     ? CachedNetworkImage(
-                                        imageUrl:
-                                            me?.avatar.toUrl(isUser: true) ??
-                                                placeholder,
+                                        imageUrl: me?.avatar.toUrl(isUser: true) ?? placeholder,
                                         width: 170,
                                         height: 170,
                                         fit: BoxFit.cover,
@@ -117,8 +117,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                           dismiss: true,
                           isTyping: false,
                           onClose: () {},
-                          controller:
-                              TextEditingController(text: me?.email ?? ""),
+                          controller: TextEditingController(text: me?.email ?? ""),
                           onChanged: (value) {},
                         ),
                         VSpacer(),
@@ -156,8 +155,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                       borderRadius: 16,
                       onPressed: () async {
                         showLoader();
-                        await authProvider.updateUser(context,
-                            image: fileImage, name: name.text);
+                        await authProvider.updateUser(context, image: fileImage, name: name.text);
                         dismissLoader();
                         if (context.mounted) {
                           Navigator.pop(context);
@@ -204,8 +202,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                   child: pickerBtn(
                     context,
                     onPressed: () async {
-                      final imageFile =
-                          await _picker.pickImage(source: ImageSource.camera);
+                      final imageFile = await _picker.pickImage(source: ImageSource.camera);
                       if (imageFile != null) {
                         setState(() {
                           fileImage = File(imageFile.path);
@@ -224,8 +221,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                   child: pickerBtn(
                     context,
                     onPressed: () async {
-                      final imageFile =
-                          await _picker.pickImage(source: ImageSource.gallery);
+                      final imageFile = await _picker.pickImage(source: ImageSource.gallery);
                       if (imageFile != null) {
                         setState(() {
                           fileImage = File(imageFile.path);

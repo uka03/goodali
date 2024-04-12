@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/pages/podcast/components/podcast_item.dart';
 import 'package:goodali/pages/podcast/provider/podcast_provider.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
+import 'package:goodali/shared/components/custom_appbar.dart';
 import 'package:goodali/shared/components/empty_state.dart';
 import 'package:goodali/shared/components/general_scaffold.dart';
 import 'package:goodali/utils/colors.dart';
@@ -38,37 +40,39 @@ class _PodcastPageState extends State<PodcastPage> {
       return DefaultTabController(
         length: 2,
         child: GeneralScaffold(
-          appBar: AppbarWithBackButton(),
+          appBar: kIsWeb ? CustomWebAppbar() : AppbarWithBackButton() as PreferredSizeWidget,
           child: SafeArea(
-            child: Column(
-              children: [
-                TabBar(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicatorWeight: 4,
-                  labelPadding:
-                      EdgeInsets.symmetric(vertical: 6, horizontal: 24),
-                  onTap: (value) {},
-                  indicatorColor: GoodaliColors.primaryColor,
-                  labelColor: GoodaliColors.primaryColor,
-                  labelStyle: GoodaliTextStyles.titleText(
-                    context,
-                    fontWeight: FontWeight.w600,
+            child: Container(
+              margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
+              child: Column(
+                children: [
+                  TabBar(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicatorWeight: 4,
+                    labelPadding: EdgeInsets.symmetric(vertical: 6, horizontal: 24),
+                    onTap: (value) {},
+                    indicatorColor: GoodaliColors.primaryColor,
+                    labelColor: GoodaliColors.primaryColor,
+                    labelStyle: GoodaliTextStyles.titleText(
+                      context,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    tabs: const [
+                      Tab(text: "Бүгд"),
+                      Tab(text: "Сонссон"),
+                    ],
                   ),
-                  tabs: const [
-                    Tab(text: "Бүгд"),
-                    Tab(text: "Сонссон"),
-                  ],
-                ),
-                Expanded(
-                    child: TabBarView(
-                  physics: NeverScrollableScrollPhysics(),
-                  children: [
-                    buildPodcast(provider.podcasts),
-                    buildPodcast(provider.listen, emptyStateText: "Сонссон"),
-                  ],
-                ))
-              ],
+                  Expanded(
+                      child: TabBarView(
+                    physics: NeverScrollableScrollPhysics(),
+                    children: [
+                      buildPodcast(provider.podcasts),
+                      buildPodcast(provider.listen, emptyStateText: "Сонссон"),
+                    ],
+                  ))
+                ],
+              ),
             ),
           ),
         ),
@@ -76,8 +80,7 @@ class _PodcastPageState extends State<PodcastPage> {
     });
   }
 
-  Widget buildPodcast(List<ProductResponseData?> podcasts,
-      {String? emptyStateText}) {
+  Widget buildPodcast(List<ProductResponseData?> podcasts, {String? emptyStateText}) {
     return podcasts.isNotEmpty
         ? RefreshIndicator(
             onRefresh: () => podcastProvider.getPodcasts(),
