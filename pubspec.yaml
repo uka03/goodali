@@ -52,7 +52,6 @@ dependencies:
   audio_video_progress_bar: ^2.0.2
   rxdart: ^0.27.7
   flutter_widget_from_html: ^0.14.11
-  youtube_player_flutter: ^9.0.0
   youtube_player_iframe: ^5.1.1
   flutter_rating_bar: ^4.0.1
   fluttertoast: ^8.2.4

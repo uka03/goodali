@@ -232,7 +232,7 @@ class _HomePageWebState extends State<HomePageWeb> {
                         shrinkWrap: true,
                         itemCount: getListViewlength(provider.articles?.length, max: 6),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          childAspectRatio: 2,
+                          childAspectRatio: 1.5,
                           crossAxisCount: 3,
                           mainAxisSpacing: 10,
                           crossAxisSpacing: 10,

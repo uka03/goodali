@@ -8,6 +8,7 @@ import 'package:goodali/pages/cart/cart_page.dart';
 import 'package:goodali/pages/cart/provider/cart_provider.dart';
 import 'package:goodali/pages/podcast/podcast_page.dart';
 import 'package:goodali/pages/profile/profile_edit.dart';
+import 'package:goodali/pages/search/search_page.dart';
 import 'package:goodali/pages/video/videos_page.dart';
 import 'package:goodali/shared/components/action_item.dart';
 import 'package:goodali/shared/components/custom_button.dart';
@@ -122,7 +123,16 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
               ),
               HSpacer.lg(),
               Expanded(
-                child: CustomInput(controller: TextEditingController()),
+                child: CustomInput(
+                  controller: TextEditingController(),
+                  readOnly: true,
+                  onTap: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                    }
+                    Navigator.pushNamed(context, SearchPage.routeName);
+                  },
+                ),
               ),
               HSpacer.lg(),
               DropdownButtonHideUnderline(
@@ -146,6 +156,9 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   onChanged: (value) {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
                     switch (value) {
                       case "Цомог":
                         Navigator.pushNamed(context, AlbumPage.routeName);
@@ -189,6 +202,9 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
               ),
               CustomButton(
                 onPressed: () {
+                  if (Navigator.canPop(context)) {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  }
                   navigtation.selectTab(1);
                 },
                 child: Container(
@@ -236,12 +252,21 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                             onChanged: (value) {
                               switch (value?.toLowerCase()) {
                                 case "би":
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.popUntil(context, (route) => route.isFirst);
+                                  }
                                   navigtation.selectTab(2);
                                   break;
                                 case "миний мэдээлэл":
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.popUntil(context, (route) => route.isFirst);
+                                  }
                                   Navigator.pushNamed(context, ProfileEdit.routeName);
                                   break;
                                 case "гарах":
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.popUntil(context, (route) => route.isFirst);
+                                  }
                                   authProvider.logout();
                                   break;
                                 default:

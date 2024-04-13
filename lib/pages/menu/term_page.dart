@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/shared/components/appbar_with_back.dart';
 import 'package:goodali/shared/components/general_scaffold.dart';
@@ -31,7 +32,10 @@ class _TermPageState extends State<TermPage> {
       appBar: AppbarWithBackButton(
         title: "Үйлчилгээний нөхцөл",
       ),
-      child: WebViewWidget(controller: _controller),
+      child: Container(
+        margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
+        child: WebViewWidget(controller: _controller),
+      ),
     );
   }
 }
