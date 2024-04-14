@@ -276,7 +276,7 @@ class _HomePageWebState extends State<HomePageWeb> {
                                 shrinkWrap: true,
                                 itemCount: provider.moodList?.length ?? 0,
                                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  childAspectRatio: 0.7,
+                                  childAspectRatio: 0.5,
                                   crossAxisCount: 4,
                                   mainAxisSpacing: 10,
                                   crossAxisSpacing: 10,

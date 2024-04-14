@@ -38,6 +38,13 @@ class PaymentItem extends StatelessWidget {
                       imageUrl: logoPath,
                       width: 30,
                       height: 30,
+                      errorWidget: (context, url, error) {
+                        return Image.asset(
+                          "assets/icons/ic_bank.png",
+                          width: 30,
+                          height: 30,
+                        );
+                      },
                       fit: BoxFit.cover,
                     ),
                   )

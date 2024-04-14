@@ -264,6 +264,7 @@ class CustomWebAppbar extends StatelessWidget implements PreferredSizeWidget {
                                   Navigator.pushNamed(context, ProfileEdit.routeName);
                                   break;
                                 case "гарах":
+                                  navigtation.selectTab(0);
                                   if (Navigator.canPop(context)) {
                                     Navigator.popUntil(context, (route) => route.isFirst);
                                   }

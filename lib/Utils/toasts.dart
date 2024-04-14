@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:goodali/utils/colors.dart';
@@ -17,9 +18,10 @@ class Toast {
     fToast.init(context);
     return fToast.showToast(
       toastDuration: Duration(seconds: 3),
-      gravity: ToastGravity.TOP,
+      gravity: kIsWeb ? ToastGravity.TOP_RIGHT : ToastGravity.TOP,
       isDismissable: true,
       child: Container(
+        width: kIsWeb ? 500 : null,
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(
           boxShadow: [
@@ -74,10 +76,11 @@ class Toast {
     fToast.init(context);
     return fToast.showToast(
       toastDuration: Duration(seconds: 3),
-      gravity: ToastGravity.TOP,
+      gravity: kIsWeb ? ToastGravity.TOP_RIGHT : ToastGravity.TOP,
       isDismissable: true,
       child: Container(
         padding: EdgeInsets.all(15),
+        width: kIsWeb ? 500 : null,
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(

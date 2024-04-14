@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:goodali/Utils/globals.dart';
 import 'package:goodali/connection/models/product_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
@@ -47,6 +48,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
   }
 
   _fecthData() async {
+    showLoader();
     lecture = ModalRoute.of(context)?.settings.arguments as ProductResponseData?;
     lecture?.albumId = lecture?.productId;
     await homeProvider.getLectureList(lecture);
@@ -54,6 +56,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
     setState(() {
       boughtItemsLenght = getBoughtItems();
     });
+    dismissLoader();
   }
 
   onAddToCart() {
@@ -159,7 +162,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                           padding: EdgeInsets.all(16),
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: provider.moodList?.length,
+                          itemCount: provider.albumLectures?.length,
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             childAspectRatio: 2,
                             crossAxisCount: 3,
@@ -167,7 +170,7 @@ class _AlbumDetailState extends State<AlbumDetail> {
                             crossAxisSpacing: 10,
                           ),
                           itemBuilder: (context, index) {
-                            final podcast = provider.podcasts?[index];
+                            final podcast = provider.albumLectures?[index];
                             return podcast != null
                                 ? PodcastItem(
                                     podcast: podcast,

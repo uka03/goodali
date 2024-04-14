@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:goodali/pages/auth/components/auth_input.dart';
+import 'package:goodali/pages/auth/forgot_web_page.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
+import 'package:goodali/pages/home/provider/home_provider.dart';
 import 'package:goodali/shared/components/custom_button.dart';
 import 'package:goodali/shared/components/general_scaffold.dart';
 import 'package:goodali/utils/colors.dart';
@@ -27,11 +29,13 @@ class _AuthWebPageState extends State<AuthWebPage> {
   final _form = GlobalKey<FormState>();
 
   late final AuthProvider authProvider;
+  late final HomeProvider homeProvider;
 
   @override
   void initState() {
     super.initState();
     authProvider = Provider.of<AuthProvider>(context, listen: false);
+    homeProvider = Provider.of<HomeProvider>(context, listen: false);
   }
 
   @override
@@ -128,9 +132,14 @@ class _AuthWebPageState extends State<AuthWebPage> {
             keyboardType: TextInputType.number,
           ),
           VSpacer(),
-          Text(
-            "Пин код мартсан?",
-            style: GoodaliTextStyles.titleText(context, fontSize: 14, textColor: GoodaliColors.primaryColor),
+          CustomButton(
+            onPressed: () {
+              Navigator.pushNamed(context, ForgotWebPage.routeName);
+            },
+            child: Text(
+              "Пин код мартсан?",
+              style: GoodaliTextStyles.titleText(context, fontSize: 14, textColor: GoodaliColors.primaryColor),
+            ),
           ),
           VSpacer.lg(),
           PrimaryButton(
@@ -141,6 +150,7 @@ class _AuthWebPageState extends State<AuthWebPage> {
               if (_form.currentState?.validate() == true) {
                 showLoader();
                 final response = await authProvider.login(email: controllerEmail.text, password: controllerPassword.text);
+                await homeProvider.getHomeData(isAuth: true);
                 dismissLoader();
                 if (response.token?.isNotEmpty == true && context.mounted) {
                   Toast.success(context, description: "Амжилттай нэвтэрлээ.");

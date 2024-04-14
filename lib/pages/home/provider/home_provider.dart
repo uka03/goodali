@@ -52,13 +52,17 @@ class HomeProvider extends ChangeNotifier {
 
   getLectureList(ProductResponseData? data) async {
     albumLectures = [];
+    notifyListeners();
     List<ProductResponseData?> response = await _dioClient.getLectureList(data?.id);
-
+    await getBoughtLectures();
     if (response.isNotEmpty == true) {
       for (var element in boughtDatas) {
         response = response.map((e) {
           if (element?.productId == e?.productId) {
             e?.isBought = true;
+            print("asdad");
+          } else {
+            e?.isBought = false;
           }
           e?.albumId = data?.productId;
 

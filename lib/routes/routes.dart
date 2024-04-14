@@ -5,6 +5,7 @@ import 'package:goodali/pages/article/article_detail.dart';
 import 'package:goodali/pages/article/article_page.dart';
 import 'package:goodali/pages/audio/audio_page.dart';
 import 'package:goodali/pages/auth/auth_web_page.dart';
+import 'package:goodali/pages/auth/forgot_web_page.dart';
 import 'package:goodali/pages/cart/cart_page.dart';
 import 'package:goodali/pages/community/create_post.dart';
 import 'package:goodali/pages/home/home_page.dart';
@@ -49,4 +50,5 @@ final Map<String, WidgetBuilder> routes = {
   AuthWebPage.routeName: (context) => AuthWebPage(),
   TermPage.routeName: (context) => TermPage(),
   HomePageWeb.routeName: (context) => HomePageWeb(),
+  ForgotWebPage.routeName: (context) => ForgotWebPage(),
 };

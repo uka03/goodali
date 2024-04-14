@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:goodali/pages/cart/provider/cart_provider.dart';
 import 'package:goodali/pages/home/provider/home_provider.dart';
@@ -12,6 +13,7 @@ import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
 import 'package:goodali/utils/toasts.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class QpayPage extends StatefulWidget {
@@ -38,8 +40,7 @@ class _QpayPageState extends State<QpayPage> {
       timer?.cancel();
       timer = Timer.periodic(Duration(seconds: 5), (timer) async {
         if (response.goodaliOrderId?.isNotEmpty == true) {
-          final checkRes =
-              await cartProvider.checkOrder(response.goodaliOrderId);
+          final checkRes = await cartProvider.checkOrder(response.goodaliOrderId);
           if (checkRes && mounted) {
             timer.cancel();
             cartProvider.removeProductAll();
@@ -59,8 +60,7 @@ class _QpayPageState extends State<QpayPage> {
       await launchUrlString(url);
     } else {
       if (mounted) {
-        Toast.error(context,
-            description: "Тухайн банкны аппликейшн олдсонгүй.");
+        Toast.error(context, description: "Тухайн банкны аппликейшн олдсонгүй.");
       }
     }
     dismissLoader();
@@ -80,35 +80,46 @@ class _QpayPageState extends State<QpayPage> {
         backgroundColor: GoodaliColors.primaryBGColor,
         appBar: AppbarWithBackButton(),
         body: SafeArea(
-          child: Column(
-            children: [
-              Text(
-                "Банк сонгох",
-                style: GoodaliTextStyles.titleText(
-                  context,
-                  fontSize: 24,
-                ),
+          child: SingleChildScrollView(
+            child: Container(
+              margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
+              child: Column(
+                children: [
+                  Text(
+                    "Банк сонгох",
+                    style: GoodaliTextStyles.titleText(
+                      context,
+                      fontSize: 24,
+                    ),
+                  ),
+                  VSpacer(),
+                  kIsWeb
+                      ? QrImageView(
+                          data: provider.paymentDetail.qrText ?? '',
+                          size: 200,
+                        )
+                      : SizedBox(),
+                  ListView.separated(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.all(16),
+                    itemCount: urls?.length ?? 0,
+                    separatorBuilder: (context, index) => VSpacer(),
+                    itemBuilder: (context, index) {
+                      final url = urls?[index];
+                      return PaymentItem(
+                        onPressed: () {
+                          openBankApp(url?.link ?? "");
+                        },
+                        logoPath: url?.logo ?? placeholder,
+                        logoOnline: true,
+                        text: url?.name ?? "",
+                      );
+                    },
+                  ),
+                ],
               ),
-              VSpacer(),
-              Expanded(
-                child: ListView.separated(
-                  padding: EdgeInsets.all(16),
-                  itemCount: urls?.length ?? 0,
-                  separatorBuilder: (context, index) => VSpacer(),
-                  itemBuilder: (context, index) {
-                    final url = urls?[index];
-                    return PaymentItem(
-                      onPressed: () {
-                        openBankApp(url?.link ?? "");
-                      },
-                      logoPath: url?.logo ?? placeholder,
-                      logoOnline: true,
-                      text: url?.name ?? "",
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       );

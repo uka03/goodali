@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:goodali/Utils/colors.dart';
 import 'package:goodali/pages/payment/card_page.dart';
 import 'package:goodali/pages/payment/components/payment_item.dart';
 import 'package:goodali/pages/payment/qpay_page.dart';
@@ -19,41 +21,45 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: GoodaliColors.whiteColor,
       appBar: AppbarWithBackButton(),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Төлөх хэлбэр сонгох",
-              style: GoodaliTextStyles.titleText(
-                context,
-                fontSize: 24,
+        child: Container(
+          margin: kIsWeb ? EdgeInsets.symmetric(horizontal: 155) : null,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Төлөх хэлбэр сонгох",
+                style: GoodaliTextStyles.titleText(
+                  context,
+                  fontSize: 24,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  PaymentItem(
-                    onPressed: () {
-                      Navigator.pushNamed(context, QpayPage.routeName);
-                    },
-                    logoPath: "assets/icons/ic_scan.png",
-                    text: 'Qpay',
-                  ),
-                  VSpacer(),
-                  PaymentItem(
-                    onPressed: () {
-                      Navigator.pushNamed(context, CardPage.routeName);
-                    },
-                    logoPath: "assets/icons/ic_visa.png",
-                    text: 'Карт',
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    PaymentItem(
+                      onPressed: () {
+                        Navigator.pushNamed(context, QpayPage.routeName);
+                      },
+                      logoPath: "assets/icons/ic_scan.png",
+                      text: 'Qpay',
+                    ),
+                    VSpacer(),
+                    PaymentItem(
+                      onPressed: () {
+                        Navigator.pushNamed(context, CardPage.routeName);
+                      },
+                      logoPath: "assets/icons/ic_visa.png",
+                      text: 'Карт',
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

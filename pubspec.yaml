@@ -63,6 +63,7 @@ dependencies:
   skeletons: ^0.0.3
   just_audio_background: ^0.0.1-beta.11
   audioplayers: ^6.0.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

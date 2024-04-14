@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:goodali/connection/models/banner_response.dart';
 import 'package:goodali/connection/models/base_response.dart';
 import 'package:goodali/connection/models/course_response.dart';
@@ -61,8 +63,7 @@ class DioClient {
   static const accountDeletionUrl = "/account_deletion";
   static const invoiceUrl = "/invoice_detail";
 
-  Future<LoginResponse> login(
-      {required String email, required String password}) async {
+  Future<LoginResponse> login({required String email, required String password}) async {
     try {
       final data = {
         "email": email,
@@ -108,8 +109,7 @@ class DioClient {
         "new_password": newPassword,
         "old_password": oldPassword,
       };
-      final response =
-          await _dioClient.post("$host$passwordChangeUrl", data: data);
+      final response = await _dioClient.post("$host$passwordChangeUrl", data: data);
       final model = BaseResponse.fromJson(response.data);
       return model;
     } catch (e) {
@@ -144,8 +144,7 @@ class DioClient {
       FormData formData = FormData.fromMap({
         "image": await MultipartFile.fromFile(image.path, filename: imagePath),
       });
-      final response =
-          await _dioClient.post("$host$uploadAvatarUrl", data: formData);
+      final response = await _dioClient.post("$host$uploadAvatarUrl", data: formData);
       final model = EditResponse.fromJson(response.data);
       return model;
     } catch (e) {
@@ -188,9 +187,7 @@ class DioClient {
     try {
       final response = await _dioClient.get("$host$boughtAlbumsUrl");
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -207,9 +204,7 @@ class DioClient {
     try {
       final response = await _dioClient.get("$host$productUrl/$id");
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -226,9 +221,7 @@ class DioClient {
     try {
       final response = await _dioClient.post("$host$podcastsUrl");
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -243,12 +236,11 @@ class DioClient {
 
   Future<List<ProductResponseData?>> getLectureList(int? id) async {
     try {
-      final response =
-          await _dioClient.post("$host$lectureListUrl", data: {"album_id": id});
+      final response = await _dioClient.post("$host$lectureListUrl", data: {
+        "album_id": id
+      });
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -265,9 +257,7 @@ class DioClient {
     try {
       final response = await _dioClient.post("$host$videoUrl");
       if (response.statusCode == 200) {
-        List<VideoResponseData?> productList = (response.data as List)
-            .map((item) => VideoResponseData.fromJson(item))
-            .toList();
+        List<VideoResponseData?> productList = (response.data as List).map((item) => VideoResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -282,8 +272,9 @@ class DioClient {
 
   Future<VideoResponse> getVideosSimilar(String id) async {
     try {
-      final response = await _dioClient
-          .post("$host$similarVideoUrl", data: {"video_id": id});
+      final response = await _dioClient.post("$host$similarVideoUrl", data: {
+        "video_id": id
+      });
       final model = VideoResponse.fromJson(response.data);
 
       return model;
@@ -299,9 +290,7 @@ class DioClient {
     try {
       final response = await _dioClient.post("$host$postUrl");
       if (response.statusCode == 200) {
-        List<ArticleResponseData?> productList = (response.data as List)
-            .map((item) => ArticleResponseData.fromJson(item))
-            .toList();
+        List<ArticleResponseData?> productList = (response.data as List).map((item) => ArticleResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -316,8 +305,9 @@ class DioClient {
 
   Future<ArticleResponse> getPostSimilar(String id) async {
     try {
-      final response =
-          await _dioClient.post("$host$similarPostUrl", data: {"post_id": id});
+      final response = await _dioClient.post("$host$similarPostUrl", data: {
+        "post_id": id
+      });
       final model = ArticleResponse.fromJson(response.data);
 
       return model;
@@ -333,9 +323,7 @@ class DioClient {
     try {
       final response = await _dioClient.post("$host$moodMainUrl");
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -350,12 +338,11 @@ class DioClient {
 
   Future<List<ProductResponseData?>> getMoodList() async {
     try {
-      final response =
-          await _dioClient.post("$host$moodListUrl", data: {"mood_id": "1"});
+      final response = await _dioClient.post("$host$moodListUrl", data: {
+        "mood_id": "1"
+      });
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -370,12 +357,11 @@ class DioClient {
 
   Future<List<ProductResponseData?>> getMoodItem(String id) async {
     try {
-      final response = await _dioClient
-          .post("$host$moodItemUrl", data: {"mood_list_id": id});
+      final response = await _dioClient.post("$host$moodItemUrl", data: {
+        "mood_list_id": id
+      });
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -456,9 +442,7 @@ class DioClient {
     try {
       final response = await _dioClient.get("$host$trainingUrl");
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -475,9 +459,7 @@ class DioClient {
     try {
       final response = await _dioClient.get("$host$boughtLecturesUrl");
       if (response.statusCode == 200) {
-        List<ProductResponseData?> productList = (response.data as List)
-            .map((item) => ProductResponseData.fromJson(item))
-            .toList();
+        List<ProductResponseData?> productList = (response.data as List).map((item) => ProductResponseData.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -490,8 +472,7 @@ class DioClient {
     }
   }
 
-  Future<PaymentResponse> createOrder(
-      {required int invoiceType, required List<int?> productIDs}) async {
+  Future<PaymentResponse> createOrder({required int invoiceType, required List<int?> productIDs}) async {
     try {
       final data = {
         "invoice_type": invoiceType,
@@ -512,7 +493,14 @@ class DioClient {
       final data = {
         "invoice_number": id,
       };
-      final response = await _dioClient.get("$host$invoiceUrl", data: data);
+      Response<dynamic> response;
+      if (kIsWeb) {
+        // https://dev.goodali.mn/api/invoice_check
+        response = await _dioClient.post("https://dev.goodali.mn/api/invoice_check", data: data);
+      } else {
+        response = await _dioClient.get("$host$invoiceUrl", data: data);
+      }
+      log(response.toString());
       final model = InvoiceResponse.fromJson(response.data);
 
       return model;
@@ -561,8 +549,7 @@ class DioClient {
     }
   }
 
-  Future<BaseResponse?> postReply(
-      {required String? body, required int? postId}) async {
+  Future<BaseResponse?> postReply({required String? body, required int? postId}) async {
     final data = {
       "body": body,
       "post_id": postId,
@@ -579,15 +566,15 @@ class DioClient {
 
   Future<List<MemberShipResponse>> getCourses({int? id}) async {
     try {
-      final data = {"training_id": id};
+      final data = {
+        "training_id": id
+      };
       final response = await _dioClient.post(
         "$host$coursesUrl",
         data: data,
       );
       if (response.statusCode == 200) {
-        List<MemberShipResponse> productList = (response.data as List)
-            .map((item) => MemberShipResponse.fromJson(item))
-            .toList();
+        List<MemberShipResponse> productList = (response.data as List).map((item) => MemberShipResponse.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -604,9 +591,7 @@ class DioClient {
     try {
       final response = await _dioClient.get("$host$itemUrl/$id");
       if (response.statusCode == 200) {
-        List<CourseItemResponse> productList = (response.data as List)
-            .map((item) => CourseItemResponse.fromJson(item))
-            .toList();
+        List<CourseItemResponse> productList = (response.data as List).map((item) => CourseItemResponse.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -623,9 +608,7 @@ class DioClient {
     try {
       final response = await _dioClient.get("$host$lessonUrl/$id");
       if (response.statusCode == 200) {
-        List<LessonResponse> productList = (response.data as List)
-            .map((item) => LessonResponse.fromJson(item))
-            .toList();
+        List<LessonResponse> productList = (response.data as List).map((item) => LessonResponse.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -642,9 +625,7 @@ class DioClient {
     try {
       final response = await _dioClient.get("$host$tasksUrl/$id");
       if (response.statusCode == 200) {
-        List<TaskResponse> productList = (response.data as List)
-            .map((item) => TaskResponse.fromJson(item))
-            .toList();
+        List<TaskResponse> productList = (response.data as List).map((item) => TaskResponse.fromJson(item)).toList();
 
         return productList;
       } else {
@@ -659,7 +640,11 @@ class DioClient {
 
   Future<BaseResponse> setAnswer({int? id, required String answer}) async {
     try {
-      final data = {"task_id": id, "text_field_data": answer, "is_answered": 1};
+      final data = {
+        "task_id": id,
+        "text_field_data": answer,
+        "is_answered": 1
+      };
       final response = await _dioClient.post("$host$setAnswerUrl", data: data);
       final model = BaseResponse.fromJson(response.data);
       return model;
@@ -671,7 +656,9 @@ class DioClient {
 
   Future<SearchResponse> search({String? text}) async {
     try {
-      final data = {"value": text};
+      final data = {
+        "value": text
+      };
       final response = await _dioClient.post("$host$searchUrl", data: data);
       if (response.data["status"] == 1) {
         final model = SearchResponse.fromJson(response.data);
@@ -686,9 +673,10 @@ class DioClient {
 
   Future<ProductResponse> getSpecialList({String? text}) async {
     try {
-      final data = {"value": text};
-      final response =
-          await _dioClient.post("$host$specialListUrl", data: data);
+      final data = {
+        "value": text
+      };
+      final response = await _dioClient.post("$host$specialListUrl", data: data);
       final model = ProductResponse.fromJson(response.data);
       return model;
     } catch (e) {
