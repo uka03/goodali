@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/pages/album/album_page.dart';
 import 'package:goodali/pages/article/article_page.dart';
@@ -181,7 +183,7 @@ class _HomePageWebState extends State<HomePageWeb> {
                         shrinkWrap: true,
                         itemCount: getListViewlength(provider.moodList?.length, max: 6),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          childAspectRatio: 2,
+                          childAspectRatio: 1.5,
                           crossAxisCount: 3,
                           mainAxisSpacing: 10,
                           crossAxisSpacing: 10,
@@ -232,7 +234,7 @@ class _HomePageWebState extends State<HomePageWeb> {
                         shrinkWrap: true,
                         itemCount: getListViewlength(provider.articles?.length, max: 6),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          childAspectRatio: 1.5,
+                          childAspectRatio: 1.3,
                           crossAxisCount: 3,
                           mainAxisSpacing: 10,
                           crossAxisSpacing: 10,
@@ -296,14 +298,15 @@ class _HomePageWebState extends State<HomePageWeb> {
                                     },
                                     child: Column(
                                       children: [
-                                        ClipRRect(
-                                            borderRadius: BorderRadius.circular(80),
-                                            child: CachedNetworkImage(
-                                              imageUrl: mood?.banner?.toUrl() ?? "",
-                                              width: 150,
-                                              height: 150,
-                                              fit: BoxFit.cover,
-                                            )),
+                                        AspectRatio(
+                                          aspectRatio: 1,
+                                          child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(800),
+                                              child: CachedNetworkImage(
+                                                imageUrl: mood?.banner?.toUrl() ?? "",
+                                                fit: BoxFit.cover,
+                                              )),
+                                        ),
                                         const SizedBox(height: 10),
                                         Text(
                                           mood?.title ?? "",

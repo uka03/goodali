@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:goodali/connection/models/video_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/pages/video/video_player.dart';
@@ -24,8 +25,7 @@ class VideoItem extends StatelessWidget {
     String? purchaseDate;
 
     if (video?.createdAt?.isNotEmpty == true) {
-      final parsedDate =
-          DateFormat('E, d MMM yyyy HH:mm:ss').parse(video!.createdAt!);
+      final parsedDate = DateFormat('E, d MMM yyyy HH:mm:ss').parse(video!.createdAt!);
       purchaseDate = DateFormat('yyyy.MM.dd').format(parsedDate);
     }
     return CustomButton(
@@ -46,11 +46,14 @@ class VideoItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CachedNetworkImage(
-            height: 190,
-            width: double.infinity,
-            imageUrl: video?.banner?.toUrl() ?? placeholder,
-            fit: BoxFit.cover,
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: CachedNetworkImage(
+              height: 190,
+              width: double.infinity,
+              imageUrl: video?.banner?.toUrl() ?? placeholder,
+              fit: BoxFit.cover,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),

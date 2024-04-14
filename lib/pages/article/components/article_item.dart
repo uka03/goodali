@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:goodali/connection/models/article_response.dart';
 import 'package:goodali/extensions/string_extensions.dart';
 import 'package:goodali/pages/article/article_detail.dart';
@@ -24,8 +26,7 @@ class ArticleItem extends StatelessWidget {
     String? purchaseDate;
 
     if (article?.createdAt?.isNotEmpty == true) {
-      final parsedDate =
-          DateFormat('E, d MMM yyyy HH:mm:ss').parse(article!.createdAt!);
+      final parsedDate = DateFormat('E, d MMM yyyy HH:mm:ss').parse(article!.createdAt!);
       purchaseDate = DateFormat('yyyy.MM.dd').format(parsedDate);
     }
     return CustomButton(
@@ -39,17 +40,28 @@ class ArticleItem extends StatelessWidget {
             ));
       },
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 30),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: CachedNetworkImage(
-                imageUrl: article?.banner?.toUrl() ?? placeholder,
-                height: 73,
-                width: 73,
-                fit: BoxFit.cover,
+            Container(
+              constraints: BoxConstraints(
+                maxHeight: 73,
+                maxWidth: 73,
+                minHeight: 30,
+                minWidth: 30,
+              ),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: article?.banner?.toUrl() ?? placeholder,
+                    height: 73,
+                    width: 73,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
             HSpacer(),

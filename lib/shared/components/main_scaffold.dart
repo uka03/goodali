@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:goodali/pages/auth/provider/auth_provider.dart';
 import 'package:goodali/pages/community/community_page.dart';
 import 'package:goodali/pages/home/home_page.dart';
@@ -11,6 +12,7 @@ import 'package:goodali/utils/colors.dart';
 import 'package:goodali/utils/spacer.dart';
 import 'package:goodali/utils/text_styles.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../provider/navigator_provider.dart';
 
@@ -41,8 +43,72 @@ class _MainScaffoldState extends State<MainScaffold> {
           authprovider.token.isNotEmpty == true ? ProfilePage() : NotUser(),
         ];
         return Scaffold(
-          backgroundColor: GoodaliColors.primaryBGColor,
-          body: SafeArea(child: widgetOptions[provider.selectedTab]),
+          backgroundColor: kIsWeb ? GoodaliColors.primaryColor : GoodaliColors.primaryBGColor,
+          body: LayoutBuilder(builder: (context, constraint) {
+            if (kIsWeb && constraint.maxWidth <= 1100) {
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      VSpacer.lg(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/logo_white.png",
+                            scale: 16 / 9,
+                          ),
+                        ],
+                      ),
+                      VSpacer(),
+                      Text(
+                        "Та GOODALI аппликашинаа App store болон Google Play - ээс \n татан авж ашиглах боломжтой",
+                        style: GoodaliTextStyles.titleText(context, textColor: GoodaliColors.whiteColor),
+                        textAlign: TextAlign.center,
+                      ),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: InkWell(
+                                onTap: () {
+                                  launchUrl(Uri.parse("https://apps.apple.com/us/app/goodali/id1661415299"));
+                                },
+                                child: Image.asset(
+                                  "assets/images/app_store.png",
+                                  width: 140,
+                                  height: 40,
+                                ),
+                              ),
+                            ),
+                            HSpacer.lg(),
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: InkWell(
+                                onTap: () {
+                                  launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.goodali.mn"));
+                                },
+                                child: Image.asset(
+                                  "assets/images/google_play.png",
+                                  width: 140,
+                                  height: 40,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return SafeArea(child: widgetOptions[provider.selectedTab]);
+          }),
           bottomNavigationBar: kIsWeb ? null : bottomBar(provider),
         );
       });
